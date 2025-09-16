@@ -1,0 +1,87 @@
+{
+  "name": "Next.js Trading App",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": "."
+  },
+  
+  // Configure tool-specific properties
+  "customizations": {
+    // Configure properties specific to VS Code
+    "vscode": {
+      // Add the IDs of extensions you want installed when the container is created
+      "extensions": [
+        "ms-vscode.vscode-typescript-next",
+        "bradlc.vscode-tailwindcss",
+        "esbenp.prettier-vscode",
+        "ms-vscode.eslint",
+        "formulahendry.auto-rename-tag",
+        "christian-kohler.path-intellisense",
+        "ms-vscode.vscode-json",
+        "ms-vscode-remote.remote-containers",
+        "GitHub.copilot",
+        "GitHub.copilot-chat",
+        "ms-playwright.playwright",
+        "ms-vscode.vscode-json5"
+      ],
+      
+      // Set *default* container specific settings.json values on container create
+      "settings": {
+        "typescript.updateImportsOnFileMove.enabled": "always",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+          "source.fixAll.eslint": "explicit"
+        },
+        "tailwindCSS.includeLanguages": {
+          "typescript": "typescript",
+          "typescriptreact": "typescriptreact"
+        },
+        "emmet.includeLanguages": {
+          "typescript": "html",
+          "typescriptreact": "html"
+        }
+      }
+    }
+  },
+
+  // Features to add to the dev container
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "nodeGypDependencies": true,
+      "version": "20"
+    },
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+
+  // Use 'forwardPorts' to make a list of ports inside the container available locally
+  "forwardPorts": [3000, 3001],
+  "portsAttributes": {
+    "3000": {
+      "label": "Next.js Dev Server",
+      "onAutoForward": "notify"
+    },
+    "3001": {
+      "label": "Next.js Backup Port",
+      "onAutoForward": "silent"
+    }
+  },
+
+  // Use 'postCreateCommand' to run commands after the container is created
+  "postCreateCommand": "echo 'Container created successfully!'",
+
+  // Use 'initializeCommand' to run commands before the container is created
+  "initializeCommand": "echo 'Initializing dev container for Next.js Trading App...'",
+
+  // Use 'postStartCommand' to run commands after the container starts
+  "postStartCommand": "echo 'Dev container is ready! Run pnpm dev to start the development server.'",
+
+  // Configure the container user
+  "remoteUser": "node",
+  "containerUser": "node",
+
+
+  // Mount the workspace directory
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace/${localWorkspaceFolderBasename},type=bind,consistency=cached",
+  "workspaceFolder": "/workspace/${localWorkspaceFolderBasename}"
+}

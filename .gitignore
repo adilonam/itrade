@@ -46,3 +46,9 @@ next-env.d.ts
 
 # Sentry Config File
 .env.sentry-build-plugin
+
+# Dev container
+.devcontainer/.env
+
+
+.pnpm-store/
