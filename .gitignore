@@ -25,7 +25,6 @@ yarn-debug.log*
 yarn-error.log*
 
 # local env files
-.env*
 .env*.local
 
 # vercel
@@ -47,8 +46,12 @@ next-env.d.ts
 # Sentry Config File
 .env.sentry-build-plugin
 
+<<<<<<< HEAD
 # Dev container
 .devcontainer/.env
 
 
 .pnpm-store/
+=======
+/generated/prisma
+>>>>>>> 8f343fab07fac72ab5fe6310bd0bc8109cd2b411

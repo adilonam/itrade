@@ -10,17 +10,19 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { UserAvatarProfile } from '@/components/user-avatar-profile';
-import { SignOutButton, useUser } from '@clerk/nextjs';
+import { signOut, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+
 export function UserNav() {
-  const { user } = useUser();
+  const { data: session } = useSession();
   const router = useRouter();
-  if (user) {
+
+  if (session?.user) {
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant='ghost' className='relative h-8 w-8 rounded-full'>
-            <UserAvatarProfile user={user} />
+            <UserAvatarProfile user={session.user} />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent
@@ -32,10 +34,10 @@ export function UserNav() {
           <DropdownMenuLabel className='font-normal'>
             <div className='flex flex-col space-y-1'>
               <p className='text-sm leading-none font-medium'>
-                {user.fullName}
+                {session.user.name}
               </p>
               <p className='text-muted-foreground text-xs leading-none'>
-                {user.emailAddresses[0].emailAddress}
+                {session.user.email}
               </p>
             </div>
           </DropdownMenuLabel>
@@ -50,7 +52,13 @@ export function UserNav() {
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuItem>
-            <SignOutButton redirectUrl='/auth/sign-in' />
+            <Button
+              variant='ghost'
+              className='w-full justify-start p-0 text-left'
+              onClick={() => signOut({ callbackUrl: '/auth/sign-in' })}
+            >
+              Sign Out
+            </Button>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
