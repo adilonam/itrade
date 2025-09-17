@@ -37,7 +37,7 @@ export function SignInForm() {
         toast.error('Invalid email or password');
       } else {
         toast.success('Signed in successfully');
-        router.push('/dashboard/overview');
+        router.push('/dashboard/markets');
       }
     } catch (error) {
       toast.error('An error occurred. Please try again.');
