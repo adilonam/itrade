@@ -1,6 +1,6 @@
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { SignIn as ClerkSignInForm } from '@clerk/nextjs';
+import { SignInForm } from '@/components/auth/sign-in-form';
 import { GitHubLogoIcon } from '@radix-ui/react-icons';
 import { IconStar } from '@tabler/icons-react';
 import { Metadata } from 'next';
@@ -15,13 +15,13 @@ export default function SignInViewPage({ stars }: { stars: number }) {
   return (
     <div className='relative h-screen flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0'>
       <Link
-        href='/examples/authentication'
+        href='/auth/sign-up'
         className={cn(
           buttonVariants({ variant: 'ghost' }),
           'absolute top-4 right-4 hidden md:top-8 md:right-8'
         )}
       >
-        Login
+        Sign Up
       </Link>
       <div className='bg-muted relative hidden h-full flex-col p-10 text-white lg:flex dark:border-r'>
         <div className='absolute inset-0 bg-zinc-900' />
@@ -38,16 +38,15 @@ export default function SignInViewPage({ stars }: { stars: number }) {
           >
             <path d='M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3' />
           </svg>
-          Logo
+          Trading App
         </div>
         <div className='relative z-20 mt-auto'>
           <blockquote className='space-y-2'>
             <p className='text-lg'>
-              &ldquo;This starter template has saved me countless hours of work
-              and helped me deliver projects to my clients faster than ever
-              before.&rdquo;
+              &ldquo;This trading platform has revolutionized how I manage my
+              investments and analyze market trends.&rdquo;
             </p>
-            <footer className='text-sm'>Random Dude</footer>
+            <footer className='text-sm'>Satisfied Trader</footer>
           </blockquote>
         </div>
       </div>
@@ -71,11 +70,8 @@ export default function SignInViewPage({ stars }: { stars: number }) {
               <span className='font-display font-medium'>{stars}</span>
             </div>
           </Link>
-          <ClerkSignInForm
-            initialValues={{
-              emailAddress: 'your_mail+clerk_test@example.com'
-            }}
-          />
+
+          <SignInForm />
 
           <p className='text-muted-foreground px-8 text-center text-sm'>
             By clicking continue, you agree to our{' '}

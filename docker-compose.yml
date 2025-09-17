@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: trading-app-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: trading_user
+      POSTGRES_PASSWORD: trading_password
+      POSTGRES_DB: trading_app_db
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - '5433:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - trading-app-network
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U trading_user -d trading_app_db']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  trading-app-network:
+    driver: bridge
