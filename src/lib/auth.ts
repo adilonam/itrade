@@ -1,4 +1,3 @@
-import bcrypt from 'bcryptjs';
 import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
@@ -8,40 +7,67 @@ export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
     CredentialsProvider({
-      name: 'credentials',
+      id: 'login',
+      name: 'Login',
       credentials: {
         email: { label: 'Email', type: 'email' },
         password: { label: 'Password', type: 'password' }
       },
+      async authorize() {
+        // This provider is only used to initiate MFA flow
+        // It should never actually authenticate the user
+        return null;
+      }
+    }),
+    CredentialsProvider({
+      id: 'mfa',
+      name: 'MFA',
+      credentials: {
+        token: { label: 'Token', type: 'text' },
+        code: { label: 'Code', type: 'text' }
+      },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
+        if (!credentials?.token || !credentials?.code) {
           return null;
         }
 
-        const user = await prisma.user.findUnique({
-          where: {
-            email: credentials.email
-          }
+        // Find the MFA challenge
+        const challenge = await prisma.mfaChallenge.findUnique({
+          where: { token: credentials.token },
+          include: { user: true }
         });
 
-        if (!user || !user.password) {
+        if (!challenge) {
           return null;
         }
 
-        const isPasswordValid = await bcrypt.compare(
-          credentials.password,
-          user.password
-        );
-
-        if (!isPasswordValid) {
+        // Check if challenge is expired
+        if (challenge.expiresAt < new Date()) {
+          await prisma.mfaChallenge.delete({ where: { id: challenge.id } });
           return null;
         }
+
+        // Check if challenge is already used
+        if (challenge.used) {
+          return null;
+        }
+
+        // Verify the code
+        if (challenge.code !== credentials.code) {
+          return null;
+        }
+
+        // Mark challenge as used
+        await prisma.mfaChallenge.update({
+          where: { id: challenge.id },
+          data: { used: true }
+        });
 
         return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          image: user.image
+          id: challenge.user.id,
+          email: challenge.user.email,
+          name: challenge.user.name,
+          image: challenge.user.image
         };
       }
     })

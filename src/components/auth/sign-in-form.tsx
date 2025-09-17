@@ -15,11 +15,14 @@ import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import Link from 'next/link';
+import MfaVerification from './mfa-verification';
 
 export function SignInForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showMfa, setShowMfa] = useState(false);
+  const [mfaToken, setMfaToken] = useState('');
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -27,17 +30,26 @@ export function SignInForm() {
     setIsLoading(true);
 
     try {
-      const result = await signIn('credentials', {
-        email,
-        password,
-        redirect: false
+      // First, initiate MFA flow
+      const response = await fetch('/api/auth/mfa/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, password })
       });
 
-      if (result?.error) {
-        toast.error('Invalid email or password');
-      } else {
-        toast.success('Signed in successfully');
-        router.push('/dashboard/markets');
+      const data = await response.json();
+
+      if (!response.ok) {
+        toast.error(data.error || 'Invalid email or password');
+        return;
+      }
+
+      if (data.success && data.token) {
+        setMfaToken(data.token);
+        setShowMfa(true);
+        toast.success('Verification code sent to your email');
       }
     } catch (error) {
       toast.error('An error occurred. Please try again.');
@@ -45,6 +57,40 @@ export function SignInForm() {
       setIsLoading(false);
     }
   };
+
+  const handleMfaVerification = async (code: string) => {
+    try {
+      const result = await signIn('mfa', {
+        token: mfaToken,
+        code,
+        redirect: false
+      });
+
+      if (result?.error) {
+        throw new Error('Invalid verification code');
+      } else {
+        toast.success('Signed in successfully');
+        router.push('/dashboard/overview');
+      }
+    } catch (error) {
+      throw error; // Re-throw to let MfaVerification component handle it
+    }
+  };
+
+  const handleBackToSignIn = () => {
+    setShowMfa(false);
+    setMfaToken('');
+  };
+
+  if (showMfa) {
+    return (
+      <MfaVerification
+        email={email}
+        onVerificationSubmit={handleMfaVerification}
+        onBack={handleBackToSignIn}
+      />
+    );
+  }
 
   return (
     <Card className='w-full max-w-md'>
