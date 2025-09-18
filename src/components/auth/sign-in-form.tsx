@@ -70,7 +70,7 @@ export function SignInForm() {
         throw new Error('Invalid verification code');
       } else {
         toast.success('Signed in successfully');
-        router.push('/dashboard/overview');
+        router.push('/dashboard/markets');
       }
     } catch (error) {
       throw error; // Re-throw to let MfaVerification component handle it
