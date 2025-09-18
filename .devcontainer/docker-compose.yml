@@ -12,7 +12,6 @@ services:
     depends_on:
       - postgres
 
-
   postgres:
     image: postgres:15
     restart: unless-stopped
