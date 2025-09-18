@@ -3,6 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
 import {
   Card,
   CardContent,
@@ -10,6 +11,7 @@ import {
   CardHeader,
   CardTitle
 } from '@/components/ui/card';
+import { IconBrandGoogle } from '@tabler/icons-react';
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
@@ -58,6 +60,21 @@ export function SignInForm() {
     }
   };
 
+  const handleGoogleSignIn = async () => {
+    try {
+      const result = await signIn('google', {
+        callbackUrl: '/dashboard/markets',
+        redirect: false
+      });
+
+      if (result?.error) {
+        toast.error('Failed to sign in with Google');
+      }
+    } catch (error) {
+      toast.error('An error occurred. Please try again.');
+    }
+  };
+
   const handleMfaVerification = async (code: string) => {
     try {
       const result = await signIn('mfa', {
@@ -101,7 +118,30 @@ export function SignInForm() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className='space-y-4'>
+        <div className='space-y-4'>
+          <Button
+            type='button'
+            variant='outline'
+            className='w-full'
+            onClick={handleGoogleSignIn}
+          >
+            <IconBrandGoogle className='mr-2 h-4 w-4' />
+            Continue with Google
+          </Button>
+
+          <div className='relative'>
+            <div className='absolute inset-0 flex items-center'>
+              <Separator className='w-full' />
+            </div>
+            <div className='relative flex justify-center text-xs uppercase'>
+              <span className='bg-background text-muted-foreground px-2'>
+                Or continue with
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <form onSubmit={handleSubmit} className='mt-4 space-y-4'>
           <div className='space-y-2'>
             <Label htmlFor='email'>Email</Label>
             <Input
