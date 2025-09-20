@@ -6,6 +6,83 @@ import {
   cleanupExpiredMfaChallenges
 } from '@/lib/email';
 
+/**
+ * @swagger
+ * /api/auth/mfa/login:
+ *   post:
+ *     summary: Initiate MFA login process
+ *     description: Validates user credentials and sends a verification code to the user's email for multi-factor authentication
+ *     tags:
+ *       - Auth
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: User's email address
+ *                 example: user@example.com
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 description: User's password
+ *                 example: mySecurePassword123
+ *     responses:
+ *       200:
+ *         description: Verification code sent successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 token:
+ *                   type: string
+ *                   description: MFA challenge token for verification
+ *                   example: "550e8400-e29b-41d4-a716-446655440000"
+ *                 message:
+ *                   type: string
+ *                   example: "Verification code sent to your email"
+ *       400:
+ *         description: Bad request - missing required fields
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Email and password are required"
+ *       401:
+ *         description: Unauthorized - invalid credentials
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Invalid credentials"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Internal server error"
+ */
 export async function POST(request: NextRequest) {
   try {
     const { email, password } = await request.json();
@@ -85,7 +162,6 @@ export async function POST(request: NextRequest) {
       message: 'Verification code sent to your email'
     });
   } catch (error) {
-    console.log('MFA login error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
