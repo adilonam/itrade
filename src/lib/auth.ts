@@ -12,19 +12,6 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!
     }),
     CredentialsProvider({
-      id: 'login',
-      name: 'Login',
-      credentials: {
-        email: { label: 'Email', type: 'email' },
-        password: { label: 'Password', type: 'password' }
-      },
-      async authorize() {
-        // This provider is only used to initiate MFA flow
-        // It should never actually authenticate the user
-        return null;
-      }
-    }),
-    CredentialsProvider({
       id: 'mfa',
       name: 'MFA',
       credentials: {
