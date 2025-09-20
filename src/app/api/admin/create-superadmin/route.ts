@@ -10,7 +10,7 @@ import { z } from 'zod';
  *     tags:
  *       - Admin
  *     summary: Create a superadmin user
- *     description: Creates a new superadmin user. Requires a valid SUPERADMIN_KEY for authentication.
+ *     description: Creates a new superadmin user. Requires a valid NEXTAUTH_SECRET for authentication.
  *     security:
  *       - ApiKeyAuth: []
  *     requestBody:
@@ -23,7 +23,7 @@ import { z } from 'zod';
  *               - name
  *               - email
  *               - password
- *               - superadminKey
+ *               - nextauthSecret
  *             properties:
  *               name:
  *                 type: string
@@ -39,10 +39,10 @@ import { z } from 'zod';
  *                 minLength: 8
  *                 description: Password for the superadmin user (minimum 8 characters)
  *                 example: "SecurePassword123!"
- *               superadminKey:
+ *               nextauthSecret:
  *                 type: string
  *                 description: Secret key required for superadmin creation
- *                 example: "your-super-secure-admin-key"
+ *                 example: "your-nextauth-secret-key"
  *     responses:
  *       201:
  *         description: Superadmin user created successfully
@@ -82,7 +82,7 @@ import { z } from 'zod';
  *                 error:
  *                   type: string
  *                   examples:
- *                     missing_fields: "Name, email, password, and superadminKey are required"
+ *                     missing_fields: "Name, email, password, and nextauthSecret are required"
  *                     user_exists: "User already exists with this email"
  *                     weak_password: "Password must be at least 8 characters long"
  *       401:
@@ -112,7 +112,7 @@ const createSuperadminSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   email: z.string().email('Valid email is required'),
   password: z.string().min(8, 'Password must be at least 8 characters long'),
-  superadminKey: z.string().min(1, 'Superadmin key is required')
+  nextauthSecret: z.string().min(1, 'NextAuth secret is required')
 });
 
 export async function POST(request: NextRequest) {
@@ -131,17 +131,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { name, email, password, superadminKey } = validationResult.data;
+    const { name, email, password, nextauthSecret } = validationResult.data;
 
     // Verify superadmin key
-    if (!process.env.SUPERADMIN_KEY) {
+    if (!process.env.NEXTAUTH_SECRET) {
       return NextResponse.json(
         { error: 'Superadmin key not configured on server' },
         { status: 500 }
       );
     }
 
-    if (superadminKey !== process.env.SUPERADMIN_KEY) {
+    if (nextauthSecret !== process.env.NEXTAUTH_SECRET) {
       return NextResponse.json(
         { error: 'Invalid superadmin key' },
         { status: 401 }
