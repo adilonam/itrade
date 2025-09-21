@@ -6,7 +6,7 @@ export const metadata = {
   title: 'Admin: Users'
 };
 
-export default async function Page() {
+export default function Page() {
   return (
     <PageContainer scrollable={true}>
       <div className='flex flex-1 flex-col space-y-6'>
@@ -17,7 +17,7 @@ export default async function Page() {
           />
         </div>
         <Separator />
-        <p>Users management</p>
+        {/* Users View */}
       </div>
     </PageContainer>
   );
