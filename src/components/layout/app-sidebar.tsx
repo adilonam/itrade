@@ -55,7 +55,7 @@ export const company = {
 export default function AppSidebar() {
   const pathname = usePathname();
   const { isOpen } = useMediaQuery();
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
   const user = session?.user;
 
@@ -63,7 +63,6 @@ export default function AppSidebar() {
   const tenants = React.useMemo(() => {
     const baseTenants = [{ id: '1', name: 'Dashboard' }];
 
-    // Add Admin tenant only for ADMIN and SUPERADMIN users
     if (user?.role === 'ADMIN' || user?.role === 'SUPERADMIN') {
       baseTenants.push({ id: '2', name: 'Admin' });
     }
@@ -107,98 +106,108 @@ export default function AppSidebar() {
     // Side effects based on sidebar state changes
   }, [isOpen]);
 
+  const isLoading = status === 'loading' || !pathname || !user;
+
   return (
     <Sidebar collapsible='icon'>
       <SidebarHeader>
-        <OrgSwitcher
-          tenants={tenants}
-          defaultTenant={selectedTenant}
-          onTenantSwitch={handleSwitchTenant}
-        />
+        {!isLoading && (
+          <OrgSwitcher
+            tenants={tenants}
+            selectedTenant={selectedTenant}
+            onTenantSwitch={handleSwitchTenant}
+          />
+        )}
       </SidebarHeader>
       <SidebarContent className='overflow-x-hidden'>
         <SidebarGroup>
           <SidebarGroupLabel>Overview</SidebarGroupLabel>
           <SidebarMenu>
-            {navItems
-              .filter((item) => {
-                // When admin tenant is selected, show ONLY admin items
-                if (selectedTenant.id === '2') {
-                  return item.isAdmin;
-                }
+            {isLoading ? (
+              <div className='flex items-center justify-center py-8'>
+                <div className='h-6 w-6 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600'></div>
+              </div>
+            ) : (
+              navItems
+                .filter((item) => {
+                  // When admin tenant is selected, show ONLY admin items
+                  if (selectedTenant.id === '2') {
+                    return item.isAdmin;
+                  }
 
-                // Otherwise, show non-admin items and admin items only for admin users
-                if (item.isAdmin) {
-                  return false;
-                }
-                return true;
-              })
-              .map((item) => {
-                const Icon = item.icon ? Icons[item.icon] : Icons.logo;
-                return item?.items && item?.items?.length > 0 ? (
-                  <Collapsible
-                    key={item.title}
-                    asChild
-                    defaultOpen={item.isActive}
-                    className='group/collapsible'
-                  >
-                    <SidebarMenuItem>
-                      <CollapsibleTrigger asChild>
-                        <SidebarMenuButton
-                          tooltip={item.title}
-                          isActive={pathname === item.url}
-                        >
-                          {item.icon && <Icon />}
-                          <span>{item.title}</span>
-                          <IconChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
-                        </SidebarMenuButton>
-                      </CollapsibleTrigger>
-                      <CollapsibleContent>
-                        <SidebarMenuSub>
-                          {item.items
-                            ?.filter((subItem) => {
-                              // When admin tenant is selected, show ONLY admin sub-items
-                              if (selectedTenant.id === '2') {
-                                return subItem.isAdmin;
-                              }
-
-                              // Otherwise, show non-admin sub-items and admin sub-items only for admin users
-                              if (subItem.isAdmin) {
-                                return false;
-                              }
-                              return true;
-                            })
-                            .map((subItem) => (
-                              <SidebarMenuSubItem key={subItem.title}>
-                                <SidebarMenuSubButton
-                                  asChild
-                                  isActive={pathname === subItem.url}
-                                >
-                                  <Link href={subItem.url}>
-                                    <span>{subItem.title}</span>
-                                  </Link>
-                                </SidebarMenuSubButton>
-                              </SidebarMenuSubItem>
-                            ))}
-                        </SidebarMenuSub>
-                      </CollapsibleContent>
-                    </SidebarMenuItem>
-                  </Collapsible>
-                ) : (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton
+                  // Otherwise, show non-admin items and admin items only for admin users
+                  if (item.isAdmin) {
+                    return false;
+                  }
+                  return true;
+                })
+                .map((item) => {
+                  const Icon = item.icon ? Icons[item.icon] : Icons.logo;
+                  return item?.items && item?.items?.length > 0 ? (
+                    <Collapsible
+                      key={item.title}
                       asChild
-                      tooltip={item.title}
-                      isActive={pathname === item.url}
+                      defaultOpen={item.isActive}
+                      className='group/collapsible'
                     >
-                      <Link href={item.url}>
-                        <Icon />
-                        <span>{item.title}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
+                      <SidebarMenuItem>
+                        <CollapsibleTrigger asChild>
+                          <SidebarMenuButton
+                            tooltip={item.title}
+                            isActive={pathname === item.url}
+                          >
+                            {item.icon && <Icon />}
+                            <span>{item.title}</span>
+                            <IconChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
+                          </SidebarMenuButton>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
+                          <SidebarMenuSub>
+                            {item.items
+                              ?.filter((subItem) => {
+                                // When admin tenant is selected, show ONLY admin sub-items
+                                if (selectedTenant.id === '2') {
+                                  return subItem.isAdmin;
+                                }
+
+                                // Otherwise, show non-admin sub-items and admin sub-items only for admin users
+                                if (subItem.isAdmin) {
+                                  return false;
+                                }
+                                return true;
+                              })
+                              .map((subItem) => (
+                                <SidebarMenuSubItem key={subItem.title}>
+                                  <SidebarMenuSubButton
+                                    asChild
+                                    isActive={pathname === subItem.url}
+                                  >
+                                    <Link href={subItem.url}>
+                                      <span>{subItem.title}</span>
+                                    </Link>
+                                  </SidebarMenuSubButton>
+                                </SidebarMenuSubItem>
+                              ))}
+                          </SidebarMenuSub>
+                        </CollapsibleContent>
+                      </SidebarMenuItem>
+                    </Collapsible>
+                  ) : (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton
+                        asChild
+                        tooltip={item.title}
+                        isActive={pathname === item.url}
+                      >
+                        <Link href={item.url}>
+                          <Icon />
+                          <span>{item.title}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })
+            )}
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
