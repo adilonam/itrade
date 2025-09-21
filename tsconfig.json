@@ -31,7 +31,7 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "src/app/docs/layout.tsx"
-  ],
+, "src/app/admin/layout.tsx"  ],
   "exclude": ["node_modules"],
   "moduleResolution": ["node_modules", ".next", "node"]
 }
