@@ -62,11 +62,17 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
-        // Mark challenge as used
-        await prisma.mfaChallenge.update({
-          where: { id: challenge.id },
-          data: { used: true }
-        });
+        // Mark challenge as used and verify user's email
+        await prisma.$transaction([
+          prisma.mfaChallenge.update({
+            where: { id: challenge.id },
+            data: { used: true }
+          }),
+          prisma.user.update({
+            where: { id: challenge.user.id },
+            data: { emailVerified: new Date() }
+          })
+        ]);
 
         return {
           id: challenge.user.id,
