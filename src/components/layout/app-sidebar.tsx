@@ -52,12 +52,6 @@ export const company = {
   plan: 'Enterprise'
 };
 
-const tenants = [
-  { id: '1', name: 'Acme Inc' },
-  { id: '2', name: 'Beta Corp' },
-  { id: '3', name: 'Gamma Ltd' }
-];
-
 export default function AppSidebar() {
   const pathname = usePathname();
   const { isOpen } = useMediaQuery();
@@ -65,12 +59,49 @@ export default function AppSidebar() {
   const router = useRouter();
   const user = session?.user;
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleSwitchTenant = (_tenantId: string) => {
-    // Tenant switching functionality would be implemented here
+  // Dynamic tenants based on user role
+  const tenants = React.useMemo(() => {
+    const baseTenants = [{ id: '1', name: 'Dashboard' }];
+
+    // Add Admin tenant only for ADMIN and SUPERADMIN users
+    if (user?.role === 'ADMIN' || user?.role === 'SUPERADMIN') {
+      baseTenants.push({ id: '2', name: 'Admin' });
+    }
+
+    return baseTenants;
+  }, [user?.role]);
+
+  // Track the selected tenant
+  const [selectedTenant, setSelectedTenant] = React.useState(() => tenants[0]);
+
+  // Update selected tenant when tenants change (e.g., when user role is loaded)
+  React.useEffect(() => {
+    if (!selectedTenant || !tenants.find((t) => t.id === selectedTenant.id)) {
+      setSelectedTenant(tenants[0]);
+    }
+  }, [tenants, selectedTenant]);
+
+  const handleSwitchTenant = (tenantId: string) => {
+    const tenant = tenants.find((t) => t.id === tenantId);
+    if (tenant) {
+      setSelectedTenant(tenant);
+    }
   };
 
-  const activeTenant = tenants[0];
+  React.useEffect(() => {
+    // Auto-select tenant based on current path
+    if (pathname.startsWith('/admin')) {
+      const adminTenant = tenants.find((t) => t.id === '2');
+      if (adminTenant) {
+        setSelectedTenant(adminTenant); // Admin tenant (if available)
+      }
+    } else if (pathname.startsWith('/dashboard')) {
+      const dashboardTenant = tenants.find((t) => t.id === '1');
+      if (dashboardTenant) {
+        setSelectedTenant(dashboardTenant); // Dashboard tenant
+      }
+    }
+  }, [pathname, tenants]);
 
   React.useEffect(() => {
     // Side effects based on sidebar state changes
@@ -81,7 +112,7 @@ export default function AppSidebar() {
       <SidebarHeader>
         <OrgSwitcher
           tenants={tenants}
-          defaultTenant={activeTenant}
+          defaultTenant={selectedTenant}
           onTenantSwitch={handleSwitchTenant}
         />
       </SidebarHeader>
@@ -89,59 +120,85 @@ export default function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupLabel>Overview</SidebarGroupLabel>
           <SidebarMenu>
-            {navItems.map((item) => {
-              const Icon = item.icon ? Icons[item.icon] : Icons.logo;
-              return item?.items && item?.items?.length > 0 ? (
-                <Collapsible
-                  key={item.title}
-                  asChild
-                  defaultOpen={item.isActive}
-                  className='group/collapsible'
-                >
-                  <SidebarMenuItem>
-                    <CollapsibleTrigger asChild>
-                      <SidebarMenuButton
-                        tooltip={item.title}
-                        isActive={pathname === item.url}
-                      >
-                        {item.icon && <Icon />}
-                        <span>{item.title}</span>
-                        <IconChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
-                      </SidebarMenuButton>
-                    </CollapsibleTrigger>
-                    <CollapsibleContent>
-                      <SidebarMenuSub>
-                        {item.items?.map((subItem) => (
-                          <SidebarMenuSubItem key={subItem.title}>
-                            <SidebarMenuSubButton
-                              asChild
-                              isActive={pathname === subItem.url}
-                            >
-                              <Link href={subItem.url}>
-                                <span>{subItem.title}</span>
-                              </Link>
-                            </SidebarMenuSubButton>
-                          </SidebarMenuSubItem>
-                        ))}
-                      </SidebarMenuSub>
-                    </CollapsibleContent>
-                  </SidebarMenuItem>
-                </Collapsible>
-              ) : (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
+            {navItems
+              .filter((item) => {
+                // When admin tenant is selected, show ONLY admin items
+                if (selectedTenant.id === '2') {
+                  return item.isAdmin;
+                }
+
+                // Otherwise, show non-admin items and admin items only for admin users
+                if (item.isAdmin) {
+                  return false;
+                }
+                return true;
+              })
+              .map((item) => {
+                const Icon = item.icon ? Icons[item.icon] : Icons.logo;
+                return item?.items && item?.items?.length > 0 ? (
+                  <Collapsible
+                    key={item.title}
                     asChild
-                    tooltip={item.title}
-                    isActive={pathname === item.url}
+                    defaultOpen={item.isActive}
+                    className='group/collapsible'
                   >
-                    <Link href={item.url}>
-                      <Icon />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              );
-            })}
+                    <SidebarMenuItem>
+                      <CollapsibleTrigger asChild>
+                        <SidebarMenuButton
+                          tooltip={item.title}
+                          isActive={pathname === item.url}
+                        >
+                          {item.icon && <Icon />}
+                          <span>{item.title}</span>
+                          <IconChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
+                        </SidebarMenuButton>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent>
+                        <SidebarMenuSub>
+                          {item.items
+                            ?.filter((subItem) => {
+                              // When admin tenant is selected, show ONLY admin sub-items
+                              if (selectedTenant.id === '2') {
+                                return subItem.isAdmin;
+                              }
+
+                              // Otherwise, show non-admin sub-items and admin sub-items only for admin users
+                              if (subItem.isAdmin) {
+                                return false;
+                              }
+                              return true;
+                            })
+                            .map((subItem) => (
+                              <SidebarMenuSubItem key={subItem.title}>
+                                <SidebarMenuSubButton
+                                  asChild
+                                  isActive={pathname === subItem.url}
+                                >
+                                  <Link href={subItem.url}>
+                                    <span>{subItem.title}</span>
+                                  </Link>
+                                </SidebarMenuSubButton>
+                              </SidebarMenuSubItem>
+                            ))}
+                        </SidebarMenuSub>
+                      </CollapsibleContent>
+                    </SidebarMenuItem>
+                  </Collapsible>
+                ) : (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton
+                      asChild
+                      tooltip={item.title}
+                      isActive={pathname === item.url}
+                    >
+                      <Link href={item.url}>
+                        <Icon />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>

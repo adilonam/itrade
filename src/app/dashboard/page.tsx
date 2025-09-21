@@ -8,6 +8,6 @@ export default async function Dashboard() {
   if (!session) {
     return redirect('/auth/sign-in');
   } else {
-    redirect('/dashboard/overview');
+    redirect('/dashboard/markets');
   }
 }
