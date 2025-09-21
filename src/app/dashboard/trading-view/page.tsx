@@ -8,11 +8,12 @@ export const metadata = {
   title: 'Dashboard: Trading View'
 };
 
-export default async function Page({
-  searchParams
-}: {
-  searchParams: { symbol?: string };
-}) {
+type PageProps = {
+  searchParams: Promise<{ symbol?: string }>;
+};
+
+export default async function Page(props: PageProps) {
+  const searchParams = await props.searchParams;
   const symbol = searchParams?.symbol;
   return (
     <PageContainer scrollable={false}>
