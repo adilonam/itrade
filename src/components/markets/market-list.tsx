@@ -12,12 +12,15 @@ import {
 import { Market } from '@/types';
 import { IconTrendingUp, IconTrendingDown } from '@tabler/icons-react';
 import { cn } from '@/lib/utils';
+import { useRouter } from 'next/navigation';
+import { toTradingViewSymbol } from '@/lib/market-symbol';
 
 interface MarketListProps {
   markets: Market[];
 }
 
 export function MarketList({ markets }: MarketListProps) {
+  const router = useRouter();
   const formatPrice = (price: number, type: 'crypto' | 'forex') => {
     if (type === 'forex') {
       return price.toFixed(4);
@@ -71,8 +74,17 @@ export function MarketList({ markets }: MarketListProps) {
             const isPositive = market.changePercent24h >= 0;
             const changeColor = isPositive ? 'text-green-600' : 'text-red-600';
 
+            const targetSymbol = toTradingViewSymbol(market);
             return (
-              <TableRow key={market.id} className='hover:bg-muted/50'>
+              <TableRow
+                key={market.id}
+                className='hover:bg-muted/50 cursor-pointer'
+                onClick={() =>
+                  router.push(
+                    `/dashboard/trading-view?symbol=${encodeURIComponent(targetSymbol)}`
+                  )
+                }
+              >
                 <TableCell>
                   <div className='flex items-center space-x-3'>
                     {market.type === 'crypto' && (

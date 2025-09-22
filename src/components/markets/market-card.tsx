@@ -5,6 +5,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Market } from '@/types';
 import { IconTrendingUp, IconTrendingDown } from '@tabler/icons-react';
 import { cn } from '@/lib/utils';
+import Link from 'next/link';
+import { toTradingViewSymbol } from '@/lib/market-symbol';
 
 interface MarketCardProps {
   market: Market;
@@ -33,95 +35,102 @@ export function MarketCard({ market }: MarketCardProps) {
     }).format(volume);
   };
 
+  const targetSymbol = toTradingViewSymbol(market);
+
   return (
     <Card className='transition-shadow duration-200 hover:shadow-md'>
       <CardContent className='p-4'>
-        <div className='mb-3 flex items-center justify-between'>
-          <div className='flex items-center space-x-2'>
-            {market.type === 'crypto' && (
-              <div className='flex h-8 w-8 items-center justify-center rounded-full bg-gray-100'>
-                <span className='text-xs font-bold text-gray-600'>
-                  {market.symbol.slice(0, 2)}
+        <Link
+          href={`/dashboard/trading-view?symbol=${encodeURIComponent(targetSymbol)}`}
+          className='block'
+        >
+          <div className='mb-3 flex cursor-pointer items-center justify-between'>
+            <div className='flex items-center space-x-2'>
+              {market.type === 'crypto' && (
+                <div className='flex h-8 w-8 items-center justify-center rounded-full bg-gray-100'>
+                  <span className='text-xs font-bold text-gray-600'>
+                    {market.symbol.slice(0, 2)}
+                  </span>
+                </div>
+              )}
+              <div>
+                <h3 className='text-sm font-semibold'>{market.symbol}</h3>
+                <p className='max-w-[120px] truncate text-xs text-gray-600'>
+                  {market.name}
+                </p>
+              </div>
+            </div>
+            <Badge variant={badgeVariant} className='text-xs'>
+              {market.type === 'crypto' ? 'CRYPTO' : 'FOREX'}
+            </Badge>
+          </div>
+
+          <div className='space-y-2'>
+            <div className='flex items-center justify-between'>
+              <span className='text-lg font-bold'>
+                {market.type === 'forex'
+                  ? market.price.toFixed(4)
+                  : formatPrice(market.price)}
+              </span>
+              <div className={cn('flex items-center space-x-1', changeColor)}>
+                {isPositive ? (
+                  <IconTrendingUp className='h-4 w-4' />
+                ) : (
+                  <IconTrendingDown className='h-4 w-4' />
+                )}
+                <span className='text-sm font-medium'>
+                  {isPositive ? '+' : ''}
+                  {market.changePercent24h.toFixed(2)}%
                 </span>
+              </div>
+            </div>
+
+            <div className='grid grid-cols-2 gap-2 text-xs text-gray-600'>
+              <div>
+                <span className='block'>24h Change</span>
+                <span className={cn('font-medium', changeColor)}>
+                  {market.type === 'forex'
+                    ? (isPositive ? '+' : '') + market.change24h.toFixed(4)
+                    : formatPrice(market.change24h)}
+                </span>
+              </div>
+              <div>
+                <span className='block'>24h Volume</span>
+                <span className='font-medium'>
+                  {formatVolume(market.volume24h)}
+                </span>
+              </div>
+            </div>
+
+            {market.type === 'forex' && (
+              <div className='grid grid-cols-2 gap-2 border-t pt-2 text-xs text-gray-600'>
+                <div>
+                  <span className='block'>Bid</span>
+                  <span className='font-medium'>{market.bid.toFixed(4)}</span>
+                </div>
+                <div>
+                  <span className='block'>Ask</span>
+                  <span className='font-medium'>{market.ask.toFixed(4)}</span>
+                </div>
               </div>
             )}
-            <div>
-              <h3 className='text-sm font-semibold'>{market.symbol}</h3>
-              <p className='max-w-[120px] truncate text-xs text-gray-600'>
-                {market.name}
-              </p>
-            </div>
+
+            {market.type === 'crypto' && (
+              <div className='grid grid-cols-2 gap-2 border-t pt-2 text-xs text-gray-600'>
+                <div>
+                  <span className='block'>Market Cap</span>
+                  <span className='font-medium'>
+                    {market.marketCap ? formatVolume(market.marketCap) : 'N/A'}
+                  </span>
+                </div>
+                <div>
+                  <span className='block'>Rank</span>
+                  <span className='font-medium'>#{market.rank}</span>
+                </div>
+              </div>
+            )}
           </div>
-          <Badge variant={badgeVariant} className='text-xs'>
-            {market.type === 'crypto' ? 'CRYPTO' : 'FOREX'}
-          </Badge>
-        </div>
-
-        <div className='space-y-2'>
-          <div className='flex items-center justify-between'>
-            <span className='text-lg font-bold'>
-              {market.type === 'forex'
-                ? market.price.toFixed(4)
-                : formatPrice(market.price)}
-            </span>
-            <div className={cn('flex items-center space-x-1', changeColor)}>
-              {isPositive ? (
-                <IconTrendingUp className='h-4 w-4' />
-              ) : (
-                <IconTrendingDown className='h-4 w-4' />
-              )}
-              <span className='text-sm font-medium'>
-                {isPositive ? '+' : ''}
-                {market.changePercent24h.toFixed(2)}%
-              </span>
-            </div>
-          </div>
-
-          <div className='grid grid-cols-2 gap-2 text-xs text-gray-600'>
-            <div>
-              <span className='block'>24h Change</span>
-              <span className={cn('font-medium', changeColor)}>
-                {market.type === 'forex'
-                  ? (isPositive ? '+' : '') + market.change24h.toFixed(4)
-                  : formatPrice(market.change24h)}
-              </span>
-            </div>
-            <div>
-              <span className='block'>24h Volume</span>
-              <span className='font-medium'>
-                {formatVolume(market.volume24h)}
-              </span>
-            </div>
-          </div>
-
-          {market.type === 'forex' && (
-            <div className='grid grid-cols-2 gap-2 border-t pt-2 text-xs text-gray-600'>
-              <div>
-                <span className='block'>Bid</span>
-                <span className='font-medium'>{market.bid.toFixed(4)}</span>
-              </div>
-              <div>
-                <span className='block'>Ask</span>
-                <span className='font-medium'>{market.ask.toFixed(4)}</span>
-              </div>
-            </div>
-          )}
-
-          {market.type === 'crypto' && (
-            <div className='grid grid-cols-2 gap-2 border-t pt-2 text-xs text-gray-600'>
-              <div>
-                <span className='block'>Market Cap</span>
-                <span className='font-medium'>
-                  {market.marketCap ? formatVolume(market.marketCap) : 'N/A'}
-                </span>
-              </div>
-              <div>
-                <span className='block'>Rank</span>
-                <span className='font-medium'>#{market.rank}</span>
-              </div>
-            </div>
-          )}
-        </div>
+        </Link>
       </CardContent>
     </Card>
   );

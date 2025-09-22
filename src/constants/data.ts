@@ -36,6 +36,14 @@ export const navItems: NavItem[] = [
     isAdmin: false
   },
   {
+    title: 'Trading View',
+    url: '/dashboard/trading-view',
+    icon: 'chart',
+    isActive: false,
+    shortcut: ['t', 'v'],
+    items: [] // Empty array as there are no child items
+  },
+  {
     title: 'Dashboard',
     url: '/dashboard/overview',
     icon: 'dashboard',
