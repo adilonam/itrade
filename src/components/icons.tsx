@@ -32,6 +32,7 @@ import {
   IconLayoutKanban,
   IconBrandGithub,
   IconGraph,
+  IconLock,
   IconChartLine
 } from '@tabler/icons-react';
 
@@ -70,5 +71,6 @@ export const Icons = {
   laptop: IconDeviceLaptop,
   github: IconBrandGithub,
   twitter: IconBrandTwitter,
-  check: IconCheck
+  check: IconCheck,
+  lock: IconLock
 };

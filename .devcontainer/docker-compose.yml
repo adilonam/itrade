@@ -11,11 +11,6 @@ services:
     network_mode: service:postgres
     depends_on:
       - postgres
-    environment:
-      - DATABASE_URL=postgresql://trading_user:trading_password@localhost:5432/trading_app_db
-      - POSTGRES_USER=trading_user
-      - POSTGRES_PASSWORD=trading_password
-      - POSTGRES_DB=trading_app_db
 
   postgres:
     image: postgres:15

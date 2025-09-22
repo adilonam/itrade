@@ -11,6 +11,19 @@ export type Product = {
   updated_at: string;
 };
 
+// User type based on Prisma model
+export type User = {
+  id: string;
+  name: string | null;
+  email: string;
+  emailVerified: Date | null;
+  image: string | null;
+  password: string | null;
+  role: 'USER' | 'ADMIN' | 'SUPERADMIN';
+  createdAt: Date;
+  updatedAt: Date;
+};
+
 //Info: The following data is used for the sidebar navigation and Cmd K bar.
 export const navItems: NavItem[] = [
   {
@@ -19,7 +32,8 @@ export const navItems: NavItem[] = [
     icon: 'market',
     isActive: false,
     shortcut: ['m', 'm'],
-    items: [] // Empty array as there are no child items for Dashboard
+    items: [], // Empty array as there are no child items for Dashboard
+    isAdmin: false
   },
   {
     title: 'Trading View',
@@ -27,7 +41,8 @@ export const navItems: NavItem[] = [
     icon: 'chart',
     isActive: false,
     shortcut: ['t', 'v'],
-    items: [] // Empty array as there are no child items
+    items: [], // Empty array as there are no child items
+    isAdmin: false
   },
   {
     title: 'Dashboard',
@@ -35,7 +50,8 @@ export const navItems: NavItem[] = [
     icon: 'dashboard',
     isActive: false,
     shortcut: ['d', 'd'],
-    items: [] // Empty array as there are no child items for Dashboard
+    items: [], // Empty array as there are no child items for Dashboard.
+    isAdmin: false
   },
   {
     title: 'Product',
@@ -43,26 +59,30 @@ export const navItems: NavItem[] = [
     icon: 'product',
     shortcut: ['p', 'p'],
     isActive: false,
-    items: [] // No child items
+    items: [], // No child items
+    isAdmin: false
   },
   {
     title: 'Account',
     url: '#', // Placeholder as there is no direct link for the parent
     icon: 'billing',
     isActive: true,
+    isAdmin: false,
 
     items: [
       {
         title: 'Profile',
         url: '/dashboard/profile',
         icon: 'userPen',
-        shortcut: ['m', 'm']
+        shortcut: ['m', 'm'],
+        isAdmin: false
       },
       {
         title: 'Login',
         shortcut: ['l', 'l'],
         url: '/',
-        icon: 'login'
+        icon: 'login',
+        isAdmin: false
       }
     ]
   },
@@ -72,7 +92,17 @@ export const navItems: NavItem[] = [
     icon: 'kanban',
     shortcut: ['k', 'k'],
     isActive: false,
-    items: [] // No child items
+    items: [], // No child items
+    isAdmin: false
+  },
+  {
+    title: 'Users',
+    url: '/admin/users',
+    icon: 'user',
+    isActive: false,
+    shortcut: ['m', 'm'],
+    items: [], // Empty array as there are no child items for Dashboard
+    isAdmin: true
   }
 ];
 

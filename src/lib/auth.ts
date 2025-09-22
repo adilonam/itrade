@@ -49,11 +49,17 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
-        // Mark challenge as used
-        await prisma.mfaChallenge.update({
-          where: { id: challenge.id },
-          data: { used: true }
-        });
+        // Mark challenge as used and verify user's email
+        await prisma.$transaction([
+          prisma.mfaChallenge.update({
+            where: { id: challenge.id },
+            data: { used: true }
+          }),
+          prisma.user.update({
+            where: { id: challenge.user.id },
+            data: { emailVerified: new Date() }
+          })
+        ]);
 
         return {
           id: challenge.user.id,
@@ -74,12 +80,19 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
+        // Fetch user with role from database
+        const dbUser = await prisma.user.findUnique({
+          where: { id: user.id },
+          select: { role: true }
+        });
+        token.role = dbUser?.role || 'USER';
       }
       return token;
     },
     async session({ session, token }) {
       if (token && session.user) {
         session.user.id = token.id as string;
+        session.user.role = token.role as string;
       }
       return session;
     }

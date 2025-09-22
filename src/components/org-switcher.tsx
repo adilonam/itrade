@@ -22,27 +22,19 @@ interface Tenant {
 
 export function OrgSwitcher({
   tenants,
-  defaultTenant,
+  selectedTenant,
   onTenantSwitch
 }: {
   tenants: Tenant[];
-  defaultTenant: Tenant;
+  selectedTenant: Tenant;
   onTenantSwitch?: (tenantId: string) => void;
 }) {
-  const [selectedTenant, setSelectedTenant] = React.useState<
-    Tenant | undefined
-  >(defaultTenant || (tenants.length > 0 ? tenants[0] : undefined));
-
   const handleTenantSwitch = (tenant: Tenant) => {
-    setSelectedTenant(tenant);
     if (onTenantSwitch) {
       onTenantSwitch(tenant.id);
     }
   };
 
-  if (!selectedTenant) {
-    return null;
-  }
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -56,7 +48,7 @@ export function OrgSwitcher({
                 <GalleryVerticalEnd className='size-4' />
               </div>
               <div className='flex flex-col gap-0.5 leading-none'>
-                <span className='font-semibold'>Next Starter</span>
+                <span className='font-semibold'>Trading App</span>
                 <span className=''>{selectedTenant.name}</span>
               </div>
               <ChevronsUpDown className='ml-auto' />

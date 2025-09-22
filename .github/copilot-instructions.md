@@ -7,6 +7,7 @@ This project uses:
 - **Radix UI** for accessible, unstyled primitives (use with Tailwind for styling)
 - **Tailwind v4** for styling
 - **tabler-icons-react** for icons
+- **shadcn/ui** for pre-built components (optional, use sparingly)
 
 ## Guidelines for Copilot
 
