@@ -41,7 +41,8 @@ export const navItems: NavItem[] = [
     icon: 'chart',
     isActive: false,
     shortcut: ['t', 'v'],
-    items: [] // Empty array as there are no child items
+    items: [], // Empty array as there are no child items
+    isAdmin: false
   },
   {
     title: 'Dashboard',
