@@ -134,9 +134,10 @@ async function checkAdminPermission(session: any) {
 // GET - Get user by ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await getServerSession(authOptions);
     const permissionCheck = await checkAdminPermission(session);
 
@@ -148,7 +149,7 @@ export async function GET(
     }
 
     const user = await prisma.user.findUnique({
-      where: { id: params.id },
+      where: { id },
       select: {
         id: true,
         name: true,
@@ -184,9 +185,10 @@ export async function GET(
 // PUT - Update user
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await getServerSession(authOptions);
     const permissionCheck = await checkAdminPermission(session);
 
@@ -209,7 +211,7 @@ export async function PUT(
 
     // Check if user exists
     const existingUser = await prisma.user.findUnique({
-      where: { id: params.id }
+      where: { id }
     });
 
     if (!existingUser) {
@@ -217,7 +219,7 @@ export async function PUT(
     }
 
     // Prevent users from modifying themselves
-    if (session?.user.id === params.id) {
+    if (session?.user.id === id) {
       return NextResponse.json(
         { error: 'Cannot modify your own account through admin interface' },
         { status: 403 }
@@ -268,7 +270,7 @@ export async function PUT(
 
     // Update user
     const updatedUser = await prisma.user.update({
-      where: { id: params.id },
+      where: { id },
       data: updateData,
       select: {
         id: true,
@@ -298,9 +300,10 @@ export async function PUT(
 // DELETE - Delete user
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await getServerSession(authOptions);
     const permissionCheck = await checkAdminPermission(session);
 
@@ -313,7 +316,7 @@ export async function DELETE(
 
     // Check if user exists
     const existingUser = await prisma.user.findUnique({
-      where: { id: params.id }
+      where: { id }
     });
 
     if (!existingUser) {
@@ -321,7 +324,7 @@ export async function DELETE(
     }
 
     // Prevent users from deleting themselves
-    if (session?.user.id === params.id) {
+    if (session?.user.id === id) {
       return NextResponse.json(
         { error: 'Cannot delete your own account' },
         { status: 403 }
@@ -341,7 +344,7 @@ export async function DELETE(
 
     // Delete user (CASCADE will handle related records)
     await prisma.user.delete({
-      where: { id: params.id }
+      where: { id }
     });
 
     return NextResponse.json({
