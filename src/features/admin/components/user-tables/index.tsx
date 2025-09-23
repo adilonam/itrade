@@ -32,8 +32,10 @@ export function UserTable<TData, TValue>({
   });
 
   return (
-    <DataTable table={table}>
-      <DataTableToolbar table={table} />
-    </DataTable>
+    <div className='relative flex min-h-[600px] flex-col'>
+      <DataTable table={table}>
+        <DataTableToolbar table={table} />
+      </DataTable>
+    </div>
   );
 }
