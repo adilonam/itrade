@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { deleteUser, updateUser } from '../../sevices/users';
+import { deleteUser, updateUser } from '../../services/users';
 import { toast } from 'sonner';
 
 interface CellActionProps {

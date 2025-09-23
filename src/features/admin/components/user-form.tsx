@@ -24,7 +24,7 @@ import { User } from '@/constants/data';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-import { createUser, updateUser } from '../sevices/users';
+import { createUser, updateUser } from '../services/users';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';

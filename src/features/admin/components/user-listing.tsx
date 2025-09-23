@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { User } from '@/constants/data';
-import { fetchUsers, GetUsersParams } from '../sevices/users';
 import { UserTable } from './user-tables';
 import { columns } from './user-tables/columns';
 import { parseAsInteger, parseAsString, useQueryStates } from 'nuqs';
+import { fetchUsers, GetUsersParams } from '../services/users';
 
 type UserListingPageProps = {};
 
@@ -23,7 +23,7 @@ export default function UserListingPage({}: UserListingPageProps) {
     role: parseAsString
   });
 
-  const loadUsers = async () => {
+  const loadUsers = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
@@ -43,38 +43,16 @@ export default function UserListingPage({}: UserListingPageProps) {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  useEffect(() => {
-    const loadUsersWrapper = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-
-        const params: GetUsersParams = {
-          page: queryParams.page,
-          limit: queryParams.perPage,
-          ...(queryParams.name && { search: queryParams.name }),
-          ...(queryParams.role && { role: queryParams.role as any })
-        };
-
-        const data = await fetchUsers(params);
-        setUsers(data.users);
-        setTotalUsers(data.pagination.total);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch users');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadUsersWrapper();
   }, [
     queryParams.page,
     queryParams.perPage,
     queryParams.name,
     queryParams.role
   ]);
+
+  useEffect(() => {
+    loadUsers();
+  }, [loadUsers]);
 
   const handleDataChange = () => {
     loadUsers();

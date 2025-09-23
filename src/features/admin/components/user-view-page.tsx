@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { fetchUserById } from '../sevices/users';
+import { fetchUserById } from '../services/users';
 import { useRouter } from 'next/navigation';
 import UserForm from './user-form';
 import { User } from '@/constants/data';

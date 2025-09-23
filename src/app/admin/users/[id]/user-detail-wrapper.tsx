@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { fetchUserById } from '@/features/admin/sevices/users';
+import { fetchUserById } from '@/features/admin/services/users';
 import { useRouter } from 'next/navigation';
 import UserDetail from '@/features/admin/components/user-detail';
 import { User } from '@/constants/data';
