@@ -63,6 +63,11 @@ import { z } from 'zod';
  *               role:
  *                 type: string
  *                 enum: [USER, ADMIN, SUPERADMIN]
+ *               emailVerified:
+ *                 type: string
+ *                 format: date-time
+ *                 nullable: true
+ *                 description: Email verification date (null for unverified)
  *     responses:
  *       200:
  *         description: User updated successfully
@@ -107,7 +112,10 @@ const updateUserSchema = z
     name: z.string().min(1).optional(),
     email: z.string().email().optional(),
     password: z.string().min(8).optional(),
-    role: z.enum(['USER', 'ADMIN', 'SUPERADMIN']).optional()
+    role: z.enum(['USER', 'ADMIN', 'SUPERADMIN']).optional(),
+    emailVerified: z
+      .union([z.string().pipe(z.coerce.date()), z.date(), z.null()])
+      .optional()
   })
   .refine((data) => Object.keys(data).length > 0, {
     message: 'At least one field must be provided for update'

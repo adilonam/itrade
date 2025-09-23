@@ -79,6 +79,11 @@ import { z } from 'zod';
  *               role:
  *                 type: string
  *                 enum: [USER, ADMIN, SUPERADMIN]
+ *               emailVerified:
+ *                 type: string
+ *                 format: date-time
+ *                 nullable: true
+ *                 description: Email verification date (null for unverified)
  *     responses:
  *       201:
  *         description: User created successfully
@@ -104,7 +109,10 @@ const createUserSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   email: z.string().email('Valid email is required'),
   password: z.string().min(8, 'Password must be at least 8 characters long'),
-  role: z.enum(['USER', 'ADMIN', 'SUPERADMIN'])
+  role: z.enum(['USER', 'ADMIN', 'SUPERADMIN']),
+  emailVerified: z
+    .union([z.string().pipe(z.coerce.date()), z.date(), z.null()])
+    .optional()
 });
 
 // Helper function to check admin permissions
