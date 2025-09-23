@@ -12,12 +12,14 @@ interface UserTableParams<TData, TValue> {
   data: TData[];
   totalItems: number;
   columns: ColumnDef<TData, TValue>[];
+  onDataChange?: () => void;
 }
 
 export function UserTable<TData, TValue>({
   data,
   totalItems,
-  columns
+  columns,
+  onDataChange
 }: UserTableParams<TData, TValue>) {
   const [pageSize] = useQueryState('perPage', parseAsInteger.withDefault(10));
 
@@ -28,7 +30,10 @@ export function UserTable<TData, TValue>({
     columns, // user columns
     pageCount: pageCount,
     shallow: false, //Setting to false triggers a network request with the updated querystring.
-    debounceMs: 500
+    debounceMs: 500,
+    meta: {
+      onDataChange
+    }
   });
 
   return (

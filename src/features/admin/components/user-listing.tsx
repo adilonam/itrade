@@ -23,41 +23,62 @@ export default function UserListingPage({}: UserListingPageProps) {
     role: parseAsString
   });
 
+  const loadUsers = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const params: GetUsersParams = {
+        page: queryParams.page,
+        limit: queryParams.perPage,
+        ...(queryParams.name && { search: queryParams.name }),
+        ...(queryParams.role && { role: queryParams.role as any })
+      };
+
+      const data = await fetchUsers(params);
+      setUsers(data.users);
+      setTotalUsers(data.pagination.total);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch users');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    async function loadUsers() {
+    const loadUsersWrapper = async () => {
       try {
         setIsLoading(true);
         setError(null);
 
-        const filters: GetUsersParams = {
+        const params: GetUsersParams = {
           page: queryParams.page,
           limit: queryParams.perPage,
           ...(queryParams.name && { search: queryParams.name }),
-          ...(queryParams.role && {
-            role: queryParams.role as 'USER' | 'ADMIN' | 'SUPERADMIN'
-          })
+          ...(queryParams.role && { role: queryParams.role as any })
         };
 
-        const data = await fetchUsers(filters);
-
+        const data = await fetchUsers(params);
         setUsers(data.users);
-        setTotalUsers(1);
+        setTotalUsers(data.pagination.total);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load users');
-        setUsers([]);
-        setTotalUsers(0);
+        setError(err instanceof Error ? err.message : 'Failed to fetch users');
       } finally {
         setIsLoading(false);
       }
-    }
+    };
 
-    loadUsers();
+    loadUsersWrapper();
   }, [
     queryParams.page,
     queryParams.perPage,
     queryParams.name,
     queryParams.role
   ]);
+
+  const handleDataChange = () => {
+    loadUsers();
+  };
 
   if (error) {
     return (
@@ -68,7 +89,7 @@ export default function UserListingPage({}: UserListingPageProps) {
           </h3>
           <p className='mt-2 text-sm text-gray-600'>{error}</p>
           <button
-            onClick={() => window.location.reload()}
+            onClick={loadUsers}
             className='mt-4 rounded-md bg-red-600 px-4 py-2 text-white transition-colors hover:bg-red-700'
           >
             Retry
@@ -88,7 +109,12 @@ export default function UserListingPage({}: UserListingPageProps) {
       )}
 
       {!isLoading && (
-        <UserTable data={users} totalItems={totalUsers} columns={columns} />
+        <UserTable
+          data={users}
+          totalItems={totalUsers}
+          columns={columns}
+          onDataChange={handleDataChange}
+        />
       )}
     </div>
   );

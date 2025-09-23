@@ -17,6 +17,22 @@ export type UsersApiResponse = {
   };
 };
 
+export type CreateUserData = {
+  name: string;
+  email: string;
+  password: string;
+  role: 'USER' | 'ADMIN' | 'SUPERADMIN';
+  emailVerified?: Date | null;
+};
+
+export type UpdateUserData = {
+  name?: string;
+  email?: string;
+  password?: string;
+  role?: 'USER' | 'ADMIN' | 'SUPERADMIN';
+  emailVerified?: Date | null;
+};
+
 export async function fetchUsers(
   params: GetUsersParams = {}
 ): Promise<UsersApiResponse> {
@@ -56,4 +72,102 @@ export async function fetchUsers(
     })),
     pagination: data.pagination
   };
+}
+
+export async function fetchUserById(id: string): Promise<User> {
+  const response = await fetch(`/api/admin/users/${id}`);
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(
+      errorData.error || `HTTP error! status: ${response.status}`
+    );
+  }
+
+  const data = await response.json();
+
+  // Transform the API response to match our expected format
+  return {
+    ...data.user,
+    emailVerified: data.user.emailVerified
+      ? new Date(data.user.emailVerified)
+      : null,
+    createdAt: new Date(data.user.createdAt),
+    updatedAt: new Date(data.user.updatedAt),
+    password: null // Never expose passwords on client
+  };
+}
+
+export async function createUser(userData: CreateUserData): Promise<User> {
+  const response = await fetch('/api/admin/users', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(userData)
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(
+      errorData.error || `HTTP error! status: ${response.status}`
+    );
+  }
+
+  const data = await response.json();
+
+  return {
+    ...data.user,
+    emailVerified: data.user.emailVerified
+      ? new Date(data.user.emailVerified)
+      : null,
+    createdAt: new Date(data.user.createdAt),
+    updatedAt: new Date(data.user.updatedAt),
+    password: null // Never expose passwords on client
+  };
+}
+
+export async function updateUser(
+  id: string,
+  userData: UpdateUserData
+): Promise<User> {
+  const response = await fetch(`/api/admin/users/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(userData)
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(
+      errorData.error || `HTTP error! status: ${response.status}`
+    );
+  }
+
+  const data = await response.json();
+
+  return {
+    ...data.user,
+    emailVerified: data.user.emailVerified
+      ? new Date(data.user.emailVerified)
+      : null,
+    createdAt: new Date(data.user.createdAt),
+    updatedAt: new Date(data.user.updatedAt),
+    password: null // Never expose passwords on client
+  };
+}
+
+export async function deleteUser(id: string): Promise<void> {
+  const response = await fetch(`/api/admin/users/${id}`, {
+    method: 'DELETE'
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(
+      errorData.error || `HTTP error! status: ${response.status}`
+    );
+  }
 }
