@@ -47,4 +47,7 @@ export interface TwelveDataErrorResponse {
 export interface TwelveDataCombinedResponse extends TwelveDataQuoteResponse {
   // This extends the quote response and adds current live price
   current_price: string; // Current live price from the price endpoint
+  bid: string; // Calculated bid price
+  ask: string; // Calculated ask price
+  spread: string; // Calculated spread
 }

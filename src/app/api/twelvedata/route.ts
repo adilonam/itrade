@@ -153,6 +153,18 @@ import { twelveDataService } from '@/lib/twelvedata';
  *                   type: string
  *                   example: "1649845281"
  *                   description: Extended hours timestamp
+ *                 bid:
+ *                   type: string
+ *                   example: "149.11500"
+ *                   description: Calculated bid price
+ *                 ask:
+ *                   type: string
+ *                   example: "149.12500"
+ *                   description: Calculated ask price
+ *                 spread:
+ *                   type: string
+ *                   example: "0.01000"
+ *                   description: Calculated spread between bid and ask
  *       400:
  *         description: Bad request - invalid symbol format or missing parameters
  *         content:

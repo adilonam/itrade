@@ -4,6 +4,7 @@ import type {
   TwelveDataErrorResponse,
   TwelveDataCombinedResponse
 } from '@/types/twelvedata';
+import { prisma } from '@/lib/prisma';
 
 class TwelveDataService {
   private readonly baseUrl = 'https://api.twelvedata.com';
@@ -122,13 +123,29 @@ class TwelveDataService {
         return quoteResult;
       }
 
+      // Get spread from database Market model
+      const market = await prisma.market.findUnique({
+        where: { symbol: symbol.toUpperCase() }
+      });
+
+      // Calculate bid/ask using spread from database (fallback to default if not found)
+      const currentPrice = parseFloat(priceResult.price);
+      const defaultSpread = 0;
+      const spread = market?.spread ?? defaultSpread;
+      const bid = currentPrice - spread / 2;
+      const ask = currentPrice + spread / 2;
+
       // Combine the data - use current price from price endpoint, other data from quote
       const combinedData: TwelveDataCombinedResponse = {
         ...quoteResult,
         // Override the close price with the current live price
         close: priceResult.price,
         // Add a current_price field for clarity
-        current_price: priceResult.price
+        current_price: priceResult.price,
+        // Add calculated bid/ask and spread
+        bid: bid.toString(),
+        ask: ask.toString(),
+        spread: spread.toString()
       };
 
       return combinedData;
