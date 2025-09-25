@@ -8,6 +8,7 @@ This project uses:
 - **Tailwind v4** for styling
 - **tabler-icons-react** for icons
 - **shadcn/ui** for pre-built components (optional, use sparingly)
+- **swagger** for API documentation UI
 
 ## Guidelines for Copilot
 

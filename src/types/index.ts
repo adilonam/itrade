@@ -69,3 +69,9 @@ export interface Cryptocurrency extends MarketBase {
 export type Market = ForexPair | Cryptocurrency;
 
 export type ViewType = 'cards' | 'list';
+
+// Re-export AlphaVantage types
+export * from './alphavantage';
+
+// Re-export FXCM types
+export * from './fxcm';
