@@ -8,7 +8,7 @@ export interface FXCMSymbol {
   ratePrecision: number;
 }
 
-export interface FXCMPrice {
+export interface TwelveDataPrice {
   symbol: string;
   bid: number;
   ask: number;
