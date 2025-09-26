@@ -90,12 +90,15 @@ enum MarketType {
 }
 
 model Market {
-  id               String     @id @default(cuid())
-  type             MarketType
-  symbol           String     @unique
-  name             String
-  createdAt        DateTime   @default(now()) @map("created_at")
-  updatedAt        DateTime   @updatedAt @map("updated_at")
-
+  id        String     @id @default(cuid())
+  type      MarketType
+  symbol    String     @unique
+  name      String
+  spread    Float      @default(0)
+  lastPrice Float      @default(0)
+  lastChange Float      @default(0)
+  visible   Boolean    @default(true)
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @updatedAt @map("updated_at")
   @@map("markets")
 }

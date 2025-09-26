@@ -1,32 +1,67 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { ViewType, Market } from '@/types';
+import { useEffect, useMemo, useState } from 'react';
+import { ViewType } from '@/types';
 import { MarketCard } from './market-card';
 import { MarketList } from './market-list';
 import { ViewToggle } from './view-toggle';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { IconSearch } from '@tabler/icons-react';
+import type { Market } from '@prisma/client';
+import {
+  IconSearch,
+  IconChevronLeft,
+  IconChevronRight
+} from '@tabler/icons-react';
 
 interface MarketsViewProps {
-  markets: Market[];
+  markets?: Market[];
 }
 
-export function MarketsView({ markets }: MarketsViewProps) {
+export function MarketsView({
+  markets: initialMarkets = []
+}: MarketsViewProps) {
   const [currentView, setCurrentView] = useState<ViewType>('cards');
   const [selectedType, setSelectedType] = useState<'all' | 'forex' | 'crypto'>(
     'all'
   );
   const [searchQuery, setSearchQuery] = useState('');
+  const [markets, setMarkets] = useState<Market[]>(initialMarkets);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
+
+  useEffect(() => {
+    async function loadMarkets() {
+      try {
+        const res = await fetch('/api/markets/get-all-markets', {
+          method: 'GET'
+        });
+        if (!res.ok) return;
+        const { markets: dbMarkets } = (await res.json()) as {
+          markets: Market[];
+        };
+
+        setMarkets(dbMarkets);
+      } catch (err) {
+        // Best-effort; keep initial markets if any
+      }
+    }
+
+    loadMarkets();
+  }, []);
 
   const filteredMarkets = useMemo(() => {
     let filtered = markets;
 
     // Filter by type
     if (selectedType !== 'all') {
-      filtered = filtered.filter((market) => market.type === selectedType);
+      filtered = filtered.filter((market) => {
+        const marketType = market.type.toLowerCase();
+        return selectedType === 'forex'
+          ? marketType === 'forex'
+          : marketType === 'crypto';
+      });
     }
 
     // Filter by search query
@@ -42,9 +77,24 @@ export function MarketsView({ markets }: MarketsViewProps) {
     return filtered;
   }, [markets, selectedType, searchQuery]);
 
+  // Pagination logic
+  const totalPages = Math.ceil(filteredMarkets.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedMarkets = filteredMarkets.slice(startIndex, endIndex);
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedType, searchQuery]);
+
   const marketCounts = useMemo(() => {
-    const forexCount = markets.filter((m) => m.type === 'forex').length;
-    const cryptoCount = markets.filter((m) => m.type === 'crypto').length;
+    const forexCount = markets.filter(
+      (m) => m.type.toLowerCase() === 'forex'
+    ).length;
+    const cryptoCount = markets.filter(
+      (m) => m.type.toLowerCase() === 'crypto'
+    ).length;
     return { forex: forexCount, crypto: cryptoCount, total: markets.length };
   }, [markets]);
 
@@ -102,10 +152,16 @@ export function MarketsView({ markets }: MarketsViewProps) {
       {/* Results Info */}
       <div className='text-muted-foreground flex items-center justify-between text-sm'>
         <span>
-          Showing {filteredMarkets.length} of {markets.length} markets
+          Showing {startIndex + 1}-{Math.min(endIndex, filteredMarkets.length)}{' '}
+          of {filteredMarkets.length} markets
           {selectedType !== 'all' && ` (${selectedType})`}
           {searchQuery && ` matching "${searchQuery}"`}
         </span>
+        {totalPages > 1 && (
+          <span>
+            Page {currentPage} of {totalPages}
+          </span>
+        )}
       </div>
 
       {/* Market Display */}
@@ -117,12 +173,53 @@ export function MarketsView({ markets }: MarketsViewProps) {
         </div>
       ) : currentView === 'cards' ? (
         <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
-          {filteredMarkets.map((market) => (
+          {paginatedMarkets.map((market) => (
             <MarketCard key={market.id} market={market} />
           ))}
         </div>
       ) : (
-        <MarketList markets={filteredMarkets} />
+        <MarketList markets={paginatedMarkets} />
+      )}
+
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className='flex items-center justify-center space-x-2 pt-6'>
+          <Button
+            variant='outline'
+            size='sm'
+            onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+            disabled={currentPage === 1}
+          >
+            <IconChevronLeft className='h-4 w-4' />
+            Previous
+          </Button>
+
+          <div className='flex items-center space-x-1'>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <Button
+                key={page}
+                variant={currentPage === page ? 'default' : 'outline'}
+                size='sm'
+                onClick={() => setCurrentPage(page)}
+                className='h-8 w-8 p-0'
+              >
+                {page}
+              </Button>
+            ))}
+          </div>
+
+          <Button
+            variant='outline'
+            size='sm'
+            onClick={() =>
+              setCurrentPage(Math.min(totalPages, currentPage + 1))
+            }
+            disabled={currentPage === totalPages}
+          >
+            Next
+            <IconChevronRight className='h-4 w-4' />
+          </Button>
+        </div>
       )}
     </div>
   );

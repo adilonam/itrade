@@ -46,6 +46,14 @@ const options: swaggerJsdoc.Options = {
       {
         name: 'Users',
         description: 'User management operations'
+      },
+      {
+        name: 'Market Data',
+        description: 'Market data operations and financial information'
+      },
+      {
+        name: 'Trading',
+        description: 'Trading operations and pricing data'
       }
     ]
   },

@@ -1,4 +1,4 @@
-# Copilot Instructions
+# Cursor Instructions
 
 This project uses:
 
@@ -10,7 +10,7 @@ This project uses:
 - **shadcn/ui** for pre-built components (optional, use sparingly)
 - **swagger** for API documentation UI
 
-## Guidelines for Copilot
+## Guidelines for Cursor
 
 - Always prefer **functional React components** with TypeScript.
 - Use **server components** by default; mark as `"use client"` only when needed (hooks, state, Radix UI).
@@ -21,3 +21,7 @@ This project uses:
   - Use `pnpm add <pkg>` for dependencies
   - Never suggest `npm` or `yarn` commands
 - Keep code clean, modular, and aligned with Next.js best practices.
+- When making changes, always use the available tools to read files first before editing.
+- Prefer editing existing files over creating new ones unless explicitly required.
+- Use semantic search and grep tools to understand the codebase before making changes.
+- Follow the existing code patterns and conventions found in the project.

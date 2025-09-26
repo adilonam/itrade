@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "public"."markets" ADD COLUMN     "lastChange" DOUBLE PRECISION NOT NULL DEFAULT 0,
+ADD COLUMN     "lastPrice" DOUBLE PRECISION NOT NULL DEFAULT 0;

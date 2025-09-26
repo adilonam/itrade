@@ -1,12 +1,15 @@
-import { Market } from '@/types';
-
 // Map our Market objects to TradingView symbols
 // - Forex: use generic FX prefix, e.g., FX:EURUSD
 // - Crypto: default to BINANCE and USDT quote, e.g., BINANCE:BTCUSDT
-export function toTradingViewSymbol(market: Market): string {
+export function toTradingViewSymbol(market: {
+  symbol: string;
+  type: 'forex' | 'crypto';
+}): string {
+  const symbol = market.symbol.replace(/\//g, '');
   if (market.type === 'forex') {
-    return `FX:${market.symbol}`;
+    // Remove any '/' from the symbol for TradingView format
+    return `FX:${symbol}`;
   }
   // market.type === 'crypto'
-  return `BINANCE:${market.symbol}USDT`;
+  return `BINANCE:${symbol}`;
 }
