@@ -57,12 +57,14 @@ model User {
   emailVerified DateTime?      @map("email_verified")
   image         String?
   password      String? // For credentials provider
+  balance       Float          @default(0) @map("balance")
   role          Role           @default(USER)
   createdAt     DateTime       @default(now()) @map("created_at")
   updatedAt     DateTime       @updatedAt @map("updated_at")
   accounts      Account[]
   sessions      Session[]
   mfaChallenges MfaChallenge[]
+  transactions  Transaction[]
 
   @@map("users")
 }
@@ -90,15 +92,68 @@ enum MarketType {
 }
 
 model Market {
-  id        String     @id @default(cuid())
-  type      MarketType
-  symbol    String     @unique
-  name      String
-  spread    Float      @default(0)
-  lastPrice Float      @default(0)
-  lastChange Float      @default(0)
-  visible   Boolean    @default(true)
-  createdAt DateTime   @default(now()) @map("created_at")
-  updatedAt DateTime   @updatedAt @map("updated_at")
+  id           String        @id @default(cuid())
+  type         MarketType
+  symbol       String        @unique
+  name         String
+  spread       Float         @default(0)
+  lastPrice    Float         @default(0)
+  lastChange   Float         @default(0)
+  visible      Boolean       @default(true)
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  transactions Transaction[]
+
   @@map("markets")
+}
+
+enum TransactionType {
+  BUY
+  SELL
+  DEPOSIT
+  WITHDRAWAL
+  TRANSFER_IN
+  TRANSFER_OUT
+  FEE
+  BONUS
+  REFUND
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  CANCELLED
+  PROCESSING
+}
+
+model Transaction {
+  id     String            @id @default(cuid())
+  userId String            @map("user_id")
+  type   TransactionType
+  status TransactionStatus @default(PENDING)
+
+  // Market/Asset information
+  marketId String? @map("market_id")
+
+  // Transaction amounts
+  amount   Float // Transaction amount
+  quantity Float? // Quantity of assets (for buy/sell transactions)
+
+  // Reference and metadata
+  description String? // Transaction description
+
+  // Timestamps
+  executedAt DateTime? @map("executed_at") // When transaction was executed
+
+  // PnL
+  pnl Float? @map("pnl") // on complete transaction
+
+  // Relations
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  market Market? @relation(fields: [marketId], references: [id], onDelete: SetNull)
+
+  // Indexes for better query performance
+
+  @@map("transactions")
 }
