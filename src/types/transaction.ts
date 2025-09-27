@@ -24,10 +24,12 @@ export interface CreateTransactionData {
   type: TransactionType;
   status?: TransactionStatus;
   marketId?: string;
-  amount: number;
-  quantity?: number;
+  quantity: number;
+  executedPrice?: number;
+  closedPrice?: number;
   description?: string;
   executedAt?: Date;
+  closedAt?: Date;
   pnl?: number;
 }
 
@@ -35,10 +37,12 @@ export interface UpdateTransactionData {
   type?: TransactionType;
   status?: TransactionStatus;
   marketId?: string;
-  amount?: number;
   quantity?: number;
+  executedPrice?: number;
+  closedPrice?: number;
   description?: string;
   executedAt?: Date;
+  closedAt?: Date;
   pnl?: number;
 }
 

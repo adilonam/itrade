@@ -1,14 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { fetchCurrentPrice } from '@/lib/pnl-calculator';
+import {
+  fetchCurrentPrice,
+  calculateTransactionPnL
+} from '@/lib/pnl-calculator';
 import type { CreateTransactionData } from '@/types/transaction';
 
 /**
  * @swagger
- * /api/admin/transactions:
+ * /api/user/transactions:
  *   get:
- *     summary: Get all transactions with filtering and pagination
- *     tags: [Admin, Transactions]
+ *     summary: Get current user's transactions with filtering and pagination
+ *     tags: [User, Transactions]
  *     parameters:
  *       - in: query
  *         name: page
@@ -23,11 +28,6 @@ import type { CreateTransactionData } from '@/types/transaction';
  *           default: 10
  *         description: Number of transactions per page
  *       - in: query
- *         name: userId
- *         schema:
- *           type: string
- *         description: Filter by user ID
- *       - in: query
  *         name: type
  *         schema:
  *           type: string
@@ -37,7 +37,7 @@ import type { CreateTransactionData } from '@/types/transaction';
  *         name: status
  *         schema:
  *           type: string
- *           enum: [PLACED, CLOSED, FAILED, PROCESSING]
+ *           enum: [PENDING, COMPLETED, FAILED, CANCELLED, PROCESSING]
  *         description: Filter by transaction status
  *       - in: query
  *         name: marketId
@@ -51,20 +51,68 @@ import type { CreateTransactionData } from '@/types/transaction';
  *         description: Search in description
  *     responses:
  *       200:
- *         description: List of transactions
+ *         description: List of user's transactions with calculated PnL
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 transactions:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       type:
+ *                         type: string
+ *                       status:
+ *                         type: string
+ *                       quantity:
+ *                         type: number
+ *                       pnl:
+ *                         type: number
+ *                         nullable: true
+ *                         description: Stored PnL value (automatically calculated and saved)
+ *                       calculatedPnL:
+ *                         type: number
+ *                         nullable: true
+ *                         description: Real-time calculated PnL based on current market price (falls back to market lastPrice for PLACED transactions if API fails)
+ *                       market:
+ *                         type: object
+ *                         properties:
+ *                           symbol:
+ *                             type: string
+ *                           name:
+ *                             type: string
+ *                           type:
+ *                             type: string
+ *                 pagination:
+ *                   type: object
+ *                   properties:
+ *                     page:
+ *                       type: number
+ *                     limit:
+ *                       type: number
+ *                     total:
+ *                       type: number
+ *                     pages:
+ *                       type: number
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
  *   post:
- *     summary: Create a new transaction
- *     tags: [Admin, Transactions]
+ *     summary: Create a new transaction for current user
+ *     tags: [User, Transactions]
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             required: [userId, type, quantity]
+ *             required: [type, quantity]
  *             properties:
- *               userId:
- *                 type: string
  *               type:
  *                 type: string
  *                 enum: [BUY, SELL, DEPOSIT, WITHDRAWAL, TRANSFER_IN, TRANSFER_OUT, FEE, BONUS, REFUND]
@@ -84,18 +132,55 @@ import type { CreateTransactionData } from '@/types/transaction';
  *                 type: number
  *     responses:
  *       201:
- *         description: Transaction created successfully
+ *         description: Transaction created successfully with calculated PnL
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                 type:
+ *                   type: string
+ *                 status:
+ *                   type: string
+ *                 quantity:
+ *                   type: number
+ *                 pnl:
+ *                   type: number
+ *                   nullable: true
+ *                   description: Stored PnL value (automatically calculated and saved)
+ *                 calculatedPnL:
+ *                   type: number
+ *                   nullable: true
+ *                   description: Real-time calculated PnL based on current market price (falls back to market lastPrice for PLACED transactions if API fails)
+ *                 market:
+ *                   type: object
+ *                   properties:
+ *                     symbol:
+ *                       type: string
+ *                     name:
+ *                       type: string
+ *                     type:
+ *                       type: string
  *       400:
  *         description: Invalid input data
+ *       401:
+ *         description: Unauthorized
  *       500:
  *         description: Internal server error
  */
 export async function GET(request: NextRequest) {
   try {
+    const session = await getServerSession(authOptions);
+
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
-    const userId = searchParams.get('userId');
     const type = searchParams.get('type');
     const status = searchParams.get('status');
     const marketId = searchParams.get('marketId');
@@ -103,9 +188,11 @@ export async function GET(request: NextRequest) {
 
     const skip = (page - 1) * limit;
 
-    // Build where clause
-    const where: any = {};
-    if (userId) where.userId = userId;
+    // Build where clause - only show current user's transactions
+    const where: any = {
+      userId: session.user.id
+    };
+
     if (type) where.type = type;
     if (status) where.status = status;
     if (marketId) where.marketId = marketId;
@@ -156,7 +243,7 @@ export async function GET(request: NextRequest) {
       }
     });
   } catch (error) {
-    console.error('Error fetching transactions:', error);
+    console.error('Error fetching user transactions:', error);
     return NextResponse.json(
       { error: 'Failed to fetch transactions' },
       { status: 500 }
@@ -166,12 +253,18 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const body: CreateTransactionData = await request.json();
+    const session = await getServerSession(authOptions);
+
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const body: Omit<CreateTransactionData, 'userId'> = await request.json();
 
     // Validate required fields
-    if (!body.userId || !body.type || body.quantity === undefined) {
+    if (!body.type || body.quantity === undefined) {
       return NextResponse.json(
-        { error: 'Missing required fields: userId, type, quantity' },
+        { error: 'Missing required fields: type, quantity' },
         { status: 400 }
       );
     }
@@ -184,23 +277,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if user exists
-    const user = await prisma.user.findUnique({
-      where: { id: body.userId }
-    });
-
-    if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    }
-
     // Check if market exists and fetch executed price for BUY/SELL transactions
-    let executedPrice = body.executedPrice;
-    if (!executedPrice) {
-      return NextResponse.json(
-        { error: 'Executed price is required' },
-        { status: 400 }
-      );
-    }
+    let executedPrice = null;
     let market = null;
 
     if (body.marketId) {
@@ -214,11 +292,22 @@ export async function POST(request: NextRequest) {
           { status: 404 }
         );
       }
+
+      // Fetch executed price for BUY/SELL transactions if not provided
+
+      const fetchedPrice = await fetchCurrentPrice(market);
+      if (fetchedPrice === null) {
+        return NextResponse.json(
+          { error: 'Unable to fetch current market price' },
+          { status: 500 }
+        );
+      }
+      executedPrice = fetchedPrice;
     }
 
     const transaction = await prisma.transaction.create({
       data: {
-        userId: body.userId,
+        userId: session.user.id,
         type: body.type,
         status: body.status || 'PLACED',
         marketId: body.marketId,
@@ -226,7 +315,7 @@ export async function POST(request: NextRequest) {
         executedPrice: executedPrice ?? undefined,
         closedPrice: body.closedPrice,
         description: body.description,
-        executedAt: body.executedAt,
+        executedAt: body.executedAt || new Date(),
         pnl: body.pnl
       },
       include: {
@@ -250,7 +339,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(transaction, { status: 201 });
   } catch (error) {
-    console.error('Error creating transaction:', error);
+    console.error('Error creating user transaction:', error);
     return NextResponse.json(
       { error: 'Failed to create transaction' },
       { status: 500 }

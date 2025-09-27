@@ -44,9 +44,8 @@ export function TransactionForm({
   const [formData, setFormData] = useState({
     userId: '',
     type: '' as TransactionType | '',
-    status: 'PENDING' as TransactionStatus,
+    status: 'PLACED' as TransactionStatus,
     marketId: '',
-    amount: '',
     quantity: '',
     description: '',
     executedAt: '',
@@ -63,7 +62,6 @@ export function TransactionForm({
         type: transaction.type,
         status: transaction.status,
         marketId: transaction.marketId || '',
-        amount: transaction.amount.toString(),
         quantity: transaction.quantity?.toString() || '',
         description: transaction.description || '',
         executedAt: transaction.executedAt
@@ -81,13 +79,13 @@ export function TransactionForm({
 
     try {
       // Validate required fields
-      if (!formData.userId || !formData.type || !formData.amount) {
-        throw new Error('User ID, type, and amount are required');
+      if (!formData.userId || !formData.type || !formData.quantity) {
+        throw new Error('User ID, type, and quantity are required');
       }
 
-      const amount = parseFloat(formData.amount);
-      if (isNaN(amount) || amount <= 0) {
-        throw new Error('Amount must be a positive number');
+      const quantity = parseFloat(formData.quantity);
+      if (isNaN(quantity) || quantity <= 0) {
+        throw new Error('Quantity must be a positive number');
       }
 
       const data = {
@@ -95,8 +93,7 @@ export function TransactionForm({
         type: formData.type as TransactionType,
         status: formData.status as TransactionStatus,
         marketId: formData.marketId || undefined,
-        amount: amount,
-        quantity: formData.quantity ? parseFloat(formData.quantity) : undefined,
+        quantity: quantity,
         description: formData.description || undefined,
         executedAt: formData.executedAt
           ? new Date(formData.executedAt)
@@ -206,10 +203,9 @@ export function TransactionForm({
                   <SelectValue placeholder='Select status' />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value='PENDING'>Pending</SelectItem>
-                  <SelectItem value='COMPLETED'>Completed</SelectItem>
+                  <SelectItem value='PLACED'>Placed</SelectItem>
+                  <SelectItem value='CLOSED'>Closed</SelectItem>
                   <SelectItem value='FAILED'>Failed</SelectItem>
-                  <SelectItem value='CANCELLED'>Cancelled</SelectItem>
                   <SelectItem value='PROCESSING'>Processing</SelectItem>
                 </SelectContent>
               </Select>
@@ -226,23 +222,9 @@ export function TransactionForm({
               />
             </div>
 
-            {/* Amount */}
-            <div className='space-y-2'>
-              <Label htmlFor='amount'>Amount *</Label>
-              <Input
-                id='amount'
-                type='number'
-                step='0.01'
-                value={formData.amount}
-                onChange={(e) => handleInputChange('amount', e.target.value)}
-                placeholder='0.00'
-                required
-              />
-            </div>
-
             {/* Quantity */}
             <div className='space-y-2'>
-              <Label htmlFor='quantity'>Quantity</Label>
+              <Label htmlFor='quantity'>Quantity *</Label>
               <Input
                 id='quantity'
                 type='number'
@@ -250,6 +232,7 @@ export function TransactionForm({
                 value={formData.quantity}
                 onChange={(e) => handleInputChange('quantity', e.target.value)}
                 placeholder='0.0000'
+                required
               />
             </div>
 

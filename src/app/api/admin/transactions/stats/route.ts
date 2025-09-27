@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { TransactionType, TransactionStatus } from '@prisma/client';
 import type { TransactionStats } from '@/types/transaction';
 
 /**
@@ -28,7 +29,40 @@ import type { TransactionStats } from '@/types/transaction';
  *         description: End date for statistics
  *     responses:
  *       200:
- *         description: Transaction statistics
+ *         description: Transaction statistics with enums
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 stats:
+ *                   type: object
+ *                   properties:
+ *                     totalTransactions:
+ *                       type: number
+ *                     totalVolume:
+ *                       type: number
+ *                     totalPnL:
+ *                       type: number
+ *                     completedTransactions:
+ *                       type: number
+ *                     pendingTransactions:
+ *                       type: number
+ *                     failedTransactions:
+ *                       type: number
+ *                 enums:
+ *                   type: object
+ *                   properties:
+ *                     transactionTypes:
+ *                       type: array
+ *                       items:
+ *                         type: string
+ *                         enum: [BUY, SELL, DEPOSIT, WITHDRAWAL, TRANSFER_IN, TRANSFER_OUT, FEE, BONUS, REFUND]
+ *                     transactionStatuses:
+ *                       type: array
+ *                       items:
+ *                         type: string
+ *                         enum: [PLACED, CLOSED, FAILED, PROCESSING]
  */
 export async function GET(request: NextRequest) {
   try {
@@ -50,14 +84,15 @@ export async function GET(request: NextRequest) {
       totalTransactions,
       totalVolume,
       totalPnL,
-      completedTransactions,
-      pendingTransactions,
-      failedTransactions
+      placedTransactions,
+      closedTransactions,
+      failedTransactions,
+      processingTransactions
     ] = await Promise.all([
       prisma.transaction.count({ where }),
       prisma.transaction.aggregate({
         where,
-        _sum: { amount: true }
+        _sum: { quantity: true }
       }),
       prisma.transaction.aggregate({
         where: {
@@ -67,26 +102,35 @@ export async function GET(request: NextRequest) {
         _sum: { pnl: true }
       }),
       prisma.transaction.count({
-        where: { ...where, status: 'COMPLETED' }
+        where: { ...where, status: TransactionStatus.PLACED }
       }),
       prisma.transaction.count({
-        where: { ...where, status: 'PENDING' }
+        where: { ...where, status: TransactionStatus.CLOSED }
       }),
       prisma.transaction.count({
-        where: { ...where, status: 'FAILED' }
+        where: { ...where, status: TransactionStatus.FAILED }
+      }),
+      prisma.transaction.count({
+        where: { ...where, status: TransactionStatus.PROCESSING }
       })
     ]);
 
     const stats: TransactionStats = {
       totalTransactions,
-      totalVolume: totalVolume._sum.amount || 0,
+      totalVolume: totalVolume._sum.quantity || 0,
       totalPnL: totalPnL._sum.pnl || 0,
-      completedTransactions,
-      pendingTransactions,
+      completedTransactions: closedTransactions,
+      pendingTransactions: placedTransactions + processingTransactions,
       failedTransactions
     };
 
-    return NextResponse.json(stats);
+    return NextResponse.json({
+      stats,
+      enums: {
+        transactionTypes: Object.values(TransactionType),
+        transactionStatuses: Object.values(TransactionStatus)
+      }
+    });
   } catch (error) {
     console.error('Error fetching transaction stats:', error);
     return NextResponse.json(

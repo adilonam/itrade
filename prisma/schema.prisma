@@ -120,10 +120,9 @@ enum TransactionType {
 }
 
 enum TransactionStatus {
-  PENDING
-  COMPLETED
+  PLACED
+  CLOSED
   FAILED
-  CANCELLED
   PROCESSING
 }
 
@@ -131,20 +130,24 @@ model Transaction {
   id     String            @id @default(cuid())
   userId String            @map("user_id")
   type   TransactionType
-  status TransactionStatus @default(PENDING)
+  status TransactionStatus @default(PLACED)
 
   // Market/Asset information
   marketId String? @map("market_id")
 
   // Transaction amounts
-  amount   Float // Transaction amount
-  quantity Float? // Quantity of assets (for buy/sell transactions)
+  quantity Float // Quantity of assets (for buy/sell transactions)
+
+  // Price information
+  executedPrice Float? @map("executed_price") // Price when transaction was executed
+  closedPrice   Float? @map("closed_price") // Price when transaction was closed
 
   // Reference and metadata
   description String? // Transaction description
 
   // Timestamps
   executedAt DateTime? @map("executed_at") // When transaction was executed
+  closedAt   DateTime? @map("closed_at") // When transaction was closed
 
   // PnL
   pnl Float? @map("pnl") // on complete transaction

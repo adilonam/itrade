@@ -18,7 +18,6 @@ import {
 } from '@tabler/icons-react';
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
-import { toTradingViewSymbol } from '@/lib/market-symbol';
 import { useMarketsWebSocket } from '@/contexts/markets-websocket-context';
 
 interface MarketListProps {
@@ -69,20 +68,13 @@ export function MarketList({ markets }: MarketListProps) {
             const bidPrice = currentPrice - market.spread / 2;
             const askPrice = currentPrice + market.spread / 2;
 
-            // Create a temporary market object for toTradingViewSymbol
-            const tempMarket = {
-              symbol: market.symbol,
-              type: market.type.toLowerCase() as 'forex' | 'crypto'
-            };
-            const targetSymbol = toTradingViewSymbol(tempMarket);
-
             return (
               <TableRow
                 key={market.id}
                 className='hover:bg-muted/50 cursor-pointer'
                 onClick={() =>
                   router.push(
-                    `/dashboard/trading-view?symbol=${encodeURIComponent(targetSymbol)}`
+                    `/dashboard/trading-view?marketId=${encodeURIComponent(market.id)}`
                   )
                 }
               >

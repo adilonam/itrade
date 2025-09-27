@@ -11,7 +11,6 @@ import {
 } from '@tabler/icons-react';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
-import { toTradingViewSymbol } from '@/lib/market-symbol';
 import { useMarketsWebSocket } from '@/contexts/markets-websocket-context';
 
 interface MarketCardProps {
@@ -42,18 +41,11 @@ export function MarketCard({ market }: MarketCardProps) {
   const bidPrice = currentPrice - market.spread / 2;
   const askPrice = currentPrice + market.spread / 2;
 
-  // Create a temporary market object for toTradingViewSymbol
-  const tempMarket = {
-    symbol: market.symbol,
-    type: market.type.toLowerCase() as 'forex' | 'crypto'
-  };
-  const targetSymbol = toTradingViewSymbol(tempMarket);
-
   return (
     <Card className='transition-shadow duration-200 hover:shadow-md'>
       <CardContent className='p-4'>
         <Link
-          href={`/dashboard/trading-view?symbol=${encodeURIComponent(targetSymbol)}`}
+          href={`/dashboard/trading-view?marketId=${encodeURIComponent(market.id)}`}
           className='block'
         >
           <div className='mb-3 flex cursor-pointer items-center justify-between'>

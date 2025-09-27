@@ -20,6 +20,10 @@ import {
 
 interface TransactionStatsProps {
   stats: TransactionStats;
+  enums?: {
+    transactionTypes: string[];
+    transactionStatuses: string[];
+  };
 }
 
 export function TransactionStats({ stats }: TransactionStatsProps) {
@@ -137,6 +141,75 @@ export function TransactionStats({ stats }: TransactionStatsProps) {
             {formatNumber(stats.failedTransactions)}
           </div>
           <p className='text-muted-foreground text-xs'>Failed transactions</p>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+// Additional component to display enums (optional)
+export function TransactionEnums({
+  enums
+}: {
+  enums: { transactionTypes: string[]; transactionStatuses: string[] };
+}) {
+  if (!enums) return null;
+
+  return (
+    <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
+      {/* Transaction Types */}
+      <Card>
+        <CardHeader>
+          <CardTitle className='text-sm font-medium'>
+            Transaction Types
+          </CardTitle>
+          <CardDescription>
+            Available transaction types in the system
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className='flex flex-wrap gap-2'>
+            {enums.transactionTypes.map((type) => (
+              <Badge key={type} variant='outline' className='text-xs'>
+                {type}
+              </Badge>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Transaction Statuses */}
+      <Card>
+        <CardHeader>
+          <CardTitle className='text-sm font-medium'>
+            Transaction Statuses
+          </CardTitle>
+          <CardDescription>
+            Available transaction statuses in the system
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className='flex flex-wrap gap-2'>
+            {enums.transactionStatuses.map((status) => (
+              <Badge
+                key={status}
+                variant='outline'
+                className={`text-xs ${
+                  status === 'CLOSED'
+                    ? 'border-green-500 text-green-700'
+                    : status === 'PLACED'
+                      ? 'border-blue-500 text-blue-700'
+                      : status === 'PROCESSING'
+                        ? 'border-yellow-500 text-yellow-700'
+                        : status === 'FAILED'
+                          ? 'border-red-500 text-red-700'
+                          : ''
+                }`}
+              >
+                {status}
+              </Badge>
+            ))}
+          </div>
         </CardContent>
       </Card>
     </div>

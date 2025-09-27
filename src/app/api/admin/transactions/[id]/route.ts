@@ -42,11 +42,9 @@ import type { UpdateTransactionData } from '@/types/transaction';
  *                 enum: [BUY, SELL, DEPOSIT, WITHDRAWAL, TRANSFER_IN, TRANSFER_OUT, FEE, BONUS, REFUND]
  *               status:
  *                 type: string
- *                 enum: [PENDING, COMPLETED, FAILED, CANCELLED, PROCESSING]
+ *                 enum: [PLACED, CLOSED, FAILED, PROCESSING]
  *               marketId:
  *                 type: string
- *               amount:
- *                 type: number
  *               quantity:
  *                 type: number
  *               description:
@@ -141,10 +139,10 @@ export async function PUT(
       );
     }
 
-    // Validate amount if provided
-    if (body.amount !== undefined && body.amount <= 0) {
+    // Validate quantity if provided
+    if (body.quantity !== undefined && body.quantity <= 0) {
       return NextResponse.json(
-        { error: 'Amount must be greater than 0' },
+        { error: 'Quantity must be greater than 0' },
         { status: 400 }
       );
     }
@@ -169,7 +167,6 @@ export async function PUT(
         type: body.type,
         status: body.status,
         marketId: body.marketId,
-        amount: body.amount,
         quantity: body.quantity,
         description: body.description,
         executedAt: body.executedAt,

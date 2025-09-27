@@ -103,14 +103,12 @@ export function TransactionsTable({
 
   const getStatusColor = (status: TransactionStatus) => {
     switch (status) {
-      case 'COMPLETED':
+      case 'CLOSED':
         return 'bg-green-100 text-green-800';
-      case 'PENDING':
+      case 'PLACED':
         return 'bg-yellow-100 text-yellow-800';
       case 'FAILED':
         return 'bg-red-100 text-red-800';
-      case 'CANCELLED':
-        return 'bg-gray-100 text-gray-800';
       case 'PROCESSING':
         return 'bg-blue-100 text-blue-800';
       default:
@@ -187,10 +185,12 @@ export function TransactionsTable({
                 <TableHead>Type</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Market</TableHead>
-                <TableHead>Amount</TableHead>
                 <TableHead>Quantity</TableHead>
+                <TableHead>Exec Price</TableHead>
+                <TableHead>Closed Price</TableHead>
                 <TableHead>P&L</TableHead>
                 <TableHead>Created</TableHead>
+                <TableHead>Closed</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -234,18 +234,25 @@ export function TransactionsTable({
                       <span className='text-muted-foreground'>N/A</span>
                     )}
                   </TableCell>
-                  <TableCell className='font-mono'>
-                    {formatCurrency(transaction.amount)}
-                  </TableCell>
-                  <TableCell className='font-mono'>
+                  <TableCell className='font-mono text-xs'>
                     {transaction.quantity
                       ? transaction.quantity.toFixed(4)
+                      : 'N/A'}
+                  </TableCell>
+                  <TableCell className='text-xs'>
+                    {transaction.executedPrice
+                      ? `$${transaction.executedPrice.toFixed(2)}`
+                      : 'N/A'}
+                  </TableCell>
+                  <TableCell className='text-xs'>
+                    {transaction.closedPrice
+                      ? `$${transaction.closedPrice.toFixed(2)}`
                       : 'N/A'}
                   </TableCell>
                   <TableCell>
                     {transaction.pnl !== null ? (
                       <div
-                        className={`flex items-center gap-1 font-mono ${
+                        className={`flex items-center gap-1 font-mono text-xs ${
                           transaction.pnl > 0
                             ? 'text-green-600'
                             : transaction.pnl < 0
@@ -261,11 +268,16 @@ export function TransactionsTable({
                         {formatCurrency(transaction.pnl)}
                       </div>
                     ) : (
-                      <span className='text-muted-foreground'>N/A</span>
+                      <span className='text-muted-foreground text-xs'>N/A</span>
                     )}
                   </TableCell>
-                  <TableCell className='text-sm'>
+                  <TableCell className='text-xs'>
                     {formatDate(transaction.createdAt)}
+                  </TableCell>
+                  <TableCell className='text-xs'>
+                    {transaction.closedAt
+                      ? formatDate(transaction.closedAt)
+                      : 'N/A'}
                   </TableCell>
                   <TableCell>
                     <div className='flex items-center gap-2'>
@@ -301,8 +313,10 @@ export function TransactionsTable({
                               <br />
                               <strong>Type:</strong> {transaction.type}
                               <br />
-                              <strong>Amount:</strong>{' '}
-                              {formatCurrency(transaction.amount)}
+                              <strong>Quantity:</strong>{' '}
+                              {transaction.quantity
+                                ? transaction.quantity.toFixed(4)
+                                : 'N/A'}
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
