@@ -2,6 +2,7 @@ import PageContainer from '@/components/layout/page-container';
 import { Heading } from '@/components/ui/heading';
 import { Separator } from '@/components/ui/separator';
 import { MarketsView } from '@/components/markets/markets-view';
+import { MarketsWebSocketProvider } from '@/contexts/markets-websocket-context';
 
 export const metadata = {
   title: 'Dashboard: Markets'
@@ -18,6 +19,7 @@ export default async function Page() {
           />
         </div>
         <Separator />
+
         <MarketsView />
       </div>
     </PageContainer>

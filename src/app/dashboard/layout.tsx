@@ -2,6 +2,7 @@ import KBar from '@/components/kbar';
 import AppSidebar from '@/components/layout/app-sidebar';
 import Header from '@/components/layout/header';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
+import { MarketsWebSocketProvider } from '@/contexts/markets-websocket-context';
 import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
 
@@ -25,7 +26,7 @@ export default async function DashboardLayout({
         <SidebarInset>
           <Header />
           {/* page main content */}
-          {children}
+          <MarketsWebSocketProvider>{children}</MarketsWebSocketProvider>
           {/* page main content ends */}
         </SidebarInset>
       </SidebarProvider>

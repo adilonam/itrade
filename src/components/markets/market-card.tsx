@@ -3,25 +3,44 @@
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import type { Market } from '@prisma/client';
-import { IconTrendingUp, IconTrendingDown } from '@tabler/icons-react';
+import {
+  IconTrendingUp,
+  IconTrendingDown,
+  IconWifi,
+  IconWifiOff
+} from '@tabler/icons-react';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { toTradingViewSymbol } from '@/lib/market-symbol';
+import { useMarketsWebSocket } from '@/contexts/markets-websocket-context';
 
 interface MarketCardProps {
   market: Market;
 }
 
 export function MarketCard({ market }: MarketCardProps) {
-  const isPositive = market.lastChange >= 0;
+  const { realTimePrices, isConnected } = useMarketsWebSocket();
+
+  // Get real-time price data for this market   lastChange = nprice - oprice , lastchagenG = Gprice -oprice   , oprice = nprice - lastChange
+  const realTimeData = realTimePrices.get(market.symbol);
+
+  // Use real-time data if available, otherwise fall back to market data
+  const currentPrice = realTimeData?.price ?? market.lastPrice;
+  const currentChange = realTimeData
+    ? realTimeData.price - (market.lastPrice - market.lastChange)
+    : market.lastChange;
+
+  const isPositive = currentChange >= 0;
   const changeColor = isPositive ? 'text-green-600' : 'text-red-600';
   const badgeVariant = isPositive ? 'default' : 'destructive';
-  const isForex = market.type.toLowerCase() === 'forex';
-  const isCrypto = market.type.toLowerCase() === 'crypto';
 
   const formatNumber = (num: number) => {
     return parseFloat(num.toFixed(5)).toString();
   };
+
+  // Calculate bid/ask from real-time data or use market data
+  const bidPrice = currentPrice - market.spread / 2;
+  const askPrice = currentPrice + market.spread / 2;
 
   // Create a temporary market object for toTradingViewSymbol
   const tempMarket = {
@@ -39,29 +58,34 @@ export function MarketCard({ market }: MarketCardProps) {
         >
           <div className='mb-3 flex cursor-pointer items-center justify-between'>
             <div className='flex items-center space-x-2'>
-              {isCrypto && (
-                <div className='flex h-8 w-8 items-center justify-center rounded-full bg-gray-100'>
-                  <span className='text-xs font-bold text-gray-600'>
-                    {market.symbol.slice(0, 2)}
-                  </span>
-                </div>
-              )}
               <div>
-                <h3 className='text-sm font-semibold'>{market.symbol}</h3>
+                <div className='flex items-center space-x-2'>
+                  <h3 className='text-sm font-semibold'>{market.symbol}</h3>
+                  {isConnected && realTimeData && (
+                    <div className='flex items-center'>
+                      <IconWifi className='h-3 w-3 text-green-500' />
+                    </div>
+                  )}
+                  {isConnected && !realTimeData && (
+                    <div className='flex items-center'>
+                      <IconWifiOff className='h-3 w-3 text-yellow-500' />
+                    </div>
+                  )}
+                </div>
                 <p className='max-w-[120px] truncate text-xs text-gray-600'>
                   {market.name}
                 </p>
               </div>
             </div>
             <Badge variant={badgeVariant} className='text-xs'>
-              {isCrypto ? 'CRYPTO' : 'FOREX'}
+              {market.type}
             </Badge>
           </div>
 
           <div className='space-y-2'>
             <div className='flex items-center justify-between'>
               <span className='text-lg font-bold'>
-                {formatNumber(market.lastPrice)}
+                {formatNumber(currentPrice)}
               </span>
               <div className={cn('flex items-center space-x-1', changeColor)}>
                 {isPositive ? (
@@ -71,7 +95,7 @@ export function MarketCard({ market }: MarketCardProps) {
                 )}
                 <span className='text-sm font-medium'>
                   {isPositive ? '+' : ''}
-                  {formatNumber(market.lastChange * 100)}%
+                  {formatNumber(currentChange * 100)}%
                 </span>
               </div>
             </div>
@@ -80,48 +104,27 @@ export function MarketCard({ market }: MarketCardProps) {
               <div>
                 <span className='block'>24h Change</span>
                 <span className={cn('font-medium', changeColor)}>
-                  {(isPositive ? '+' : '') + formatNumber(market.lastChange)}
+                  {(isPositive ? '+' : '') + formatNumber(currentChange)}
                 </span>
               </div>
               <div>
                 <span className='block'>Price</span>
                 <span className='font-medium'>
-                  {formatNumber(market.lastPrice)}
+                  {formatNumber(currentPrice)}
                 </span>
               </div>
             </div>
 
-            {isForex && (
-              <div className='grid grid-cols-2 gap-2 border-t pt-2 text-xs text-gray-600'>
-                <div>
-                  <span className='block'>Bid</span>
-                  <span className='font-medium'>
-                    {formatNumber(market.lastPrice - market.spread / 2)}
-                  </span>
-                </div>
-                <div>
-                  <span className='block'>Ask</span>
-                  <span className='font-medium'>
-                    {formatNumber(market.lastPrice + market.spread / 2)}
-                  </span>
-                </div>
+            <div className='grid grid-cols-2 gap-2 border-t pt-2 text-xs text-gray-600'>
+              <div>
+                <span className='block'>Bid</span>
+                <span className='font-medium'>{formatNumber(bidPrice)}</span>
               </div>
-            )}
-
-            {isCrypto && (
-              <div className='grid grid-cols-2 gap-2 border-t pt-2 text-xs text-gray-600'>
-                <div>
-                  <span className='block'>Spread</span>
-                  <span className='font-medium'>
-                    {formatNumber(market.spread)}
-                  </span>
-                </div>
-                <div>
-                  <span className='block'>Type</span>
-                  <span className='font-medium'>CRYPTO</span>
-                </div>
+              <div>
+                <span className='block'>Ask</span>
+                <span className='font-medium'>{formatNumber(askPrice)}</span>
               </div>
-            )}
+            </div>
           </div>
         </Link>
       </CardContent>
