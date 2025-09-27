@@ -158,6 +158,9 @@ export const columns: ColumnDef<User>[] = [
   },
   {
     id: 'actions',
-    cell: ({ row }) => <CellAction data={row.original} />
+    cell: ({ row, table }) => {
+      const onDataChange = (table.options.meta as any)?.onDataChange;
+      return <CellAction data={row.original} onDataChange={onDataChange} />;
+    }
   }
 ];

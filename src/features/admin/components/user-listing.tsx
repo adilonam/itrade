@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { User } from '@/constants/data';
-import { fetchUsers, GetUsersParams } from '../sevices/users';
 import { UserTable } from './user-tables';
 import { columns } from './user-tables/columns';
 import { parseAsInteger, parseAsString, useQueryStates } from 'nuqs';
+import { fetchUsers, GetUsersParams } from '../services/users';
 
 type UserListingPageProps = {};
 
@@ -23,41 +23,40 @@ export default function UserListingPage({}: UserListingPageProps) {
     role: parseAsString
   });
 
-  useEffect(() => {
-    async function loadUsers() {
-      try {
-        setIsLoading(true);
-        setError(null);
+  const loadUsers = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
 
-        const filters: GetUsersParams = {
-          page: queryParams.page,
-          limit: queryParams.perPage,
-          ...(queryParams.name && { search: queryParams.name }),
-          ...(queryParams.role && {
-            role: queryParams.role as 'USER' | 'ADMIN' | 'SUPERADMIN'
-          })
-        };
+      const params: GetUsersParams = {
+        page: queryParams.page,
+        limit: queryParams.perPage,
+        ...(queryParams.name && { search: queryParams.name }),
+        ...(queryParams.role && { role: queryParams.role as any })
+      };
 
-        const data = await fetchUsers(filters);
-
-        setUsers(data.users);
-        setTotalUsers(1);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load users');
-        setUsers([]);
-        setTotalUsers(0);
-      } finally {
-        setIsLoading(false);
-      }
+      const data = await fetchUsers(params);
+      setUsers(data.users);
+      setTotalUsers(data.pagination.total);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch users');
+    } finally {
+      setIsLoading(false);
     }
-
-    loadUsers();
   }, [
     queryParams.page,
     queryParams.perPage,
     queryParams.name,
     queryParams.role
   ]);
+
+  useEffect(() => {
+    loadUsers();
+  }, [loadUsers]);
+
+  const handleDataChange = () => {
+    loadUsers();
+  };
 
   if (error) {
     return (
@@ -68,7 +67,7 @@ export default function UserListingPage({}: UserListingPageProps) {
           </h3>
           <p className='mt-2 text-sm text-gray-600'>{error}</p>
           <button
-            onClick={() => window.location.reload()}
+            onClick={loadUsers}
             className='mt-4 rounded-md bg-red-600 px-4 py-2 text-white transition-colors hover:bg-red-700'
           >
             Retry
@@ -88,7 +87,12 @@ export default function UserListingPage({}: UserListingPageProps) {
       )}
 
       {!isLoading && (
-        <UserTable data={users} totalItems={totalUsers} columns={columns} />
+        <UserTable
+          data={users}
+          totalItems={totalUsers}
+          columns={columns}
+          onDataChange={handleDataChange}
+        />
       )}
     </div>
   );
