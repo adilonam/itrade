@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
-import { authOptions } from '@/lib/auth';
 
 /**
  * @swagger
@@ -28,12 +26,13 @@ import { authOptions } from '@/lib/auth';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const investment = await prisma.investment.findUnique({
       where: {
-        id: params.id,
+        id,
         isActive: true
       },
       select: {

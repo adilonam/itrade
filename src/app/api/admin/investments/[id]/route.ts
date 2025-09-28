@@ -48,9 +48,10 @@ const UpdateInvestmentSchema = z.object({
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await getServerSession(authOptions);
 
     if (!session?.user) {
@@ -65,7 +66,7 @@ export async function GET(
     }
 
     const investment = await prisma.investment.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         userInvestments: {
           include: {
@@ -163,9 +164,10 @@ export async function GET(
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await getServerSession(authOptions);
 
     if (!session?.user) {
@@ -184,7 +186,7 @@ export async function PUT(
 
     // Check if investment exists
     const existingInvestment = await prisma.investment.findUnique({
-      where: { id: params.id }
+      where: { id }
     });
 
     if (!existingInvestment) {
@@ -208,7 +210,7 @@ export async function PUT(
     }
 
     const investment = await prisma.investment.update({
-      where: { id: params.id },
+      where: { id },
       data: validatedData
     });
 
@@ -259,9 +261,10 @@ export async function PUT(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await getServerSession(authOptions);
 
     if (!session?.user) {
@@ -277,7 +280,7 @@ export async function DELETE(
 
     // Check if investment exists
     const investment = await prisma.investment.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         userInvestments: {
           where: {
@@ -303,7 +306,7 @@ export async function DELETE(
     }
 
     await prisma.investment.delete({
-      where: { id: params.id }
+      where: { id }
     });
 
     return NextResponse.json(

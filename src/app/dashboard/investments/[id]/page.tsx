@@ -6,7 +6,7 @@ import PageContainer from '@/components/layout/page-container';
 import { prisma } from '@/lib/prisma';
 
 interface InvestmentPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 async function getInvestment(id: string) {
@@ -46,13 +46,14 @@ async function getUserBalance(userId: string) {
 }
 
 export default async function InvestmentPage({ params }: InvestmentPageProps) {
+  const { id } = await params;
   const session = await getServerSession(authOptions);
 
   if (!session?.user) {
     return redirect('/auth/sign-in');
   }
 
-  const investment = await getInvestment(params.id);
+  const investment = await getInvestment(id);
 
   if (!investment) {
     return notFound();
