@@ -54,6 +54,15 @@ export const navItems: NavItem[] = [
     isAdmin: false
   },
   {
+    title: 'Investments',
+    url: '/dashboard/investments',
+    icon: 'pigMoney',
+    isActive: false,
+    shortcut: ['i', 'v'],
+    items: [], // Empty array as there are no child items
+    isAdmin: false
+  },
+  {
     title: 'Dashboard',
     url: '/dashboard/overview',
     icon: 'dashboard',
@@ -119,6 +128,15 @@ export const navItems: NavItem[] = [
     icon: 'market',
     isActive: false,
     shortcut: ['a', 'm'],
+    items: [], // Empty array as there are no child items
+    isAdmin: true
+  },
+  {
+    title: 'Investments',
+    url: '/admin/investments',
+    icon: 'pigMoney',
+    isActive: false,
+    shortcut: ['a', 'i'],
     items: [], // Empty array as there are no child items
     isAdmin: true
   },

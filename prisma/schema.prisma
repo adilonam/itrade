@@ -51,20 +51,21 @@ model Session {
 }
 
 model User {
-  id            String         @id @default(cuid())
-  name          String?
-  email         String         @unique
-  emailVerified DateTime?      @map("email_verified")
-  image         String?
-  password      String? // For credentials provider
-  balance       Float          @default(0) @map("balance")
-  role          Role           @default(USER)
-  createdAt     DateTime       @default(now()) @map("created_at")
-  updatedAt     DateTime       @updatedAt @map("updated_at")
-  accounts      Account[]
-  sessions      Session[]
-  mfaChallenges MfaChallenge[]
-  transactions  Transaction[]
+  id              String           @id @default(cuid())
+  name            String?
+  email           String           @unique
+  emailVerified   DateTime?        @map("email_verified")
+  image           String?
+  password        String? // For credentials provider
+  balance         Float            @default(0) @map("balance")
+  role            Role             @default(USER)
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+  accounts        Account[]
+  sessions        Session[]
+  mfaChallenges   MfaChallenge[]
+  transactions    Transaction[]
+  userInvestments UserInvestment[]
 
   @@map("users")
 }
@@ -159,4 +160,64 @@ model Transaction {
   // Indexes for better query performance
 
   @@map("transactions")
+}
+
+enum InvestmentStatus {
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+model Investment {
+  id               String  @id @default(cuid())
+  title            String
+  description      String? @db.Text
+  country          String
+  duration         Int // Duration in months
+  rentability      Float // Annual rentability percentage
+  minInvestment    Float   @map("min_investment")
+  maxInvestment    Float?  @map("max_investment")
+  autoReinvestment Boolean @default(false) @map("auto_reinvestment")
+  totalCapacity    Float?  @map("total_capacity") // Maximum total investment allowed
+  currentCapacity  Float   @default(0) @map("current_capacity") // Current invested amount
+  riskLevel        String  @default("MEDIUM") @map("risk_level") // LOW, MEDIUM, HIGH
+  isActive         Boolean @default(true) @map("is_active")
+  imageUrl         String? @map("image_url")
+
+  // Timestamps
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  userInvestments UserInvestment[]
+
+  @@map("investments")
+}
+
+model UserInvestment {
+  id           String           @id @default(cuid())
+  userId       String           @map("user_id")
+  investmentId String           @map("investment_id")
+  amount       Float
+  status       InvestmentStatus @default(ACTIVE)
+
+  // Investment details
+  startDate      DateTime @default(now()) @map("start_date")
+  endDate        DateTime @map("end_date")
+  expectedReturn Float    @map("expected_return") // Calculated expected return
+  actualReturn   Float?   @map("actual_return") // Actual return when completed
+
+  // Auto-reinvestment settings
+  autoReinvest Boolean @default(false) @map("auto_reinvest")
+
+  // Timestamps
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  completedAt DateTime? @map("completed_at")
+
+  // Relations
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  investment Investment @relation(fields: [investmentId], references: [id], onDelete: Cascade)
+
+  @@map("user_investments")
 }
