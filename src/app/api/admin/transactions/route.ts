@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { fetchCurrentPrice } from '@/lib/pnl-calculator';
+import { calculateTransactionPnL } from '@/lib/pnl-calculator';
 import type { CreateTransactionData } from '@/types/transaction';
 
 /**
@@ -51,7 +51,62 @@ import type { CreateTransactionData } from '@/types/transaction';
  *         description: Search in description
  *     responses:
  *       200:
- *         description: List of transactions
+ *         description: List of transactions with calculated PnL for PLACED BUY/SELL transactions
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 transactions:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       type:
+ *                         type: string
+ *                       status:
+ *                         type: string
+ *                       quantity:
+ *                         type: number
+ *                       pnl:
+ *                         type: number
+ *                         nullable: true
+ *                         description: Stored PnL value
+ *                       calculatedPnL:
+ *                         type: number
+ *                         nullable: true
+ *                         description: Real-time calculated PnL for PLACED BUY/SELL transactions based on current market price
+ *                       market:
+ *                         type: object
+ *                         properties:
+ *                           symbol:
+ *                             type: string
+ *                           name:
+ *                             type: string
+ *                           type:
+ *                             type: string
+ *                       user:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: string
+ *                           name:
+ *                             type: string
+ *                           email:
+ *                             type: string
+ *                 pagination:
+ *                   type: object
+ *                   properties:
+ *                     page:
+ *                       type: number
+ *                     limit:
+ *                       type: number
+ *                     total:
+ *                       type: number
+ *                     pages:
+ *                       type: number
  *   post:
  *     summary: Create a new transaction
  *     tags: [Admin, Transactions]
@@ -84,7 +139,46 @@ import type { CreateTransactionData } from '@/types/transaction';
  *                 type: number
  *     responses:
  *       201:
- *         description: Transaction created successfully
+ *         description: Transaction created successfully with calculated PnL
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                 type:
+ *                   type: string
+ *                 status:
+ *                   type: string
+ *                 quantity:
+ *                   type: number
+ *                 pnl:
+ *                   type: number
+ *                   nullable: true
+ *                   description: Stored PnL value
+ *                 calculatedPnL:
+ *                   type: number
+ *                   nullable: true
+ *                   description: Real-time calculated PnL for PLACED BUY/SELL transactions based on current market price
+ *                 market:
+ *                   type: object
+ *                   properties:
+ *                     symbol:
+ *                       type: string
+ *                     name:
+ *                       type: string
+ *                     type:
+ *                       type: string
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                     name:
+ *                       type: string
+ *                     email:
+ *                       type: string
  *       400:
  *         description: Invalid input data
  *       500:
@@ -146,8 +240,25 @@ export async function GET(request: NextRequest) {
       prisma.transaction.count({ where })
     ]);
 
+    // Calculate PnL for PLACED transactions only
+    const transactionsWithPnL = await Promise.all(
+      transactions.map(async (transaction) => {
+        if (transaction.status === 'PLACED') {
+          const calculatedPnL = await calculateTransactionPnL(transaction);
+          return {
+            ...transaction,
+            calculatedPnL
+          };
+        }
+        return {
+          ...transaction,
+          calculatedPnL: null
+        };
+      })
+    );
+
     return NextResponse.json({
-      transactions: transactions,
+      transactions: transactionsWithPnL,
       pagination: {
         page,
         limit,
@@ -242,13 +353,25 @@ export async function POST(request: NextRequest) {
             id: true,
             symbol: true,
             name: true,
-            type: true
+            type: true,
+            lastPrice: true
           }
         }
       }
     });
 
-    return NextResponse.json(transaction, { status: 201 });
+    // Calculate PnL for PLACED transactions only
+    let calculatedPnL = null;
+    if (transaction.status === 'PLACED') {
+      calculatedPnL = await calculateTransactionPnL(transaction);
+    }
+
+    const response = {
+      ...transaction,
+      calculatedPnL
+    };
+
+    return NextResponse.json(response, { status: 201 });
   } catch (error) {
     console.error('Error creating transaction:', error);
     return NextResponse.json(

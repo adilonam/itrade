@@ -77,7 +77,7 @@ import type { CreateTransactionData } from '@/types/transaction';
  *                       calculatedPnL:
  *                         type: number
  *                         nullable: true
- *                         description: Real-time calculated PnL based on current market price (falls back to market lastPrice for PLACED transactions if API fails)
+ *                         description: Real-time calculated PnL for PLACED BUY/SELL transactions based on current market price
  *                       market:
  *                         type: object
  *                         properties:
@@ -153,7 +153,7 @@ import type { CreateTransactionData } from '@/types/transaction';
  *                 calculatedPnL:
  *                   type: number
  *                   nullable: true
- *                   description: Real-time calculated PnL based on current market price (falls back to market lastPrice for PLACED transactions if API fails)
+ *                   description: Real-time calculated PnL for PLACED BUY/SELL transactions based on current market price
  *                 market:
  *                   type: object
  *                   properties:
@@ -233,8 +233,26 @@ export async function GET(request: NextRequest) {
       prisma.transaction.count({ where })
     ]);
 
+    // Calculate PnL for PLACED transactions only
+    const transactionsWithPnL = await Promise.all(
+      transactions.map(async (transaction) => {
+        if (transaction.status === 'PLACED') {
+          const pnl = await calculateTransactionPnL(transaction);
+
+          return {
+            ...transaction,
+            pnl
+          };
+        }
+        return {
+          ...transaction,
+          pnl: null
+        };
+      })
+    );
+
     return NextResponse.json({
-      transactions: transactions,
+      transactions: transactionsWithPnL,
       pagination: {
         page,
         limit,
@@ -331,13 +349,25 @@ export async function POST(request: NextRequest) {
             id: true,
             symbol: true,
             name: true,
-            type: true
+            type: true,
+            lastPrice: true
           }
         }
       }
     });
 
-    return NextResponse.json(transaction, { status: 201 });
+    // Calculate PnL for PLACED transactions only
+    let pnl = null;
+    if (transaction.status === 'PLACED') {
+      pnl = await calculateTransactionPnL(transaction);
+    }
+
+    const response = {
+      ...transaction,
+      pnl
+    };
+
+    return NextResponse.json(response, { status: 201 });
   } catch (error) {
     console.error('Error creating user transaction:', error);
     return NextResponse.json(
