@@ -10,10 +10,15 @@ import {
   TableRow
 } from '@/components/ui/table';
 import type { Market } from '@prisma/client';
-import { IconTrendingUp, IconTrendingDown } from '@tabler/icons-react';
+import {
+  IconTrendingUp,
+  IconTrendingDown,
+  IconWifi,
+  IconWifiOff
+} from '@tabler/icons-react';
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
-import { toTradingViewSymbol } from '@/lib/market-symbol';
+import { useMarketsWebSocket } from '@/contexts/markets-websocket-context';
 
 interface MarketListProps {
   markets: Market[];
@@ -21,6 +26,8 @@ interface MarketListProps {
 
 export function MarketList({ markets }: MarketListProps) {
   const router = useRouter();
+  const { realTimePrices, isConnected } = useMarketsWebSocket();
+
   const formatNumber = (num: number) => {
     return parseFloat(num.toFixed(5)).toString();
   };
@@ -45,16 +52,21 @@ export function MarketList({ markets }: MarketListProps) {
         </TableHeader>
         <TableBody>
           {markets.map((market) => {
-            const isPositive = market.lastChange >= 0;
-            const changeColor = isPositive ? 'text-green-600' : 'text-red-600';
-            const isCrypto = market.type.toLowerCase() === 'crypto';
+            // Get real-time price data for this market
+            const realTimeData = realTimePrices.get(market.symbol);
 
-            // Create a temporary market object for toTradingViewSymbol
-            const tempMarket = {
-              symbol: market.symbol,
-              type: market.type.toLowerCase() as 'forex' | 'crypto'
-            };
-            const targetSymbol = toTradingViewSymbol(tempMarket);
+            // Use real-time data if available, otherwise fall back to market data
+            const currentPrice = realTimeData?.price ?? market.lastPrice;
+            const currentChange = realTimeData
+              ? realTimeData.price - (market.lastPrice - market.lastChange)
+              : market.lastChange;
+
+            const isPositive = currentChange >= 0;
+            const changeColor = isPositive ? 'text-green-600' : 'text-red-600';
+
+            // Calculate bid/ask from real-time data or use market data
+            const bidPrice = currentPrice - market.spread / 2;
+            const askPrice = currentPrice + market.spread / 2;
 
             return (
               <TableRow
@@ -62,22 +74,23 @@ export function MarketList({ markets }: MarketListProps) {
                 className='hover:bg-muted/50 cursor-pointer'
                 onClick={() =>
                   router.push(
-                    `/dashboard/trading-view?symbol=${encodeURIComponent(targetSymbol)}`
+                    `/dashboard/trading-view?marketId=${encodeURIComponent(market.id)}`
                   )
                 }
               >
                 <TableCell>
                   <div className='flex items-center space-x-3'>
-                    {isCrypto && (
-                      <div className='flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gray-100'>
-                        <span className='text-xs font-bold text-gray-600'>
-                          {market.symbol.slice(0, 2)}
-                        </span>
-                      </div>
-                    )}
                     <div className='min-w-0'>
-                      <div className='text-sm font-semibold'>
-                        {market.symbol}
+                      <div className='flex items-center space-x-2'>
+                        <div className='text-sm font-semibold'>
+                          {market.symbol}
+                        </div>
+                        {isConnected && realTimeData && (
+                          <IconWifi className='h-3 w-3 text-green-500' />
+                        )}
+                        {isConnected && !realTimeData && (
+                          <IconWifiOff className='h-3 w-3 text-yellow-500' />
+                        )}
                       </div>
                       <div className='text-muted-foreground truncate text-xs'>
                         {market.name}
@@ -86,18 +99,15 @@ export function MarketList({ markets }: MarketListProps) {
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Badge
-                    variant={isCrypto ? 'default' : 'secondary'}
-                    className='text-xs'
-                  >
-                    {isCrypto ? 'CRYPTO' : 'FOREX'}
+                  <Badge variant={'default'} className='text-xs'>
+                    {market.type}
                   </Badge>
                 </TableCell>
                 <TableCell className='text-right font-mono'>
-                  {formatNumber(market.lastPrice)}
+                  {formatNumber(currentPrice)}
                 </TableCell>
                 <TableCell className={cn('text-right font-mono', changeColor)}>
-                  {formatChange(market.lastChange)}
+                  {formatChange(currentChange)}
                 </TableCell>
                 <TableCell className='text-right'>
                   <div
@@ -113,15 +123,15 @@ export function MarketList({ markets }: MarketListProps) {
                     )}
                     <span className='font-medium'>
                       {isPositive ? '+' : ''}
-                      {formatNumber(market.lastChange * 100)}%
+                      {formatNumber(currentChange * 100)}%
                     </span>
                   </div>
                 </TableCell>
                 <TableCell className='text-right font-mono'>
-                  {formatNumber(market.lastPrice - market.spread / 2)}
+                  {formatNumber(bidPrice)}
                 </TableCell>
                 <TableCell className='text-right font-mono'>
-                  {formatNumber(market.lastPrice + market.spread / 2)}
+                  {formatNumber(askPrice)}
                 </TableCell>
               </TableRow>
             );

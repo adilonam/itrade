@@ -33,7 +33,8 @@ import {
   IconBrandGithub,
   IconGraph,
   IconLock,
-  IconChartLine
+  IconChartLine,
+  IconSwitchVertical
 } from '@tabler/icons-react';
 
 export type Icon = React.ComponentType<IconProps>;
@@ -72,5 +73,6 @@ export const Icons = {
   github: IconBrandGithub,
   twitter: IconBrandTwitter,
   check: IconCheck,
-  lock: IconLock
+  lock: IconLock,
+  switchVertical: IconSwitchVertical
 };

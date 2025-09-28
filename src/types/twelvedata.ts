@@ -51,3 +51,66 @@ export interface TwelveDataCombinedResponse extends TwelveDataQuoteResponse {
   ask: string; // Calculated ask price
   spread: string; // Calculated spread
 }
+
+// WebSocket Types
+export interface TwelveDataWebSocketMessage {
+  event: 'subscribe-status' | 'price' | 'error';
+  status?: 'ok' | 'error';
+  message?: string;
+}
+
+export interface TwelveDataWebSocketSubscribeStatus
+  extends TwelveDataWebSocketMessage {
+  event: 'subscribe-status';
+  status: 'ok' | 'error';
+  success?: Array<{
+    symbol: string;
+    exchange: string;
+    country: string;
+    type: string;
+  }>;
+  fails?: Array<{
+    symbol: string;
+    message: string;
+  }>;
+}
+
+export interface TwelveDataWebSocketPriceData
+  extends TwelveDataWebSocketMessage {
+  event: 'price';
+  symbol: string;
+  currency?: string;
+  currency_base?: string;
+  currency_quote?: string;
+  exchange?: string;
+  type?: string;
+  timestamp: number;
+  price: number;
+  day_volume?: number;
+  bid?: number;
+  ask?: number;
+}
+
+export interface TwelveDataWebSocketError extends TwelveDataWebSocketMessage {
+  event: 'error';
+  message: string;
+}
+
+export type TwelveDataWebSocketResponse =
+  | TwelveDataWebSocketSubscribeStatus
+  | TwelveDataWebSocketPriceData
+  | TwelveDataWebSocketError;
+
+export interface TwelveDataWebSocketSubscription {
+  action: 'subscribe' | 'unsubscribe' | 'reset' | 'heartbeat';
+  params?: {
+    symbols:
+      | string
+      | Array<{
+          symbol: string;
+          exchange?: string;
+          mic_code?: string;
+          type?: string;
+        }>;
+  };
+}
