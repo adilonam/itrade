@@ -8,11 +8,13 @@ services:
     volumes:
       - ..:/workspaces:cached
     command: sleep infinity
-    network_mode: service:postgres
     depends_on:
-      - postgres
+      - db
+    ports:
+      - '3000:3000' # Forward Next.js port
+      - '3001:3001' # Forward backup port
 
-  postgres:
+  db:
     image: postgres:15
     restart: unless-stopped
     environment:
@@ -22,16 +24,8 @@ services:
       POSTGRES_HOST_AUTH_METHOD: trust
     ports:
       - '5432:5432'
-      - '3000:3000' # Forward Next.js port
-      - '3001:3001' # Forward backup port
     volumes:
       - postgres-data:/var/lib/postgresql/data
-      - ../init.sql:/docker-entrypoint-initdb.d/init.sql:ro
-    healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U trading_user -d trading_app_db']
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
 volumes:
   postgres-data:

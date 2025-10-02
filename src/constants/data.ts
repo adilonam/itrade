@@ -19,6 +19,7 @@ export type User = {
   emailVerified: Date | null;
   image: string | null;
   password: string | null;
+  balance: number;
   role: 'USER' | 'ADMIN' | 'SUPERADMIN';
   createdAt: Date;
   updatedAt: Date;
@@ -50,6 +51,15 @@ export const navItems: NavItem[] = [
     icon: 'switchVertical',
     isActive: false,
     shortcut: ['m', 't'],
+    items: [], // Empty array as there are no child items
+    isAdmin: false
+  },
+  {
+    title: 'Investments',
+    url: '/dashboard/investments',
+    icon: 'pigMoney',
+    isActive: false,
+    shortcut: ['i', 'v'],
     items: [], // Empty array as there are no child items
     isAdmin: false
   },
@@ -111,6 +121,24 @@ export const navItems: NavItem[] = [
     isActive: false,
     shortcut: ['u', 'u'],
     items: [], // Empty array as there are no child items for Dashboard
+    isAdmin: true
+  },
+  {
+    title: 'Markets',
+    url: '/admin/markets',
+    icon: 'market',
+    isActive: false,
+    shortcut: ['a', 'm'],
+    items: [], // Empty array as there are no child items
+    isAdmin: true
+  },
+  {
+    title: 'Investments',
+    url: '/admin/investments',
+    icon: 'pigMoney',
+    isActive: false,
+    shortcut: ['a', 'i'],
+    items: [], // Empty array as there are no child items
     isAdmin: true
   },
   {

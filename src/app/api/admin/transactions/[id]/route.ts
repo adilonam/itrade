@@ -79,11 +79,12 @@ import type { UpdateTransactionData } from '@/types/transaction';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const transaction = await prisma.transaction.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         user: {
           select: {
@@ -122,14 +123,15 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body: UpdateTransactionData = await request.json();
 
     // Check if transaction exists
     const existingTransaction = await prisma.transaction.findUnique({
-      where: { id: params.id }
+      where: { id }
     });
 
     if (!existingTransaction) {
@@ -162,7 +164,7 @@ export async function PUT(
     }
 
     const transaction = await prisma.transaction.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         type: body.type,
         status: body.status,
@@ -203,12 +205,13 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     // Check if transaction exists
     const existingTransaction = await prisma.transaction.findUnique({
-      where: { id: params.id }
+      where: { id }
     });
 
     if (!existingTransaction) {
@@ -219,7 +222,7 @@ export async function DELETE(
     }
 
     await prisma.transaction.delete({
-      where: { id: params.id }
+      where: { id }
     });
 
     return NextResponse.json({ message: 'Transaction deleted successfully' });

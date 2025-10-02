@@ -28,6 +28,7 @@ export type User = {
   emailVerified: Date | null;
   image: string | null;
   password: string | null;
+  balance: number;
   role: 'USER' | 'ADMIN' | 'SUPERADMIN';
   createdAt: Date;
   updatedAt: Date;
@@ -199,6 +200,7 @@ export const fakeUsers = {
           ? `https://api.slingacademy.com/public/sample-users/${id}.png`
           : null,
         password: null, // We don't expose password hashes
+        balance: faker.number.float({ min: 0, max: 10000, fractionDigits: 2 }),
         role: faker.helpers.arrayElement(roles),
         createdAt,
         updatedAt

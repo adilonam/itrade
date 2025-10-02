@@ -31,6 +31,7 @@ export type UpdateUserData = {
   password?: string;
   role?: 'USER' | 'ADMIN' | 'SUPERADMIN';
   emailVerified?: Date | null;
+  balance?: number;
 };
 
 export async function fetchUsers(
@@ -170,4 +171,36 @@ export async function deleteUser(id: string): Promise<void> {
       errorData.error || `HTTP error! status: ${response.status}`
     );
   }
+}
+
+export async function updateUserBalance(
+  id: string,
+  balance: number
+): Promise<User> {
+  const response = await fetch(`/api/admin/users/${id}/balance`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ balance })
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(
+      errorData.error || `HTTP error! status: ${response.status}`
+    );
+  }
+
+  const data = await response.json();
+
+  return {
+    ...data.user,
+    emailVerified: data.user.emailVerified
+      ? new Date(data.user.emailVerified)
+      : null,
+    createdAt: new Date(data.user.createdAt),
+    updatedAt: new Date(data.user.updatedAt),
+    password: null // Never expose passwords on client
+  };
 }

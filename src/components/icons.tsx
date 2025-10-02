@@ -34,7 +34,8 @@ import {
   IconGraph,
   IconLock,
   IconChartLine,
-  IconSwitchVertical
+  IconSwitchVertical,
+  IconPigMoney
 } from '@tabler/icons-react';
 
 export type Icon = React.ComponentType<IconProps>;
@@ -74,5 +75,6 @@ export const Icons = {
   twitter: IconBrandTwitter,
   check: IconCheck,
   lock: IconLock,
-  switchVertical: IconSwitchVertical
+  switchVertical: IconSwitchVertical,
+  pigMoney: IconPigMoney
 };

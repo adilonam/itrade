@@ -272,7 +272,7 @@ export function TransactionsTable({
                     )}
                   </TableCell>
                   <TableCell className='text-xs'>
-                    {formatDate(transaction.createdAt)}
+                    {formatDate(transaction.executedAt || new Date())}
                   </TableCell>
                   <TableCell className='text-xs'>
                     {transaction.closedAt

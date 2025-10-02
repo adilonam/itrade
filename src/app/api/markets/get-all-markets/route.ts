@@ -6,13 +6,13 @@ import { twelveDataService } from '@/lib/twelvedata';
  * @swagger
  * /api/markets/get-all-markets:
  *   get:
- *     summary: Get all markets
- *     description: Retrieves all available markets from the database, including their type, symbol, and name
+ *     summary: Get all visible markets
+ *     description: Retrieves all visible markets from the database, including their type, symbol, and name. Only returns markets that are set to visible=true for user trading.
  *     tags:
  *       - Markets
  *     responses:
  *       200:
- *         description: Successfully retrieved all markets
+ *         description: Successfully retrieved all visible markets
  *         content:
  *           application/json:
  *             schema:
@@ -66,8 +66,11 @@ import { twelveDataService } from '@/lib/twelvedata';
  */
 export async function GET() {
   try {
-    // Get all markets from database
+    // Get only visible markets from database
     const markets = await prisma.market.findMany({
+      where: {
+        visible: true
+      },
       orderBy: {
         createdAt: 'desc'
       }
