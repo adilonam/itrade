@@ -92,11 +92,18 @@ enum MarketType {
   INDICES
 }
 
+enum Room {
+  STOCK
+  TRADING
+  STOCK_AND_TRADING
+}
+
 model Market {
   id           String        @id @default(cuid())
   type         MarketType
   symbol       String        @unique
   name         String
+  room         Room          @default(TRADING)
   spread       Float         @default(0)
   lastPrice    Float         @default(0)
   lastChange   Float         @default(0)
