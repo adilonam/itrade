@@ -4,6 +4,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { User } from '@/constants/data';
 import { format } from 'date-fns';
 import {
@@ -14,17 +16,54 @@ import {
   Calendar,
   CheckCircle2,
   XCircle,
-  ArrowLeft
+  ArrowLeft,
+  DollarSign,
+  Save,
+  X
 } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { updateUserBalance } from '@/features/admin/services/users';
 
 type UserDetailProps = {
   user: User;
+  onUserUpdate?: (updatedUser: User) => void;
 };
 
-export default function UserDetail({ user }: UserDetailProps) {
+export default function UserDetail({ user, onUserUpdate }: UserDetailProps) {
   const router = useRouter();
+  const [isEditingBalance, setIsEditingBalance] = useState(false);
+  const [balanceValue, setBalanceValue] = useState(user.balance.toString());
+  const [isUpdatingBalance, setIsUpdatingBalance] = useState(false);
+
+  const handleBalanceUpdate = async () => {
+    try {
+      setIsUpdatingBalance(true);
+      const newBalance = parseFloat(balanceValue);
+      if (isNaN(newBalance) || newBalance < 0) {
+        alert('Please enter a valid positive number');
+        return;
+      }
+
+      const updatedUser = await updateUserBalance(user.id, newBalance);
+      // Update the user object with the new balance
+      user.balance = newBalance;
+      // Notify parent component of the update
+      onUserUpdate?.(updatedUser);
+      setIsEditingBalance(false);
+    } catch (error) {
+      console.error('Failed to update balance:', error);
+      alert('Failed to update balance. Please try again.');
+    } finally {
+      setIsUpdatingBalance(false);
+    }
+  };
+
+  const handleBalanceCancel = () => {
+    setBalanceValue(user.balance.toString());
+    setIsEditingBalance(false);
+  };
 
   const getRoleConfig = (role: string) => {
     const roleConfig = {
@@ -172,6 +211,71 @@ export default function UserDetail({ user }: UserDetailProps) {
                     <p>• Basic user access</p>
                     <p>• Personal data management</p>
                   </>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Balance */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Account Balance</CardTitle>
+          </CardHeader>
+          <CardContent className='space-y-4'>
+            <div className='flex items-center space-x-3'>
+              <DollarSign className='text-muted-foreground h-4 w-4' />
+              <div className='flex-1'>
+                <p className='text-sm font-medium'>Current Balance</p>
+                {isEditingBalance ? (
+                  <div className='mt-2 space-y-2'>
+                    <Label htmlFor='balance-input' className='sr-only'>
+                      Balance
+                    </Label>
+                    <Input
+                      id='balance-input'
+                      type='number'
+                      step='0.01'
+                      min='0'
+                      value={balanceValue}
+                      onChange={(e) => setBalanceValue(e.target.value)}
+                      placeholder='Enter balance'
+                      className='w-full'
+                    />
+                    <div className='flex space-x-2'>
+                      <Button
+                        size='sm'
+                        onClick={handleBalanceUpdate}
+                        disabled={isUpdatingBalance}
+                      >
+                        <Save className='mr-1 h-3 w-3' />
+                        {isUpdatingBalance ? 'Saving...' : 'Save'}
+                      </Button>
+                      <Button
+                        size='sm'
+                        variant='outline'
+                        onClick={handleBalanceCancel}
+                        disabled={isUpdatingBalance}
+                      >
+                        <X className='mr-1 h-3 w-3' />
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className='mt-1 flex items-center justify-between'>
+                    <p className='text-2xl font-bold text-green-600'>
+                      ${user.balance.toFixed(2)}
+                    </p>
+                    <Button
+                      size='sm'
+                      variant='outline'
+                      onClick={() => setIsEditingBalance(true)}
+                    >
+                      <Edit className='mr-1 h-3 w-3' />
+                      Edit
+                    </Button>
+                  </div>
                 )}
               </div>
             </div>

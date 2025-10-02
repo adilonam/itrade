@@ -19,6 +19,7 @@ export type User = {
   emailVerified: Date | null;
   image: string | null;
   password: string | null;
+  balance: number;
   role: 'USER' | 'ADMIN' | 'SUPERADMIN';
   createdAt: Date;
   updatedAt: Date;

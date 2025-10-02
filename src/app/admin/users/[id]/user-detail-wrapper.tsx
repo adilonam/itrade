@@ -57,5 +57,5 @@ export default function UserDetailWrapper({ userId }: UserDetailWrapperProps) {
     );
   }
 
-  return <UserDetail user={user} />;
+  return <UserDetail user={user} onUserUpdate={setUser} />;
 }
