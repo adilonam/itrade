@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { fetchUserById } from '@/features/admin/services/users';
 import { useRouter } from 'next/navigation';
 import UserDetail from '@/features/admin/components/user-detail';
-import { User } from '@/constants/data';
+import { User } from '@prisma/client';
 import FormCardSkeleton from '@/components/form-card-skeleton';
 
 type UserDetailWrapperProps = {

@@ -113,6 +113,7 @@ const updateUserSchema = z
     email: z.string().email().optional(),
     password: z.string().min(8).optional(),
     role: z.enum(['USER', 'ADMIN', 'SUPERADMIN']).optional(),
+    balance: z.number().min(0, 'Balance cannot be negative').optional(),
     emailVerified: z
       .union([z.string().pipe(z.coerce.date()), z.date(), z.null()])
       .optional()

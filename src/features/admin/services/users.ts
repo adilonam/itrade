@@ -1,4 +1,4 @@
-import { User } from '@/constants/data';
+import { User } from '@prisma/client';
 
 export type GetUsersParams = {
   page?: number;
@@ -22,6 +22,7 @@ export type CreateUserData = {
   email: string;
   password: string;
   role: 'USER' | 'ADMIN' | 'SUPERADMIN';
+  balance?: number;
   emailVerified?: Date | null;
 };
 

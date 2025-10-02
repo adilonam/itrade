@@ -9,7 +9,8 @@ import {
   Mail,
   Shield,
   User as UserIcon,
-  XCircle
+  XCircle,
+  DollarSign
 } from 'lucide-react';
 import Image from 'next/image';
 import { CellAction } from './cell-action';
@@ -123,6 +124,24 @@ export const columns: ColumnDef<User>[] = [
       label: 'roles',
       variant: 'multiSelect',
       options: ROLE_OPTIONS
+    }
+  },
+  {
+    id: 'balance',
+    accessorKey: 'balance',
+    header: ({ column }: { column: Column<User, unknown> }) => (
+      <DataTableColumnHeader column={column} title='Balance' />
+    ),
+    cell: ({ row }) => {
+      const balance = row.getValue('balance') as number;
+      return (
+        <div className='flex items-center space-x-2'>
+          <DollarSign className='text-muted-foreground h-4 w-4' />
+          <span className='font-medium text-green-600'>
+            ${balance.toFixed(2)}
+          </span>
+        </div>
+      );
     }
   },
   {

@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { User } from '@/constants/data';
+import { User } from '@prisma/client';
 import { format } from 'date-fns';
 import {
   Edit,
@@ -19,12 +19,14 @@ import {
   ArrowLeft,
   DollarSign,
   Save,
-  X
+  X,
+  AlertTriangle
 } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { updateUserBalance } from '@/features/admin/services/users';
+import { useSession } from 'next-auth/react';
 
 type UserDetailProps = {
   user: User;
@@ -33,9 +35,13 @@ type UserDetailProps = {
 
 export default function UserDetail({ user, onUserUpdate }: UserDetailProps) {
   const router = useRouter();
+  const { data: session } = useSession();
   const [isEditingBalance, setIsEditingBalance] = useState(false);
   const [balanceValue, setBalanceValue] = useState(user.balance.toString());
   const [isUpdatingBalance, setIsUpdatingBalance] = useState(false);
+
+  // Check if current user is trying to modify their own account
+  const isOwnAccount = session?.user?.id === user.id;
 
   const handleBalanceUpdate = async () => {
     try {
@@ -53,6 +59,7 @@ export default function UserDetail({ user, onUserUpdate }: UserDetailProps) {
       onUserUpdate?.(updatedUser);
       setIsEditingBalance(false);
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Failed to update balance:', error);
       alert('Failed to update balance. Please try again.');
     } finally {
@@ -83,6 +90,18 @@ export default function UserDetail({ user, onUserUpdate }: UserDetailProps) {
 
   return (
     <div className='space-y-6'>
+      {isOwnAccount && (
+        <div className='flex items-center space-x-2 rounded-md bg-amber-50 p-4 text-amber-800'>
+          <AlertTriangle className='h-5 w-5' />
+          <div>
+            <p className='font-medium'>Self-Modification Restricted</p>
+            <p className='text-sm'>
+              You cannot modify your own account through the admin interface.
+              Use your profile settings instead.
+            </p>
+          </div>
+        </div>
+      )}
       <div className='flex items-center justify-between'>
         <div className='flex items-center gap-4'>
           <Button
@@ -99,7 +118,10 @@ export default function UserDetail({ user, onUserUpdate }: UserDetailProps) {
             </p>
           </div>
         </div>
-        <Button onClick={() => router.push(`/admin/users/${user.id}/edit`)}>
+        <Button
+          onClick={() => router.push(`/admin/users/${user.id}/edit`)}
+          disabled={isOwnAccount}
+        >
           <Edit className='mr-2 h-4 w-4' />
           Edit User
         </Button>
@@ -223,6 +245,15 @@ export default function UserDetail({ user, onUserUpdate }: UserDetailProps) {
             <CardTitle>Account Balance</CardTitle>
           </CardHeader>
           <CardContent className='space-y-4'>
+            {isOwnAccount && (
+              <div className='flex items-center space-x-2 rounded-md bg-amber-50 p-3 text-amber-800'>
+                <AlertTriangle className='h-4 w-4' />
+                <p className='text-sm font-medium'>
+                  You cannot modify your own account balance through the admin
+                  interface.
+                </p>
+              </div>
+            )}
             <div className='flex items-center space-x-3'>
               <DollarSign className='text-muted-foreground h-4 w-4' />
               <div className='flex-1'>
@@ -241,12 +272,13 @@ export default function UserDetail({ user, onUserUpdate }: UserDetailProps) {
                       onChange={(e) => setBalanceValue(e.target.value)}
                       placeholder='Enter balance'
                       className='w-full'
+                      disabled={isOwnAccount}
                     />
                     <div className='flex space-x-2'>
                       <Button
                         size='sm'
                         onClick={handleBalanceUpdate}
-                        disabled={isUpdatingBalance}
+                        disabled={isUpdatingBalance || isOwnAccount}
                       >
                         <Save className='mr-1 h-3 w-3' />
                         {isUpdatingBalance ? 'Saving...' : 'Save'}
@@ -255,7 +287,7 @@ export default function UserDetail({ user, onUserUpdate }: UserDetailProps) {
                         size='sm'
                         variant='outline'
                         onClick={handleBalanceCancel}
-                        disabled={isUpdatingBalance}
+                        disabled={isUpdatingBalance || isOwnAccount}
                       >
                         <X className='mr-1 h-3 w-3' />
                         Cancel
@@ -271,6 +303,7 @@ export default function UserDetail({ user, onUserUpdate }: UserDetailProps) {
                       size='sm'
                       variant='outline'
                       onClick={() => setIsEditingBalance(true)}
+                      disabled={isOwnAccount}
                     >
                       <Edit className='mr-1 h-3 w-3' />
                       Edit

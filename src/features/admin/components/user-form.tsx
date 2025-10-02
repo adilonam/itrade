@@ -20,7 +20,7 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { User } from '@/constants/data';
+import { User } from '@prisma/client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -42,6 +42,13 @@ const createFormSchema = z.object({
   role: z.enum(['USER', 'ADMIN', 'SUPERADMIN'], {
     required_error: 'Please select a role.'
   }),
+  balance: z
+    .number()
+    .min(0, {
+      message: 'Balance cannot be negative.'
+    })
+    .optional()
+    .default(0),
   emailVerified: z.boolean().optional()
 });
 
@@ -62,6 +69,12 @@ const updateFormSchema = z.object({
   role: z.enum(['USER', 'ADMIN', 'SUPERADMIN'], {
     required_error: 'Please select a role.'
   }),
+  balance: z
+    .number()
+    .min(0, {
+      message: 'Balance cannot be negative.'
+    })
+    .optional(),
   emailVerified: z.boolean().optional()
 });
 
@@ -83,6 +96,7 @@ export default function UserForm({
     email: initialData?.email || '',
     password: '',
     role: initialData?.role || ('USER' as const),
+    balance: initialData?.balance || 0,
     emailVerified: !!initialData?.emailVerified
   };
 
@@ -227,6 +241,33 @@ export default function UserForm({
                 )}
               />
             </div>
+
+            <FormField
+              control={form.control}
+              name='balance'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Account Balance</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder='Enter account balance'
+                      type='number'
+                      step='0.01'
+                      min='0'
+                      disabled={loading}
+                      {...field}
+                      onChange={(e) =>
+                        field.onChange(parseFloat(e.target.value) || 0)
+                      }
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Set the initial account balance for this user
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <FormField
               control={form.control}

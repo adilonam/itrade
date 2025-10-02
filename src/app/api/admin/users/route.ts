@@ -110,6 +110,11 @@ const createUserSchema = z.object({
   email: z.string().email('Valid email is required'),
   password: z.string().min(8, 'Password must be at least 8 characters long'),
   role: z.enum(['USER', 'ADMIN', 'SUPERADMIN']),
+  balance: z
+    .number()
+    .min(0, 'Balance cannot be negative')
+    .optional()
+    .default(0),
   emailVerified: z
     .union([z.string().pipe(z.coerce.date()), z.date(), z.null()])
     .optional()
@@ -244,7 +249,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { name, email, password, role } = validation.data;
+    const { name, email, password, role, balance } = validation.data;
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
@@ -275,7 +280,8 @@ export async function POST(request: NextRequest) {
         name,
         email,
         password: hashedPassword,
-        role
+        role,
+        balance: balance || 0
       },
       select: {
         id: true,

@@ -107,6 +107,17 @@ export async function PUT(
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
+    // Prevent users from modifying their own balance
+    if (session?.user.id === id) {
+      return NextResponse.json(
+        {
+          error:
+            'Cannot modify your own account balance through admin interface'
+        },
+        { status: 403 }
+      );
+    }
+
     // Only SUPERADMIN can modify SUPERADMIN users
     if (
       existingUser.role === 'SUPERADMIN' &&

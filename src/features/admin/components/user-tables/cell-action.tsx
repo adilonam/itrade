@@ -21,6 +21,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { deleteUser, updateUser } from '../../services/users';
 import { toast } from 'sonner';
+import { useSession } from 'next-auth/react';
 
 interface CellActionProps {
   data: User;
@@ -34,6 +35,10 @@ export const CellAction: React.FC<CellActionProps> = ({
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const router = useRouter();
+  const { data: session } = useSession();
+
+  // Check if current user is trying to modify their own account
+  const isOwnAccount = session?.user?.id === data.id;
 
   const onConfirm = async () => {
     try {
@@ -95,10 +100,10 @@ export const CellAction: React.FC<CellActionProps> = ({
           <DropdownMenuItem onClick={onView}>
             <Eye className='mr-2 h-4 w-4' /> View
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={onEdit}>
+          <DropdownMenuItem onClick={onEdit} disabled={isOwnAccount}>
             <Edit className='mr-2 h-4 w-4' /> Edit
           </DropdownMenuItem>
-          {data.role !== 'SUPERADMIN' && (
+          {data.role !== 'SUPERADMIN' && !isOwnAccount && (
             <DropdownMenuItem onClick={onToggleRole}>
               {data.role === 'ADMIN' ? (
                 <>
@@ -114,6 +119,7 @@ export const CellAction: React.FC<CellActionProps> = ({
           <DropdownMenuItem
             onClick={() => setOpen(true)}
             className='text-red-600 focus:text-red-600'
+            disabled={isOwnAccount}
           >
             <Trash className='mr-2 h-4 w-4' /> Delete
           </DropdownMenuItem>

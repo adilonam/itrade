@@ -11,20 +11,6 @@ export type Product = {
   updated_at: string;
 };
 
-// User type based on Prisma model
-export type User = {
-  id: string;
-  name: string | null;
-  email: string;
-  emailVerified: Date | null;
-  image: string | null;
-  password: string | null;
-  balance: number;
-  role: 'USER' | 'ADMIN' | 'SUPERADMIN';
-  createdAt: Date;
-  updatedAt: Date;
-};
-
 //Info: The following data is used for the sidebar navigation and Cmd K bar.
 export const navItems: NavItem[] = [
   {
