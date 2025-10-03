@@ -1,7 +1,7 @@
 'use client';
 import { Badge } from '@/components/ui/badge';
 import { DataTableColumnHeader } from '@/components/ui/table/data-table-column-header';
-import { User } from '@/constants/data';
+import { User } from '@prisma/client';
 import { format } from 'date-fns';
 import { Column, ColumnDef } from '@tanstack/react-table';
 import {
