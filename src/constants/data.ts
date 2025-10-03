@@ -23,6 +23,15 @@ export const navItems: NavItem[] = [
     isAdmin: false
   },
   {
+    title: 'Market Trading',
+    url: '/dashboard/market-trading',
+    icon: 'trendingUp',
+    isActive: false,
+    shortcut: ['m', 't'],
+    items: [], // Empty array as there are no child items
+    isAdmin: false
+  },
+  {
     title: 'Trading View',
     url: '/dashboard/trading-view',
     icon: 'chart',

@@ -1,10 +1,10 @@
 import PageContainer from '@/components/layout/page-container';
 import { Heading } from '@/components/ui/heading';
 import { Separator } from '@/components/ui/separator';
-import { MarketsView } from '@/components/markets/markets-view';
+import { MarketTrading } from '@/components/markets/market-trading';
 
 export const metadata = {
-  title: 'Dashboard: Markets'
+  title: 'Dashboard: Market Trading'
 };
 
 export default async function Page() {
@@ -13,13 +13,13 @@ export default async function Page() {
       <div className='flex flex-1 flex-col space-y-6'>
         <div className='flex items-start justify-between'>
           <Heading
-            title='Markets'
-            description='Monitor forex pairs and cryptocurrency prices in real-time.'
+            title='Market Trading'
+            description='Select a market to start trading with advanced charting and analysis tools.'
           />
         </div>
         <Separator />
 
-        <MarketsView />
+        <MarketTrading />
       </div>
     </PageContainer>
   );

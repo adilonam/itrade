@@ -74,7 +74,7 @@ export function MarketList({ markets }: MarketListProps) {
                 className='hover:bg-muted/50 cursor-pointer'
                 onClick={() =>
                   router.push(
-                    `/dashboard/trading-view?marketId=${encodeURIComponent(market.id)}`
+                    `/dashboard/room-trading?pk=${encodeURIComponent(market.id)}`
                   )
                 }
               >

@@ -45,7 +45,7 @@ export function MarketCard({ market }: MarketCardProps) {
     <Card className='transition-shadow duration-200 hover:shadow-md'>
       <CardContent className='p-4'>
         <Link
-          href={`/dashboard/trading-view?marketId=${encodeURIComponent(market.id)}`}
+          href={`/dashboard/room-trading?pk=${encodeURIComponent(market.id)}`}
           className='block'
         >
           <div className='mb-3 flex cursor-pointer items-center justify-between'>
