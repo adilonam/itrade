@@ -119,6 +119,10 @@ import type { CreateTransactionData } from '@/types/transaction';
  *               status:
  *                 type: string
  *                 enum: [PLACED, CLOSED, FAILED, PROCESSING]
+ *               room:
+ *                 type: string
+ *                 enum: [STOCK, TRADING, STOCK_AND_TRADING]
+ *                 description: Room type (defaults to TRADING)
  *               marketId:
  *                 type: string
  *               quantity:
@@ -128,6 +132,15 @@ import type { CreateTransactionData } from '@/types/transaction';
  *               executedAt:
  *                 type: string
  *                 format: date-time
+ *               executedPrice:
+ *                 type: number
+ *                 description: Executed price (required for PROCESSING status)
+ *               takeProfit:
+ *                 type: number
+ *                 description: Take profit price level
+ *               stopLoss:
+ *                 type: number
+ *                 description: Stop loss price level
  *               pnl:
  *                 type: number
  *     responses:
@@ -261,7 +274,6 @@ export async function GET(request: NextRequest) {
       }
     });
   } catch (error) {
-    console.error('Error fetching user transactions:', error);
     return NextResponse.json(
       { error: 'Failed to fetch transactions' },
       { status: 500 }
@@ -295,7 +307,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if market exists and fetch executed price for BUY/SELL transactions
+    // Check if market exists and handle executed price logic
     let executedPrice = null;
     let market = null;
 
@@ -311,27 +323,155 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // Fetch executed price for BUY/SELL transactions if not provided
+      // Handle executed price based on status and order type
+      if (body.status === 'PROCESSING' && body.executedPrice) {
+        // For PROCESSING orders, use provided executedPrice
+        executedPrice = body.executedPrice;
 
-      const fetchedPrice = await fetchCurrentPrice(market);
-      if (fetchedPrice === null) {
-        return NextResponse.json(
-          { error: 'Unable to fetch current market price' },
-          { status: 500 }
-        );
+        // Validate executed price against current market price
+        const currentPrice = await fetchCurrentPrice(market);
+        if (currentPrice === null) {
+          return NextResponse.json(
+            { error: 'Unable to fetch current market price for validation' },
+            { status: 500 }
+          );
+        }
+
+        // Validate executed price based on order type
+        if (body.type === 'BUY' && executedPrice >= currentPrice) {
+          return NextResponse.json(
+            {
+              error:
+                'For BUY orders, executed price must be lower than current market price'
+            },
+            { status: 400 }
+          );
+        }
+
+        if (body.type === 'SELL' && executedPrice <= currentPrice) {
+          return NextResponse.json(
+            {
+              error:
+                'For SELL orders, executed price must be higher than current market price'
+            },
+            { status: 400 }
+          );
+        }
+      } else {
+        // For PLACED orders or when no executedPrice provided, fetch current price
+        const fetchedPrice = await fetchCurrentPrice(market);
+        if (fetchedPrice === null) {
+          return NextResponse.json(
+            { error: 'Unable to fetch current market price' },
+            { status: 500 }
+          );
+        }
+        executedPrice = fetchedPrice;
       }
-      executedPrice = fetchedPrice;
+    }
+
+    // Validate take profit and stop loss if provided
+    if (body.takeProfit !== undefined || body.stopLoss !== undefined) {
+      if (body.marketId && market && executedPrice) {
+        // Use executedPrice as the reference price for validation
+        const referencePrice = executedPrice;
+        // Validate take profit
+        if (body.takeProfit !== undefined) {
+          if (body.takeProfit <= 0) {
+            return NextResponse.json(
+              { error: 'Take profit must be greater than 0' },
+              { status: 400 }
+            );
+          }
+
+          if (body.type === 'BUY' && body.takeProfit <= referencePrice) {
+            return NextResponse.json(
+              {
+                error:
+                  'For BUY orders, take profit must be higher than executed price'
+              },
+              { status: 400 }
+            );
+          }
+
+          if (body.type === 'SELL' && body.takeProfit >= referencePrice) {
+            return NextResponse.json(
+              {
+                error:
+                  'For SELL orders, take profit must be lower than executed price'
+              },
+              { status: 400 }
+            );
+          }
+        }
+
+        // Validate stop loss
+        if (body.stopLoss !== undefined) {
+          if (body.stopLoss <= 0) {
+            return NextResponse.json(
+              { error: 'Stop loss must be greater than 0' },
+              { status: 400 }
+            );
+          }
+
+          if (body.type === 'BUY' && body.stopLoss >= referencePrice) {
+            return NextResponse.json(
+              {
+                error:
+                  'For BUY orders, stop loss must be lower than executed price'
+              },
+              { status: 400 }
+            );
+          }
+
+          if (body.type === 'SELL' && body.stopLoss <= referencePrice) {
+            return NextResponse.json(
+              {
+                error:
+                  'For SELL orders, stop loss must be higher than executed price'
+              },
+              { status: 400 }
+            );
+          }
+        }
+
+        // Validate take profit vs stop loss relationship
+        if (body.takeProfit !== undefined && body.stopLoss !== undefined) {
+          if (body.type === 'BUY' && body.takeProfit <= body.stopLoss) {
+            return NextResponse.json(
+              {
+                error:
+                  'For BUY orders, take profit must be higher than stop loss'
+              },
+              { status: 400 }
+            );
+          }
+
+          if (body.type === 'SELL' && body.takeProfit >= body.stopLoss) {
+            return NextResponse.json(
+              {
+                error:
+                  'For SELL orders, take profit must be lower than stop loss'
+              },
+              { status: 400 }
+            );
+          }
+        }
+      }
     }
 
     const transaction = await prisma.transaction.create({
       data: {
         userId: session.user.id,
         type: body.type,
-        status: body.status || 'PLACED',
+        status: body.status || 'PROCESSING',
+        room: body.room || 'TRADING',
         marketId: body.marketId,
         quantity: body.quantity,
         executedPrice: executedPrice ?? undefined,
         closedPrice: body.closedPrice,
+        takeProfit: body.takeProfit,
+        stopLoss: body.stopLoss,
         description: body.description,
         executedAt: body.executedAt || new Date(),
         pnl: body.pnl
@@ -369,7 +509,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(response, { status: 201 });
   } catch (error) {
-    console.error('Error creating user transaction:', error);
     return NextResponse.json(
       { error: 'Failed to create transaction' },
       { status: 500 }

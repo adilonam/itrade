@@ -1,4 +1,3 @@
-import PageContainer from '@/components/layout/page-container';
 import { Heading } from '@/components/ui/heading';
 import { Separator } from '@/components/ui/separator';
 import { TradingViewRoomTrading } from '@/components/trading-view/trading-view-room-trading';
@@ -40,8 +39,8 @@ export default async function Page(props: PageProps) {
   }
 
   return (
-    <PageContainer scrollable={false}>
-      <div className='flex h-full flex-1 flex-col space-y-6'>
+    <div className='h-[calc(100dvh-52px)] overflow-y-auto'>
+      <div className='flex min-h-full flex-col space-y-6 p-4 md:px-6'>
         <div className='flex items-start justify-between'>
           <Heading
             title='Room Trading'
@@ -53,11 +52,24 @@ export default async function Page(props: PageProps) {
           />
         </div>
         <Separator />
-        <div className='min-h-0 w-full flex-1'>
-          <TradingViewRoomTrading symbol={tradingViewSymbol || undefined} />
+
+        {/* Trading View - Full width with responsive height */}
+        <div className='h-[500px] w-full md:h-[600px] lg:h-[700px]'>
+          <TradingViewRoomTrading
+            symbol={tradingViewSymbol || undefined}
+            height='100%'
+            width='100%'
+          />
         </div>
-        <TradingActionsRoomTrading market={market} />
+
+        {/* Trading Actions - Full width */}
+        <div className='w-full'>
+          <TradingActionsRoomTrading market={market} />
+        </div>
+
+        {/* Bottom spacing */}
+        <div className='h-8'></div>
       </div>
-    </PageContainer>
+    </div>
   );
 }

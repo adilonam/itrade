@@ -50,6 +50,15 @@ export const navItems: NavItem[] = [
     isAdmin: false
   },
   {
+    title: 'My Transactions Trading',
+    url: '/dashboard/transactions-room-trading',
+    icon: 'switchVertical',
+    isActive: false,
+    shortcut: ['m', 'r'],
+    items: [], // Empty array as there are no child items
+    isAdmin: false
+  },
+  {
     title: 'Investments',
     url: '/dashboard/investments',
     icon: 'pigMoney',

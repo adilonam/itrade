@@ -5,6 +5,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select';
+import {
   Card,
   CardContent,
   CardDescription,
@@ -40,6 +47,10 @@ export function TradingActionsRoomTrading({
 }: TradingActionsRoomTradingProps) {
   const { data: session } = useSession();
   const [quantity, setQuantity] = useState<string>('');
+  const [limitPrice, setLimitPrice] = useState<string>('');
+  const [takeProfit, setTakeProfit] = useState<string>('');
+  const [stopLoss, setStopLoss] = useState<string>('');
+  const [orderType, setOrderType] = useState<'MARKET' | 'LIMIT'>('MARKET');
   const [isCreatingTransaction, setIsCreatingTransaction] = useState(false);
   const [showBuyDialog, setShowBuyDialog] = useState(false);
   const [showSellDialog, setShowSellDialog] = useState(false);
@@ -61,19 +72,34 @@ export function TradingActionsRoomTrading({
       return;
     }
 
+    // Validate limit price for limit orders
+    if (orderType === 'LIMIT') {
+      const limitPriceNum = parseFloat(limitPrice);
+      if (isNaN(limitPriceNum) || limitPriceNum <= 0) {
+        toast.error('Please enter a valid limit price');
+        return;
+      }
+    }
+
     setIsCreatingTransaction(true);
 
     try {
-      const response = await fetch('/api/transactions/create', {
+      const response = await fetch('/api/user/transactions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           type,
+          status: orderType === 'LIMIT' ? 'PROCESSING' : 'PLACED',
+          room: 'TRADING',
+          executedPrice:
+            orderType === 'LIMIT' ? parseFloat(limitPrice) : undefined,
           marketId: propMarket.id,
           quantity: quantityNum,
-          description: `${type} ${quantityNum} units of ${propMarket.symbol}`
+          takeProfit: takeProfit ? parseFloat(takeProfit) : undefined,
+          stopLoss: stopLoss ? parseFloat(stopLoss) : undefined,
+          description: `${type} ${quantityNum} units of ${propMarket.symbol} (${orderType} order)`
         })
       });
 
@@ -82,17 +108,17 @@ export function TradingActionsRoomTrading({
         throw new Error(errorData.message || 'Failed to create transaction');
       }
 
-      const result = await response.json();
-      toast.success(
-        `Transaction ${type.toLowerCase()} order placed successfully!`
-      );
+      await response.json();
+      toast.success(`${type} ${orderType} order placed successfully!`);
 
       // Reset form
       setQuantity('');
+      setLimitPrice('');
+      setTakeProfit('');
+      setStopLoss('');
       setShowBuyDialog(false);
       setShowSellDialog(false);
     } catch (error) {
-      console.error('Transaction creation error:', error);
       toast.error(
         error instanceof Error
           ? error.message
@@ -131,6 +157,24 @@ export function TradingActionsRoomTrading({
         </CardDescription>
       </CardHeader>
       <CardContent className='space-y-4'>
+        {/* Order Type Selection */}
+        <div className='space-y-2'>
+          <Label htmlFor='order-type'>Order Type</Label>
+          <Select
+            value={orderType}
+            onValueChange={(value: 'MARKET' | 'LIMIT') => setOrderType(value)}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value='MARKET'>Market Order</SelectItem>
+              <SelectItem value='LIMIT'>Limit Order</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Quantity Input */}
         <div className='space-y-2'>
           <Label htmlFor='quantity'>Quantity</Label>
           <Input
@@ -144,33 +188,144 @@ export function TradingActionsRoomTrading({
           />
         </div>
 
+        {/* Limit Price Input - Only show for limit orders */}
+        {orderType === 'LIMIT' && (
+          <div className='space-y-2'>
+            <Label htmlFor='limit-price'>Limit Price</Label>
+            <Input
+              id='limit-price'
+              type='number'
+              placeholder='Enter limit price'
+              value={limitPrice}
+              onChange={(e) => setLimitPrice(e.target.value)}
+              min='0'
+              step='0.01'
+            />
+          </div>
+        )}
+
+        {/* Risk Management Section */}
+        <div className='space-y-3'>
+          <div className='text-muted-foreground text-sm font-medium'>
+            Risk Management (Optional)
+          </div>
+
+          {/* Take Profit Input */}
+          <div className='space-y-2'>
+            <Label htmlFor='take-profit'>Take Profit</Label>
+            <Input
+              id='take-profit'
+              type='number'
+              placeholder='Enter take profit price'
+              value={takeProfit}
+              onChange={(e) => setTakeProfit(e.target.value)}
+              min='0'
+              step='0.01'
+            />
+          </div>
+
+          {/* Stop Loss Input */}
+          <div className='space-y-2'>
+            <Label htmlFor='stop-loss'>Stop Loss</Label>
+            <Input
+              id='stop-loss'
+              type='number'
+              placeholder='Enter stop loss price'
+              value={stopLoss}
+              onChange={(e) => setStopLoss(e.target.value)}
+              min='0'
+              step='0.01'
+            />
+          </div>
+        </div>
+
+        {/* Order Summary */}
+        {quantity && propMarket && (
+          <div className='bg-muted rounded-lg p-3 text-sm'>
+            <div className='font-medium'>Order Summary</div>
+            <div className='mt-1 space-y-1'>
+              <div>Type: {orderType} Order</div>
+              <div>Quantity: {quantity} units</div>
+              <div>
+                Price:{' '}
+                {orderType === 'MARKET'
+                  ? `Market (${propMarket.lastPrice.toFixed(5)})`
+                  : limitPrice}
+              </div>
+              {takeProfit && <div>Take Profit: ${takeProfit}</div>}
+              {stopLoss && <div>Stop Loss: ${stopLoss}</div>}
+              <div className='font-medium'>
+                Total: $
+                {(parseFloat(quantity) * propMarket.lastPrice).toFixed(2)}
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className='flex gap-2'>
           <AlertDialog open={showBuyDialog} onOpenChange={setShowBuyDialog}>
             <AlertDialogTrigger asChild>
               <Button
                 className='flex-1'
                 variant='default'
-                disabled={isCreatingTransaction || !quantity}
+                disabled={
+                  isCreatingTransaction ||
+                  !quantity ||
+                  (orderType === 'LIMIT' && !limitPrice)
+                }
               >
                 {isCreatingTransaction ? (
                   <IconLoader2 className='mr-2 h-4 w-4 animate-spin' />
                 ) : (
                   <IconTrendingUp className='mr-2 h-4 w-4' />
                 )}
-                Buy
+                Buy {orderType}
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Confirm Buy Order</AlertDialogTitle>
+                <AlertDialogTitle>
+                  Confirm Buy {orderType} Order
+                </AlertDialogTitle>
                 <AlertDialogDescription>
-                  Are you sure you want to buy {quantity} units of{' '}
-                  {propMarket.symbol} at ${propMarket.lastPrice.toFixed(5)}?
+                  Are you sure you want to place a {orderType.toLowerCase()} buy
+                  order for {quantity} units of {propMarket.symbol}?
                   <br />
-                  <strong>
-                    Total: $
-                    {(parseFloat(quantity) * propMarket.lastPrice).toFixed(2)}
-                  </strong>
+                  {orderType === 'MARKET' ? (
+                    <>
+                      Price: Market price (${propMarket.lastPrice.toFixed(5)})
+                      <br />
+                      <strong>
+                        Total: $
+                        {(parseFloat(quantity) * propMarket.lastPrice).toFixed(
+                          2
+                        )}
+                      </strong>
+                    </>
+                  ) : (
+                    <>
+                      Limit Price: ${limitPrice}
+                      <br />
+                      <strong>
+                        Total: $
+                        {(
+                          parseFloat(quantity) * parseFloat(limitPrice)
+                        ).toFixed(2)}
+                      </strong>
+                    </>
+                  )}
+                  {takeProfit && (
+                    <>
+                      <br />
+                      Take Profit: ${takeProfit}
+                    </>
+                  )}
+                  {stopLoss && (
+                    <>
+                      <br />
+                      Stop Loss: ${stopLoss}
+                    </>
+                  )}
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
@@ -190,27 +345,64 @@ export function TradingActionsRoomTrading({
               <Button
                 className='flex-1'
                 variant='destructive'
-                disabled={isCreatingTransaction || !quantity}
+                disabled={
+                  isCreatingTransaction ||
+                  !quantity ||
+                  (orderType === 'LIMIT' && !limitPrice)
+                }
               >
                 {isCreatingTransaction ? (
                   <IconLoader2 className='mr-2 h-4 w-4 animate-spin' />
                 ) : (
                   <IconTrendingDown className='mr-2 h-4 w-4' />
                 )}
-                Sell
+                Sell {orderType}
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Confirm Sell Order</AlertDialogTitle>
+                <AlertDialogTitle>
+                  Confirm Sell {orderType} Order
+                </AlertDialogTitle>
                 <AlertDialogDescription>
-                  Are you sure you want to sell {quantity} units of{' '}
-                  {propMarket.symbol} at ${propMarket.lastPrice.toFixed(5)}?
+                  Are you sure you want to place a {orderType.toLowerCase()}{' '}
+                  sell order for {quantity} units of {propMarket.symbol}?
                   <br />
-                  <strong>
-                    Total: $
-                    {(parseFloat(quantity) * propMarket.lastPrice).toFixed(2)}
-                  </strong>
+                  {orderType === 'MARKET' ? (
+                    <>
+                      Price: Market price (${propMarket.lastPrice.toFixed(5)})
+                      <br />
+                      <strong>
+                        Total: $
+                        {(parseFloat(quantity) * propMarket.lastPrice).toFixed(
+                          2
+                        )}
+                      </strong>
+                    </>
+                  ) : (
+                    <>
+                      Limit Price: ${limitPrice}
+                      <br />
+                      <strong>
+                        Total: $
+                        {(
+                          parseFloat(quantity) * parseFloat(limitPrice)
+                        ).toFixed(2)}
+                      </strong>
+                    </>
+                  )}
+                  {takeProfit && (
+                    <>
+                      <br />
+                      Take Profit: ${takeProfit}
+                    </>
+                  )}
+                  {stopLoss && (
+                    <>
+                      <br />
+                      Stop Loss: ${stopLoss}
+                    </>
+                  )}
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>

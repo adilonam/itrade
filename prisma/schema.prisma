@@ -61,6 +61,7 @@ model User {
   role            Role             @default(USER)
   createdAt       DateTime         @default(now()) @map("created_at")
   updatedAt       DateTime         @updatedAt @map("updated_at")
+  leverage        Int              @default(1) @map("leverage")
   accounts        Account[]
   sessions        Session[]
   mfaChallenges   MfaChallenge[]
@@ -138,7 +139,8 @@ model Transaction {
   id     String            @id @default(cuid())
   userId String            @map("user_id")
   type   TransactionType
-  status TransactionStatus @default(PLACED)
+  status TransactionStatus @default(PROCESSING)
+  room   Room              @default(TRADING)
 
   // Market/Asset information
   marketId String? @map("market_id")
@@ -149,6 +151,10 @@ model Transaction {
   // Price information
   executedPrice Float? @map("executed_price") // Price when transaction was executed
   closedPrice   Float? @map("closed_price") // Price when transaction was closed
+
+  // Risk management
+  takeProfit Float? @map("take_profit") // Take profit price level
+  stopLoss   Float? @map("stop_loss") // Stop loss price level
 
   // Reference and metadata
   description String? // Transaction description

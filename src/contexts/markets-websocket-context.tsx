@@ -26,6 +26,8 @@ interface MarketsWebSocketContextType {
   disconnect: () => void;
   updateMarkets: (markets: Market[]) => void;
   refreshPrices: () => void;
+  reset: () => void;
+  subscribe: (symbols: string[]) => void;
 }
 
 const MarketsWebSocketContext =
@@ -50,8 +52,9 @@ export function MarketsWebSocketProvider({
     priceData: realTimePrices,
     connect: wsConnect,
     disconnect: wsDisconnect,
-    subscribe,
-    unsubscribe
+    subscribe: wsSubscribe,
+    unsubscribe: wsUnsubscribe,
+    reset: wsReset
   } = useTwelveDataWebSocket({
     apiKey,
     autoConnect: true
@@ -62,10 +65,10 @@ export function MarketsWebSocketProvider({
     if (isConnected && markets.length > 0) {
       const symbols = markets.map((market) => market.symbol);
       if (symbols.length > 0) {
-        subscribe(symbols);
+        wsSubscribe(symbols);
       }
     }
-  }, [isConnected, markets, subscribe]);
+  }, [isConnected, markets, wsSubscribe]);
 
   const connect = useCallback(() => {
     if (apiKey) {
@@ -91,7 +94,7 @@ export function MarketsWebSocketProvider({
           (symbol) => !newSymbols.includes(symbol)
         );
         if (symbolsToUnsubscribe.length > 0) {
-          unsubscribe(symbolsToUnsubscribe);
+          wsUnsubscribe(symbolsToUnsubscribe);
         }
 
         // Subscribe to new symbols
@@ -99,19 +102,30 @@ export function MarketsWebSocketProvider({
           (symbol) => !currentSymbols.includes(symbol)
         );
         if (symbolsToSubscribe.length > 0) {
-          subscribe(symbolsToSubscribe);
+          wsSubscribe(symbolsToSubscribe);
         }
       }
     },
-    [isConnected, realTimePrices, subscribe, unsubscribe]
+    [isConnected, realTimePrices, wsSubscribe, wsUnsubscribe]
   );
 
   const refreshPrices = useCallback(() => {
     if (isConnected && markets.length > 0) {
       const symbols = markets.map((market) => market.symbol);
-      subscribe(symbols);
+      wsSubscribe(symbols);
     }
-  }, [isConnected, markets, subscribe]);
+  }, [isConnected, markets, wsSubscribe]);
+
+  const reset = useCallback(() => {
+    wsReset();
+  }, [wsReset]);
+
+  const subscribe = useCallback(
+    (symbols: string[]) => {
+      wsSubscribe(symbols);
+    },
+    [wsSubscribe]
+  );
 
   const value: MarketsWebSocketContextType = {
     isConnected,
@@ -122,7 +136,9 @@ export function MarketsWebSocketProvider({
     connect,
     disconnect,
     updateMarkets,
-    refreshPrices
+    refreshPrices,
+    reset,
+    subscribe
   };
 
   return (

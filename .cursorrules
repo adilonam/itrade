@@ -12,6 +12,7 @@ This project uses:
 
 ## Guidelines for Cursor
 
+- dont ask me to run pnpm dev i m already running it 
 - Always prefer **functional React components** with TypeScript.
 - Use **server components** by default; mark as `"use client"` only when needed (hooks, state, Radix UI).
 - Import Radix UI components from `@radix-ui/react-*`.
