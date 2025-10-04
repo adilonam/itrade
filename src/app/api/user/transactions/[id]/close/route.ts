@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { fetchCurrentPrice } from '@/lib/pnl-calculator';
+import { refreshMarkets, calculateTransactionPnL } from '@/lib/pnl-calculator';
+import { Market } from '@prisma/client';
 
 /**
  * @swagger
@@ -75,15 +76,7 @@ export async function PATCH(
             email: true
           }
         },
-        market: {
-          select: {
-            id: true,
-            symbol: true,
-            name: true,
-            type: true,
-            lastPrice: true
-          }
-        }
+        market: true
       }
     });
 
@@ -103,53 +96,69 @@ export async function PATCH(
     }
 
     // Check if transaction can be closed (not already closed)
-    if (['CLOSED', 'FAILED'].includes(existingTransaction.status)) {
+    if (['CLOSED'].includes(existingTransaction.status)) {
       return NextResponse.json(
         { error: 'Transaction is already closed' },
         { status: 400 }
       );
     }
 
-    // Fetch closed price for BUY/SELL transactions
+    // Refresh market data and calculate P&L for BUY/SELL transactions
     let closedPrice = null;
+    let calculatedPnL = null;
+
     if (
       existingTransaction.market &&
       ['BUY', 'SELL'].includes(existingTransaction.type)
     ) {
-      closedPrice = await fetchCurrentPrice(existingTransaction.market);
-      if (closedPrice === null) {
+      // Refresh market data
+      const refreshedMarkets = await refreshMarkets([
+        existingTransaction.market as Market
+      ]);
+      if (refreshedMarkets && refreshedMarkets.length > 0) {
+        // Calculate bid/ask prices based on market spread
+        const market = existingTransaction.market;
+        const midPrice = market.lastPrice ?? 0;
+        const spread = market.spread ?? 0;
+        const bidPrice = midPrice - spread / 2;
+        const askPrice = midPrice + spread / 2;
+
+        // Use ask price for BUY, bid price for SELL
+        closedPrice = existingTransaction.type === 'BUY' ? askPrice : bidPrice;
+
+        // Calculate P&L for the transaction
+        const transactionWithClosedPrice = {
+          ...existingTransaction,
+          closedPrice: closedPrice,
+          status: 'CLOSED' as const // Temporarily set to CLOSED for P&L calculation
+        };
+
+        calculatedPnL = await calculateTransactionPnL(
+          transactionWithClosedPrice
+        );
+
+        if (calculatedPnL !== null) {
+          console.log(
+            `Calculated P&L for transaction ${id}: ${calculatedPnL.toFixed(2)}`
+          );
+        } else {
+          console.warn(`Unable to calculate P&L for transaction ${id}`);
+        }
+      } else {
         console.warn(
-          `Unable to fetch closed price for ${existingTransaction.market.symbol}`
+          `Unable to refresh market data for ${existingTransaction.market.symbol}`
         );
       }
     }
 
-    // Update the transaction
+    // Update the transaction with P&L
     const updatedTransaction = await prisma.transaction.update({
       where: { id },
       data: {
         status,
         closedPrice: closedPrice || undefined,
         closedAt: new Date(),
-        executedAt: new Date()
-      },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true
-          }
-        },
-        market: {
-          select: {
-            id: true,
-            symbol: true,
-            name: true,
-            type: true,
-            lastPrice: true
-          }
-        }
+        pnl: calculatedPnL || 0
       }
     });
 

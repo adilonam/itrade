@@ -2,11 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import {
-  fetchCurrentPrice,
-  calculateTransactionPnL
-} from '@/lib/pnl-calculator';
+import { refreshMarkets, calculateTransactionPnL } from '@/lib/pnl-calculator';
 import type { CreateTransactionData } from '@/types/transaction';
+import { Market, Transaction } from '@prisma/client';
 
 /**
  * @swagger
@@ -250,7 +248,11 @@ export async function GET(request: NextRequest) {
     const transactionsWithPnL = await Promise.all(
       transactions.map(async (transaction) => {
         if (transaction.status === 'PLACED') {
-          const pnl = await calculateTransactionPnL(transaction);
+          const pnl = await calculateTransactionPnL(
+            transaction as Transaction & {
+              market: Market | null;
+            }
+          );
 
           return {
             ...transaction,
@@ -258,8 +260,7 @@ export async function GET(request: NextRequest) {
           };
         }
         return {
-          ...transaction,
-          pnl: null
+          ...transaction
         };
       })
     );
@@ -328,14 +329,15 @@ export async function POST(request: NextRequest) {
         // For PROCESSING orders, use provided executedPrice
         executedPrice = body.executedPrice;
 
-        // Validate executed price against current market price
-        const currentPrice = await fetchCurrentPrice(market);
-        if (currentPrice === null) {
+        // Refresh market data and validate executed price against current market price
+        const refreshedMarkets = await refreshMarkets([market]);
+        if (!refreshedMarkets || refreshedMarkets.length === 0) {
           return NextResponse.json(
-            { error: 'Unable to fetch current market price for validation' },
+            { error: 'Unable to refresh market data for validation' },
             { status: 500 }
           );
         }
+        const currentPrice = market.lastPrice; // Use the market's lastPrice since getCombinedData stores data
 
         // Validate executed price based on order type
         if (body.type === 'BUY' && executedPrice >= currentPrice) {
@@ -358,15 +360,15 @@ export async function POST(request: NextRequest) {
           );
         }
       } else {
-        // For PLACED orders or when no executedPrice provided, fetch current price
-        const fetchedPrice = await fetchCurrentPrice(market);
-        if (fetchedPrice === null) {
+        // For PLACED orders or when no executedPrice provided, refresh market and use current price
+        const refreshedMarkets = await refreshMarkets([market]);
+        if (!refreshedMarkets || refreshedMarkets.length === 0) {
           return NextResponse.json(
-            { error: 'Unable to fetch current market price' },
+            { error: 'Unable to refresh market data' },
             { status: 500 }
           );
         }
-        executedPrice = fetchedPrice;
+        executedPrice = market.lastPrice; // Use the market's lastPrice since getCombinedData stores data
       }
     }
 
@@ -499,7 +501,11 @@ export async function POST(request: NextRequest) {
     // Calculate PnL for PLACED transactions only
     let pnl = null;
     if (transaction.status === 'PLACED') {
-      pnl = await calculateTransactionPnL(transaction);
+      pnl = await calculateTransactionPnL(
+        transaction as Transaction & {
+          market: Market | null;
+        }
+      );
     }
 
     const response = {

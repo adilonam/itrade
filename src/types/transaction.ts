@@ -6,20 +6,6 @@ import type {
   Room
 } from '@prisma/client';
 
-export interface TransactionWithRelations extends Transaction {
-  user: {
-    id: string;
-    name: string | null;
-    email: string;
-  };
-  market: {
-    id: string;
-    symbol: string;
-    name: string;
-    type: MarketType;
-  } | null;
-}
-
 export interface CreateTransactionData {
   userId: string;
   type: TransactionType;
