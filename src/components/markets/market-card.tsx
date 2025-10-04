@@ -15,9 +15,13 @@ import { useMarketsWebSocket } from '@/contexts/markets-websocket-context';
 
 interface MarketCardProps {
   market: Market;
+  tradingRoute?: string;
 }
 
-export function MarketCard({ market }: MarketCardProps) {
+export function MarketCard({
+  market,
+  tradingRoute = '/dashboard/room-trading'
+}: MarketCardProps) {
   const { realTimePrices, isConnected } = useMarketsWebSocket();
 
   // Get real-time price data for this market   lastChange = nprice - oprice , lastchagenG = Gprice -oprice   , oprice = nprice - lastChange
@@ -45,7 +49,7 @@ export function MarketCard({ market }: MarketCardProps) {
     <Card className='transition-shadow duration-200 hover:shadow-md'>
       <CardContent className='p-4'>
         <Link
-          href={`/dashboard/room-trading?pk=${encodeURIComponent(market.id)}`}
+          href={`${tradingRoute}?pk=${encodeURIComponent(market.id)}`}
           className='block'
         >
           <div className='mb-3 flex cursor-pointer items-center justify-between'>

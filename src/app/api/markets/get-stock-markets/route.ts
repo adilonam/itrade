@@ -4,15 +4,15 @@ import { twelveDataService } from '@/lib/twelvedata';
 
 /**
  * @swagger
- * /api/markets/get-trading-markets:
+ * /api/markets/get-stock-markets:
  *   get:
- *     summary: Get all visible markets with TRADING room
- *     description: Retrieves all visible markets from the database that have room=TRADING, including their type, symbol, and name. Only returns markets that are set to visible=true for user trading.
+ *     summary: Get all visible markets with STOCK room
+ *     description: Retrieves all visible markets from the database that have room=STOCK or room=STOCK_AND_TRADING, including their type, symbol, and name. Only returns markets that are set to visible=true for user stock trading.
  *     tags:
  *       - Markets
  *     responses:
  *       200:
- *         description: Successfully retrieved all visible trading markets
+ *         description: Successfully retrieved all visible stock markets
  *         content:
  *           application/json:
  *             schema:
@@ -30,20 +30,20 @@ import { twelveDataService } from '@/lib/twelvedata';
  *                       type:
  *                         type: string
  *                         enum: [FOREX, CRYPTO, STOCKS, COMMODITIES, INDICES]
- *                         example: "FOREX"
+ *                         example: "STOCKS"
  *                         description: Type of market
  *                       symbol:
  *                         type: string
- *                         example: "EURUSD"
+ *                         example: "AAPL"
  *                         description: Market symbol
  *                       name:
  *                         type: string
- *                         example: "Euro / US Dollar"
+ *                         example: "Apple Inc."
  *                         description: Human-readable name of the market
  *                       room:
  *                         type: string
  *                         enum: [STOCK, TRADING, STOCK_AND_TRADING]
- *                         example: "TRADING"
+ *                         example: "STOCK"
  *                         description: Market room type
  *                       spread:
  *                         type: number
@@ -51,11 +51,11 @@ import { twelveDataService } from '@/lib/twelvedata';
  *                         description: Market spread
  *                       lastPrice:
  *                         type: number
- *                         example: 1.0850
+ *                         example: 150.25
  *                         description: Last known price
  *                       lastChange:
  *                         type: number
- *                         example: 0.0012
+ *                         example: 2.50
  *                         description: Last price change
  *                       visible:
  *                         type: boolean
@@ -80,18 +80,18 @@ import { twelveDataService } from '@/lib/twelvedata';
  *               properties:
  *                 error:
  *                   type: string
- *                   example: "Failed to fetch trading markets"
+ *                   example: "Failed to fetch stock markets"
  *                 message:
  *                   type: string
  *                   example: "Database connection error"
  */
 export async function GET() {
   try {
-    // Get only visible markets with TRADING or STOCK_AND_TRADING room from database
+    // Get only visible markets with STOCK or STOCK_AND_TRADING room from database
     const markets = await prisma.market.findMany({
       where: {
         visible: true,
-        OR: [{ room: 'TRADING' }, { room: 'STOCK_AND_TRADING' }]
+        OR: [{ room: 'STOCK' }, { room: 'STOCK_AND_TRADING' }]
       },
       orderBy: {
         createdAt: 'desc'
@@ -126,30 +126,22 @@ export async function GET() {
           });
 
           return updatedMarket;
-        } catch (error) {
-          // If update fails, return original market
+        } catch (err) {
+          // If update fails, return original market data
           return market;
         }
       })
     );
 
-    return NextResponse.json({ markets: updatedMarkets }, { status: 200 });
+    return NextResponse.json({ markets: updatedMarkets });
   } catch (error) {
     return NextResponse.json(
       {
-        error: 'Failed to fetch trading markets',
+        error: 'Failed to fetch stock markets',
         message:
           error instanceof Error ? error.message : 'Unknown error occurred'
       },
       { status: 500 }
     );
   }
-}
-
-export async function POST() {
-  return NextResponse.json({ error: 'Method not allowed' }, { status: 405 });
-}
-
-export async function PUT() {
-  return NextResponse.json({ error: 'Method not allowed' }, { status: 405 });
 }

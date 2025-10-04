@@ -8,7 +8,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { MoreHorizontal, Trash, Eye, EyeOff } from 'lucide-react';
+import { MoreHorizontal, Trash, Eye, EyeOff, Edit } from 'lucide-react';
 import { useState } from 'react';
 import {
   AdminMarket,
@@ -16,6 +16,7 @@ import {
   updateMarket
 } from '../../services/markets';
 import { toast } from 'sonner';
+import { EditRoomDialog } from './edit-room-dialog';
 
 interface CellActionProps {
   data: AdminMarket;
@@ -28,6 +29,7 @@ export const CellAction: React.FC<CellActionProps> = ({
 }) => {
   const [loading, setLoading] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [editRoomOpen, setEditRoomOpen] = useState(false);
   const [visibilityLoading, setVisibilityLoading] = useState(false);
 
   const onDeleteConfirm = async () => {
@@ -75,6 +77,12 @@ export const CellAction: React.FC<CellActionProps> = ({
         onConfirm={onDeleteConfirm}
         loading={loading}
       />
+      <EditRoomDialog
+        open={editRoomOpen}
+        onOpenChange={setEditRoomOpen}
+        data={data}
+        onSuccess={onDataChange}
+      />
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
           <Button variant='ghost' className='h-8 w-8 p-0'>
@@ -84,6 +92,11 @@ export const CellAction: React.FC<CellActionProps> = ({
         </DropdownMenuTrigger>
         <DropdownMenuContent align='end'>
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
+
+          <DropdownMenuItem onClick={() => setEditRoomOpen(true)}>
+            <Edit className='mr-2 h-4 w-4' />
+            Edit Room
+          </DropdownMenuItem>
 
           <DropdownMenuItem
             onClick={toggleVisibility}
