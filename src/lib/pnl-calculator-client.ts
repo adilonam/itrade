@@ -1,6 +1,6 @@
 'use client';
 
-import type { TransactionWithRelations } from '@/types/transaction';
+import type { Transaction } from '@prisma/client';
 import type { TwelveDataWebSocketPriceData } from '@/types/twelvedata';
 
 /**
@@ -12,7 +12,7 @@ import type { TwelveDataWebSocketPriceData } from '@/types/twelvedata';
  * @returns Calculated P&L or null if calculation fails
  */
 export function calculatePnLClient(
-  transaction: TransactionWithRelations,
+  transaction: Transaction,
   realTimeData?: TwelveDataWebSocketPriceData
 ): number | null {
   // Only calculate dynamic P&L for PLACED transactions
@@ -23,7 +23,7 @@ export function calculatePnLClient(
 
   // If no market or executed price, can't calculate P&L
   if (
-    !transaction.market ||
+    !transaction.marketId ||
     !transaction.executedPrice ||
     !transaction.quantity
   ) {
