@@ -143,7 +143,7 @@ import { z } from 'zod';
  *       403:
  *         description: Forbidden - requires admin role
  *       409:
- *         description: Market already exists
+ *         description: Market with this symbol and type combination already exists
  *       500:
  *         description: Internal server error
  */
@@ -263,14 +263,21 @@ export async function POST(request: NextRequest) {
     const { symbol, type, room, spread = 0, visible = true } = validation.data;
     const upperSymbol = symbol.toUpperCase();
 
-    // Check if market already exists
-    const existingMarket = await prisma.market.findUnique({
-      where: { symbol: upperSymbol }
+    // Check if market already exists (symbol + type combination should be unique)
+    const existingMarket = await prisma.market.findFirst({
+      where: {
+        symbol: upperSymbol,
+        type: type,
+        room: room
+      }
     });
 
     if (existingMarket) {
       return NextResponse.json(
-        { error: 'Market already exists' },
+        {
+          error:
+            'Market with this symbol and type and room combination already exists'
+        },
         { status: 409 }
       );
     }

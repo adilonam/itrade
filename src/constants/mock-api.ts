@@ -4,6 +4,7 @@
 
 import { faker } from '@faker-js/faker';
 import { matchSorter } from 'match-sorter'; // For filtering
+import { User } from '@prisma/client';
 
 export const delay = (ms: number) =>
   new Promise((resolve) => setTimeout(resolve, ms));
@@ -18,20 +19,6 @@ export type Product = {
   id: number;
   category: string;
   updated_at: string;
-};
-
-// Define the shape of User data based on Prisma model
-export type User = {
-  id: string;
-  name: string | null;
-  email: string;
-  emailVerified: Date | null;
-  image: string | null;
-  password: string | null;
-  balance: number;
-  role: 'USER' | 'ADMIN' | 'SUPERADMIN';
-  createdAt: Date;
-  updatedAt: Date;
 };
 
 // Mock product data store
@@ -202,6 +189,7 @@ export const fakeUsers = {
         password: null, // We don't expose password hashes
         balance: faker.number.float({ min: 0, max: 10000, fractionDigits: 2 }),
         role: faker.helpers.arrayElement(roles),
+        leverage: faker.number.int({ min: 1, max: 10 }),
         createdAt,
         updatedAt
       };

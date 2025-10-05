@@ -100,7 +100,7 @@ export const CellAction: React.FC<CellActionProps> = ({
           <DropdownMenuItem onClick={onView}>
             <Eye className='mr-2 h-4 w-4' /> View
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={onEdit} disabled={isOwnAccount}>
+          <DropdownMenuItem onClick={onEdit}>
             <Edit className='mr-2 h-4 w-4' /> Edit
           </DropdownMenuItem>
           {data.role !== 'SUPERADMIN' && !isOwnAccount && (

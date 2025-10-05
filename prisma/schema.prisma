@@ -102,7 +102,7 @@ enum Room {
 model Market {
   id           String        @id @default(cuid())
   type         MarketType
-  symbol       String        @unique
+  symbol       String        
   name         String
   room         Room          @default(TRADING)
   spread       Float         @default(0)

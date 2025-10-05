@@ -16,7 +16,7 @@ import Image from 'next/image';
 import { CellAction } from './cell-action';
 import { ROLE_OPTIONS } from './options';
 
-export const columns: ColumnDef<User>[] = [
+export const createColumns = (currentUserId?: string): ColumnDef<User>[] => [
   {
     accessorKey: 'image',
     header: 'AVATAR',
@@ -53,10 +53,18 @@ export const columns: ColumnDef<User>[] = [
     cell: ({ row }) => {
       const name = row.getValue('name') as string | null;
       const email = row.getValue('email') as string;
+      const isCurrentUser = currentUserId === row.original.id;
 
       return (
         <div className='flex flex-col'>
-          <div className='font-medium'>{name || 'No Name'}</div>
+          <div className='flex items-center gap-2'>
+            <span className='font-medium'>{name || 'No Name'}</span>
+            {isCurrentUser && (
+              <Badge variant='outline' className='text-xs'>
+                You
+              </Badge>
+            )}
+          </div>
           <div className='text-muted-foreground text-sm'>{email}</div>
         </div>
       );
@@ -183,3 +191,6 @@ export const columns: ColumnDef<User>[] = [
     }
   }
 ];
+
+// Export the original columns for backward compatibility
+export const columns = createColumns();

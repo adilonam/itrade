@@ -3,9 +3,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { User } from '@prisma/client';
 import { UserTable } from './user-tables';
-import { columns } from './user-tables/columns';
+import { createColumns } from './user-tables/columns';
 import { parseAsInteger, parseAsString, useQueryStates } from 'nuqs';
 import { fetchUsers, GetUsersParams } from '../services/users';
+import { useSession } from 'next-auth/react';
 
 type UserListingPageProps = {};
 
@@ -14,6 +15,7 @@ export default function UserListingPage({}: UserListingPageProps) {
   const [totalUsers, setTotalUsers] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { data: session } = useSession();
 
   // Use query states to sync with URL parameters
   const [queryParams] = useQueryStates({
@@ -90,7 +92,7 @@ export default function UserListingPage({}: UserListingPageProps) {
         <UserTable
           data={users}
           totalItems={totalUsers}
-          columns={columns}
+          columns={createColumns(session?.user?.id)}
           onDataChange={handleDataChange}
         />
       )}

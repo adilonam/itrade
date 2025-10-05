@@ -91,13 +91,12 @@ export default function UserDetail({ user, onUserUpdate }: UserDetailProps) {
   return (
     <div className='space-y-6'>
       {isOwnAccount && (
-        <div className='flex items-center space-x-2 rounded-md bg-amber-50 p-4 text-amber-800'>
+        <div className='flex items-center space-x-2 rounded-md bg-blue-50 p-4 text-blue-800'>
           <AlertTriangle className='h-5 w-5' />
           <div>
-            <p className='font-medium'>Self-Modification Restricted</p>
+            <p className='font-medium'>Editing Your Own Account</p>
             <p className='text-sm'>
-              You cannot modify your own account through the admin interface.
-              Use your profile settings instead.
+              You are currently viewing and editing your own account.
             </p>
           </div>
         </div>
@@ -118,10 +117,7 @@ export default function UserDetail({ user, onUserUpdate }: UserDetailProps) {
             </p>
           </div>
         </div>
-        <Button
-          onClick={() => router.push(`/admin/users/${user.id}/edit`)}
-          disabled={isOwnAccount}
-        >
+        <Button onClick={() => router.push(`/admin/users/${user.id}/edit`)}>
           <Edit className='mr-2 h-4 w-4' />
           Edit User
         </Button>
@@ -246,11 +242,10 @@ export default function UserDetail({ user, onUserUpdate }: UserDetailProps) {
           </CardHeader>
           <CardContent className='space-y-4'>
             {isOwnAccount && (
-              <div className='flex items-center space-x-2 rounded-md bg-amber-50 p-3 text-amber-800'>
+              <div className='flex items-center space-x-2 rounded-md bg-blue-50 p-3 text-blue-800'>
                 <AlertTriangle className='h-4 w-4' />
                 <p className='text-sm font-medium'>
-                  You cannot modify your own account balance through the admin
-                  interface.
+                  You are editing your own account balance.
                 </p>
               </div>
             )}
@@ -272,13 +267,12 @@ export default function UserDetail({ user, onUserUpdate }: UserDetailProps) {
                       onChange={(e) => setBalanceValue(e.target.value)}
                       placeholder='Enter balance'
                       className='w-full'
-                      disabled={isOwnAccount}
                     />
                     <div className='flex space-x-2'>
                       <Button
                         size='sm'
                         onClick={handleBalanceUpdate}
-                        disabled={isUpdatingBalance || isOwnAccount}
+                        disabled={isUpdatingBalance}
                       >
                         <Save className='mr-1 h-3 w-3' />
                         {isUpdatingBalance ? 'Saving...' : 'Save'}
@@ -287,7 +281,7 @@ export default function UserDetail({ user, onUserUpdate }: UserDetailProps) {
                         size='sm'
                         variant='outline'
                         onClick={handleBalanceCancel}
-                        disabled={isUpdatingBalance || isOwnAccount}
+                        disabled={isUpdatingBalance}
                       >
                         <X className='mr-1 h-3 w-3' />
                         Cancel
@@ -303,7 +297,6 @@ export default function UserDetail({ user, onUserUpdate }: UserDetailProps) {
                       size='sm'
                       variant='outline'
                       onClick={() => setIsEditingBalance(true)}
-                      disabled={isOwnAccount}
                     >
                       <Edit className='mr-1 h-3 w-3' />
                       Edit

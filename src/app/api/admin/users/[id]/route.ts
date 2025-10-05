@@ -35,7 +35,7 @@ import { z } from 'zod';
  *     tags:
  *       - Admin - Users
  *     summary: Update user
- *     description: Update a user's information. Requires ADMIN or SUPERADMIN role.
+ *     description: Update a user's information. Requires ADMIN or SUPERADMIN role. Users can modify their own accounts.
  *     security:
  *       - ApiKeyAuth: []
  *     parameters:
@@ -228,13 +228,7 @@ export async function PUT(
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // Prevent users from modifying themselves
-    if (session?.user.id === id) {
-      return NextResponse.json(
-        { error: 'Cannot modify your own account through admin interface' },
-        { status: 403 }
-      );
-    }
+    // Allow users to modify themselves through admin interface
 
     const updateData = { ...validation.data };
 

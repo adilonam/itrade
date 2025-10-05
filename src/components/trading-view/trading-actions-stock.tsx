@@ -54,26 +54,8 @@ export function TradingActionsStock({
   const [isCreatingTransaction, setIsCreatingTransaction] = useState(false);
   const [showBuyDialog, setShowBuyDialog] = useState(false);
   const [showSellDialog, setShowSellDialog] = useState(false);
-  const [userBalance, setUserBalance] = useState<number | null>(null);
-
-  // Fetch user balance
-  useEffect(() => {
-    async function fetchUserBalance() {
-      if (!session?.user?.id) return;
-
-      try {
-        const response = await fetch('/api/user/profile');
-        if (!response.ok) return;
-
-        const data = await response.json();
-        setUserBalance(data.user?.balance ?? 0);
-      } catch (error) {
-        // Silently handle error
-      }
-    }
-
-    fetchUserBalance();
-  }, [session?.user?.id]);
+  // Get user balance from session (no need to fetch separately)
+  const userBalance = session?.user?.balance ?? 0;
 
   // Calculate required margin for SELL orders
   const calculateSellMargin = () => {
@@ -165,12 +147,8 @@ export function TradingActionsStock({
       await response.json();
       toast.success(`${type} ${orderType} order placed successfully!`);
 
-      // Refresh user balance
-      const balanceResponse = await fetch('/api/user/profile');
-      if (balanceResponse.ok) {
-        const balanceData = await balanceResponse.json();
-        setUserBalance(balanceData.user?.balance ?? 0);
-      }
+      // Note: Balance will be updated in the session on next page refresh or login
+      // For real-time updates, you might want to implement a balance refresh mechanism
 
       // Reset form
       setQuantity('');
