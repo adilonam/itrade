@@ -19,13 +19,32 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { UserTransactionsTable } from './user-transactions-table';
+import { UserTransactionsTableRoomStock } from './user-transactions-table-room-stock';
 import type {
-  TransactionWithRelations,
-  TransactionFilters,
+  Transaction,
   TransactionType,
-  TransactionStatus
-} from '@/types/transaction';
+  TransactionStatus,
+  Market,
+  User
+} from '@prisma/client';
+
+// Extended transaction type with relations
+type TransactionWithRelations = Transaction & {
+  user: User | null;
+  market: Market | null;
+};
+
+// Transaction filters interface
+interface TransactionFilters {
+  userId?: string;
+  type?: TransactionType;
+  status?: TransactionStatus;
+  room?: string;
+  marketId?: string;
+  dateFrom?: Date;
+  dateTo?: Date;
+  search?: string;
+}
 import {
   IconSearch,
   IconFilter,
@@ -42,7 +61,7 @@ interface PaginationInfo {
   pages: number;
 }
 
-export function UserTransactionsView() {
+export function UserTransactionsViewRoomStock() {
   const [transactions, setTransactions] = useState<TransactionWithRelations[]>(
     []
   );
@@ -338,7 +357,7 @@ export function UserTransactionsView() {
       )}
 
       {/* Transactions Table */}
-      <UserTransactionsTable
+      <UserTransactionsTableRoomStock
         transactions={transactions}
         loading={loading}
         onClose={handleCloseTransaction}

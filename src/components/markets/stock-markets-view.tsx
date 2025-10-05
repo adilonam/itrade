@@ -227,14 +227,14 @@ export function StockMarketsView({
             <MarketCard
               key={market.id}
               market={market}
-              tradingRoute='/dashboard/stock-trading'
+              tradingRoute='/dashboard/trading-view-room-stock'
             />
           ))}
         </div>
       ) : (
         <MarketList
           markets={paginatedMarkets}
-          tradingRoute='/dashboard/stock-trading'
+          tradingRoute='/dashboard/trading-view-room-stock'
         />
       )}
 

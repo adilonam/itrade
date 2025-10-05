@@ -124,7 +124,7 @@ class TwelveDataService {
       }
 
       // Get spread from database Market model
-      const market = await prisma.market.findUnique({
+      const market = await prisma.market.findFirst({
         where: { symbol: symbol.toUpperCase() }
       });
 

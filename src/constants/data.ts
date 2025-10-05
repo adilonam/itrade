@@ -14,52 +14,25 @@ export type Product = {
 //Info: The following data is used for the sidebar navigation and Cmd K bar.
 export const navItems: NavItem[] = [
   {
-    title: 'Markets',
-    url: '/dashboard/markets',
-    icon: 'market',
-    isActive: false,
-    shortcut: ['m', 'm'],
-    items: [], // Empty array as there are no child items for Dashboard
-    isAdmin: false
-  },
-  {
-    title: 'Stock Markets',
-    url: '/dashboard/stock-markets',
-    icon: 'chart',
-    isActive: false,
-    shortcut: ['s', 'm'],
-    items: [], // Empty array as there are no child items
-    isAdmin: false
-  },
-  {
-    title: 'Market Trading',
-    url: '/dashboard/market-trading',
+    title: 'Room Trading',
+    url: '/dashboard/markets-room-trading',
     icon: 'trendingUp',
     isActive: false,
-    shortcut: ['m', 't'],
+    shortcut: ['r', 't'],
     items: [], // Empty array as there are no child items
     isAdmin: false
   },
   {
-    title: 'Trading View',
-    url: '/dashboard/trading-view',
-    icon: 'chart',
+    title: 'Room Stock',
+    url: '/dashboard/markets-room-stock',
+    icon: 'trendingUp',
     isActive: false,
-    shortcut: ['t', 'v'],
+    shortcut: ['s', 's'],
     items: [], // Empty array as there are no child items
     isAdmin: false
   },
   {
-    title: 'My Transactions',
-    url: '/dashboard/transactions',
-    icon: 'switchVertical',
-    isActive: false,
-    shortcut: ['m', 't'],
-    items: [], // Empty array as there are no child items
-    isAdmin: false
-  },
-  {
-    title: 'My Transactions Trading',
+    title: 'My Transactions RT',
     url: '/dashboard/transactions-room-trading',
     icon: 'switchVertical',
     isActive: false,
@@ -67,6 +40,16 @@ export const navItems: NavItem[] = [
     items: [], // Empty array as there are no child items
     isAdmin: false
   },
+  {
+    title: 'My Transactions RS',
+    url: '/dashboard/transactions-room-stock',
+    icon: 'switchVertical',
+    isActive: false,
+    shortcut: ['m', 't'],
+    items: [], // Empty array as there are no child items
+    isAdmin: false
+  },
+
   {
     title: 'Investments',
     url: '/dashboard/investments',

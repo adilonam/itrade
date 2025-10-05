@@ -25,10 +25,7 @@ interface MarketListProps {
   tradingRoute?: string;
 }
 
-export function MarketList({
-  markets,
-  tradingRoute = '/dashboard/room-trading'
-}: MarketListProps) {
+export function MarketList({ markets, tradingRoute }: MarketListProps) {
   const router = useRouter();
   const { realTimePrices, isConnected } = useMarketsWebSocket();
 

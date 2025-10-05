@@ -289,7 +289,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error: 'Market validation failed',
-          message: `Symbol "${upperSymbol}" not found on TwelveData API`
+          message: `Symbol "${upperSymbol}" got error on TwelveData API`
         },
         { status: 400 }
       );

@@ -1,7 +1,7 @@
 import PageContainer from '@/components/layout/page-container';
 import { Heading } from '@/components/ui/heading';
 import { Separator } from '@/components/ui/separator';
-import { UserTransactionsView } from '@/components/user/transactions/user-transactions-view';
+import { UserTransactionsViewRoomStock } from '@/components/user/transactions/user-transactions-view-room-stock';
 
 export const metadata = {
   title: 'Dashboard: Transactions'
@@ -18,7 +18,7 @@ export default async function Page() {
           />
         </div>
         <Separator />
-        <UserTransactionsView />
+        <UserTransactionsViewRoomStock />
       </div>
     </PageContainer>
   );

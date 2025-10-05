@@ -29,7 +29,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger
 } from '@/components/ui/alert-dialog';
-import type { TransactionWithRelations } from '@/types/transaction';
+import type { Market, Transaction } from '@prisma/client';
 import { useMarketsWebSocket } from '@/contexts/markets-websocket-context';
 import { calculatePnLClient } from '@/lib/pnl-calculator-client';
 import {
@@ -40,12 +40,14 @@ import {
   IconMinus
 } from '@tabler/icons-react';
 
+type TransactionWithMarket = Transaction & {
+  market: Market | null;
+};
 interface UserTransactionsTableRoomTradingProps {
-  transactions: TransactionWithRelations[];
+  transactions: TransactionWithMarket[];
   loading: boolean;
   onClose: (transactionId: string) => void;
 }
-
 export function UserTransactionsTableRoomTrading({
   transactions,
   loading,

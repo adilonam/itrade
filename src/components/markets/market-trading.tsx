@@ -234,11 +234,18 @@ export function MarketTrading({
       ) : currentView === 'cards' ? (
         <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
           {paginatedMarkets.map((market) => (
-            <MarketCard key={market.id} market={market} />
+            <MarketCard
+              key={market.id}
+              market={market}
+              tradingRoute='/dashboard/trading-view-room-trading'
+            />
           ))}
         </div>
       ) : (
-        <MarketList markets={paginatedMarkets} />
+        <MarketList
+          markets={paginatedMarkets}
+          tradingRoute='/dashboard/trading-view-room-trading'
+        />
       )}
 
       {/* Pagination Controls */}

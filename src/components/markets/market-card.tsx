@@ -18,10 +18,7 @@ interface MarketCardProps {
   tradingRoute?: string;
 }
 
-export function MarketCard({
-  market,
-  tradingRoute = '/dashboard/room-trading'
-}: MarketCardProps) {
+export function MarketCard({ market, tradingRoute }: MarketCardProps) {
   const { realTimePrices, isConnected } = useMarketsWebSocket();
 
   // Get real-time price data for this market   lastChange = nprice - oprice , lastchagenG = Gprice -oprice   , oprice = nprice - lastChange

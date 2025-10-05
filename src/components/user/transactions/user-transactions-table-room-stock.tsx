@@ -29,7 +29,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger
 } from '@/components/ui/alert-dialog';
-import type { TransactionWithRelations } from '@/types/transaction';
+import type { Market, Transaction } from '@prisma/client';
 import {
   IconX,
   IconLoader2,
@@ -38,17 +38,21 @@ import {
   IconMinus
 } from '@tabler/icons-react';
 
-interface UserTransactionsTableProps {
-  transactions: TransactionWithRelations[];
+type TransactionWithMarket = Transaction & {
+  market: Market | null;
+};
+
+interface UserTransactionsTableRoomStockProps {
+  transactions: TransactionWithMarket[];
   loading: boolean;
   onClose: (transactionId: string) => void;
 }
 
-export function UserTransactionsTable({
+export function UserTransactionsTableRoomStock({
   transactions,
   loading,
   onClose
-}: UserTransactionsTableProps) {
+}: UserTransactionsTableRoomStockProps) {
   const [closingTransactionId, setClosingTransactionId] = useState<
     string | null
   >(null);
