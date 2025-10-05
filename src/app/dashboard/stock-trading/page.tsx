@@ -1,13 +1,13 @@
 import { Heading } from '@/components/ui/heading';
 import { Separator } from '@/components/ui/separator';
 import { TradingViewRoomTrading } from '@/components/trading-view/trading-view-room-trading';
-import { TradingActionsRoomTrading } from '@/components/trading-view/trading-actions-room-trading';
+import { TradingActionsStock } from '@/components/trading-view/trading-actions-stock';
 import { prisma } from '@/lib/prisma';
 import { toTradingViewSymbol } from '@/lib/market-symbol';
 import { notFound } from 'next/navigation';
 
 export const metadata = {
-  title: 'Dashboard: Room Trading'
+  title: 'Dashboard: Stock Trading'
 };
 
 type PageProps = {
@@ -26,7 +26,7 @@ export default async function Page(props: PageProps) {
     market = await prisma.market.findFirst({
       where: {
         id: marketId,
-        OR: [{ room: 'TRADING' }, { room: 'STOCK_AND_TRADING' }],
+        OR: [{ room: 'STOCK' }, { room: 'STOCK_AND_TRADING' }],
         visible: true
       }
     });
@@ -34,6 +34,7 @@ export default async function Page(props: PageProps) {
     if (!market) {
       notFound();
     }
+
     // Convert to TradingView symbol format
     tradingViewSymbol = toTradingViewSymbol(market);
   }
@@ -43,11 +44,11 @@ export default async function Page(props: PageProps) {
       <div className='flex min-h-full flex-col space-y-6 p-4 md:px-6'>
         <div className='flex items-start justify-between'>
           <Heading
-            title='Room Trading'
+            title='Stock Trading'
             description={
               market
                 ? `Advanced charting and technical analysis for ${market.symbol} - ${market.name}`
-                : 'Advanced charting and technical analysis tools for trading.'
+                : 'Advanced charting and technical analysis tools for stock trading.'
             }
           />
         </div>
@@ -64,7 +65,7 @@ export default async function Page(props: PageProps) {
 
         {/* Trading Actions - Full width */}
         <div className='w-full'>
-          <TradingActionsRoomTrading market={market} />
+          <TradingActionsStock market={market} />
         </div>
 
         {/* Bottom spacing */}

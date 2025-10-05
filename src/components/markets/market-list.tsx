@@ -22,9 +22,13 @@ import { useMarketsWebSocket } from '@/contexts/markets-websocket-context';
 
 interface MarketListProps {
   markets: Market[];
+  tradingRoute?: string;
 }
 
-export function MarketList({ markets }: MarketListProps) {
+export function MarketList({
+  markets,
+  tradingRoute = '/dashboard/room-trading'
+}: MarketListProps) {
   const router = useRouter();
   const { realTimePrices, isConnected } = useMarketsWebSocket();
 
@@ -74,7 +78,7 @@ export function MarketList({ markets }: MarketListProps) {
                 className='hover:bg-muted/50 cursor-pointer'
                 onClick={() =>
                   router.push(
-                    `/dashboard/room-trading?pk=${encodeURIComponent(market.id)}`
+                    `${tradingRoute}?pk=${encodeURIComponent(market.id)}`
                   )
                 }
               >

@@ -65,7 +65,7 @@ export async function GET() {
       name: user.name,
       email: user.email,
       image: user.image,
-      balance: (user as any).balance || 0, // Type assertion for balance
+      balance: user.balance,
       role: user.role,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt

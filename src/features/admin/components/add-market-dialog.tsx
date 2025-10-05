@@ -47,6 +47,9 @@ const formSchema = z.object({
   type: z.enum(['FOREX', 'CRYPTO', 'STOCKS', 'COMMODITIES', 'INDICES'], {
     required_error: 'Please select a market type'
   }),
+  room: z.enum(['STOCK', 'TRADING', 'STOCK_AND_TRADING'], {
+    required_error: 'Please select a market room'
+  }),
   spread: z.coerce.number().min(0, 'Spread must be non-negative').optional(),
   visible: z.boolean().optional()
 });
@@ -70,6 +73,7 @@ export function AddMarketDialog({
     resolver: zodResolver(formSchema),
     defaultValues: {
       symbol: '',
+      room: 'TRADING',
       spread: 0,
       visible: true
     }
@@ -82,6 +86,7 @@ export function AddMarketDialog({
       const marketData: CreateMarketParams = {
         symbol: data.symbol.toUpperCase(),
         type: data.type,
+        room: data.room,
         ...(data.spread !== undefined && { spread: data.spread }),
         ...(data.visible !== undefined && { visible: data.visible })
       };
@@ -164,6 +169,35 @@ export function AddMarketDialog({
                       <SelectItem value='STOCKS'>Stocks</SelectItem>
                       <SelectItem value='COMMODITIES'>Commodities</SelectItem>
                       <SelectItem value='INDICES'>Indices</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name='room'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Market Room</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    disabled={loading}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder='Select market room' />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value='TRADING'>Trading Only</SelectItem>
+                      <SelectItem value='STOCK'>Stock Only</SelectItem>
+                      <SelectItem value='STOCK_AND_TRADING'>
+                        Stock & Trading
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />

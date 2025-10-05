@@ -138,6 +138,46 @@ export const columns: ColumnDef<AdminMarket>[] = [
     }
   },
   {
+    accessorKey: 'room',
+    header: ({ column }: { column: Column<AdminMarket, unknown> }) => (
+      <DataTableColumnHeader column={column} title='Room' />
+    ),
+    cell: ({ row }) => {
+      const room = row.getValue('room') as string;
+
+      const getRoomColor = (room: string) => {
+        switch (room) {
+          case 'TRADING':
+            return 'bg-indigo-100 text-indigo-800';
+          case 'STOCK':
+            return 'bg-teal-100 text-teal-800';
+          case 'STOCK_AND_TRADING':
+            return 'bg-violet-100 text-violet-800';
+          default:
+            return 'bg-gray-100 text-gray-800';
+        }
+      };
+
+      const getRoomLabel = (room: string) => {
+        switch (room) {
+          case 'TRADING':
+            return 'Trading';
+          case 'STOCK':
+            return 'Stock';
+          case 'STOCK_AND_TRADING':
+            return 'Stock & Trading';
+          default:
+            return room;
+        }
+      };
+
+      return <Badge className={getRoomColor(room)}>{getRoomLabel(room)}</Badge>;
+    },
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    }
+  },
+  {
     accessorKey: 'createdAt',
     header: ({ column }: { column: Column<AdminMarket, unknown> }) => (
       <DataTableColumnHeader column={column} title='Created' />

@@ -79,7 +79,8 @@ import { z } from 'zod';
 
 const updateMarketSchema = z.object({
   visible: z.boolean().optional(),
-  spread: z.number().min(0).optional()
+  spread: z.number().min(0).optional(),
+  room: z.enum(['STOCK', 'TRADING', 'STOCK_AND_TRADING']).optional()
 });
 
 type RouteParams = {
