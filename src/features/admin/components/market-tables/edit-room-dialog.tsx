@@ -77,7 +77,9 @@ export function EditRoomDialog({
             <label className='text-sm font-medium'>Market Room</label>
             <Select
               value={selectedRoom}
-              onValueChange={setSelectedRoom}
+              onValueChange={(value) =>
+                setSelectedRoom(value as typeof selectedRoom)
+              }
               disabled={loading}
             >
               <SelectTrigger>

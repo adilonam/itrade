@@ -51,7 +51,7 @@ export async function fetchCurrentPrice(
  */
 export async function calculateTransactionPnL(
   transaction: Transaction & {
-    market: Market | null;
+    market: Market;
   }
 ): Promise<number | null> {
   try {
@@ -166,7 +166,7 @@ export async function calculateTransactionsPnL(
     transactions.map(async (transaction) => {
       const calculatedPnL = await calculateTransactionPnL(
         transaction as Transaction & {
-          market: Market | null;
+          market: Market;
         }
       );
       return {

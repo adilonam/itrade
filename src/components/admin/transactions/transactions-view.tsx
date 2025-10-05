@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -21,11 +21,35 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { TransactionsTable } from './transactions-table';
 import { TransactionForm } from './transaction-form';
 import { TransactionStats, TransactionEnums } from './transaction-stats';
-import type {
-  TransactionWithRelations,
-  TransactionFilters,
-  TransactionStats as TransactionStatsType
-} from '@/types/transaction';
+import type { Transaction, Market, User } from '@prisma/client';
+
+// Extended transaction type with relations
+type TransactionWithRelations = Transaction & {
+  user: User | null;
+  market: Market | null;
+};
+
+// Transaction filters interface
+type TransactionFilters = {
+  userId?: string;
+  type?: string;
+  status?: string;
+  room?: string;
+  marketId?: string;
+  dateFrom?: Date;
+  dateTo?: Date;
+  search?: string;
+};
+
+// Transaction stats type
+type TransactionStats = {
+  totalTransactions: number;
+  totalVolume: number;
+  totalPnL: number;
+  completedTransactions: number;
+  pendingTransactions: number;
+  failedTransactions: number;
+};
 import {
   IconPlus,
   IconSearch,
@@ -46,7 +70,7 @@ export function TransactionsView() {
   const [transactions, setTransactions] = useState<TransactionWithRelations[]>(
     []
   );
-  const [stats, setStats] = useState<TransactionStatsType | null>(null);
+  const [stats, setStats] = useState<TransactionStats | null>(null);
   const [enums, setEnums] = useState<{
     transactionTypes: string[];
     transactionStatuses: string[];
@@ -74,49 +98,49 @@ export function TransactionsView() {
   const [currentFilters, setCurrentFilters] = useState<TransactionFilters>({});
 
   // Load transactions
-  const loadTransactions = async (
-    page = 1,
-    newFilters: TransactionFilters = {}
-  ) => {
-    try {
-      setLoading(true);
-      setError(null);
+  const loadTransactions = useCallback(
+    async (page = 1, newFilters: TransactionFilters = {}) => {
+      try {
+        setLoading(true);
+        setError(null);
 
-      const params = new URLSearchParams({
-        page: page.toString(),
-        limit: pagination.limit.toString()
-      });
+        const params = new URLSearchParams({
+          page: page.toString(),
+          limit: pagination.limit.toString()
+        });
 
-      // Add filter values, handling Date objects and undefined values
-      Object.entries(newFilters).forEach(([key, value]) => {
-        if (value !== undefined && value !== '') {
-          if (value instanceof Date) {
-            params.set(key, value.toISOString());
-          } else {
-            params.set(key, value.toString());
+        // Add filter values, handling Date objects and undefined values
+        Object.entries(newFilters).forEach(([key, value]) => {
+          if (value !== undefined && value !== '') {
+            if (value instanceof Date) {
+              params.set(key, value.toISOString());
+            } else {
+              params.set(key, value.toString());
+            }
           }
+        });
+
+        const response = await fetch(`/api/admin/transactions?${params}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch transactions');
         }
-      });
 
-      const response = await fetch(`/api/admin/transactions?${params}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch transactions');
+        const data = await response.json();
+        setTransactions(data.transactions);
+        setPagination(data.pagination);
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : 'Failed to load transactions'
+        );
+      } finally {
+        setLoading(false);
       }
-
-      const data = await response.json();
-      setTransactions(data.transactions);
-      setPagination(data.pagination);
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : 'Failed to load transactions'
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+    [pagination.limit]
+  );
 
   // Load stats
-  const loadStats = async () => {
+  const loadStats = useCallback(async () => {
     try {
       const params = new URLSearchParams();
       if (currentFilters.userId) params.set('userId', currentFilters.userId);
@@ -134,18 +158,19 @@ export function TransactionsView() {
       setStats(data.stats);
       setEnums(data.enums);
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error('Failed to load stats:', err);
     }
-  };
+  }, [currentFilters]);
 
   // Load data on mount and when filters change
   useEffect(() => {
     loadTransactions(1, currentFilters);
-  }, [currentFilters]);
+  }, [currentFilters, loadTransactions]);
 
   useEffect(() => {
     loadStats();
-  }, [currentFilters]);
+  }, [loadStats]);
 
   // Handle filter changes
   const handleFilterChange = (key: keyof TransactionFilters, value: any) => {

@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { calculateTransactionPnL } from '@/lib/pnl-calculator';
-import type { CreateTransactionData } from '@/types/transaction';
+import { Market, Transaction } from '@prisma/client';
+
+// Create transaction data type
+type CreateTransactionData = Transaction;
 
 /**
  * @swagger
@@ -221,15 +224,7 @@ export async function GET(request: NextRequest) {
               email: true
             }
           },
-          market: {
-            select: {
-              id: true,
-              symbol: true,
-              name: true,
-              type: true,
-              lastPrice: true
-            }
-          }
+          market: true
         },
         orderBy: {
           executedAt: 'desc'
@@ -244,7 +239,11 @@ export async function GET(request: NextRequest) {
     const transactionsWithPnL = await Promise.all(
       transactions.map(async (transaction) => {
         if (transaction.status === 'PLACED') {
-          const calculatedPnL = await calculateTransactionPnL(transaction);
+          const calculatedPnL = await calculateTransactionPnL(
+            transaction as Transaction & {
+              market: Market;
+            }
+          );
           return {
             ...transaction,
             calculatedPnL
@@ -348,22 +347,18 @@ export async function POST(request: NextRequest) {
             email: true
           }
         },
-        market: {
-          select: {
-            id: true,
-            symbol: true,
-            name: true,
-            type: true,
-            lastPrice: true
-          }
-        }
+        market: true
       }
     });
 
     // Calculate PnL for PLACED transactions only
     let calculatedPnL = null;
     if (transaction.status === 'PLACED') {
-      calculatedPnL = await calculateTransactionPnL(transaction);
+      calculatedPnL = await calculateTransactionPnL(
+        transaction as Transaction & {
+          market: Market;
+        }
+      );
     }
 
     const response = {

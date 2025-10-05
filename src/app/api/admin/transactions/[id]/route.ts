@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import type { UpdateTransactionData } from '@/types/transaction';
+import type { Transaction } from '@prisma/client';
+
+// Update transaction data type
+type UpdateTransactionData = Partial<Transaction>;
 
 /**
  * @swagger

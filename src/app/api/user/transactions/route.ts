@@ -3,7 +3,8 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { refreshMarkets, calculateTransactionPnL } from '@/lib/pnl-calculator';
-import type { CreateTransactionData } from '@/types/transaction';
+// Create transaction data type
+type CreateTransactionData = Transaction;
 import { Market, Transaction } from '@prisma/client';
 
 /**
@@ -225,15 +226,7 @@ export async function GET(request: NextRequest) {
               email: true
             }
           },
-          market: {
-            select: {
-              id: true,
-              symbol: true,
-              name: true,
-              type: true,
-              lastPrice: true
-            }
-          }
+          market: true
         },
         orderBy: {
           executedAt: 'desc'
@@ -250,7 +243,7 @@ export async function GET(request: NextRequest) {
         if (transaction.status === 'PLACED') {
           const pnl = await calculateTransactionPnL(
             transaction as Transaction & {
-              market: Market | null;
+              market: Market;
             }
           );
 
@@ -440,7 +433,7 @@ export async function POST(request: NextRequest) {
         // Use executedPrice as the reference price for validation
         const referencePrice = executedPrice;
         // Validate take profit
-        if (body.takeProfit !== undefined) {
+        if (body.takeProfit !== undefined && body.takeProfit !== null) {
           if (body.takeProfit <= 0) {
             return NextResponse.json(
               { error: 'Take profit must be greater than 0' },
@@ -470,7 +463,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Validate stop loss
-        if (body.stopLoss !== undefined) {
+        if (body.stopLoss !== undefined && body.stopLoss !== null) {
           if (body.stopLoss <= 0) {
             return NextResponse.json(
               { error: 'Stop loss must be greater than 0' },
@@ -500,7 +493,12 @@ export async function POST(request: NextRequest) {
         }
 
         // Validate take profit vs stop loss relationship
-        if (body.takeProfit !== undefined && body.stopLoss !== undefined) {
+        if (
+          body.takeProfit !== undefined &&
+          body.stopLoss !== undefined &&
+          body.takeProfit !== null &&
+          body.stopLoss !== null
+        ) {
           if (body.type === 'BUY' && body.takeProfit <= body.stopLoss) {
             return NextResponse.json(
               {
@@ -548,15 +546,7 @@ export async function POST(request: NextRequest) {
             email: true
           }
         },
-        market: {
-          select: {
-            id: true,
-            symbol: true,
-            name: true,
-            type: true,
-            lastPrice: true
-          }
-        }
+        market: true
       }
     });
 
@@ -594,7 +584,7 @@ export async function POST(request: NextRequest) {
     if (transaction.status === 'PLACED') {
       pnl = await calculateTransactionPnL(
         transaction as Transaction & {
-          market: Market | null;
+          market: Market;
         }
       );
     }

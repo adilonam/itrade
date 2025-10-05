@@ -22,13 +22,24 @@ import {
 } from '@/components/ui/dialog';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import type {
-  TransactionWithRelations,
-  CreateTransactionData,
-  UpdateTransactionData,
   TransactionType,
-  TransactionStatus
-} from '@/types/transaction';
-import { IconX } from '@tabler/icons-react';
+  TransactionStatus,
+  Transaction,
+  Market,
+  User
+} from '@prisma/client';
+
+// Extended transaction type with relations
+type TransactionWithRelations = Transaction & {
+  user: User | null;
+  market: Market | null;
+};
+
+// Create transaction data type
+type CreateTransactionData = Transaction;
+
+// Update transaction data type
+type UpdateTransactionData = Partial<Transaction>;
 
 interface TransactionFormProps {
   transaction?: TransactionWithRelations | null;

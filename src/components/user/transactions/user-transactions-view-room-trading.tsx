@@ -1,9 +1,8 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import {
   Card,
   CardContent,
@@ -20,12 +19,25 @@ import {
 } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { UserTransactionsTableRoomTrading } from './user-transactions-table-room-trading';
-import type {
-  TransactionWithRelations,
-  TransactionFilters,
-  TransactionType,
-  TransactionStatus
-} from '@/types/transaction';
+import type { Transaction, Market, User } from '@prisma/client';
+
+// Extended transaction type with relations
+type TransactionWithRelations = Transaction & {
+  user: User | null;
+  market: Market | null;
+};
+
+// Transaction filters interface
+type TransactionFilters = {
+  userId?: string;
+  type?: string;
+  status?: string;
+  room?: string;
+  marketId?: string;
+  dateFrom?: Date;
+  dateTo?: Date;
+  search?: string;
+};
 import {
   IconSearch,
   IconFilter,
@@ -65,51 +77,51 @@ export function UserTransactionsViewRoomTrading() {
   const [currentFilters, setCurrentFilters] = useState<TransactionFilters>({});
 
   // Load transactions
-  const loadTransactions = async (
-    page = 1,
-    newFilters: TransactionFilters = {}
-  ) => {
-    try {
-      setLoading(true);
-      setError(null);
+  const loadTransactions = useCallback(
+    async (page = 1, newFilters: TransactionFilters = {}) => {
+      try {
+        setLoading(true);
+        setError(null);
 
-      const params = new URLSearchParams({
-        page: page.toString(),
-        limit: pagination.limit.toString()
-      });
+        const params = new URLSearchParams({
+          page: page.toString(),
+          limit: pagination.limit.toString()
+        });
 
-      // Add filter values, handling Date objects and undefined values
-      Object.entries(newFilters).forEach(([key, value]) => {
-        if (value !== undefined && value !== '') {
-          if (value instanceof Date) {
-            params.set(key, value.toISOString());
-          } else {
-            params.set(key, value.toString());
+        // Add filter values, handling Date objects and undefined values
+        Object.entries(newFilters).forEach(([key, value]) => {
+          if (value !== undefined && value !== '') {
+            if (value instanceof Date) {
+              params.set(key, value.toISOString());
+            } else {
+              params.set(key, value.toString());
+            }
           }
+        });
+
+        const response = await fetch(`/api/user/transactions?${params}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch transactions');
         }
-      });
 
-      const response = await fetch(`/api/user/transactions?${params}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch transactions');
+        const data = await response.json();
+        setTransactions(data.transactions);
+        setPagination(data.pagination);
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : 'Failed to load transactions'
+        );
+      } finally {
+        setLoading(false);
       }
-
-      const data = await response.json();
-      setTransactions(data.transactions);
-      setPagination(data.pagination);
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : 'Failed to load transactions'
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+    [pagination.limit]
+  );
 
   // Load data on mount and when filters change
   useEffect(() => {
     loadTransactions(1, currentFilters);
-  }, [currentFilters]);
+  }, [currentFilters, loadTransactions]);
 
   // Handle filter changes
   const handleFilterChange = (key: keyof TransactionFilters, value: any) => {

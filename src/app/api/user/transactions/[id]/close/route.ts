@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { refreshMarkets, calculateTransactionPnL } from '@/lib/pnl-calculator';
-import { Market } from '@prisma/client';
+import { Market, Transaction } from '@prisma/client';
 
 /**
  * @swagger
@@ -134,7 +134,7 @@ export async function PATCH(
         };
 
         calculatedPnL = await calculateTransactionPnL(
-          transactionWithClosedPrice
+          transactionWithClosedPrice as Transaction & { market: Market }
         );
 
         if (calculatedPnL !== null) {

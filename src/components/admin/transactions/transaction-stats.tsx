@@ -8,7 +8,15 @@ import {
   CardTitle
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import type { TransactionStats } from '@/types/transaction';
+// Transaction stats type
+type TransactionStats = {
+  totalTransactions: number;
+  totalVolume: number;
+  totalPnL: number;
+  completedTransactions: number;
+  pendingTransactions: number;
+  failedTransactions: number;
+};
 import {
   IconTrendingUp,
   IconTrendingDown,

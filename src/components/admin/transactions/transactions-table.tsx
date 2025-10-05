@@ -30,10 +30,18 @@ import {
   AlertDialogTrigger
 } from '@/components/ui/alert-dialog';
 import type {
-  TransactionWithRelations,
   TransactionType,
-  TransactionStatus
-} from '@/types/transaction';
+  TransactionStatus,
+  Transaction,
+  Market,
+  User
+} from '@prisma/client';
+
+// Extended transaction type with relations
+type TransactionWithRelations = Transaction & {
+  user: User | null;
+  market: Market | null;
+};
 import {
   IconEdit,
   IconTrash,
@@ -203,10 +211,10 @@ export function TransactionsTable({
                   <TableCell>
                     <div>
                       <div className='font-medium'>
-                        {transaction.user.name || 'N/A'}
+                        {transaction.user?.name || 'N/A'}
                       </div>
                       <div className='text-muted-foreground text-sm'>
-                        {transaction.user.email}
+                        {transaction.user?.email}
                       </div>
                     </div>
                   </TableCell>

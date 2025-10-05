@@ -31,8 +31,12 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "src/app/docs/layout.tsx",
-    "src/app/admin/layout.tsx"
-, "src/features/admin/components/market-listing.tsx", "src/components/markets/markets-view.back", "src/components/trading-view/trading-actions.back", "src/components/user/transactions/user-transactions-table-room-stock.tsx"  ],
+    "src/app/admin/layout.tsx",
+    "src/features/admin/components/market-listing.tsx",
+    "src/components/markets/markets-view.back",
+    "src/components/trading-view/trading-actions.back",
+    "src/components/user/transactions/user-transactions-table-room-stock.tsx"
+, "src/types/transaction.back"  ],
   "exclude": ["node_modules"],
   "moduleResolution": ["node_modules", ".next", "node"]
 }

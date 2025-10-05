@@ -1,7 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { TransactionType, TransactionStatus } from '@prisma/client';
-import type { TransactionStats } from '@/types/transaction';
+// Transaction stats type
+type TransactionStats = {
+  totalTransactions: number;
+  totalVolume: number;
+  totalPnL: number;
+  completedTransactions: number;
+  pendingTransactions: number;
+  failedTransactions: number;
+};
 
 /**
  * @swagger
@@ -132,6 +140,7 @@ export async function GET(request: NextRequest) {
       }
     });
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('Error fetching transaction stats:', error);
     return NextResponse.json(
       { error: 'Failed to fetch transaction statistics' },
