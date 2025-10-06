@@ -48,6 +48,12 @@ import { Market, Position } from '@prisma/client';
  *         schema:
  *           type: string
  *         description: Search in description
+ *       - in: query
+ *         name: room
+ *         schema:
+ *           type: string
+ *           enum: [STOCK, TRADING, STOCK_AND_TRADING]
+ *         description: Filter by room type
  *     responses:
  *       200:
  *         description: List of user's positions with calculated PnL
@@ -197,6 +203,7 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status');
     const marketId = searchParams.get('marketId');
     const search = searchParams.get('search');
+    const room = searchParams.get('room');
 
     const skip = (page - 1) * limit;
 
@@ -208,6 +215,7 @@ export async function GET(request: NextRequest) {
     if (type) where.type = type;
     if (status) where.status = status;
     if (marketId) where.marketId = marketId;
+    if (room) where.room = room;
     if (search) {
       where.description = {
         contains: search,

@@ -140,7 +140,7 @@ model Position {
   marketId String @map("market_id")
 
   // Position amounts
-  quantity Float // Quantity of assets (for buy/sell positions)
+  quantity Float // Quantity of assets (for buy/sell positions in lots)
 
   // Price information
   executedPrice Float? @map("executed_price") // Price when position was executed

@@ -89,7 +89,8 @@ export function UserPositionsViewRoomStock() {
 
       const params = new URLSearchParams({
         page: page.toString(),
-        limit: pagination.limit.toString()
+        limit: pagination.limit.toString(),
+        room: 'STOCK'
       });
 
       // Add filter values, handling Date objects and undefined values
