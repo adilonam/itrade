@@ -1,12 +1,10 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { ViewType } from '@/types';
 import { MarketCard } from './market-card';
 import { MarketList } from './market-list';
 import { ViewToggle } from './view-toggle';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import type { Market } from '@prisma/client';
@@ -20,14 +18,14 @@ import {
 } from '@tabler/icons-react';
 import { useMarketsWebSocket } from '@/contexts/markets-websocket-context';
 
-interface StockMarketsViewProps {
+interface MarketTradingProps {
   markets?: Market[];
 }
 
-export function StockMarketsView({
+export function TradingMarketsView({
   markets: initialMarkets = []
-}: StockMarketsViewProps) {
-  const [currentView, setCurrentView] = useState<ViewType>('cards');
+}: MarketTradingProps) {
+  const [currentView, setCurrentView] = useState<'cards' | 'list'>('cards');
   const [selectedType, setSelectedType] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [markets, setMarkets] = useState<Market[]>(initialMarkets);
@@ -47,14 +45,13 @@ export function StockMarketsView({
   useEffect(() => {
     async function loadMarkets() {
       try {
-        const res = await fetch('/api/markets/get-stock-markets', {
+        const res = await fetch('/api/markets/get-trading-markets', {
           method: 'GET'
         });
         if (!res.ok) return;
         const { markets: dbMarkets } = (await res.json()) as {
           markets: Market[];
         };
-
         setMarkets(dbMarkets);
         // Update WebSocket context with new markets
         updateMarkets(dbMarkets);
@@ -67,7 +64,7 @@ export function StockMarketsView({
     if (markets.length === 0) {
       loadMarkets();
     }
-  }, [markets.length]); // Include dependencies to satisfy linter
+  }, [markets.length]);
 
   const filteredMarkets = useMemo(() => {
     let filtered = markets;
@@ -104,97 +101,108 @@ export function StockMarketsView({
     setCurrentPage(1);
   }, [selectedType, searchQuery]);
 
+  const handleRefresh = async () => {
+    try {
+      const res = await fetch('/api/markets/get-trading-markets', {
+        method: 'GET'
+      });
+      if (!res.ok) return;
+      const { markets: dbMarkets } = (await res.json()) as {
+        markets: Market[];
+      };
+
+      setMarkets(dbMarkets);
+      updateMarkets(dbMarkets);
+      refreshPrices();
+    } catch (err) {
+      // Handle error silently
+    }
+  };
+
   const marketTypes = useMemo(() => {
-    const types = new Set(markets.map((m) => m.type.toLowerCase()));
+    const types = new Set(markets.map((market) => market.type));
     return Array.from(types).sort();
   }, [markets]);
 
-  const marketCounts = useMemo(() => {
-    const counts: Record<string, number> = { all: markets.length };
-    marketTypes.forEach((type) => {
-      counts[type] = markets.filter(
-        (m) => m.type.toLowerCase() === type
-      ).length;
-    });
-    return counts;
-  }, [markets, marketTypes]);
-
   return (
     <div className='space-y-6'>
-      {/* WebSocket Status */}
+      {/* Connection Status */}
       {wsError && (
         <Alert variant='destructive'>
-          <AlertDescription>WebSocket Error: {wsError}</AlertDescription>
+          <AlertDescription>
+            WebSocket connection error: {wsError}
+          </AlertDescription>
         </Alert>
       )}
 
-      {/* Header Controls */}
+      {/* Controls */}
       <div className='flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0'>
-        <div className='flex items-center space-x-2'>
-          <Button
-            variant={selectedType === 'all' ? 'default' : 'outline'}
-            size='sm'
-            onClick={() => setSelectedType('all')}
-          >
-            All Stocks
-            <Badge variant='secondary' className='ml-2'>
-              {marketCounts.all}
-            </Badge>
-          </Button>
-          {marketTypes.map((type) => (
-            <Button
-              key={type}
-              variant={selectedType === type ? 'default' : 'outline'}
-              size='sm'
-              onClick={() => setSelectedType(type)}
-            >
-              {type.charAt(0).toUpperCase() + type.slice(1)}
-              <Badge variant='secondary' className='ml-2'>
-                {marketCounts[type]}
-              </Badge>
-            </Button>
-          ))}
-        </div>
-
-        <div className='flex items-center space-x-4'>
-          {/* WebSocket Status Indicator */}
-          <div className='flex items-center space-x-2'>
-            {isConnected ? (
-              <div className='flex items-center space-x-1 text-green-600'>
-                <IconWifi className='h-4 w-4' />
-                <span className='text-xs font-medium'>Live</span>
-              </div>
-            ) : isConnecting ? (
-              <div className='flex items-center space-x-1 text-yellow-600'>
-                <IconWifiOff className='h-4 w-4' />
-                <span className='text-xs font-medium'>Connecting...</span>
-              </div>
-            ) : (
-              <div className='flex items-center space-x-1 text-gray-500'>
-                <IconWifiOff className='h-4 w-4' />
-                <span className='text-xs font-medium'>Offline</span>
-              </div>
-            )}
-            <Button
-              variant='outline'
-              size='sm'
-              onClick={refreshPrices}
-              disabled={!isConnected}
-              className='h-7 px-2'
-            >
-              <IconRefresh className='h-3 w-3' />
-            </Button>
-          </div>
-
-          <div className='relative'>
-            <IconSearch className='text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform' />
+        <div className='flex flex-col space-y-2 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-4'>
+          {/* Search */}
+          <div className='relative flex-1 sm:max-w-sm'>
+            <IconSearch className='absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400' />
             <Input
-              placeholder='Search stocks...'
+              placeholder='Search markets...'
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className='w-64 pl-10'
+              className='pl-10'
             />
           </div>
+
+          {/* Type Filter */}
+          <div className='flex space-x-2'>
+            <Button
+              variant={selectedType === 'all' ? 'default' : 'outline'}
+              size='sm'
+              onClick={() => setSelectedType('all')}
+            >
+              All
+            </Button>
+            {marketTypes.map((type) => (
+              <Button
+                key={type}
+                variant={selectedType === type ? 'default' : 'outline'}
+                size='sm'
+                onClick={() => setSelectedType(type)}
+              >
+                {type}
+              </Button>
+            ))}
+          </div>
+        </div>
+
+        <div className='flex items-center space-x-2'>
+          {/* Connection Status */}
+          <div className='flex items-center space-x-2 text-sm text-gray-600'>
+            {isConnecting ? (
+              <div className='flex items-center space-x-1'>
+                <div className='h-2 w-2 animate-pulse rounded-full bg-yellow-500' />
+                <span>Connecting...</span>
+              </div>
+            ) : isConnected ? (
+              <div className='flex items-center space-x-1'>
+                <IconWifi className='h-4 w-4 text-green-500' />
+                <span>Live</span>
+              </div>
+            ) : (
+              <div className='flex items-center space-x-1'>
+                <IconWifiOff className='h-4 w-4 text-red-500' />
+                <span>Offline</span>
+              </div>
+            )}
+          </div>
+
+          {/* Refresh Button */}
+          <Button
+            variant='outline'
+            size='sm'
+            onClick={handleRefresh}
+            disabled={isConnecting}
+          >
+            <IconRefresh className='h-4 w-4' />
+          </Button>
+
+          {/* View Toggle */}
           <ViewToggle currentView={currentView} onViewChange={setCurrentView} />
         </div>
       </div>
@@ -203,7 +211,7 @@ export function StockMarketsView({
       <div className='text-muted-foreground flex items-center justify-between text-sm'>
         <span>
           Showing {startIndex + 1}-{Math.min(endIndex, filteredMarkets.length)}{' '}
-          of {filteredMarkets.length} stocks
+          of {filteredMarkets.length} trading markets
           {selectedType !== 'all' &&
             ` (${selectedType.charAt(0).toUpperCase() + selectedType.slice(1)})`}
           {searchQuery && ` matching "${searchQuery}"`}
@@ -219,7 +227,7 @@ export function StockMarketsView({
       {filteredMarkets.length === 0 ? (
         <div className='py-12 text-center'>
           <p className='text-muted-foreground'>
-            No stocks found matching your criteria.
+            No trading markets found matching your criteria.
           </p>
         </div>
       ) : currentView === 'cards' ? (
@@ -228,7 +236,7 @@ export function StockMarketsView({
             <MarketCard
               key={market.id}
               market={market}
-              tradingRoute='/dashboard/trading-view-room-stock'
+              tradingRoute='/dashboard/trading-view-room-trading'
               realTimeData={realTimePrices.get(market.symbol)}
               isConnected={isConnected}
             />
@@ -237,7 +245,7 @@ export function StockMarketsView({
       ) : (
         <MarketList
           markets={paginatedMarkets}
-          tradingRoute='/dashboard/trading-view-room-stock'
+          tradingRoute='/dashboard/trading-view-room-trading'
           realTimePrices={realTimePrices}
           isConnected={isConnected}
         />
@@ -245,11 +253,11 @@ export function StockMarketsView({
 
       {/* Pagination Controls */}
       {totalPages > 1 && (
-        <div className='flex items-center justify-center space-x-2 pt-6'>
+        <div className='flex items-center justify-center space-x-2'>
           <Button
             variant='outline'
             size='sm'
-            onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
           >
             <IconChevronLeft className='h-4 w-4' />
@@ -257,24 +265,35 @@ export function StockMarketsView({
           </Button>
 
           <div className='flex items-center space-x-1'>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-              <Button
-                key={page}
-                variant={currentPage === page ? 'default' : 'outline'}
-                size='sm'
-                onClick={() => setCurrentPage(page)}
-                className='h-8 w-8 p-0'
-              >
-                {page}
-              </Button>
-            ))}
+            {Array.from({ length: totalPages }, (_, i) => i + 1)
+              .filter(
+                (page) =>
+                  page === 1 ||
+                  page === totalPages ||
+                  (page >= currentPage - 1 && page <= currentPage + 1)
+              )
+              .map((page, index, array) => (
+                <div key={page} className='flex items-center'>
+                  {index > 0 && array[index - 1] !== page - 1 && (
+                    <span className='px-2 text-gray-400'>...</span>
+                  )}
+                  <Button
+                    variant={currentPage === page ? 'default' : 'outline'}
+                    size='sm'
+                    onClick={() => setCurrentPage(page)}
+                    className='h-8 w-8 p-0'
+                  >
+                    {page}
+                  </Button>
+                </div>
+              ))}
           </div>
 
           <Button
             variant='outline'
             size='sm'
             onClick={() =>
-              setCurrentPage(Math.min(totalPages, currentPage + 1))
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
             }
             disabled={currentPage === totalPages}
           >

@@ -1,10 +1,10 @@
 import PageContainer from '@/components/layout/page-container';
 import { Heading } from '@/components/ui/heading';
 import { Separator } from '@/components/ui/separator';
-import { TradingMarketsView } from '@/components/markets/trading-markets-view';
+import { UserPositionsViewRoomTrading } from '@/components/user/positions/user-positions-view-room-trading';
 
 export const metadata = {
-  title: 'Dashboard: Market Trading'
+  title: 'Dashboard: My Positions Room Trading'
 };
 
 export default async function Page() {
@@ -13,13 +13,12 @@ export default async function Page() {
       <div className='flex flex-1 flex-col space-y-6'>
         <div className='flex items-start justify-between'>
           <Heading
-            title='Market Trading'
-            description='Select a market to start trading with advanced charting and analysis tools.'
+            title='My Positions Room Trading'
+            description='View and manage your room trading positions.'
           />
         </div>
         <Separator />
-
-        <TradingMarketsView />
+        <UserPositionsViewRoomTrading />
       </div>
     </PageContainer>
   );

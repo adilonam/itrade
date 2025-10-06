@@ -35,7 +35,7 @@
     "src/features/admin/components/market-listing.tsx",
     "src/components/markets/markets-view.back",
     "src/components/trading-view/trading-actions.back",
-    "src/components/user/transactions/user-transactions-table-room-stock.tsx"
+    "src/components/user/positions/user-positions-table-room-stock.tsx"
   ],
   "exclude": ["node_modules"],
   "moduleResolution": ["node_modules", ".next", "node"]

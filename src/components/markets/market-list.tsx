@@ -10,6 +10,7 @@ import {
   TableRow
 } from '@/components/ui/table';
 import type { Market } from '@prisma/client';
+import type { TwelveDataWebSocketPriceData } from '@/types/twelvedata';
 import {
   IconTrendingUp,
   IconTrendingDown,
@@ -18,16 +19,21 @@ import {
 } from '@tabler/icons-react';
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
-import { useMarketsWebSocket } from '@/contexts/markets-websocket-context';
 
 interface MarketListProps {
   markets: Market[];
   tradingRoute?: string;
+  realTimePrices?: Map<string, TwelveDataWebSocketPriceData>;
+  isConnected?: boolean;
 }
 
-export function MarketList({ markets, tradingRoute }: MarketListProps) {
+export function MarketList({
+  markets,
+  tradingRoute,
+  realTimePrices,
+  isConnected
+}: MarketListProps) {
   const router = useRouter();
-  const { realTimePrices, isConnected } = useMarketsWebSocket();
 
   const formatNumber = (num: number) => {
     return parseFloat(num.toFixed(5)).toString();
@@ -54,7 +60,7 @@ export function MarketList({ markets, tradingRoute }: MarketListProps) {
         <TableBody>
           {markets.map((market) => {
             // Get real-time price data for this market
-            const realTimeData = realTimePrices.get(market.symbol);
+            const realTimeData = realTimePrices?.get(market.symbol);
 
             // Use real-time data if available, otherwise fall back to market data
             const currentPrice = realTimeData?.price ?? market.lastPrice;

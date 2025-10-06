@@ -114,8 +114,8 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { investmentId, amount, autoReinvest } = EnrollmentSchema.parse(body);
 
-    // Start a transaction to ensure data consistency
-    const result = await prisma.$transaction(async (tx) => {
+    // Start a position to ensure data consistency
+    const result = await prisma.$position(async (tx) => {
       // Get user with current balance
       const user = await tx.user.findUnique({
         where: { id: session.user.id },

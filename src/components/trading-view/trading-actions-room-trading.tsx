@@ -51,13 +51,13 @@ export function TradingActionsRoomTrading({
   const [takeProfit, setTakeProfit] = useState<string>('');
   const [stopLoss, setStopLoss] = useState<string>('');
   const [orderType, setOrderType] = useState<'MARKET' | 'LIMIT'>('MARKET');
-  const [isCreatingTransaction, setIsCreatingTransaction] = useState(false);
+  const [isCreatingPosition, setIsCreatingPosition] = useState(false);
   const [showBuyDialog, setShowBuyDialog] = useState(false);
   const [showSellDialog, setShowSellDialog] = useState(false);
 
-  const handleCreateTransaction = async (type: 'BUY' | 'SELL') => {
+  const handleCreatePosition = async (type: 'BUY' | 'SELL') => {
     if (!session?.user?.id) {
-      toast.error('You must be logged in to create transactions');
+      toast.error('You must be logged in to create positions');
       return;
     }
 
@@ -81,17 +81,17 @@ export function TradingActionsRoomTrading({
       }
     }
 
-    setIsCreatingTransaction(true);
+    setIsCreatingPosition(true);
 
     try {
-      const response = await fetch('/api/user/transactions', {
+      const response = await fetch('/api/user/positions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           type,
-          status: orderType === 'LIMIT' ? 'PROCESSING' : 'PLACED',
+          status: orderType === 'LIMIT' ? 'PENDING' : 'PLACED',
           room: 'TRADING',
           executedPrice:
             orderType === 'LIMIT' ? parseFloat(limitPrice) : undefined,
@@ -105,7 +105,7 @@ export function TradingActionsRoomTrading({
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to create transaction');
+        throw new Error(errorData.message || 'Failed to create position');
       }
 
       await response.json();
@@ -122,10 +122,10 @@ export function TradingActionsRoomTrading({
       toast.error(
         error instanceof Error
           ? error.message
-          : 'Failed to create transaction. Please try again.'
+          : 'Failed to create position. Please try again.'
       );
     } finally {
-      setIsCreatingTransaction(false);
+      setIsCreatingPosition(false);
     }
   };
 
@@ -269,12 +269,12 @@ export function TradingActionsRoomTrading({
                 className='flex-1'
                 variant='default'
                 disabled={
-                  isCreatingTransaction ||
+                  isCreatingPosition ||
                   !quantity ||
                   (orderType === 'LIMIT' && !limitPrice)
                 }
               >
-                {isCreatingTransaction ? (
+                {isCreatingPosition ? (
                   <IconLoader2 className='mr-2 h-4 w-4 animate-spin' />
                 ) : (
                   <IconTrendingUp className='mr-2 h-4 w-4' />
@@ -331,8 +331,8 @@ export function TradingActionsRoomTrading({
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                 <AlertDialogAction
-                  onClick={() => handleCreateTransaction('BUY')}
-                  disabled={isCreatingTransaction}
+                  onClick={() => handleCreatePosition('BUY')}
+                  disabled={isCreatingPosition}
                 >
                   Confirm Buy
                 </AlertDialogAction>
@@ -346,12 +346,12 @@ export function TradingActionsRoomTrading({
                 className='flex-1'
                 variant='destructive'
                 disabled={
-                  isCreatingTransaction ||
+                  isCreatingPosition ||
                   !quantity ||
                   (orderType === 'LIMIT' && !limitPrice)
                 }
               >
-                {isCreatingTransaction ? (
+                {isCreatingPosition ? (
                   <IconLoader2 className='mr-2 h-4 w-4 animate-spin' />
                 ) : (
                   <IconTrendingDown className='mr-2 h-4 w-4' />
@@ -408,8 +408,8 @@ export function TradingActionsRoomTrading({
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                 <AlertDialogAction
-                  onClick={() => handleCreateTransaction('SELL')}
-                  disabled={isCreatingTransaction}
+                  onClick={() => handleCreatePosition('SELL')}
+                  disabled={isCreatingPosition}
                 >
                   Confirm Sell
                 </AlertDialogAction>

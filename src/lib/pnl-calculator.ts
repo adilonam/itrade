@@ -3,7 +3,7 @@
 import { twelveDataService } from '@/lib/twelvedata';
 import { toTwelveDataSymbol } from '@/lib/market-symbol';
 import { prisma } from '@/lib/prisma';
-import { Market, Transaction } from '@prisma/client';
+import { Market, Position } from '@prisma/client';
 
 /**
  * Fetch current price from TwelveData API with fallback to market lastPrice
@@ -43,58 +43,58 @@ export async function fetchCurrentPrice(
 }
 
 /**
- * Calculate PnL for a transaction based on executed price and closed price
- * This function calculates profit/loss based on the transaction type and actual prices.
+ * Calculate PnL for a position based on executed price and closed price
+ * This function calculates profit/loss based on the position type and actual prices.
  *
- * @param transaction - Transaction with market information, executedPrice, and closedPrice
+ * @param position - Position with market information, executedPrice, and closedPrice
  * @returns Calculated PnL or null if calculation fails
  */
-export async function calculateTransactionPnL(
-  transaction: Transaction & {
+export async function calculatePositionPnL(
+  position: Position & {
     market: Market;
   }
 ): Promise<number | null> {
   try {
-    // Only calculate PnL for BUY/SELL transactions with market data
-    if (!transaction.market || !['BUY', 'SELL'].includes(transaction.type)) {
+    // Only calculate PnL for BUY/SELL positions with market data
+    if (!position.market || !['BUY', 'SELL'].includes(position.type)) {
       return null;
     }
 
-    const quantity = transaction.quantity;
+    const quantity = position.quantity;
 
-    // Use executed price from transaction (don't change it)
-    const executedPrice = transaction.executedPrice;
+    // Use executed price from position (don't change it)
+    const executedPrice = position.executedPrice;
     if (!executedPrice || executedPrice <= 0) {
       console.warn(
-        `No valid executed price for transaction ${transaction.market.symbol}`
+        `No valid executed price for position ${position.market.symbol}`
       );
       return null;
     }
 
-    // Get current price (bid or ask based on transaction type)
+    // Get current price (bid or ask based on position type)
     let currentPrice: number | null = null;
 
-    if (transaction.closedPrice && transaction.closedPrice > 0) {
-      // If transaction is closed, use the closed price
-      currentPrice = transaction.closedPrice;
+    if (position.closedPrice && position.closedPrice > 0) {
+      // If position is closed, use the closed price
+      currentPrice = position.closedPrice;
     } else {
-      // For open transactions, refresh market data and calculate current price
+      // For open positions, refresh market data and calculate current price
       const refreshedMarkets = await refreshMarkets([
-        transaction.market as Market
+        position.market as Market
       ]);
       if (refreshedMarkets && refreshedMarkets.length > 0) {
         // Calculate bid/ask prices based on market spread
-        const market = transaction.market;
+        const market = position.market;
         const midPrice = market.lastPrice ?? 0;
         const spread = market.spread ?? 0;
         const bidPrice = midPrice - spread / 2;
         const askPrice = midPrice + spread / 2;
 
         // Use ask price for BUY, bid price for SELL
-        currentPrice = transaction.type === 'BUY' ? askPrice : bidPrice;
+        currentPrice = position.type === 'BUY' ? askPrice : bidPrice;
       } else {
         console.warn(
-          `Unable to refresh market data for ${transaction.market.symbol}`
+          `Unable to refresh market data for ${position.market.symbol}`
         );
         return null;
       }
@@ -102,23 +102,23 @@ export async function calculateTransactionPnL(
     console.log('currentPrice', currentPrice);
     console.log('executedPrice', executedPrice);
     console.log('quantity', quantity);
-    console.log('type', transaction.type);
+    console.log('type', position.type);
 
     // If we can't get current price, return null
     if (currentPrice === null) {
       console.warn(
-        `Unable to calculate PnL for ${transaction.market.symbol}: missing current price`
+        `Unable to calculate PnL for ${position.market.symbol}: missing current price`
       );
       return null;
     }
 
-    // Calculate PnL based on transaction type
+    // Calculate PnL based on position type
     let pnl: number;
 
-    if (transaction.type === 'BUY') {
+    if (position.type === 'BUY') {
       // For BUY: PnL = (current_price - executed_price) * quantity
       pnl = (currentPrice - executedPrice) * quantity;
-    } else if (transaction.type === 'SELL') {
+    } else if (position.type === 'SELL') {
       // For SELL: PnL = (executed_price - current_price) * quantity
       pnl = (executedPrice - currentPrice) * quantity;
     } else {
@@ -126,7 +126,7 @@ export async function calculateTransactionPnL(
     }
 
     console.log(
-      `Calculated PnL for ${transaction.type} ${transaction.market.symbol}: ${pnl.toFixed(2)} (Exec: ${executedPrice}, Current: ${currentPrice}, Qty: ${quantity})`
+      `Calculated PnL for ${position.type} ${position.market.symbol}: ${pnl.toFixed(2)} (Exec: ${executedPrice}, Current: ${currentPrice}, Qty: ${quantity})`
     );
     return pnl;
   } catch (error) {
@@ -136,12 +136,12 @@ export async function calculateTransactionPnL(
 }
 
 /**
- * Calculate PnL for multiple transactions
- * @param transactions - Array of transactions with market information
- * @returns Array of transactions with calculated PnL
+ * Calculate PnL for multiple positions
+ * @param positions - Array of positions with market information
+ * @returns Array of positions with calculated PnL
  */
-export async function calculateTransactionsPnL(
-  transactions: (Transaction & {
+export async function calculatePositionsPnL(
+  positions: (Position & {
     market: {
       id: string;
       symbol: string;
@@ -151,7 +151,7 @@ export async function calculateTransactionsPnL(
     } | null;
   })[]
 ): Promise<
-  (Transaction & {
+  (Position & {
     market: {
       id: string;
       symbol: string;
@@ -162,21 +162,21 @@ export async function calculateTransactionsPnL(
     calculatedPnL: number | null;
   })[]
 > {
-  const transactionsWithPnL = await Promise.all(
-    transactions.map(async (transaction) => {
-      const calculatedPnL = await calculateTransactionPnL(
-        transaction as Transaction & {
+  const positionsWithPnL = await Promise.all(
+    positions.map(async (position) => {
+      const calculatedPnL = await calculatePositionPnL(
+        position as Position & {
           market: Market;
         }
       );
       return {
-        ...transaction,
+        ...position,
         calculatedPnL
       };
     })
   );
 
-  return transactionsWithPnL;
+  return positionsWithPnL;
 }
 
 /**

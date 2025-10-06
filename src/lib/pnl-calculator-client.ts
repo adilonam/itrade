@@ -1,32 +1,28 @@
 'use client';
 
-import type { Transaction } from '@prisma/client';
+import type { Position } from '@prisma/client';
 import type { TwelveDataWebSocketPriceData } from '@/types/twelvedata';
 
 /**
  * Client-side function to calculate dynamic P&L based on real-time websocket data
- * Only calculates dynamic P&L for PLACED transactions, returns stored P&L for others
+ * Only calculates dynamic P&L for PLACED positions, returns stored P&L for others
  *
- * @param transaction - Transaction with market information and executed price
+ * @param position - Position with market information and executed price
  * @param realTimeData - Real-time price data from websocket
  * @returns Calculated P&L or null if calculation fails
  */
 export function calculatePnLClient(
-  transaction: Transaction,
+  position: Position,
   realTimeData?: TwelveDataWebSocketPriceData
 ): number | null {
-  // Only calculate dynamic P&L for PLACED transactions
-  if (transaction.status !== 'PLACED') {
-    // For non-PLACED transactions, return stored P&L or null
-    return transaction.pnl;
+  // Only calculate dynamic P&L for PLACED positions
+  if (position.status !== 'PLACED') {
+    // For non-PLACED positions, return stored P&L or null
+    return position.pnl;
   }
 
   // If no market or executed price, can't calculate P&L
-  if (
-    !transaction.marketId ||
-    !transaction.executedPrice ||
-    !transaction.quantity
-  ) {
+  if (!position.marketId || !position.executedPrice || !position.quantity) {
     return null;
   }
 
@@ -36,14 +32,14 @@ export function calculatePnLClient(
   }
 
   const currentPrice = realTimeData.price;
-  const executedPrice = transaction.executedPrice;
-  const quantity = transaction.quantity;
+  const executedPrice = position.executedPrice;
+  const quantity = position.quantity;
 
-  // Calculate P&L based on transaction type
-  if (transaction.type === 'BUY') {
+  // Calculate P&L based on position type
+  if (position.type === 'BUY') {
     // For BUY: P&L = (current_price - executed_price) * quantity
     return (currentPrice - executedPrice) * quantity;
-  } else if (transaction.type === 'SELL') {
+  } else if (position.type === 'SELL') {
     // For SELL: P&L = (executed_price - current_price) * quantity
     return (executedPrice - currentPrice) * quantity;
   }

@@ -3,6 +3,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import type { Market } from '@prisma/client';
+import type { TwelveDataWebSocketPriceData } from '@/types/twelvedata';
 import {
   IconTrendingUp,
   IconTrendingDown,
@@ -11,18 +12,21 @@ import {
 } from '@tabler/icons-react';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
-import { useMarketsWebSocket } from '@/contexts/markets-websocket-context';
 
 interface MarketCardProps {
   market: Market;
   tradingRoute?: string;
+  realTimeData?: TwelveDataWebSocketPriceData | null;
+  isConnected?: boolean;
 }
 
-export function MarketCard({ market, tradingRoute }: MarketCardProps) {
-  const { realTimePrices, isConnected } = useMarketsWebSocket();
-
+export function MarketCard({
+  market,
+  tradingRoute,
+  realTimeData,
+  isConnected
+}: MarketCardProps) {
   // Get real-time price data for this market   lastChange = nprice - oprice , lastchagenG = Gprice -oprice   , oprice = nprice - lastChange
-  const realTimeData = realTimePrices.get(market.symbol);
 
   // Use real-time data if available, otherwise fall back to market data
   const currentPrice = realTimeData?.price ?? market.lastPrice;

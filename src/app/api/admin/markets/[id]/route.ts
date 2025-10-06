@@ -72,7 +72,7 @@ import { z } from 'zod';
  *       404:
  *         description: Market not found
  *       409:
- *         description: Cannot delete market with existing transactions
+ *         description: Cannot delete market with existing positions
  *       500:
  *         description: Internal server error
  */
@@ -169,14 +169,14 @@ export async function DELETE(request: NextRequest, context: RouteParams) {
       return NextResponse.json({ error: 'Market not found' }, { status: 404 });
     }
 
-    // Check if market has transactions
-    const transactionCount = await prisma.transaction.count({
+    // Check if market has positions
+    const positionCount = await prisma.position.count({
       where: { marketId: id }
     });
 
-    if (transactionCount > 0) {
+    if (positionCount > 0) {
       return NextResponse.json(
-        { error: 'Cannot delete market with existing transactions' },
+        { error: 'Cannot delete market with existing positions' },
         { status: 409 }
       );
     }

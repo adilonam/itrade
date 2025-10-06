@@ -1,7 +1,7 @@
 {
   "crons": [
     {
-      "path": "/api/refresh-transaction",
+      "path": "/api/refresh-position",
       "schedule": "* * * * *"
     }
   ]

@@ -58,6 +58,7 @@ model User {
   image           String?
   password        String? // For credentials provider
   balance         Float            @default(0) @map("balance")
+  usedMargin      Float            @default(0) @map("used_margin")
   role            Role             @default(USER)
   createdAt       DateTime         @default(now()) @map("created_at")
   updatedAt       DateTime         @updatedAt @map("updated_at")
@@ -65,7 +66,7 @@ model User {
   accounts        Account[]
   sessions        Session[]
   mfaChallenges   MfaChallenge[]
-  transactions    Transaction[]
+  positions       Position[]
   userInvestments UserInvestment[]
 
   @@map("users")
@@ -100,79 +101,72 @@ enum Room {
 }
 
 model Market {
-  id           String        @id @default(cuid())
-  type         MarketType
-  symbol       String        
-  name         String
-  room         Room          @default(TRADING)
-  spread       Float         @default(0)
-  lastPrice    Float         @default(0)
-  lastChange   Float         @default(0)
-  visible      Boolean       @default(true)
-  createdAt    DateTime      @default(now()) @map("created_at")
-  updatedAt    DateTime      @updatedAt @map("updated_at")
-  transactions Transaction[]
+  id         String     @id @default(cuid())
+  type       MarketType
+  symbol     String
+  name       String
+  room       Room       @default(TRADING)
+  spread     Float      @default(0)
+  lastPrice  Float      @default(0)
+  lastChange Float      @default(0)
+  visible    Boolean    @default(true)
+  createdAt  DateTime   @default(now()) @map("created_at")
+  updatedAt  DateTime   @updatedAt @map("updated_at")
+  positions  Position[]
 
   @@map("markets")
 }
 
-enum TransactionType {
+enum PositionType {
   BUY
   SELL
-  DEPOSIT
-  WITHDRAWAL
-  TRANSFER_IN
-  TRANSFER_OUT
-  FEE
-  BONUS
-  REFUND
 }
 
-enum TransactionStatus {
+enum PositionStatus {
   PLACED
   CLOSED
   FAILED
-  PROCESSING
+  PENDING
 }
 
-model Transaction {
-  id     String            @id @default(cuid())
-  userId String            @map("user_id")
-  type   TransactionType
-  status TransactionStatus @default(PROCESSING)
-  room   Room              @default(TRADING)
+model Position {
+  id     String         @id @default(cuid())
+  userId String         @map("user_id")
+  type   PositionType
+  status PositionStatus @default(PENDING)
+  room   Room           @default(TRADING)
 
   // Market/Asset information
-  marketId String? @map("market_id")
+  marketId String @map("market_id")
 
-  // Transaction amounts
-  quantity Float // Quantity of assets (for buy/sell transactions)
+  // Position amounts
+  quantity Float // Quantity of assets (for buy/sell positions)
 
   // Price information
-  executedPrice Float? @map("executed_price") // Price when transaction was executed
-  closedPrice   Float? @map("closed_price") // Price when transaction was closed
+  executedPrice Float? @map("executed_price") // Price when position was executed
+  closedPrice   Float? @map("closed_price") // Price when position was closed
 
   // Risk management
   takeProfit Float? @map("take_profit") // Take profit price level
   stopLoss   Float? @map("stop_loss") // Stop loss price level
 
   // Reference and metadata
-  description String? // Transaction description
+  description String? // Position description
 
   // Timestamps
-  executedAt DateTime? @map("executed_at") // When transaction was executed
-  closedAt   DateTime? @map("closed_at") // When transaction was closed
+  executedAt DateTime? @map("executed_at") // When position was executed
+  closedAt   DateTime? @map("closed_at") // When position was closed
 
   // PnL
-  pnl Float? @map("pnl") // on complete transaction
+  pnl Float? @map("pnl") // on complete position
 
   // Relations
-  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  market Market? @relation(fields: [marketId], references: [id], onDelete: SetNull)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  market Market @relation(fields: [marketId], references: [id], onDelete: SetNull)
 
   // Indexes for better query performance
 
-  @@map("transactions")
+  @@map("positions")
 }
 
 enum InvestmentStatus {

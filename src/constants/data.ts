@@ -32,8 +32,8 @@ export const navItems: NavItem[] = [
     isAdmin: false
   },
   {
-    title: 'My Transactions RT',
-    url: '/dashboard/transactions-room-trading',
+    title: 'My Positions RT',
+    url: '/dashboard/positions-room-trading',
     icon: 'switchVertical',
     isActive: false,
     shortcut: ['m', 'r'],
@@ -41,8 +41,8 @@ export const navItems: NavItem[] = [
     isAdmin: false
   },
   {
-    title: 'My Transactions RS',
-    url: '/dashboard/transactions-room-stock',
+    title: 'My Positions RS',
+    url: '/dashboard/positions-room-stock',
     icon: 'switchVertical',
     isActive: false,
     shortcut: ['m', 't'],
@@ -138,8 +138,8 @@ export const navItems: NavItem[] = [
     isAdmin: true
   },
   {
-    title: 'Transactions',
-    url: '/admin/transactions',
+    title: 'Positions',
+    url: '/admin/positions',
     icon: 'switchVertical',
     isActive: false,
     shortcut: ['t', 't'],

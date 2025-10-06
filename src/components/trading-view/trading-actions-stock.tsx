@@ -51,7 +51,7 @@ export function TradingActionsStock({
   const [takeProfit, setTakeProfit] = useState<string>('');
   const [stopLoss, setStopLoss] = useState<string>('');
   const [orderType, setOrderType] = useState<'MARKET' | 'LIMIT'>('MARKET');
-  const [isCreatingTransaction, setIsCreatingTransaction] = useState(false);
+  const [isCreatingPosition, setIsCreatingPosition] = useState(false);
   const [showBuyDialog, setShowBuyDialog] = useState(false);
   const [showSellDialog, setShowSellDialog] = useState(false);
   // Get user balance from session (no need to fetch separately)
@@ -81,9 +81,9 @@ export function TradingActionsStock({
     return qty * price;
   };
 
-  const handleCreateTransaction = async (type: 'BUY' | 'SELL') => {
+  const handleCreatePosition = async (type: 'BUY' | 'SELL') => {
     if (!session?.user?.id) {
-      toast.error('You must be logged in to create transactions');
+      toast.error('You must be logged in to create positions');
       return;
     }
 
@@ -107,17 +107,17 @@ export function TradingActionsStock({
       }
     }
 
-    setIsCreatingTransaction(true);
+    setIsCreatingPosition(true);
 
     try {
-      const response = await fetch('/api/user/transactions', {
+      const response = await fetch('/api/user/positions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           type,
-          status: orderType === 'LIMIT' ? 'PROCESSING' : 'PLACED',
+          status: orderType === 'LIMIT' ? 'PENDING' : 'PLACED',
           room: 'STOCK',
           executedPrice:
             orderType === 'LIMIT' ? parseFloat(limitPrice) : undefined,
@@ -139,7 +139,7 @@ export function TradingActionsStock({
               `Insufficient balance. You need $${errorData.requiredBalance?.toFixed(2)} but only have $${errorData.currentBalance?.toFixed(2)}.`
           );
         } else {
-          throw new Error(errorData.message || 'Failed to create transaction');
+          throw new Error(errorData.message || 'Failed to create position');
         }
         return;
       }
@@ -161,10 +161,10 @@ export function TradingActionsStock({
       toast.error(
         error instanceof Error
           ? error.message
-          : 'Failed to create transaction. Please try again.'
+          : 'Failed to create position. Please try again.'
       );
     } finally {
-      setIsCreatingTransaction(false);
+      setIsCreatingPosition(false);
     }
   };
 
@@ -348,7 +348,7 @@ export function TradingActionsStock({
                 className='flex-1'
                 variant='default'
                 disabled={
-                  isCreatingTransaction ||
+                  isCreatingPosition ||
                   !quantity ||
                   (orderType === 'LIMIT' && !limitPrice) ||
                   (userBalance !== null &&
@@ -359,7 +359,7 @@ export function TradingActionsStock({
                       userBalance)
                 }
               >
-                {isCreatingTransaction ? (
+                {isCreatingPosition ? (
                   <IconLoader2 className='mr-2 h-4 w-4 animate-spin' />
                 ) : (
                   <IconTrendingUp className='mr-2 h-4 w-4' />
@@ -416,8 +416,8 @@ export function TradingActionsStock({
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                 <AlertDialogAction
-                  onClick={() => handleCreateTransaction('BUY')}
-                  disabled={isCreatingTransaction}
+                  onClick={() => handleCreatePosition('BUY')}
+                  disabled={isCreatingPosition}
                 >
                   Confirm Buy
                 </AlertDialogAction>
@@ -431,13 +431,13 @@ export function TradingActionsStock({
                 className='flex-1'
                 variant='destructive'
                 disabled={
-                  isCreatingTransaction ||
+                  isCreatingPosition ||
                   !quantity ||
                   (orderType === 'LIMIT' && !limitPrice) ||
                   (userBalance !== null && calculateSellMargin() > userBalance)
                 }
               >
-                {isCreatingTransaction ? (
+                {isCreatingPosition ? (
                   <IconLoader2 className='mr-2 h-4 w-4 animate-spin' />
                 ) : (
                   <IconTrendingDown className='mr-2 h-4 w-4' />
@@ -494,8 +494,8 @@ export function TradingActionsStock({
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                 <AlertDialogAction
-                  onClick={() => handleCreateTransaction('SELL')}
-                  disabled={isCreatingTransaction}
+                  onClick={() => handleCreatePosition('SELL')}
+                  disabled={isCreatingPosition}
                 >
                   Confirm Sell
                 </AlertDialogAction>
