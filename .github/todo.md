@@ -1,2 +1,3 @@
 - [ ] admin interface
-- [ ] get market to be one api 
+- [ ] get market to be one api
+- [ ] correct on insuffisant balance
