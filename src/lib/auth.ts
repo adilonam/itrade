@@ -50,7 +50,7 @@ export const authOptions: NextAuthOptions = {
         }
 
         // Mark challenge as used and verify user's email
-        await prisma.$position([
+        await prisma.$transaction([
           prisma.mfaChallenge.update({
             where: { id: challenge.id },
             data: { used: true }
@@ -90,12 +90,11 @@ export const authOptions: NextAuthOptions = {
         // Fetch fresh user data from database on every session access
         const dbUser = await prisma.user.findUnique({
           where: { id: token.id as string },
-          select: { role: true, balance: true, usedMargin: true }
+          select: { role: true, balance: true }
         });
 
         session.user.role = dbUser?.role || 'USER';
         session.user.balance = dbUser?.balance || 0;
-        session.user.usedMargin = dbUser?.usedMargin || 0;
       }
       return session;
     }

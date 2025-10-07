@@ -23,6 +23,7 @@ export type CreateUserData = {
   password: string;
   role: 'USER' | 'ADMIN' | 'SUPERADMIN';
   balance?: number;
+  leverage?: number;
   emailVerified?: Date | null;
 };
 
@@ -33,6 +34,7 @@ export type UpdateUserData = {
   role?: 'USER' | 'ADMIN' | 'SUPERADMIN';
   emailVerified?: Date | null;
   balance?: number;
+  leverage?: number;
 };
 
 export async function fetchUsers(

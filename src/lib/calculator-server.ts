@@ -3,44 +3,7 @@
 import { twelveDataService } from '@/lib/twelvedata';
 import { toTwelveDataSymbol } from '@/lib/market-symbol';
 import { prisma } from '@/lib/prisma';
-import { Market, Position } from '@prisma/client';
-
-/**
- * Fetch current price from TwelveData API with fallback to market lastPrice
- * @param market - Market object with symbol and type
- * @returns Current price or null if unavailable
- */
-export async function fetchCurrentPrice(
-  market: Market
-): Promise<number | null> {
-  try {
-    const twelveDataSymbol = toTwelveDataSymbol(market);
-    const marketData =
-      await twelveDataService.getCombinedData(twelveDataSymbol);
-
-    if ('error' in marketData) {
-      console.warn(
-        `Failed to get price for ${twelveDataSymbol}:`,
-        marketData.error
-      );
-      // Fallback to market's last price
-      if (market.lastPrice && market.lastPrice > 0) {
-        console.log(
-          `Using fallback price ${market.lastPrice} for ${twelveDataSymbol}`
-        );
-        return market.lastPrice;
-      } else {
-        console.warn(`No fallback price available for ${twelveDataSymbol}`);
-        return null;
-      }
-    } else {
-      return parseFloat(marketData.current_price);
-    }
-  } catch (error) {
-    console.error('Error fetching current price:', error);
-    return null;
-  }
-}
+import { Market, Position, User } from '@prisma/client';
 
 /**
  * Calculate PnL for a position based on executed price and closed price
@@ -79,7 +42,7 @@ export async function calculatePositionPnL(
       currentPrice = position.closedPrice;
     } else {
       // For open positions, refresh market data and calculate current price
-      const refreshedMarkets = await refreshMarkets([
+      const refreshedMarkets = await refreshSaveMarkets([
         position.market as Market
       ]);
       if (refreshedMarkets && refreshedMarkets.length > 0) {
@@ -114,13 +77,17 @@ export async function calculatePositionPnL(
 
     // Calculate PnL based on position type
     let pnl: number;
+    let lotSize = 1;
+    if (position.market.type === 'FOREX') {
+      lotSize = 100000;
+    }
 
     if (position.type === 'BUY') {
       // For BUY: PnL = (current_price - executed_price) * quantity
-      pnl = (currentPrice - executedPrice) * quantity;
+      pnl = (currentPrice - executedPrice) * quantity * lotSize;
     } else if (position.type === 'SELL') {
       // For SELL: PnL = (executed_price - current_price) * quantity
-      pnl = (executedPrice - currentPrice) * quantity;
+      pnl = (executedPrice - currentPrice) * quantity * lotSize;
     } else {
       return null;
     }
@@ -180,12 +147,12 @@ export async function calculatePositionsPnL(
 }
 
 /**
- * Refresh market data from TwelveData API (getCombinedData already stores data)
+ * Refresh market data from TwelveData API and save to database
  * @param markets - Array of market objects to refresh
  * @param refreshAll - Whether to refresh all markets (default: false)
  * @returns Array of markets with refreshed data or null if refresh fails
  */
-export async function refreshMarkets(
+export async function refreshSaveMarkets(
   markets?: Market[],
   refreshAll: boolean = false
 ): Promise<Market[] | null> {
@@ -210,7 +177,7 @@ export async function refreshMarkets(
       return [];
     }
 
-    // Refresh market data using getCombinedData (which already stores data)
+    // Refresh market data using getCombinedData and save to database
     const refreshedMarkets = await Promise.all(
       marketsToRefresh.map(async (market) => {
         try {
@@ -226,9 +193,23 @@ export async function refreshMarkets(
             return market; // Return original market if API fails
           }
 
-          // getCombinedData already stores the data, so we just return the market
-          // The data is now available in the service's cache/storage
-          return market;
+          // Update market with fresh data from API
+          const updatedMarket = await prisma.market.update({
+            where: { id: market.id },
+            data: {
+              lastPrice: parseFloat(marketData.current_price),
+              lastChange: parseFloat(marketData.change),
+              updatedAt: new Date()
+            }
+          });
+
+          console.log(`Updated market ${market.symbol} with fresh data:`, {
+            lastPrice: updatedMarket.lastPrice,
+            lastChange: updatedMarket.lastChange,
+            spread: updatedMarket.spread
+          });
+
+          return updatedMarket;
         } catch (error) {
           console.error(`Error refreshing market ${market.symbol}:`, error);
           return market; // Return original market if refresh fails
@@ -239,6 +220,58 @@ export async function refreshMarkets(
     return refreshedMarkets;
   } catch (error) {
     console.error('Error refreshing markets:', error);
+    return null;
+  }
+}
+
+/**
+ * Calculate required margin for a position based on user leverage, position price and quantity
+ * @param position - Position object with user relation, quantity and executedPrice
+ * @returns Required margin amount or null if calculation fails
+ */
+export async function calculateRequiredMargin(
+  position: Position & { user: User; market: Market }
+): Promise<number | null> {
+  try {
+    // Validate inputs
+    if (!position || !position.user) {
+      console.warn('Position or user is missing for margin calculation');
+      return null;
+    }
+
+    // Always use executedPrice as the position price
+    if (!position.executedPrice || position.executedPrice <= 0) {
+      console.warn(`No valid executed price for position ${position.id}`);
+      return null;
+    }
+
+    const positionPrice = position.executedPrice;
+
+    // Calculate position value (price * quantity * lot size)
+    // Standard lot size is typically 100,000 units for forex, 100 for stocks
+    let lotSize = 1;
+    if (position.market.type === 'FOREX') {
+      lotSize = 100000;
+    }
+    const positionValue = positionPrice * position.quantity * lotSize;
+
+    // Calculate required margin based on leverage
+    // Required Margin = Position Value / Leverage
+    const leverage = position.user.leverage || 1; // Default to 1:1 if no leverage set
+    const requiredMargin = positionValue / leverage;
+
+    console.log(`Calculated required margin for position ${position.id}:`, {
+      positionValue,
+      leverage,
+      requiredMargin,
+      positionPrice,
+      quantity: position.quantity,
+      lotSize
+    });
+
+    return requiredMargin;
+  } catch (error) {
+    console.error('Error calculating required margin:', error);
     return null;
   }
 }

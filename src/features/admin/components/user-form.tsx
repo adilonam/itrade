@@ -49,6 +49,13 @@ const createFormSchema = z.object({
     })
     .optional()
     .default(0),
+  leverage: z
+    .number()
+    .min(1, {
+      message: 'Leverage must be at least 1.'
+    })
+    .optional()
+    .default(1),
   emailVerified: z.boolean().optional()
 });
 
@@ -75,6 +82,12 @@ const updateFormSchema = z.object({
       message: 'Balance cannot be negative.'
     })
     .optional(),
+  leverage: z
+    .number()
+    .min(1, {
+      message: 'Leverage must be at least 1.'
+    })
+    .optional(),
   emailVerified: z.boolean().optional()
 });
 
@@ -97,6 +110,7 @@ export default function UserForm({
     password: '',
     role: initialData?.role || ('USER' as const),
     balance: initialData?.balance || 0,
+    leverage: initialData?.leverage || 1,
     emailVerified: !!initialData?.emailVerified
   };
 
@@ -242,32 +256,60 @@ export default function UserForm({
               />
             </div>
 
-            <FormField
-              control={form.control}
-              name='balance'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Account Balance</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder='Enter account balance'
-                      type='number'
-                      step='0.01'
-                      min='0'
-                      disabled={loading}
-                      {...field}
-                      onChange={(e) =>
-                        field.onChange(parseFloat(e.target.value) || 0)
-                      }
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    Set the initial account balance for this user
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
+              <FormField
+                control={form.control}
+                name='balance'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Account Balance</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder='Enter account balance'
+                        type='number'
+                        step='0.01'
+                        min='0'
+                        disabled={loading}
+                        {...field}
+                        onChange={(e) =>
+                          field.onChange(parseFloat(e.target.value) || 0)
+                        }
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Set the initial account balance for this user
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name='leverage'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Trading Leverage</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder='Enter leverage (e.g., 100)'
+                        type='number'
+                        min='1'
+                        disabled={loading}
+                        {...field}
+                        onChange={(e) =>
+                          field.onChange(parseInt(e.target.value) || 1)
+                        }
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Set the trading leverage multiplier (1:1, 10:1, 100:1,
+                      etc.)
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             <FormField
               control={form.control}

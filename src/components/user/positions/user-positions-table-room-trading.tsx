@@ -29,9 +29,14 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger
 } from '@/components/ui/alert-dialog';
+import { DataTable } from '@/components/ui/table/data-table';
+import { DataTableToolbar } from '@/components/ui/table/data-table-toolbar';
+import { DataTablePagination } from '@/components/ui/table/data-table-pagination';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { flexRender, type Table as TanstackTable } from '@tanstack/react-table';
 import type { Market, Position } from '@prisma/client';
 import { useMarketsWebSocket } from '@/contexts/markets-websocket-context';
-import { calculatePnLClient } from '@/lib/pnl-calculator-client';
+import { calculatePnLClient } from '@/lib/calculator-client';
 import {
   IconX,
   IconLoader2,
@@ -47,11 +52,15 @@ interface UserPositionsTableRoomTradingProps {
   positions: PositionWithMarket[];
   loading: boolean;
   onClose: (positionId: string) => void;
+  onUpdateRealTimePnL?: (positionId: string, pnl: number) => void;
+  realTimePnL?: Record<string, number>;
 }
 export function UserPositionsTableRoomTrading({
   positions,
   loading,
-  onClose
+  onClose,
+  onUpdateRealTimePnL,
+  realTimePnL = {}
 }: UserPositionsTableRoomTradingProps) {
   const [closingPositionId, setClosingPositionId] = useState<string | null>(
     null
@@ -77,6 +86,25 @@ export function UserPositionsTableRoomTrading({
       }
     }
   }, [isConnected, positions, reset, subscribe]);
+
+  // Update real-time PnL when market data changes
+  useEffect(() => {
+    if (onUpdateRealTimePnL) {
+      positions.forEach((position) => {
+        if (position.market?.symbol) {
+          const realTimeData = realTimePrices.get(position.market.symbol);
+          if (realTimeData) {
+            const dynamicPnL = position.market
+              ? calculatePnLClient(position as any, realTimeData)
+              : null;
+            if (dynamicPnL !== null) {
+              onUpdateRealTimePnL(position.id, dynamicPnL);
+            }
+          }
+        }
+      });
+    }
+  }, [positions, realTimePrices, onUpdateRealTimePnL]);
 
   const handleClosePosition = async (positionId: string) => {
     setClosingPositionId(positionId);
@@ -165,165 +193,192 @@ export function UserPositionsTableRoomTrading({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className='rounded-md border'>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Type</TableHead>
-                <TableHead>Market</TableHead>
-                <TableHead>Quantity</TableHead>
-                <TableHead>Exec Price</TableHead>
-                <TableHead>Closed Price</TableHead>
-                <TableHead>Take Profit</TableHead>
-                <TableHead>Stop Loss</TableHead>
-                <TableHead>P&L</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Closed</TableHead>
-                <TableHead className='text-right'>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {positions.map((position) => (
-                <TableRow key={position.id}>
-                  <TableCell>
-                    <div className='flex items-center gap-2'>
-                      {getTypeIcon(position.type)}
-                      <span className='font-medium'>{position.type}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    {position.market ? (
-                      <div>
-                        <div className='font-medium'>
-                          {position.market.symbol}
-                        </div>
-                        <div className='text-muted-foreground text-sm'>
-                          {position.market.name}
-                        </div>
-                      </div>
-                    ) : (
-                      <span className='text-muted-foreground'>-</span>
-                    )}
-                  </TableCell>
-                  <TableCell className='text-xs'>
-                    {position.quantity ? position.quantity.toFixed(4) : '-'}
-                  </TableCell>
-                  <TableCell className='text-xs'>
-                    {position.executedPrice
-                      ? `$${position.executedPrice.toFixed(2)}`
-                      : '-'}
-                  </TableCell>
-                  <TableCell className='text-xs'>
-                    {position.closedPrice
-                      ? `$${position.closedPrice.toFixed(2)}`
-                      : '-'}
-                  </TableCell>
-                  <TableCell className='text-xs'>
-                    {position.takeProfit
-                      ? `$${position.takeProfit.toFixed(2)}`
-                      : '-'}
-                  </TableCell>
-                  <TableCell className='text-xs'>
-                    {position.stopLoss
-                      ? `$${position.stopLoss.toFixed(2)}`
-                      : '-'}
-                  </TableCell>
-                  <TableCell className='text-xs'>
-                    {(() => {
-                      const realTimeData = position.market?.symbol
-                        ? realTimePrices.get(position.market.symbol)
-                        : undefined;
-                      const dynamicPnL = calculatePnLClient(
-                        position,
-                        realTimeData
-                      );
+        <div className='relative flex min-h-[600px] flex-col'>
+          <div className='flex flex-1 flex-col space-y-4'>
+            <div className='relative flex flex-1'>
+              <div className='absolute inset-0 flex overflow-hidden rounded-lg border'>
+                <ScrollArea className='h-full w-full'>
+                  <Table>
+                    <TableHeader className='bg-muted sticky top-0 z-10'>
+                      <TableRow>
+                        <TableHead>Type</TableHead>
+                        <TableHead>Market</TableHead>
+                        <TableHead>Quantity</TableHead>
+                        <TableHead>Exec Price</TableHead>
+                        <TableHead>Closed Price</TableHead>
+                        <TableHead>Take Profit</TableHead>
+                        <TableHead>Stop Loss</TableHead>
+                        <TableHead>P&L</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Closed</TableHead>
+                        <TableHead className='text-right'>Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {positions.map((position) => (
+                        <TableRow key={position.id}>
+                          <TableCell>
+                            <div className='flex items-center gap-2'>
+                              {getTypeIcon(position.type)}
+                              <span className='font-medium'>
+                                {position.type}
+                              </span>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            {position.market ? (
+                              <div>
+                                <div className='font-medium'>
+                                  {position.market.symbol}
+                                </div>
+                                <div className='text-muted-foreground text-sm'>
+                                  {position.market.name}
+                                </div>
+                              </div>
+                            ) : (
+                              <span className='text-muted-foreground'>-</span>
+                            )}
+                          </TableCell>
+                          <TableCell className='text-xs'>
+                            {position.quantity
+                              ? parseFloat(position.quantity.toString())
+                              : '-'}
+                          </TableCell>
+                          <TableCell className='text-xs'>
+                            {position.executedPrice
+                              ? `$${position.executedPrice.toFixed(2)}`
+                              : '-'}
+                          </TableCell>
+                          <TableCell className='text-xs'>
+                            {position.closedPrice
+                              ? `$${position.closedPrice.toFixed(2)}`
+                              : '-'}
+                          </TableCell>
+                          <TableCell className='text-xs'>
+                            {position.takeProfit
+                              ? `$${position.takeProfit.toFixed(2)}`
+                              : '-'}
+                          </TableCell>
+                          <TableCell className='text-xs'>
+                            {position.stopLoss
+                              ? `$${position.stopLoss.toFixed(2)}`
+                              : '-'}
+                          </TableCell>
+                          <TableCell className='text-xs'>
+                            {(() => {
+                              const realTimeData = position.market?.symbol
+                                ? realTimePrices.get(position.market.symbol)
+                                : undefined;
+                              const dynamicPnL = position.market
+                                ? calculatePnLClient(
+                                    position as any,
+                                    realTimeData
+                                  )
+                                : null;
 
-                      if (dynamicPnL !== null) {
-                        return (
-                          <span
-                            className={
-                              dynamicPnL >= 0
-                                ? 'text-green-600'
-                                : 'text-red-600'
-                            }
-                          >
-                            {dynamicPnL >= 0 ? '+' : ''}${dynamicPnL.toFixed(2)}
-                            {position.status === 'PLACED' && realTimeData && (
-                              <span className='text-muted-foreground ml-1 text-xs'>
-                                (live)
+                              if (dynamicPnL !== null) {
+                                return (
+                                  <span
+                                    className={
+                                      dynamicPnL >= 0
+                                        ? 'text-green-600'
+                                        : 'text-red-600'
+                                    }
+                                  >
+                                    {dynamicPnL >= 0 ? '+' : ''}$
+                                    {dynamicPnL.toFixed(2)}
+                                    {position.status === 'PLACED' &&
+                                      realTimeData && (
+                                        <span className='text-muted-foreground ml-1 text-xs'>
+                                          (live)
+                                        </span>
+                                      )}
+                                  </span>
+                                );
+                              }
+
+                              return (
+                                <span className='text-muted-foreground'>-</span>
+                              );
+                            })()}
+                          </TableCell>
+                          <TableCell>
+                            <Badge
+                              variant={getStatusBadgeVariant(position.status)}
+                              className='text-xs'
+                            >
+                              {position.status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className='text-muted-foreground text-xs'>
+                            {formatDate(position.executedAt || new Date())}
+                          </TableCell>
+                          <TableCell className='text-muted-foreground text-xs'>
+                            {position.closedAt
+                              ? formatDate(position.closedAt)
+                              : '-'}
+                          </TableCell>
+                          <TableCell className='text-right'>
+                            {canClosePosition(position.status) ? (
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button
+                                    variant='outline'
+                                    size='sm'
+                                    disabled={closingPositionId === position.id}
+                                  >
+                                    {closingPositionId === position.id ? (
+                                      <IconLoader2 className='h-4 w-4 animate-spin' />
+                                    ) : (
+                                      <IconX className='h-4 w-4' />
+                                    )}
+                                    Close
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>
+                                      Close Room Trading Position
+                                    </AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      Are you sure you want to close this{' '}
+                                      {position.type} room trading position?
+                                      This action cannot be undone.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>
+                                      Cancel
+                                    </AlertDialogCancel>
+                                    <AlertDialogAction
+                                      onClick={() =>
+                                        handleClosePosition(position.id)
+                                      }
+                                      className='bg-red-600 hover:bg-red-700'
+                                    >
+                                      Close Position
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            ) : (
+                              <span className='text-muted-foreground text-sm'>
+                                {position.status === 'CLOSED'
+                                  ? 'Closed'
+                                  : 'Closed'}
                               </span>
                             )}
-                          </span>
-                        );
-                      }
-
-                      return <span className='text-muted-foreground'>-</span>;
-                    })()}
-                  </TableCell>
-                  <TableCell>
-                    <Badge
-                      variant={getStatusBadgeVariant(position.status)}
-                      className='text-xs'
-                    >
-                      {position.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className='text-muted-foreground text-xs'>
-                    {formatDate(position.executedAt || new Date())}
-                  </TableCell>
-                  <TableCell className='text-muted-foreground text-xs'>
-                    {position.closedAt ? formatDate(position.closedAt) : '-'}
-                  </TableCell>
-                  <TableCell className='text-right'>
-                    {canClosePosition(position.status) ? (
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button
-                            variant='outline'
-                            size='sm'
-                            disabled={closingPositionId === position.id}
-                          >
-                            {closingPositionId === position.id ? (
-                              <IconLoader2 className='h-4 w-4 animate-spin' />
-                            ) : (
-                              <IconX className='h-4 w-4' />
-                            )}
-                            Close
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>
-                              Close Room Trading Position
-                            </AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Are you sure you want to close this{' '}
-                              {position.type} room trading position? This action
-                              cannot be undone.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => handleClosePosition(position.id)}
-                              className='bg-red-600 hover:bg-red-700'
-                            >
-                              Close Position
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    ) : (
-                      <span className='text-muted-foreground text-sm'>
-                        {position.status === 'CLOSED' ? 'Closed' : 'Closed'}
-                      </span>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                  <ScrollBar orientation='horizontal' />
+                </ScrollArea>
+              </div>
+            </div>
+          </div>
         </div>
       </CardContent>
     </Card>

@@ -1,6 +1,6 @@
 'use client';
 
-import type { Position } from '@prisma/client';
+import type { Market, Position } from '@prisma/client';
 import type { TwelveDataWebSocketPriceData } from '@/types/twelvedata';
 
 /**
@@ -12,7 +12,9 @@ import type { TwelveDataWebSocketPriceData } from '@/types/twelvedata';
  * @returns Calculated P&L or null if calculation fails
  */
 export function calculatePnLClient(
-  position: Position,
+  position: Position & {
+    market: Market;
+  },
   realTimeData?: TwelveDataWebSocketPriceData
 ): number | null {
   // Only calculate dynamic P&L for PLACED positions
@@ -35,13 +37,18 @@ export function calculatePnLClient(
   const executedPrice = position.executedPrice;
   const quantity = position.quantity;
 
+  let lotSize = 1;
+  if (position.market.type === 'FOREX') {
+    lotSize = 100000;
+  }
+
   // Calculate P&L based on position type
   if (position.type === 'BUY') {
     // For BUY: P&L = (current_price - executed_price) * quantity
-    return (currentPrice - executedPrice) * quantity;
+    return (currentPrice - executedPrice) * quantity * lotSize;
   } else if (position.type === 'SELL') {
     // For SELL: P&L = (executed_price - current_price) * quantity
-    return (executedPrice - currentPrice) * quantity;
+    return (executedPrice - currentPrice) * quantity * lotSize;
   }
 
   return null;

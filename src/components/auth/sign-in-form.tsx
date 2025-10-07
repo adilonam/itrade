@@ -63,7 +63,7 @@ export function SignInForm() {
   const handleGoogleSignIn = async () => {
     try {
       const result = await signIn('google', {
-        callbackUrl: '/dashboard/markets',
+        callbackUrl: '/',
         redirect: false
       });
 
@@ -87,7 +87,7 @@ export function SignInForm() {
         throw new Error('Invalid verification code');
       } else {
         toast.success('Signed in successfully');
-        router.push('/dashboard/markets');
+        router.push('/');
       }
     } catch (error) {
       throw error; // Re-throw to let MfaVerification component handle it

@@ -63,6 +63,14 @@ import { z } from 'zod';
  *               role:
  *                 type: string
  *                 enum: [USER, ADMIN, SUPERADMIN]
+ *               balance:
+ *                 type: number
+ *                 minimum: 0
+ *                 description: User account balance
+ *               leverage:
+ *                 type: number
+ *                 minimum: 1
+ *                 description: Trading leverage multiplier
  *               emailVerified:
  *                 type: string
  *                 format: date-time
@@ -114,6 +122,7 @@ const updateUserSchema = z
     password: z.string().min(8).optional(),
     role: z.enum(['USER', 'ADMIN', 'SUPERADMIN']).optional(),
     balance: z.number().min(0, 'Balance cannot be negative').optional(),
+    leverage: z.number().min(1, 'Leverage must be at least 1').optional(),
     emailVerified: z
       .union([z.string().pipe(z.coerce.date()), z.date(), z.null()])
       .optional()
@@ -164,6 +173,7 @@ export async function GET(
         name: true,
         email: true,
         balance: true,
+        leverage: true,
         role: true,
         emailVerified: true,
         createdAt: true,
@@ -281,6 +291,7 @@ export async function PUT(
         name: true,
         email: true,
         balance: true,
+        leverage: true,
         role: true,
         emailVerified: true,
         createdAt: true,

@@ -2,7 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { refreshMarkets, calculatePositionPnL } from '@/lib/pnl-calculator';
+import {
+  refreshSaveMarkets,
+  calculatePositionPnL,
+  calculateRequiredMargin
+} from '@/lib/calculator-server';
 // Create position data type
 type CreatePositionData = Position;
 import { Market, Position } from '@prisma/client';
@@ -83,6 +87,10 @@ import { Market, Position } from '@prisma/client';
  *                         type: number
  *                         nullable: true
  *                         description: Real-time calculated PnL for PLACED BUY/SELL positions based on current market price
+ *                       requiredMargin:
+ *                         type: number
+ *                         nullable: true
+ *                         description: Required margin for the position (calculated for PLACED positions)
  *                       market:
  *                         type: object
  *                         properties:
@@ -172,6 +180,10 @@ import { Market, Position } from '@prisma/client';
  *                   type: number
  *                   nullable: true
  *                   description: Real-time calculated PnL for PLACED BUY/SELL positions based on current market price
+ *                 requiredMargin:
+ *                   type: number
+ *                   nullable: true
+ *                   description: Required margin for the position (calculated for PLACED positions)
  *                 market:
  *                   type: object
  *                   properties:
@@ -341,7 +353,7 @@ export async function POST(request: NextRequest) {
         executedPrice = body.executedPrice;
 
         // Refresh market data and validate executed price against current market price
-        const refreshedMarkets = await refreshMarkets([market]);
+        const refreshedMarkets = await refreshSaveMarkets([market]);
         if (!refreshedMarkets || refreshedMarkets.length === 0) {
           return NextResponse.json(
             { error: 'Unable to refresh market data for validation' },
@@ -372,7 +384,7 @@ export async function POST(request: NextRequest) {
         }
       } else {
         // For PLACED orders or when no executedPrice provided, refresh market and use current price
-        const refreshedMarkets = await refreshMarkets([market]);
+        const refreshedMarkets = await refreshSaveMarkets([market]);
         if (!refreshedMarkets || refreshedMarkets.length === 0) {
           return NextResponse.json(
             { error: 'Unable to refresh market data' },
@@ -530,6 +542,45 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Calculate required margin for PLACED positions
+    let requiredMargin = null;
+    if (
+      (body.status || 'PENDING') === 'PLACED' &&
+      body.marketId &&
+      executedPrice
+    ) {
+      // Get user with leverage information for margin calculation
+      const userWithLeverage = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: { leverage: true }
+      });
+
+      if (userWithLeverage) {
+        // Create a temporary position object for margin calculation
+        const tempPosition = {
+          id: 'temp',
+          userId: session.user.id,
+          type: body.type,
+          status: 'PLACED' as const,
+          room: body.room || 'TRADING',
+          marketId: body.marketId,
+          quantity: body.quantity,
+          executedPrice: executedPrice,
+          closedPrice: null,
+          takeProfit: body.takeProfit,
+          stopLoss: body.stopLoss,
+          description: body.description,
+          executedAt: body.executedAt || new Date(),
+          closedAt: null,
+          pnl: null,
+          user: userWithLeverage,
+          market: market
+        };
+
+        requiredMargin = await calculateRequiredMargin(tempPosition as any);
+      }
+    }
+
     const position = await prisma.position.create({
       data: {
         userId: session.user.id,
@@ -542,6 +593,7 @@ export async function POST(request: NextRequest) {
         closedPrice: body.closedPrice,
         takeProfit: body.takeProfit,
         stopLoss: body.stopLoss,
+        requiredMargin: requiredMargin,
         description: body.description,
         executedAt: body.executedAt || new Date(),
         pnl: body.pnl
@@ -551,7 +603,8 @@ export async function POST(request: NextRequest) {
           select: {
             id: true,
             name: true,
-            email: true
+            email: true,
+            leverage: true
           }
         },
         market: true

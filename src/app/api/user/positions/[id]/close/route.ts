@@ -2,8 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { refreshMarkets, calculatePositionPnL } from '@/lib/pnl-calculator';
-import { Market, Position } from '@prisma/client';
+import {
+  refreshSaveMarkets,
+  calculatePositionPnL
+} from '@/lib/calculator-server';
+import { Market, Position, TransactionType } from '@prisma/client';
 
 /**
  * @swagger
@@ -112,7 +115,7 @@ export async function PATCH(
       ['BUY', 'SELL'].includes(existingPosition.type)
     ) {
       // Refresh market data
-      const refreshedMarkets = await refreshMarkets([
+      const refreshedMarkets = await refreshSaveMarkets([
         existingPosition.market as Market
       ]);
       if (refreshedMarkets && refreshedMarkets.length > 0) {
@@ -161,6 +164,37 @@ export async function PATCH(
         pnl: calculatedPnL || 0
       }
     });
+
+    // Update user balance and create transaction if P&L is calculated
+    if (calculatedPnL !== null && calculatedPnL !== 0) {
+      const transactionType: TransactionType =
+        calculatedPnL > 0 ? 'GAIN' : 'LOSS';
+      const absoluteAmount = Math.abs(calculatedPnL);
+
+      // Update user balance
+      await prisma.user.update({
+        where: { id: session.user.id },
+        data: {
+          balance: {
+            increment: calculatedPnL // Add P&L to balance (negative for losses)
+          }
+        }
+      });
+
+      // Create transaction record
+      await prisma.transaction.create({
+        data: {
+          userId: session.user.id,
+          type: transactionType,
+          amount: absoluteAmount,
+          description: `Position ${existingPosition.type} closed - ${existingPosition.market?.symbol || 'Unknown'}`
+        }
+      });
+
+      console.log(
+        `Updated user balance by ${calculatedPnL.toFixed(2)} and created ${transactionType} transaction`
+      );
+    }
 
     return NextResponse.json(updatedPosition);
   } catch (error) {

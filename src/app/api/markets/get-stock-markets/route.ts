@@ -121,7 +121,8 @@ export async function GET() {
             where: { id: market.id },
             data: {
               lastPrice: isFinite(lastPrice) ? lastPrice : market.lastPrice,
-              lastChange: isFinite(lastChange) ? lastChange : market.lastChange
+              lastChange: isFinite(lastChange) ? lastChange : market.lastChange,
+              updatedAt: new Date()
             }
           });
 

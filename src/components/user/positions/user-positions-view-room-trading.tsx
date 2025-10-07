@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useMemo, useCallback } from 'react';
+import { useSession } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -19,6 +20,7 @@ import {
 } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { UserPositionsTableRoomTrading } from './user-positions-table-room-trading';
+import { UserFinanceCard } from '@/components/user/finance/user-finance-card';
 import type { Position, Market, User } from '@prisma/client';
 
 // Extended position type with relations
@@ -55,7 +57,9 @@ interface PaginationInfo {
 }
 
 export function UserPositionsViewRoomTrading() {
+  const { data: session } = useSession();
   const [positions, setPositions] = useState<PositionWithRelations[]>([]);
+  const [realTimePnL, setRealTimePnL] = useState<Record<string, number>>({});
   const [pagination, setPagination] = useState<PaginationInfo>({
     page: 1,
     limit: 10,
@@ -174,14 +178,82 @@ export function UserPositionsViewRoomTrading() {
     loadPositions(pagination.page, currentFilters);
   };
 
+  // Update real-time PnL for a specific position
+  const updateRealTimePnL = useCallback((positionId: string, pnl: number) => {
+    setRealTimePnL((prev) => ({
+      ...prev,
+      [positionId]: pnl
+    }));
+  }, []);
+
+  // Calculate financial metrics
+  const financialMetrics = useMemo(() => {
+    // Get user balance from session
+    const userBalance = session?.user?.balance || 0;
+
+    // Sum of required margins only from PLACED positions
+    const usedMargin = positions.reduce((sum, position) => {
+      if (position.status === 'PLACED') {
+        return sum + (position.requiredMargin || 0);
+      }
+      return sum;
+    }, 0);
+
+    // Sum of all PnL from positions (using real-time PnL when available)
+    const totalPnL = positions
+      .filter((position) => position.status === 'PLACED')
+      .reduce((sum, position) => {
+        // Use real-time PnL if available, otherwise use stored PnL
+        const currentPnL =
+          realTimePnL[position.id] !== undefined
+            ? realTimePnL[position.id]
+            : position.pnl || 0;
+        return sum + currentPnL;
+      }, 0);
+
+    // Equity = balance + total PnL (reactive to real-time changes)
+    const equity = userBalance + totalPnL;
+
+    // Free margin = equity - used margin (reactive to real-time changes)
+    const freeMargin = equity - usedMargin;
+
+    return {
+      usedMargin,
+      totalPnL,
+      equity,
+      freeMargin,
+      userBalance
+    };
+  }, [positions, session?.user?.balance, realTimePnL]);
+
   // Calculate summary statistics
   const summaryStats = useMemo(() => {
     const totalPositions = positions.length;
-    const totalPnL = positions.reduce((sum, t) => sum + (t.pnl || 0), 0);
-    const profitablePositions = positions.filter(
-      (t) => (t.pnl || 0) > 0
-    ).length;
-    const losingPositions = positions.filter((t) => (t.pnl || 0) < 0).length;
+
+    // Use real-time PnL for summary calculations
+    const totalPnL = positions.reduce((sum, position) => {
+      const currentPnL =
+        realTimePnL[position.id] !== undefined
+          ? realTimePnL[position.id]
+          : position.pnl || 0;
+      return sum + currentPnL;
+    }, 0);
+
+    const profitablePositions = positions.filter((position) => {
+      const currentPnL =
+        realTimePnL[position.id] !== undefined
+          ? realTimePnL[position.id]
+          : position.pnl || 0;
+      return currentPnL > 0;
+    }).length;
+
+    const losingPositions = positions.filter((position) => {
+      const currentPnL =
+        realTimePnL[position.id] !== undefined
+          ? realTimePnL[position.id]
+          : position.pnl || 0;
+      return currentPnL < 0;
+    }).length;
 
     return {
       totalPositions,
@@ -189,10 +261,10 @@ export function UserPositionsViewRoomTrading() {
       profitablePositions,
       losingPositions
     };
-  }, [positions]);
+  }, [positions, realTimePnL]);
 
   return (
-    <div className='space-y-6'>
+    <div className='max-w-[1000px] space-y-6 overflow-x-auto'>
       {/* Summary Cards */}
       <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4'>
         <Card>
@@ -241,6 +313,13 @@ export function UserPositionsViewRoomTrading() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Finance Card */}
+      <UserFinanceCard
+        balance={financialMetrics.userBalance}
+        usedMargin={financialMetrics.usedMargin}
+        equity={financialMetrics.equity}
+      />
 
       {/* Filters */}
       <Card>
@@ -349,6 +428,8 @@ export function UserPositionsViewRoomTrading() {
         positions={positions}
         loading={loading}
         onClose={handleClosePosition}
+        onUpdateRealTimePnL={updateRealTimePnL}
+        realTimePnL={realTimePnL}
       />
 
       {/* Pagination */}

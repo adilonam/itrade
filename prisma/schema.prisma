@@ -58,7 +58,6 @@ model User {
   image           String?
   password        String? // For credentials provider
   balance         Float            @default(0) @map("balance")
-  usedMargin      Float            @default(0) @map("used_margin")
   role            Role             @default(USER)
   createdAt       DateTime         @default(now()) @map("created_at")
   updatedAt       DateTime         @updatedAt @map("updated_at")
@@ -68,6 +67,7 @@ model User {
   mfaChallenges   MfaChallenge[]
   positions       Position[]
   userInvestments UserInvestment[]
+  transactions    Transaction[]
 
   @@map("users")
 }
@@ -147,8 +147,9 @@ model Position {
   closedPrice   Float? @map("closed_price") // Price when position was closed
 
   // Risk management
-  takeProfit Float? @map("take_profit") // Take profit price level
-  stopLoss   Float? @map("stop_loss") // Stop loss price level
+  takeProfit     Float? @map("take_profit") // Take profit price level
+  stopLoss       Float? @map("stop_loss") // Stop loss price level
+  requiredMargin Float? @map("required_margin") // Required margin for the position
 
   // Reference and metadata
   description String? // Position description
@@ -227,4 +228,30 @@ model UserInvestment {
   investment Investment @relation(fields: [investmentId], references: [id], onDelete: Cascade)
 
   @@map("user_investments")
+}
+
+// Transaction model for tracking user financial transactions
+model Transaction {
+  id          String          @id @default(cuid())
+  userId      String          @map("user_id")
+  type        TransactionType
+  amount      Float
+  description String?
+
+  // Timestamps
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("transactions")
+}
+
+// Transaction type enum
+enum TransactionType {
+  GAIN // Profit from trading or investment or stock market
+  LOSS // Loss from trading or investment or stock market
+  DEPOSIT // Money deposited to account
+  WITHDRAW // Money withdrawn from account
 }

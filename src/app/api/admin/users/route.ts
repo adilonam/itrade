@@ -79,6 +79,14 @@ import { z } from 'zod';
  *               role:
  *                 type: string
  *                 enum: [USER, ADMIN, SUPERADMIN]
+ *               balance:
+ *                 type: number
+ *                 minimum: 0
+ *                 description: User account balance
+ *               leverage:
+ *                 type: number
+ *                 minimum: 1
+ *                 description: Trading leverage multiplier
  *               emailVerified:
  *                 type: string
  *                 format: date-time
@@ -115,6 +123,11 @@ const createUserSchema = z.object({
     .min(0, 'Balance cannot be negative')
     .optional()
     .default(0),
+  leverage: z
+    .number()
+    .min(1, 'Leverage must be at least 1')
+    .optional()
+    .default(1),
   emailVerified: z
     .union([z.string().pipe(z.coerce.date()), z.date(), z.null()])
     .optional()
@@ -189,6 +202,7 @@ export async function GET(request: NextRequest) {
           name: true,
           email: true,
           balance: true,
+          leverage: true,
           role: true,
           emailVerified: true,
           createdAt: true,
@@ -249,7 +263,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { name, email, password, role, balance } = validation.data;
+    const { name, email, password, role, balance, leverage } = validation.data;
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
@@ -281,13 +295,15 @@ export async function POST(request: NextRequest) {
         email,
         password: hashedPassword,
         role,
-        balance: balance || 0
+        balance: balance || 0,
+        leverage: leverage || 1
       },
       select: {
         id: true,
         name: true,
         email: true,
         balance: true,
+        leverage: true,
         role: true,
         emailVerified: true,
         createdAt: true,
