@@ -4,4 +4,4 @@
 - [ ] logo de app
 - [ ] logo des markets
 - [ ] position en stock => portefeuil binance
-- [ ] admin cloture 
+- [ ] admin cloture
