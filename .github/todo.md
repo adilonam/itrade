@@ -1,3 +1,7 @@
 - [ ] admin interface
 - [ ] get market to be one api
 - [ ] correct on insuffisant balance
+- [ ] logo de app
+- [ ] logo des markets
+- [ ] position en stock => portefeuil binance
+- [ ] admin cloture 
