@@ -1,7 +1,10 @@
-- [ ] admin interface
+- [x] admin interface
+- [ ] super admin
 - [ ] get market to be one api
-- [ ] correct on insuffisant balance
-- [ ] logo de app
-- [ ] logo des markets
-- [ ] position en stock => portefeuil binance
-- [ ] admin cloture
+- [ ] correct on insuffisant balance adil ----
+- [ ] logo de app superdamin + theme (super admin)
+- [ ] logo des markets 
+- [ ] profil user
+- [ ] position en stock => portefeuil binance 10 btc +10usd 
+- [ ] admin cloture -- tradin- adil 
+- [ ] cutomization admin  + superadmin
