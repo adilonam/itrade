@@ -3,8 +3,8 @@
 - [ ] get market to be one api
 - [ ] correct on insuffisant balance adil ----
 - [ ] logo de app superdamin + theme (super admin)
-- [ ] logo des markets 
+- [ ] logo des markets
 - [ ] profil user
-- [ ] position en stock => portefeuil binance 10 btc +10usd 
-- [ ] admin cloture -- tradin- adil 
-- [ ] cutomization admin  + superadmin
+- [ ] position en stock => portefeuil binance 10 btc +10usd
+- [ ] admin cloture -- tradin- adil
+- [ ] cutomization admin + superadmin
