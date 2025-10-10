@@ -145,6 +145,26 @@ export const navItems: NavItem[] = [
     shortcut: ['t', 't'],
     items: [], // Empty array as there are no child items
     isAdmin: true
+  },
+  {
+    title: 'App Settings',
+    url: '/super-admin/app-settings',
+    icon: 'settings',
+    isActive: false,
+    shortcut: ['s', 'a'],
+    items: [], // Empty array as there are no child items
+    isAdmin: true,
+    isSuperAdmin: true
+  },
+  {
+    title: 'Theme Settings',
+    url: '/super-admin/theme-settings',
+    icon: 'palette',
+    isActive: false,
+    shortcut: ['t', 's'],
+    items: [], // Empty array as there are no child items
+    isAdmin: true,
+    isSuperAdmin: true
   }
 ];
 

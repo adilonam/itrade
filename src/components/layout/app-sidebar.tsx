@@ -46,6 +46,8 @@ import { usePathname, useRouter } from 'next/navigation';
 import * as React from 'react';
 import { Icons } from '../icons';
 import { OrgSwitcher } from '../org-switcher';
+import { AppBranding } from './app-branding';
+
 export const company = {
   name: 'Acme Inc',
   logo: IconPhotoUp,
@@ -65,6 +67,10 @@ export default function AppSidebar() {
 
     if (user?.role === 'ADMIN' || user?.role === 'SUPERADMIN') {
       baseTenants.push({ id: '2', name: 'Admin' });
+    }
+
+    if (user?.role === 'SUPERADMIN') {
+      baseTenants.push({ id: '3', name: 'Super Admin' });
     }
 
     return baseTenants;
@@ -89,10 +95,15 @@ export default function AppSidebar() {
 
   React.useEffect(() => {
     // Auto-select tenant based on current path
-    if (pathname.startsWith('/admin')) {
+    if (pathname.startsWith('/super-admin')) {
+      const superAdminTenant = tenants.find((t) => t.id === '3');
+      if (superAdminTenant) {
+        setSelectedTenant(superAdminTenant); // Super Admin tenant
+      }
+    } else if (pathname.startsWith('/admin')) {
       const adminTenant = tenants.find((t) => t.id === '2');
       if (adminTenant) {
-        setSelectedTenant(adminTenant); // Admin tenant (if available)
+        setSelectedTenant(adminTenant); // Admin tenant
       }
     } else if (pathname.startsWith('/dashboard')) {
       const dashboardTenant = tenants.find((t) => t.id === '1');
@@ -111,6 +122,7 @@ export default function AppSidebar() {
   return (
     <Sidebar collapsible='icon'>
       <SidebarHeader>
+        <AppBranding className='px-2 py-3' />
         {!isLoading && (
           <OrgSwitcher
             tenants={tenants}
@@ -130,12 +142,17 @@ export default function AppSidebar() {
             ) : (
               navItems
                 .filter((item) => {
-                  // When admin tenant is selected, show ONLY admin items
-                  if (selectedTenant.id === '2') {
-                    return item.isAdmin;
+                  // When super admin tenant is selected, show ONLY super admin items
+                  if (selectedTenant.id === '3') {
+                    return item.isSuperAdmin;
                   }
 
-                  // Otherwise, show non-admin items and admin items only for admin users
+                  // When admin tenant is selected, show admin items (excluding super admin only)
+                  if (selectedTenant.id === '2') {
+                    return item.isAdmin && !item.isSuperAdmin;
+                  }
+
+                  // Otherwise, show non-admin items
                   if (item.isAdmin) {
                     return false;
                   }
@@ -165,12 +182,19 @@ export default function AppSidebar() {
                           <SidebarMenuSub>
                             {item.items
                               ?.filter((subItem) => {
-                                // When admin tenant is selected, show ONLY admin sub-items
-                                if (selectedTenant.id === '2') {
-                                  return subItem.isAdmin;
+                                // When super admin tenant is selected, show ONLY super admin sub-items
+                                if (selectedTenant.id === '3') {
+                                  return subItem.isSuperAdmin;
                                 }
 
-                                // Otherwise, show non-admin sub-items and admin sub-items only for admin users
+                                // When admin tenant is selected, show admin sub-items (excluding super admin only)
+                                if (selectedTenant.id === '2') {
+                                  return (
+                                    subItem.isAdmin && !subItem.isSuperAdmin
+                                  );
+                                }
+
+                                // Otherwise, show non-admin sub-items
                                 if (subItem.isAdmin) {
                                   return false;
                                 }

@@ -255,3 +255,14 @@ enum TransactionType {
   DEPOSIT // Money deposited to account
   WITHDRAW // Money withdrawn from account
 }
+
+// App Settings model for global configuration
+model AppSettings {
+  id        String   @id @default("default")
+  appIcon   String?  @map("app_icon") // Path to uploaded icon
+  appName   String   @default("Trading Dashboard") @map("app_name")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("app_settings")
+}
