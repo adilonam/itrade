@@ -5,7 +5,6 @@ import { Separator } from '../ui/separator';
 import { Breadcrumbs } from '../breadcrumbs';
 import SearchInput from '../search-input';
 import { UserNav } from './user-nav';
-import { ThemeSelector } from '../theme-selector';
 import { ModeToggle } from './ThemeToggle/theme-toggle';
 import { useSession } from 'next-auth/react';
 import { Badge } from '../ui/badge';
@@ -38,9 +37,8 @@ export default function Header() {
             </span>
           </Badge>
         )}
-        <UserNav />
         <ModeToggle />
-        <ThemeSelector />
+        <UserNav />
       </div>
     </header>
   );
