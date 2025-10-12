@@ -47,7 +47,7 @@ export function StockMarketsView({
   useEffect(() => {
     async function loadMarkets() {
       try {
-        const res = await fetch('/api/markets/get-stock-markets', {
+        const res = await fetch('/api/markets?room=STOCK', {
           method: 'GET'
         });
         if (!res.ok) return;
