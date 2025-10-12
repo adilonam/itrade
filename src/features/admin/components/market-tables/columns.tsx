@@ -151,8 +151,6 @@ export const columns: ColumnDef<AdminMarket>[] = [
             return 'bg-indigo-100 text-indigo-800';
           case 'STOCK':
             return 'bg-teal-100 text-teal-800';
-          case 'STOCK_AND_TRADING':
-            return 'bg-violet-100 text-violet-800';
           default:
             return 'bg-gray-100 text-gray-800';
         }
@@ -164,8 +162,7 @@ export const columns: ColumnDef<AdminMarket>[] = [
             return 'Trading';
           case 'STOCK':
             return 'Stock';
-          case 'STOCK_AND_TRADING':
-            return 'Stock & Trading';
+
           default:
             return room;
         }

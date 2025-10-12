@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import {
   Table,
   TableBody,
@@ -9,7 +8,6 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
   Card,
@@ -18,25 +16,8 @@ import {
   CardHeader,
   CardTitle
 } from '@/components/ui/card';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger
-} from '@/components/ui/alert-dialog';
 import type { Market, Position } from '@prisma/client';
-import {
-  IconX,
-  IconLoader2,
-  IconTrendingUp,
-  IconTrendingDown,
-  IconMinus
-} from '@tabler/icons-react';
+import { IconLoader2 } from '@tabler/icons-react';
 
 type PositionWithMarket = Position & {
   market: Market | null;
@@ -45,27 +26,12 @@ type PositionWithMarket = Position & {
 interface UserPositionsTableRoomStockProps {
   positions: PositionWithMarket[];
   loading: boolean;
-  onClose: (positionId: string) => void;
 }
 
 export function UserPositionsTableRoomStock({
   positions,
-  loading,
-  onClose
+  loading
 }: UserPositionsTableRoomStockProps) {
-  const [closingPositionId, setClosingPositionId] = useState<string | null>(
-    null
-  );
-
-  const handleClosePosition = async (positionId: string) => {
-    setClosingPositionId(positionId);
-    try {
-      await onClose(positionId);
-    } finally {
-      setClosingPositionId(null);
-    }
-  };
-
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
       case 'CLOSED':
@@ -81,17 +47,6 @@ export function UserPositionsTableRoomStock({
     }
   };
 
-  const getTypeIcon = (type: string) => {
-    switch (type) {
-      case 'BUY':
-        return <IconTrendingUp className='h-4 w-4 text-green-600' />;
-      case 'SELL':
-        return <IconTrendingDown className='h-4 w-4 text-red-600' />;
-      default:
-        return <IconMinus className='h-4 w-4 text-gray-600' />;
-    }
-  };
-
   const formatDate = (date: Date | string) => {
     return new Date(date).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -100,10 +55,6 @@ export function UserPositionsTableRoomStock({
       hour: '2-digit',
       minute: '2-digit'
     });
-  };
-
-  const canClosePosition = (status: string) => {
-    return ['PLACED', 'PENDING'].includes(status);
   };
 
   if (loading) {
@@ -135,17 +86,14 @@ export function UserPositionsTableRoomStock({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Your Positions</CardTitle>
-        <CardDescription>
-          View and manage your trading positions
-        </CardDescription>
+        <CardTitle>History</CardTitle>
+        <CardDescription>View your trading history</CardDescription>
       </CardHeader>
       <CardContent>
         <div className='rounded-md border'>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Type</TableHead>
                 <TableHead>Market</TableHead>
                 <TableHead>Quantity</TableHead>
                 <TableHead>Exec Price</TableHead>
@@ -154,18 +102,11 @@ export function UserPositionsTableRoomStock({
                 <TableHead>Status</TableHead>
                 <TableHead>Date</TableHead>
                 <TableHead>Closed</TableHead>
-                <TableHead className='text-right'>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {positions.map((position) => (
                 <TableRow key={position.id}>
-                  <TableCell>
-                    <div className='flex items-center gap-2'>
-                      {getTypeIcon(position.type)}
-                      <span className='font-medium'>{position.type}</span>
-                    </div>
-                  </TableCell>
                   <TableCell>
                     {position.market ? (
                       <div>
@@ -219,49 +160,6 @@ export function UserPositionsTableRoomStock({
                   </TableCell>
                   <TableCell className='text-muted-foreground text-xs'>
                     {position.closedAt ? formatDate(position.closedAt) : '-'}
-                  </TableCell>
-                  <TableCell className='text-right'>
-                    {canClosePosition(position.status) ? (
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button
-                            variant='outline'
-                            size='sm'
-                            disabled={closingPositionId === position.id}
-                          >
-                            {closingPositionId === position.id ? (
-                              <IconLoader2 className='h-4 w-4 animate-spin' />
-                            ) : (
-                              <IconX className='h-4 w-4' />
-                            )}
-                            Close
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Close Position</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Are you sure you want to close this{' '}
-                              {position.type} position? This action cannot be
-                              undone.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => handleClosePosition(position.id)}
-                              className='bg-red-600 hover:bg-red-700'
-                            >
-                              Close Position
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    ) : (
-                      <span className='text-muted-foreground text-sm'>
-                        {position.status === 'CLOSED' ? 'Closed' : 'Closed'}
-                      </span>
-                    )}
                   </TableCell>
                 </TableRow>
               ))}

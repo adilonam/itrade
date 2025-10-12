@@ -88,9 +88,6 @@ export function EditRoomDialog({
               <SelectContent>
                 <SelectItem value='TRADING'>Trading Only</SelectItem>
                 <SelectItem value='STOCK'>Stock Only</SelectItem>
-                <SelectItem value='STOCK_AND_TRADING'>
-                  Stock & Trading
-                </SelectItem>
               </SelectContent>
             </Select>
           </div>

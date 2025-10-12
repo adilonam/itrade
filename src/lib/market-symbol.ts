@@ -6,7 +6,7 @@ import type { Market } from '@prisma/client';
  * @returns TwelveData compatible symbol
  */
 export function toTwelveDataSymbol(market: Market): string {
-  const symbol = market.symbol.replace(/\//g, '');
+  const symbol = market.symbol;
 
   // For crypto markets, use the symbol as-is (e.g., BTCUSDT)
   if (market.type === 'CRYPTO') {

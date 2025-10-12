@@ -74,9 +74,7 @@ export async function POST(request: NextRequest) {
         marketId,
         status: 'PLACED',
         type: 'BUY',
-        room: {
-          in: ['STOCK', 'STOCK_AND_TRADING']
-        }
+        room: 'STOCK'
       },
       include: {
         market: true
@@ -159,7 +157,7 @@ export async function POST(request: NextRequest) {
         data: {
           userId: session.user.id,
           type: totalPnL >= 0 ? 'GAIN' : 'LOSS',
-          amount: Math.abs(totalPnL),
+          absoluteAmount: Math.abs(totalPnL),
           description: `Sold ${totalQuantity} ${market.symbol} at ${currentPrice.toFixed(2)} - ${totalPnL >= 0 ? 'Profit' : 'Loss'}: ${Math.abs(totalPnL).toFixed(2)}`
         }
       });

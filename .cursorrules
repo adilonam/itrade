@@ -17,7 +17,6 @@ This project uses:
 - Use **server components** by default; mark as `"use client"` only when needed (hooks, state, Radix UI).
 - Import Radix UI components from `@radix-ui/react-*`.
 - Style with **Tailwind CSS**, keep classes minimal and semantic.
-- Favor **composition over complex props** when wrapping Radix components.
 - Follow **pnpm** conventions:
   - Use `pnpm add <pkg>` for dependencies
   - Never suggest `npm` or `yarn` commands
@@ -26,3 +25,6 @@ This project uses:
 - Prefer editing existing files over creating new ones unless explicitly required.
 - Use semantic search and grep tools to understand the codebase before making changes.
 - Follow the existing code patterns and conventions found in the project.
+- dont create markdown files
+- use always the schema from prisma/schema.prisma
+

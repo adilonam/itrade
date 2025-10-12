@@ -151,7 +151,7 @@ import { z } from 'zod';
 const createMarketSchema = z.object({
   symbol: z.string().min(1, 'Symbol is required').max(12, 'Symbol too long'),
   type: z.enum(['FOREX', 'CRYPTO', 'STOCKS', 'COMMODITIES', 'INDICES']),
-  room: z.enum(['STOCK', 'TRADING', 'STOCK_AND_TRADING']),
+  room: z.enum(['STOCK', 'TRADING']),
   spread: z.number().min(0).optional(),
   visible: z.boolean().optional()
 });

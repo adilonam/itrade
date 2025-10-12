@@ -13,7 +13,7 @@ export interface GetMarketsParams {
 export interface CreateMarketParams {
   symbol: string;
   type: 'FOREX' | 'CRYPTO' | 'STOCKS' | 'COMMODITIES' | 'INDICES';
-  room: 'STOCK' | 'TRADING' | 'STOCK_AND_TRADING';
+  room: 'STOCK' | 'TRADING';
   spread?: number;
   visible?: boolean;
 }
@@ -21,7 +21,7 @@ export interface CreateMarketParams {
 export interface UpdateMarketParams {
   visible?: boolean;
   spread?: number;
-  room?: 'STOCK' | 'TRADING' | 'STOCK_AND_TRADING';
+  room?: 'STOCK' | 'TRADING';
 }
 
 export interface MarketsResponse {
