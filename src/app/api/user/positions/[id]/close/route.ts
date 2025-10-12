@@ -188,7 +188,7 @@ export async function PATCH(
           data: {
             userId: session.user.id,
             type: transactionType,
-            abosulteAmount: absoluteAmount,
+            absoluteAmount: absoluteAmount,
             description: `Position ${existingPosition.type} closed - ${existingPosition.market?.symbol || 'Unknown'}`
           }
         });

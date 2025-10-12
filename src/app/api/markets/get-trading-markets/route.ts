@@ -42,7 +42,7 @@ import { twelveDataService } from '@/lib/twelvedata';
  *                         description: Human-readable name of the market
  *                       room:
  *                         type: string
- *                         enum: [STOCK, TRADING, STOCK_AND_TRADING]
+ *                         enum: [STOCK, TRADING]
  *                         example: "TRADING"
  *                         description: Market room type
  *                       spread:
@@ -87,11 +87,11 @@ import { twelveDataService } from '@/lib/twelvedata';
  */
 export async function GET() {
   try {
-    // Get only visible markets with TRADING or STOCK_AND_TRADING room from database
+    // Get only visible markets with TRADING  room from database
     const markets = await prisma.market.findMany({
       where: {
         visible: true,
-        OR: [{ room: 'TRADING' }, { room: 'STOCK_AND_TRADING' }]
+        room: 'TRADING'
       },
       orderBy: {
         createdAt: 'desc'

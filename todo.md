@@ -1,0 +1,2 @@
+- [x] search for lot size
+- [ ] close position when negative bal 

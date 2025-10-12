@@ -1,9 +1,24 @@
 'use server';
 
 import { twelveDataService } from '@/lib/twelvedata';
-import { toTwelveDataSymbol } from '@/lib/market-symbol';
 import { prisma } from '@/lib/prisma';
-import { Market, Position, User } from '@prisma/client';
+import { Market, Position, User, MarketType } from '@prisma/client';
+
+/**
+ * Get lot size based on market type
+ * @param type - The type of market (FOREX, STOCKS, etc.)
+ * @returns Lot size multiplier
+ */
+export async function getLotSize(type: MarketType): Promise<number> {
+  switch (type) {
+    case 'FOREX':
+      return 100000;
+    case 'STOCKS':
+      return 100;
+    default:
+      return 1;
+  }
+}
 
 /**
  * Calculate PnL for a position based on executed price and closed price
@@ -77,10 +92,7 @@ export async function calculatePositionPnL(
 
     // Calculate PnL based on position type
     let pnl: number;
-    let lotSize = 1;
-    if (position.market.type === 'FOREX') {
-      lotSize = 100000;
-    }
+    const lotSize = await getLotSize(position.market.type);
 
     if (position.type === 'BUY') {
       // For BUY: PnL = (current_price - executed_price) * quantity
@@ -181,9 +193,10 @@ export async function refreshSaveMarkets(
     const refreshedMarkets = await Promise.all(
       marketsToRefresh.map(async (market) => {
         try {
-          const twelveDataSymbol = toTwelveDataSymbol(market);
-          const marketData =
-            await twelveDataService.getCombinedData(twelveDataSymbol);
+          // const twelveDataSymbol = toTwelveDataSymbol(market);
+          const marketData = await twelveDataService.getCombinedData(
+            market.symbol
+          );
 
           if ('error' in marketData) {
             console.warn(
@@ -248,16 +261,14 @@ export async function calculateRequiredMargin(
     const positionPrice = position.executedPrice;
 
     // Calculate position value (price * quantity * lot size)
-    // Standard lot size is typically 100,000 units for forex, 100 for stocks
-    let lotSize = 1;
-    if (position.market.type === 'FOREX') {
-      lotSize = 100000;
-    }
+    const lotSize = await getLotSize(position.market.type);
     const positionValue = positionPrice * position.quantity * lotSize;
 
     // Calculate required margin based on leverage
     // Required Margin = Position Value / Leverage
-    const leverage = position.user.leverage || 1; // Default to 1:1 if no leverage set
+    // For stock room, always use leverage = 1, otherwise use user's leverage
+    const leverage =
+      position.market.room === 'STOCK' ? 1 : position.user.leverage || 1;
     const requiredMargin = positionValue / leverage;
 
     console.log(`Calculated required margin for position ${position.id}:`, {
@@ -339,10 +350,7 @@ export async function couldOpenPosition(
           const currentPrice = pos.type === 'BUY' ? askPrice : bidPrice;
 
           // Calculate PnL
-          let lotSize = 1;
-          if (pos.market.type === 'FOREX') {
-            lotSize = 100000;
-          }
+          const lotSize = await getLotSize(pos.market.type);
 
           let pnl = 0;
           if (pos.type === 'BUY') {
@@ -363,6 +371,10 @@ export async function couldOpenPosition(
 
     // Calculate free margin: balance + total PnL - total required margin
     const freeMargin = user.balance + totalPnL - totalRequiredMargin;
+    console.log('freeMargin', freeMargin);
+    console.log('user.balance', user.balance);
+    console.log('totalPnL', totalPnL);
+    console.log('totalRequiredMargin', totalRequiredMargin);
 
     // Calculate required margin for the new position
     const newPositionRequiredMargin = await calculateRequiredMargin(position);
@@ -378,13 +390,18 @@ export async function couldOpenPosition(
 
     const canOpen = freeMargin >= newPositionRequiredMargin;
 
+    // Determine leverage based on market room
+    const effectiveLeverage =
+      position.market.room === 'STOCK' ? 1 : user.leverage || 1;
+
     console.log(`Position opening check for user ${user.id}:`, {
       canOpen,
       freeMargin,
       totalPnL,
       totalRequiredMargin,
       newPositionRequiredMargin,
-      leverage: user.leverage,
+      leverage: effectiveLeverage,
+      marketRoom: position.market.room,
       userBalance: user.balance
     });
 
@@ -394,7 +411,7 @@ export async function couldOpenPosition(
       totalPnL,
       totalRequiredMargin,
       newPositionRequiredMargin,
-      leverage: user.leverage
+      leverage: effectiveLeverage
     };
   } catch (error) {
     console.error('Error checking if position can be opened:', error);

@@ -5,7 +5,6 @@ import { prisma } from '@/lib/prisma';
 import {
   refreshSaveMarkets,
   calculatePositionPnL,
-  calculateRequiredMargin,
   couldOpenPosition
 } from '@/lib/calculator-server';
 // Create position data type
@@ -57,7 +56,7 @@ import { Market, Position } from '@prisma/client';
  *         name: room
  *         schema:
  *           type: string
- *           enum: [STOCK, TRADING, STOCK_AND_TRADING]
+ *           enum: [STOCK, TRADING]
  *         description: Filter by room type
  *     responses:
  *       200:
@@ -135,7 +134,7 @@ import { Market, Position } from '@prisma/client';
  *                 enum: [PLACED, CLOSED, FAILED, PENDING]
  *               room:
  *                 type: string
- *                 enum: [STOCK, TRADING, STOCK_AND_TRADING]
+ *                 enum: [STOCK, TRADING]
  *                 description: Room type (defaults to TRADING)
  *               marketId:
  *                 type: string
@@ -395,57 +394,7 @@ export async function POST(request: NextRequest) {
         executedPrice = market.lastPrice; // Use the market's lastPrice since getCombinedData stores data
       }
 
-      // Validate user has sufficient balance for STOCK room only
-      const isStockRoom =
-        body.room === 'STOCK' || body.room === 'STOCK_AND_TRADING';
-
-      if (isStockRoom) {
-        // Validate user has sufficient balance for BUY orders
-        if (body.type === 'BUY' && executedPrice) {
-          const totalCost = body.quantity * executedPrice;
-
-          if (user.balance < totalCost) {
-            return NextResponse.json(
-              {
-                error: 'Insufficient balance',
-                message: `You need $${totalCost.toFixed(2)} but only have $${user.balance.toFixed(2)}. Please add funds to your account.`,
-                requiredBalance: totalCost,
-                currentBalance: user.balance
-              },
-              { status: 400 }
-            );
-          }
-        }
-
-        // Validate user has sufficient balance for SELL orders
-        if (body.type === 'SELL' && executedPrice) {
-          // For SELL orders, user needs margin to cover potential losses
-          // Calculate required margin based on quantity and price
-          // Use stop loss if provided, otherwise require full position value as margin
-          let requiredMargin: number;
-
-          if (body.stopLoss && body.stopLoss > executedPrice) {
-            // If stop loss is set, calculate maximum potential loss
-            const maxLoss = (body.stopLoss - executedPrice) * body.quantity;
-            requiredMargin = maxLoss;
-          } else {
-            // Without stop loss, require the full position value as margin
-            requiredMargin = body.quantity * executedPrice;
-          }
-
-          if (user.balance < requiredMargin) {
-            return NextResponse.json(
-              {
-                error: 'Insufficient balance',
-                message: `You need $${requiredMargin.toFixed(2)} margin but only have $${user.balance.toFixed(2)}. Please add funds to your account or set a stop loss.`,
-                requiredBalance: requiredMargin,
-                currentBalance: user.balance
-              },
-              { status: 400 }
-            );
-          }
-        }
-      }
+      // Balance validation is handled by couldOpenPosition function for both STOCK and TRADING rooms
     }
 
     // Validate take profit and stop loss if provided
@@ -666,34 +615,8 @@ export async function POST(request: NextRequest) {
       }
     });
 
-    // Update user balance for STOCK room positions
-    const isStockRoom =
-      body.room === 'STOCK' || body.room === 'STOCK_AND_TRADING';
-    if (isStockRoom && executedPrice) {
-      let balanceChange = 0;
-
-      if (body.type === 'BUY') {
-        // Deduct cost for BUY orders
-        balanceChange = -(body.quantity * executedPrice);
-      } else if (body.type === 'SELL') {
-        // Deduct margin for SELL orders
-        if (body.stopLoss && body.stopLoss > executedPrice) {
-          balanceChange = -((body.stopLoss - executedPrice) * body.quantity);
-        } else {
-          balanceChange = -(body.quantity * executedPrice);
-        }
-      }
-
-      // Update user balance
-      await prisma.user.update({
-        where: { id: session.user.id },
-        data: {
-          balance: {
-            increment: balanceChange
-          }
-        }
-      });
-    }
+    // No balance update needed - margin is already calculated and reserved by couldOpenPosition
+    // STOCK room: leverage = 1, TRADING room: leverage = user.leverage
 
     // Calculate PnL for PLACED positions only
     let pnl = null;

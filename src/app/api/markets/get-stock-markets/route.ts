@@ -7,7 +7,7 @@ import { twelveDataService } from '@/lib/twelvedata';
  * /api/markets/get-stock-markets:
  *   get:
  *     summary: Get all visible markets with STOCK room
- *     description: Retrieves all visible markets from the database that have room=STOCK or room=STOCK_AND_TRADING, including their type, symbol, and name. Only returns markets that are set to visible=true for user stock trading.
+ *     description: Retrieves all visible markets from the database that have room=STOCK  including their type, symbol, and name. Only returns markets that are set to visible=true for user stock trading.
  *     tags:
  *       - Markets
  *     responses:
@@ -42,7 +42,7 @@ import { twelveDataService } from '@/lib/twelvedata';
  *                         description: Human-readable name of the market
  *                       room:
  *                         type: string
- *                         enum: [STOCK, TRADING, STOCK_AND_TRADING]
+ *                         enum: [STOCK, TRADING]
  *                         example: "STOCK"
  *                         description: Market room type
  *                       spread:
@@ -87,11 +87,11 @@ import { twelveDataService } from '@/lib/twelvedata';
  */
 export async function GET() {
   try {
-    // Get only visible markets with STOCK or STOCK_AND_TRADING room from database
+    // Get only visible markets with STOCK  room from database
     const markets = await prisma.market.findMany({
       where: {
         visible: true,
-        OR: [{ room: 'STOCK' }, { room: 'STOCK_AND_TRADING' }]
+        room: 'STOCK'
       },
       orderBy: {
         createdAt: 'desc'

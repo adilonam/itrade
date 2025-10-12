@@ -26,7 +26,7 @@ export default async function Page(props: PageProps) {
     market = await prisma.market.findFirst({
       where: {
         id: marketId,
-        OR: [{ room: 'TRADING' }, { room: 'STOCK_AND_TRADING' }],
+        room: 'TRADING',
         visible: true
       }
     });

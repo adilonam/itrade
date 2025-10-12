@@ -28,7 +28,7 @@ interface WebSocketState {
 export function useTwelveDataWebSocket({
   apiKey,
   autoConnect = false,
-  heartbeatInterval = 1000 // 10 seconds
+  heartbeatInterval = 1000 // 1 seconds
 }: UseTwelveDataWebSocketOptions) {
   const wsRef = useRef<WebSocket | null>(null);
   const heartbeatRef = useRef<NodeJS.Timeout | null>(null);

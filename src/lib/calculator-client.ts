@@ -1,7 +1,23 @@
 'use client';
 
-import type { Market, Position, User } from '@prisma/client';
+import type { Market, Position, User, MarketType } from '@prisma/client';
 import type { TwelveDataWebSocketPriceData } from '@/types/twelvedata';
+
+/**
+ * Get lot size based on market type
+ * @param type - The type of market (FOREX, STOCK, etc.)
+ * @returns Lot size multiplier
+ */
+export function getLotSize(type: MarketType): number {
+  switch (type) {
+    case 'FOREX':
+      return 100000;
+    case 'STOCKS':
+      return 100;
+    default:
+      return 1;
+  }
+}
 
 /**
  * Client-side function to calculate dynamic P&L based on real-time websocket data
@@ -37,10 +53,7 @@ export function calculatePnLClient(
   const executedPrice = position.executedPrice;
   const quantity = position.quantity;
 
-  let lotSize = 1;
-  if (position.market.type === 'FOREX') {
-    lotSize = 100000;
-  }
+  const lotSize = getLotSize(position.market.type);
 
   // Calculate P&L based on position type
   if (position.type === 'BUY') {
@@ -78,16 +91,14 @@ export async function calculateRequiredMargin(
     const positionPrice = position.executedPrice;
 
     // Calculate position value (price * quantity * lot size)
-    // Standard lot size is typically 100,000 units for forex, 100 for stocks
-    let lotSize = 1;
-    if (position.market.type === 'FOREX') {
-      lotSize = 100000;
-    }
+    const lotSize = getLotSize(position.market.type);
     const positionValue = positionPrice * position.quantity * lotSize;
 
     // Calculate required margin based on leverage
     // Required Margin = Position Value / Leverage
-    const leverage = position.user.leverage || 1; // Default to 1:1 if no leverage set
+    // For stock room, always use leverage = 1, otherwise use user's leverage
+    const leverage =
+      position.market.room === 'STOCK' ? 1 : position.user.leverage || 1;
     const requiredMargin = positionValue / leverage;
 
     console.log(`Calculated required margin for position ${position.id}:`, {
