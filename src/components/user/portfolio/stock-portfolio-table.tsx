@@ -140,12 +140,9 @@ export function StockPortfolioTable({
             <TableRow>
               <TableHead>Stock</TableHead>
               <TableHead className='text-right'>Quantity</TableHead>
-              <TableHead className='text-right'>Avg. Buy Price</TableHead>
               <TableHead className='text-right'>Current Price</TableHead>
-              <TableHead className='text-right'>Total Cost</TableHead>
               <TableHead className='text-right'>Current Value</TableHead>
               <TableHead className='text-right'>P&L</TableHead>
-              <TableHead className='text-right'>P&L %</TableHead>
               <TableHead className='text-right'>Positions</TableHead>
               <TableHead className='text-right'>Action</TableHead>
             </TableRow>
@@ -171,14 +168,8 @@ export function StockPortfolioTable({
                   <TableCell className='text-right font-medium'>
                     {stock.totalQuantity.toFixed(2)}
                   </TableCell>
-                  <TableCell className='text-right'>
-                    {formatCurrency(stock.averageBuyPrice)}
-                  </TableCell>
                   <TableCell className='text-right font-medium'>
                     {formatCurrency(stock.currentPrice)}
-                  </TableCell>
-                  <TableCell className='text-right'>
-                    {formatCurrency(stock.totalCost)}
                   </TableCell>
                   <TableCell className='text-right font-semibold'>
                     {formatCurrency(stock.currentValue)}
@@ -199,14 +190,6 @@ export function StockPortfolioTable({
                         {formatCurrency(stock.totalPnL)}
                       </span>
                     </div>
-                  </TableCell>
-                  <TableCell className='text-right'>
-                    <Badge
-                      variant={isProfitable ? 'default' : 'destructive'}
-                      className='font-semibold'
-                    >
-                      {formatPercentage(stock.pnlPercentage)}
-                    </Badge>
                   </TableCell>
                   <TableCell className='text-right'>
                     <Badge variant='secondary'>{stock.positionCount}</Badge>
