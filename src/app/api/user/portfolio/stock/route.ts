@@ -69,14 +69,12 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Get all PLACED positions for the user in STOCK or STOCK_AND_TRADING rooms
+    // Get all PLACED positions for the user in STOCK rooms
     const positions = await prisma.position.findMany({
       where: {
         userId: session.user.id,
         status: 'PLACED',
-        room: {
-          in: ['STOCK', 'STOCK_AND_TRADING']
-        },
+        room: 'STOCK',
         type: 'BUY' // Only BUY positions for stock portfolio
       },
       include: {
@@ -107,9 +105,7 @@ export async function GET() {
       where: {
         userId: session.user.id,
         status: 'PLACED',
-        room: {
-          in: ['STOCK', 'STOCK_AND_TRADING']
-        },
+        room: 'STOCK',
         type: 'BUY'
       },
       include: {

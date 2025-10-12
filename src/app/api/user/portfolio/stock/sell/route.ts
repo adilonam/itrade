@@ -74,9 +74,7 @@ export async function POST(request: NextRequest) {
         marketId,
         status: 'PLACED',
         type: 'BUY',
-        room: {
-          in: ['STOCK', 'STOCK_AND_TRADING']
-        }
+        room: 'STOCK'
       },
       include: {
         market: true
