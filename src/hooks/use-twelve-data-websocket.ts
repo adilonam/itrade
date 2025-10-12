@@ -6,7 +6,8 @@ import type {
   TwelveDataWebSocketPriceData,
   TwelveDataWebSocketSubscription,
   TwelveDataWebSocketSubscribeStatus,
-  TwelveDataWebSocketError
+  TwelveDataWebSocketError,
+  TwelveDataWebSocketResetStatus
 } from '@/types/twelvedata';
 
 interface UseTwelveDataWebSocketOptions {
@@ -27,7 +28,7 @@ interface WebSocketState {
 export function useTwelveDataWebSocket({
   apiKey,
   autoConnect = false,
-  heartbeatInterval = 10000 // 10 seconds
+  heartbeatInterval = 1000 // 10 seconds
 }: UseTwelveDataWebSocketOptions) {
   const wsRef = useRef<WebSocket | null>(null);
   const heartbeatRef = useRef<NodeJS.Timeout | null>(null);
@@ -56,7 +57,6 @@ export function useTwelveDataWebSocket({
       const ws = new WebSocket(wsUrl);
 
       ws.onopen = () => {
-        console.log('WebSocket connected');
         setState((prev) => ({
           ...prev,
           isConnected: true,
@@ -110,11 +110,23 @@ export function useTwelveDataWebSocket({
               }));
               break;
 
+            case 'reset-status':
+              // Handle reset status event - typically indicates successful reset
+              setState((prev) => ({
+                ...prev,
+                subscribedSymbols: [], // Clear subscribed symbols on reset
+                priceData: new Map() // Clear price data on reset
+              }));
+              break;
+
+            case 'heartbeat':
+              // Handle heartbeat response from server
+              break;
+
             default:
               console.log('Unknown event type:', data);
           }
         } catch (error) {
-          console.error('Error parsing WebSocket message:', error);
           setState((prev) => ({
             ...prev,
             error: 'Failed to parse WebSocket message'
@@ -123,7 +135,6 @@ export function useTwelveDataWebSocket({
       };
 
       ws.onclose = (event) => {
-        console.log('WebSocket closed:', event.code, event.reason);
         setState((prev) => ({
           ...prev,
           isConnected: false,
@@ -135,7 +146,6 @@ export function useTwelveDataWebSocket({
           clearInterval(heartbeatRef.current);
           heartbeatRef.current = null;
         }
-
         // Attempt to reconnect if not a manual close
         if (
           event.code !== 1000 &&
@@ -148,16 +158,12 @@ export function useTwelveDataWebSocket({
           );
 
           reconnectTimeoutRef.current = setTimeout(() => {
-            console.log(
-              `Attempting to reconnect (${reconnectAttempts.current}/${maxReconnectAttempts})...`
-            );
             connect();
           }, delay);
         }
       };
 
       ws.onerror = (error) => {
-        console.error('WebSocket error:', error);
         setState((prev) => ({
           ...prev,
           isConnecting: false,

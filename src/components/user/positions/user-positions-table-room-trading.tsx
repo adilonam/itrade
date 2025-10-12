@@ -73,7 +73,7 @@ export function UserPositionsTableRoomTrading({
   useEffect(() => {
     if (isConnected && positions.length > 0) {
       // Reset first to clear any existing subscriptions
-      reset();
+      // reset();
 
       // Get unique market symbols from positions
       const marketSymbols = positions

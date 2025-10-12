@@ -71,17 +71,20 @@ export function MarketsWebSocketProvider({
   }, [isConnected, markets, wsSubscribe]);
 
   const connect = useCallback(() => {
+    console.log('Connecting WebSocket from provider ....');
     if (apiKey) {
       wsConnect();
     }
   }, [apiKey, wsConnect]);
 
   const disconnect = useCallback(() => {
+    console.log('Disconnecting WebSocket from provider ....');
     wsDisconnect();
   }, [wsDisconnect]);
 
   const updateMarkets = useCallback(
     (newMarkets: Market[]) => {
+      console.log('Updating markets in provider ....');
       setMarkets(newMarkets);
 
       // If connected, update subscriptions
@@ -106,10 +109,12 @@ export function MarketsWebSocketProvider({
         }
       }
     },
+
     [isConnected, realTimePrices, wsSubscribe, wsUnsubscribe]
   );
 
   const refreshPrices = useCallback(() => {
+    console.log('Refreshing prices in provider ....');
     if (isConnected && markets.length > 0) {
       const symbols = markets.map((market) => market.symbol);
       wsSubscribe(symbols);
@@ -117,6 +122,7 @@ export function MarketsWebSocketProvider({
   }, [isConnected, markets, wsSubscribe]);
 
   const reset = useCallback(() => {
+    console.log('Resetting WebSocket from provider ....');
     wsReset();
   }, [wsReset]);
 

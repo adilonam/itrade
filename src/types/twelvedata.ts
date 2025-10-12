@@ -54,7 +54,7 @@ export interface TwelveDataCombinedResponse extends TwelveDataQuoteResponse {
 
 // WebSocket Types
 export interface TwelveDataWebSocketMessage {
-  event: 'subscribe-status' | 'price' | 'error';
+  event: 'subscribe-status' | 'price' | 'error' | 'reset-status' | 'heartbeat';
   status?: 'ok' | 'error';
   message?: string;
 }
@@ -96,10 +96,18 @@ export interface TwelveDataWebSocketError extends TwelveDataWebSocketMessage {
   message: string;
 }
 
+export interface TwelveDataWebSocketResetStatus
+  extends TwelveDataWebSocketMessage {
+  event: 'reset-status';
+  status: 'ok' | 'error';
+}
+
 export type TwelveDataWebSocketResponse =
   | TwelveDataWebSocketSubscribeStatus
   | TwelveDataWebSocketPriceData
-  | TwelveDataWebSocketError;
+  | TwelveDataWebSocketError
+  | TwelveDataWebSocketResetStatus
+  | TwelveDataWebSocketMessage;
 
 export interface TwelveDataWebSocketSubscription {
   action: 'subscribe' | 'unsubscribe' | 'reset' | 'heartbeat';
