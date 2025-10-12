@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -31,11 +31,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useSession } from 'next-auth/react';
 import { toast } from 'sonner';
-import {
-  IconTrendingUp,
-  IconTrendingDown,
-  IconLoader2
-} from '@tabler/icons-react';
+import { IconTrendingUp, IconLoader2 } from '@tabler/icons-react';
 import type { Market } from '@prisma/client';
 
 interface TradingActionsStockProps {
@@ -48,40 +44,13 @@ export function TradingActionsStock({
   const { data: session } = useSession();
   const [quantity, setQuantity] = useState<string>('');
   const [limitPrice, setLimitPrice] = useState<string>('');
-  const [takeProfit, setTakeProfit] = useState<string>('');
-  const [stopLoss, setStopLoss] = useState<string>('');
   const [orderType, setOrderType] = useState<'MARKET' | 'LIMIT'>('MARKET');
   const [isCreatingPosition, setIsCreatingPosition] = useState(false);
   const [showBuyDialog, setShowBuyDialog] = useState(false);
-  const [showSellDialog, setShowSellDialog] = useState(false);
   // Get user balance from session (no need to fetch separately)
   const userBalance = session?.user?.balance ?? 0;
 
-  // Calculate required margin for SELL orders
-  const calculateSellMargin = () => {
-    if (!quantity || !propMarket) return 0;
-
-    const qty = parseFloat(quantity);
-    const price =
-      orderType === 'MARKET'
-        ? propMarket.lastPrice
-        : parseFloat(limitPrice || '0');
-
-    if (isNaN(qty) || isNaN(price) || price === 0) return 0;
-
-    // If stop loss is set, calculate max potential loss
-    if (stopLoss) {
-      const stopLossPrice = parseFloat(stopLoss);
-      if (!isNaN(stopLossPrice) && stopLossPrice > price) {
-        return (stopLossPrice - price) * qty;
-      }
-    }
-
-    // Without stop loss, require full position value
-    return qty * price;
-  };
-
-  const handleCreatePosition = async (type: 'BUY' | 'SELL') => {
+  const handleCreatePosition = async (type: 'BUY') => {
     if (!session?.user?.id) {
       toast.error('You must be logged in to create positions');
       return;
@@ -123,8 +92,6 @@ export function TradingActionsStock({
             orderType === 'LIMIT' ? parseFloat(limitPrice) : undefined,
           marketId: propMarket.id,
           quantity: quantityNum,
-          takeProfit: takeProfit ? parseFloat(takeProfit) : undefined,
-          stopLoss: stopLoss ? parseFloat(stopLoss) : undefined,
           description: `${type} ${quantityNum} units of ${propMarket.symbol} (${orderType} order)`
         })
       });
@@ -153,10 +120,7 @@ export function TradingActionsStock({
       // Reset form
       setQuantity('');
       setLimitPrice('');
-      setTakeProfit('');
-      setStopLoss('');
       setShowBuyDialog(false);
-      setShowSellDialog(false);
     } catch (error) {
       toast.error(
         error instanceof Error
@@ -255,41 +219,6 @@ export function TradingActionsStock({
           </div>
         )}
 
-        {/* Risk Management Section */}
-        <div className='space-y-3'>
-          <div className='text-muted-foreground text-sm font-medium'>
-            Risk Management (Optional)
-          </div>
-
-          {/* Take Profit Input */}
-          <div className='space-y-2'>
-            <Label htmlFor='take-profit'>Take Profit</Label>
-            <Input
-              id='take-profit'
-              type='number'
-              placeholder='Enter take profit price'
-              value={takeProfit}
-              onChange={(e) => setTakeProfit(e.target.value)}
-              min='0'
-              step='0.01'
-            />
-          </div>
-
-          {/* Stop Loss Input */}
-          <div className='space-y-2'>
-            <Label htmlFor='stop-loss'>Stop Loss</Label>
-            <Input
-              id='stop-loss'
-              type='number'
-              placeholder='Enter stop loss price'
-              value={stopLoss}
-              onChange={(e) => setStopLoss(e.target.value)}
-              min='0'
-              step='0.01'
-            />
-          </div>
-        </div>
-
         {/* Order Summary */}
         {quantity && propMarket && (
           <div className='bg-muted rounded-lg p-3 text-sm'>
@@ -303,8 +232,6 @@ export function TradingActionsStock({
                   ? `Market (${propMarket.lastPrice.toFixed(5)})`
                   : limitPrice}
               </div>
-              {takeProfit && <div>Take Profit: ${takeProfit}</div>}
-              {stopLoss && <div>Stop Loss: ${stopLoss}</div>}
               <div className='font-medium'>
                 Total Cost (BUY): $
                 {(
@@ -313,9 +240,6 @@ export function TradingActionsStock({
                     ? propMarket.lastPrice
                     : parseFloat(limitPrice || '0'))
                 ).toFixed(2)}
-              </div>
-              <div className='font-medium'>
-                Required Margin (SELL): ${calculateSellMargin().toFixed(2)}
               </div>
               {userBalance !== null && (
                 <div className='text-muted-foreground'>
@@ -332,11 +256,6 @@ export function TradingActionsStock({
                     ⚠ Insufficient balance for BUY order
                   </div>
                 )}
-              {userBalance !== null && calculateSellMargin() > userBalance && (
-                <div className='text-destructive text-xs font-medium'>
-                  ⚠ Insufficient margin for SELL order
-                </div>
-              )}
             </div>
           </div>
         )}
@@ -399,18 +318,6 @@ export function TradingActionsStock({
                       </strong>
                     </>
                   )}
-                  {takeProfit && (
-                    <>
-                      <br />
-                      Take Profit: ${takeProfit}
-                    </>
-                  )}
-                  {stopLoss && (
-                    <>
-                      <br />
-                      Stop Loss: ${stopLoss}
-                    </>
-                  )}
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
@@ -420,84 +327,6 @@ export function TradingActionsStock({
                   disabled={isCreatingPosition}
                 >
                   Confirm Buy
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-
-          <AlertDialog open={showSellDialog} onOpenChange={setShowSellDialog}>
-            <AlertDialogTrigger asChild>
-              <Button
-                className='flex-1'
-                variant='destructive'
-                disabled={
-                  isCreatingPosition ||
-                  !quantity ||
-                  (orderType === 'LIMIT' && !limitPrice) ||
-                  (userBalance !== null && calculateSellMargin() > userBalance)
-                }
-              >
-                {isCreatingPosition ? (
-                  <IconLoader2 className='mr-2 h-4 w-4 animate-spin' />
-                ) : (
-                  <IconTrendingDown className='mr-2 h-4 w-4' />
-                )}
-                Sell {orderType}
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>
-                  Confirm Sell {orderType} Order
-                </AlertDialogTitle>
-                <AlertDialogDescription>
-                  Are you sure you want to place a {orderType.toLowerCase()}{' '}
-                  sell order for {quantity} units of {propMarket.symbol}?
-                  <br />
-                  {orderType === 'MARKET' ? (
-                    <>
-                      Price: Market price (${propMarket.lastPrice.toFixed(5)})
-                      <br />
-                      <strong>
-                        Total: $
-                        {(parseFloat(quantity) * propMarket.lastPrice).toFixed(
-                          2
-                        )}
-                      </strong>
-                    </>
-                  ) : (
-                    <>
-                      Limit Price: ${limitPrice}
-                      <br />
-                      <strong>
-                        Total: $
-                        {(
-                          parseFloat(quantity) * parseFloat(limitPrice)
-                        ).toFixed(2)}
-                      </strong>
-                    </>
-                  )}
-                  {takeProfit && (
-                    <>
-                      <br />
-                      Take Profit: ${takeProfit}
-                    </>
-                  )}
-                  {stopLoss && (
-                    <>
-                      <br />
-                      Stop Loss: ${stopLoss}
-                    </>
-                  )}
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={() => handleCreatePosition('SELL')}
-                  disabled={isCreatingPosition}
-                >
-                  Confirm Sell
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
