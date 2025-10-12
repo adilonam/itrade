@@ -1,18 +1,26 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { twelveDataService } from '@/lib/twelvedata';
 
 /**
  * @swagger
- * /api/markets/get-trading-markets:
+ * /api/markets:
  *   get:
- *     summary: Get all visible markets with TRADING room
- *     description: Retrieves all visible markets from the database that have room=TRADING, including their type, symbol, and name. Only returns markets that are set to visible=true for user trading.
+ *     summary: Get markets by room type
+ *     description: Retrieves visible markets from the database filtered by room type. Supports STOCK, TRADING, STOCK_AND_TRADING, or ALL rooms.
  *     tags:
  *       - Markets
+ *     parameters:
+ *       - in: query
+ *         name: room
+ *         schema:
+ *           type: string
+ *           enum: [STOCK, TRADING, STOCK_AND_TRADING, ALL]
+ *           default: ALL
+ *         description: Filter markets by room type. Use ALL to get all visible markets regardless of room.
  *     responses:
  *       200:
- *         description: Successfully retrieved all visible trading markets
+ *         description: Successfully retrieved markets
  *         content:
  *           application/json:
  *             schema:
@@ -71,6 +79,19 @@ import { twelveDataService } from '@/lib/twelvedata';
  *                         format: date-time
  *                         example: "2024-01-15T10:30:00.000Z"
  *                         description: When the market was last updated
+ *       400:
+ *         description: Invalid room parameter
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Invalid room parameter"
+ *                 message:
+ *                   type: string
+ *                   example: "Room must be one of: STOCK, TRADING, STOCK_AND_TRADING, ALL"
  *       500:
  *         description: Internal server error
  *         content:
@@ -80,19 +101,43 @@ import { twelveDataService } from '@/lib/twelvedata';
  *               properties:
  *                 error:
  *                   type: string
- *                   example: "Failed to fetch trading markets"
+ *                   example: "Failed to fetch markets"
  *                 message:
  *                   type: string
  *                   example: "Database connection error"
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    // Get only visible markets with TRADING  room from database
+    const searchParams = request.nextUrl.searchParams;
+    const room = searchParams.get('room')?.toUpperCase() || 'ALL';
+
+    // Validate room parameter
+    const validRooms = ['STOCK', 'TRADING'];
+    if (!validRooms.includes(room)) {
+      return NextResponse.json(
+        {
+          error: 'Invalid room parameter',
+          message: `Room must be one of: ${validRooms.join(', ')}`
+        },
+        { status: 400 }
+      );
+    }
+
+    // Build where clause based on room parameter
+    const whereClause: any = {
+      visible: true
+    };
+
+    if (room === 'STOCK') {
+      whereClause.room = 'STOCK';
+    } else if (room === 'TRADING') {
+      whereClause.room = 'TRADING';
+    }
+    // For 'ALL', we just use visible: true
+
+    // Get markets from database
     const markets = await prisma.market.findMany({
-      where: {
-        visible: true,
-        room: 'TRADING'
-      },
+      where: whereClause,
       orderBy: {
         createdAt: 'desc'
       }
@@ -138,7 +183,7 @@ export async function GET() {
   } catch (error) {
     return NextResponse.json(
       {
-        error: 'Failed to fetch trading markets',
+        error: 'Failed to fetch markets',
         message:
           error instanceof Error ? error.message : 'Unknown error occurred'
       },
@@ -152,5 +197,9 @@ export async function POST() {
 }
 
 export async function PUT() {
+  return NextResponse.json({ error: 'Method not allowed' }, { status: 405 });
+}
+
+export async function DELETE() {
   return NextResponse.json({ error: 'Method not allowed' }, { status: 405 });
 }

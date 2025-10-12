@@ -45,7 +45,7 @@ export function TradingMarketsView({
   useEffect(() => {
     async function loadMarkets() {
       try {
-        const res = await fetch('/api/markets/get-trading-markets', {
+        const res = await fetch('/api/markets?room=TRADING', {
           method: 'GET'
         });
         if (!res.ok) return;
@@ -103,7 +103,7 @@ export function TradingMarketsView({
 
   const handleRefresh = async () => {
     try {
-      const res = await fetch('/api/markets/get-trading-markets', {
+      const res = await fetch('/api/markets?room=TRADING', {
         method: 'GET'
       });
       if (!res.ok) return;
