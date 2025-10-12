@@ -7,7 +7,7 @@ declare module 'next-auth' {
       id: string;
       role: string;
       balance: number;
-      usedMargin: number;
+      leverage: number;
     } & DefaultSession['user'];
   }
 
@@ -21,6 +21,6 @@ declare module 'next-auth/jwt' {
     id: string;
     role: string;
     balance: number;
-    usedMargin: number;
+    leverage: number;
   }
 }

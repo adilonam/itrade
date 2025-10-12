@@ -267,6 +267,23 @@ export function UserPositionsTableRoomTrading({
                           </TableCell>
                           <TableCell className='text-xs'>
                             {(() => {
+                              // For non-placed positions, always show position.pnl
+                              if (position.status !== 'PLACED') {
+                                const pnl = position.pnl || 0;
+                                return (
+                                  <span
+                                    className={
+                                      pnl >= 0
+                                        ? 'text-green-600'
+                                        : 'text-red-600'
+                                    }
+                                  >
+                                    {pnl >= 0 ? '+' : ''}${pnl.toFixed(2)}
+                                  </span>
+                                );
+                              }
+
+                              // For placed positions, try to get dynamic PnL, fallback to position.pnl
                               const realTimeData = position.market?.symbol
                                 ? realTimePrices.get(position.market.symbol)
                                 : undefined;
@@ -277,29 +294,30 @@ export function UserPositionsTableRoomTrading({
                                   )
                                 : null;
 
-                              if (dynamicPnL !== null) {
-                                return (
-                                  <span
-                                    className={
-                                      dynamicPnL >= 0
-                                        ? 'text-green-600'
-                                        : 'text-red-600'
-                                    }
-                                  >
-                                    {dynamicPnL >= 0 ? '+' : ''}$
-                                    {dynamicPnL.toFixed(2)}
-                                    {position.status === 'PLACED' &&
-                                      realTimeData && (
-                                        <span className='text-muted-foreground ml-1 text-xs'>
-                                          (live)
-                                        </span>
-                                      )}
-                                  </span>
-                                );
-                              }
+                              // Use dynamic PnL if available, otherwise fallback to position.pnl
+                              const displayPnL =
+                                dynamicPnL !== null
+                                  ? dynamicPnL
+                                  : position.pnl || 0;
+                              const isLive =
+                                dynamicPnL !== null && realTimeData;
 
                               return (
-                                <span className='text-muted-foreground'>-</span>
+                                <span
+                                  className={
+                                    displayPnL >= 0
+                                      ? 'text-green-600'
+                                      : 'text-red-600'
+                                  }
+                                >
+                                  {displayPnL >= 0 ? '+' : ''}$
+                                  {displayPnL.toFixed(2)}
+                                  {isLive && (
+                                    <span className='text-muted-foreground ml-1 text-xs'>
+                                      (live)
+                                    </span>
+                                  )}
+                                </span>
                               );
                             })()}
                           </TableCell>

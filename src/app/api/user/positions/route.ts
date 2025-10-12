@@ -5,7 +5,8 @@ import { prisma } from '@/lib/prisma';
 import {
   refreshSaveMarkets,
   calculatePositionPnL,
-  calculateRequiredMargin
+  calculateRequiredMargin,
+  couldOpenPosition
 } from '@/lib/calculator-server';
 // Create position data type
 type CreatePositionData = Position;
@@ -549,14 +550,18 @@ export async function POST(request: NextRequest) {
       body.marketId &&
       executedPrice
     ) {
-      // Get user with leverage information for margin calculation
+      // Get user with all necessary information for margin calculation and position check
       const userWithLeverage = await prisma.user.findUnique({
         where: { id: session.user.id },
-        select: { leverage: true }
+        select: {
+          id: true,
+          balance: true,
+          leverage: true
+        }
       });
 
       if (userWithLeverage) {
-        // Create a temporary position object for margin calculation
+        // Create a temporary position object for margin calculation and position check
         const tempPosition = {
           id: 'temp',
           userId: session.user.id,
@@ -577,7 +582,57 @@ export async function POST(request: NextRequest) {
           market: market
         };
 
-        requiredMargin = await calculateRequiredMargin(tempPosition as any);
+        // Check if user can open this position
+        const positionCheck = await couldOpenPosition(tempPosition as any);
+        console.log('positionCheck', positionCheck);
+
+        if (!positionCheck || !positionCheck.canOpen) {
+          // User cannot open position, create with FAILED status
+          const failedPosition = await prisma.position.create({
+            data: {
+              userId: session.user.id,
+              type: body.type,
+              status: 'FAILED',
+              room: body.room || 'TRADING',
+              marketId: body.marketId,
+              quantity: body.quantity,
+              executedPrice: executedPrice ?? undefined,
+              closedPrice: body.closedPrice,
+              takeProfit: body.takeProfit,
+              stopLoss: body.stopLoss,
+              requiredMargin: positionCheck?.newPositionRequiredMargin || 0,
+              description:
+                body.description ||
+                'Position failed due to insufficient margin',
+              executedAt: body.executedAt || new Date(),
+              pnl: body.pnl
+            },
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                  email: true,
+                  leverage: true
+                }
+              },
+              market: true
+            }
+          });
+
+          return NextResponse.json(
+            {
+              success: false,
+              message: 'Position creation failed due to insufficient margin',
+              position: failedPosition,
+              marginInfo: positionCheck
+            },
+            { status: 400 }
+          );
+        }
+
+        // User can open position, use the required margin from position check
+        requiredMargin = positionCheck.newPositionRequiredMargin;
       }
     }
 

@@ -275,3 +275,129 @@ export async function calculateRequiredMargin(
     return null;
   }
 }
+
+/**
+ * Check if a user can open a new position based on their current positions, PnL, required margin, and leverage
+ * @param position - The new position to potentially open (with user and market data)
+ * @returns Object containing whether position can be opened and relevant calculations
+ */
+export async function couldOpenPosition(
+  position: Position & { user: User; market: Market }
+): Promise<{
+  canOpen: boolean;
+  freeMargin: number;
+  totalPnL: number;
+  totalRequiredMargin: number;
+  newPositionRequiredMargin: number;
+  leverage: number;
+} | null> {
+  try {
+    const user = position.user;
+
+    // Get all user positions with PLACED status from database
+    const allUserPlacedPositions = await prisma.position.findMany({
+      where: {
+        userId: user.id,
+        status: 'PLACED'
+      },
+      include: { market: true }
+    });
+
+    // Get all unique markets from user positions
+    const marketMap = new Map();
+    allUserPlacedPositions.forEach((pos) => {
+      if (pos.market) {
+        marketMap.set(pos.market.id, pos.market);
+      }
+    });
+    const markets = Array.from(marketMap.values());
+
+    // Refresh market data for all positions
+    const refreshedMarkets = await refreshSaveMarkets(markets);
+    if (!refreshedMarkets) {
+      console.warn('Failed to refresh market data for position calculation');
+      return null;
+    }
+
+    // Create a map of refreshed market data for quick lookup
+    const marketDataMap = new Map();
+    refreshedMarkets.forEach((market) => {
+      marketDataMap.set(market.id, market);
+    });
+
+    // Calculate total PnL by manually calculating PnL for each position with refreshed data
+    let totalPnL = 0;
+    for (const pos of allUserPlacedPositions) {
+      if (pos.market && pos.executedPrice && pos.executedPrice > 0) {
+        const refreshedMarket = marketDataMap.get(pos.market.id);
+        if (refreshedMarket) {
+          // Calculate current price based on position type
+          const midPrice = refreshedMarket.lastPrice ?? 0;
+          const spread = refreshedMarket.spread ?? 0;
+          const bidPrice = midPrice - spread / 2;
+          const askPrice = midPrice + spread / 2;
+          const currentPrice = pos.type === 'BUY' ? askPrice : bidPrice;
+
+          // Calculate PnL
+          let lotSize = 1;
+          if (pos.market.type === 'FOREX') {
+            lotSize = 100000;
+          }
+
+          let pnl = 0;
+          if (pos.type === 'BUY') {
+            pnl = (currentPrice - pos.executedPrice) * pos.quantity * lotSize;
+          } else if (pos.type === 'SELL') {
+            pnl = (pos.executedPrice - currentPrice) * pos.quantity * lotSize;
+          }
+
+          totalPnL += pnl;
+        }
+      }
+    }
+
+    // Calculate total required margin from all active positions (PLACED)
+    const totalRequiredMargin = allUserPlacedPositions.reduce((sum, pos) => {
+      return sum + (pos.requiredMargin || 0);
+    }, 0);
+
+    // Calculate free margin: balance + total PnL - total required margin
+    const freeMargin = user.balance + totalPnL - totalRequiredMargin;
+
+    // Calculate required margin for the new position
+    const newPositionRequiredMargin = await calculateRequiredMargin(position);
+    if (newPositionRequiredMargin === null) {
+      console.warn(
+        `Could not calculate required margin for new position ${position.id}`
+      );
+      return null;
+    }
+
+    // Check if user has enough free margin to open the new position
+    // Also consider leverage - with higher leverage, less margin is needed
+
+    const canOpen = freeMargin >= newPositionRequiredMargin;
+
+    console.log(`Position opening check for user ${user.id}:`, {
+      canOpen,
+      freeMargin,
+      totalPnL,
+      totalRequiredMargin,
+      newPositionRequiredMargin,
+      leverage: user.leverage,
+      userBalance: user.balance
+    });
+
+    return {
+      canOpen,
+      freeMargin,
+      totalPnL,
+      totalRequiredMargin,
+      newPositionRequiredMargin,
+      leverage: user.leverage
+    };
+  } catch (error) {
+    console.error('Error checking if position can be opened:', error);
+    return null;
+  }
+}

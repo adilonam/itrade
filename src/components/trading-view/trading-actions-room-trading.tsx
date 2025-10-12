@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -37,6 +37,7 @@ import {
   IconLoader2
 } from '@tabler/icons-react';
 import type { Market } from '@prisma/client';
+import { calculateRequiredMargin } from '@/lib/calculator-client';
 
 interface TradingActionsRoomTradingProps {
   market?: Market | null;
@@ -54,6 +55,69 @@ export function TradingActionsRoomTrading({
   const [isCreatingPosition, setIsCreatingPosition] = useState(false);
   const [showBuyDialog, setShowBuyDialog] = useState(false);
   const [showSellDialog, setShowSellDialog] = useState(false);
+  const [requiredMargin, setRequiredMargin] = useState<number | null>(null);
+
+  // Calculate required margin when quantity or market changes
+  useEffect(() => {
+    const calculateMargin = async () => {
+      if (!quantity || !propMarket || !session?.user) {
+        setRequiredMargin(null);
+        return;
+      }
+
+      try {
+        const quantityNum = parseFloat(quantity);
+        if (isNaN(quantityNum) || quantityNum <= 0) {
+          setRequiredMargin(null);
+          return;
+        }
+
+        // Create a temporary position object for margin calculation
+        const tempPosition = {
+          id: 'temp',
+          userId: session.user.id,
+          type: 'BUY' as const, // We'll calculate for both BUY and SELL, but use BUY as default
+          status: 'PLACED' as const,
+          room: 'TRADING' as const,
+          marketId: propMarket.id,
+          quantity: quantityNum,
+          executedPrice:
+            orderType === 'MARKET'
+              ? propMarket.lastPrice
+              : parseFloat(limitPrice) || propMarket.lastPrice,
+          closedPrice: null,
+          takeProfit: takeProfit ? parseFloat(takeProfit) : null,
+          stopLoss: stopLoss ? parseFloat(stopLoss) : null,
+          description: null,
+          executedAt: new Date(),
+          closedAt: null,
+          pnl: null,
+          user: {
+            id: session.user.id,
+            balance: session.user.balance || 0,
+            leverage: session.user.leverage || 1
+          },
+          market: propMarket
+        };
+
+        const margin = await calculateRequiredMargin(tempPosition as any);
+        setRequiredMargin(margin);
+      } catch (error) {
+        console.error('Error calculating required margin:', error);
+        setRequiredMargin(null);
+      }
+    };
+
+    calculateMargin();
+  }, [
+    quantity,
+    propMarket,
+    session?.user,
+    orderType,
+    limitPrice,
+    takeProfit,
+    stopLoss
+  ]);
 
   const handleCreatePosition = async (type: 'BUY' | 'SELL') => {
     if (!session?.user?.id) {
@@ -151,10 +215,6 @@ export function TradingActionsRoomTrading({
             {propMarket.name}
           </span>
         </CardTitle>
-        <CardDescription>
-          Current Price: ${propMarket.lastPrice.toFixed(5)} | Spread:{' '}
-          {propMarket.spread}
-        </CardDescription>
       </CardHeader>
       <CardContent className='space-y-4'>
         {/* Order Type Selection */}
@@ -254,10 +314,9 @@ export function TradingActionsRoomTrading({
               </div>
               {takeProfit && <div>Take Profit: ${takeProfit}</div>}
               {stopLoss && <div>Stop Loss: ${stopLoss}</div>}
-              <div className='font-medium'>
-                Total: $
-                {(parseFloat(quantity) * propMarket.lastPrice).toFixed(2)}
-              </div>
+              {requiredMargin !== null && (
+                <div>Required Margin: ${requiredMargin.toFixed(2)}</div>
+              )}
             </div>
           </div>
         )}
