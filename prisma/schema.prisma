@@ -235,7 +235,7 @@ model Transaction {
   id          String          @id @default(cuid())
   userId      String          @map("user_id")
   type        TransactionType
-  amount      Float
+  abosulteAmount      Float  @default(0) // absolute amount of the transaction
   description String?
 
   // Timestamps

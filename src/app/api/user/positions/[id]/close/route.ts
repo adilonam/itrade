@@ -107,8 +107,8 @@ export async function PATCH(
     }
 
     // Refresh market data and calculate P&L for BUY/SELL positions
-    let closedPrice = null;
-    let calculatedPnL = null;
+    let closedPrice: number | null = null;
+    let calculatedPnL: number | null = null;
 
     if (
       existingPosition.market &&
@@ -154,47 +154,48 @@ export async function PATCH(
       }
     }
 
-    // Update the position with P&L
-    const updatedPosition = await prisma.position.update({
-      where: { id },
-      data: {
-        status,
-        closedPrice: closedPrice || undefined,
-        closedAt: new Date(),
-        pnl: calculatedPnL || 0
-      }
-    });
-
-    // Update user balance and create transaction if P&L is calculated
-    if (calculatedPnL !== null && calculatedPnL !== 0) {
-      const transactionType: TransactionType =
-        calculatedPnL > 0 ? 'GAIN' : 'LOSS';
-      const absoluteAmount = Math.abs(calculatedPnL);
-
-      // Update user balance
-      await prisma.user.update({
-        where: { id: session.user.id },
+    // Update position, user balance, and create transaction in a single transaction
+    const updatedPosition = await prisma.$transaction(async (tx) => {
+      // Update the position with P&L
+      const updatedPosition = await tx.position.update({
+        where: { id },
         data: {
-          balance: {
-            increment: calculatedPnL // Add P&L to balance (negative for losses)
+          status,
+          closedPrice: closedPrice || undefined,
+          closedAt: new Date(),
+          pnl: calculatedPnL || 0
+        }
+      });
+
+      // Update user balance and create transaction if P&L is calculated
+      if (calculatedPnL !== null && calculatedPnL !== 0) {
+        const transactionType: TransactionType =
+          calculatedPnL > 0 ? 'GAIN' : 'LOSS';
+        const absoluteAmount = Math.abs(calculatedPnL);
+
+        // Update user balance
+        await tx.user.update({
+          where: { id: session.user.id },
+          data: {
+            balance: {
+              increment: calculatedPnL // Add P&L to balance (negative for losses)
+            }
           }
-        }
-      });
+        });
 
-      // Create transaction record
-      await prisma.transaction.create({
-        data: {
-          userId: session.user.id,
-          type: transactionType,
-          amount: absoluteAmount,
-          description: `Position ${existingPosition.type} closed - ${existingPosition.market?.symbol || 'Unknown'}`
-        }
-      });
+        // Create transaction record
+        await tx.transaction.create({
+          data: {
+            userId: session.user.id,
+            type: transactionType,
+            abosulteAmount: absoluteAmount,
+            description: `Position ${existingPosition.type} closed - ${existingPosition.market?.symbol || 'Unknown'}`
+          }
+        });
+      }
 
-      console.log(
-        `Updated user balance by ${calculatedPnL.toFixed(2)} and created ${transactionType} transaction`
-      );
-    }
+      return updatedPosition;
+    });
 
     return NextResponse.json(updatedPosition);
   } catch (error) {
