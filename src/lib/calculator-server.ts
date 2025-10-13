@@ -321,6 +321,12 @@ export async function couldOpenPosition(
         marketMap.set(pos.market.id, pos.market);
       }
     });
+
+    // Add the market from the position parameter
+    if (position.market) {
+      marketMap.set(position.market.id, position.market);
+    }
+
     const markets = Array.from(marketMap.values());
 
     // Refresh market data for all positions
