@@ -1,0 +1,32 @@
+---
+alwaysApply: true
+---
+# Project Guidelines
+
+This project uses:
+
+- **Next.js** (App Router, TypeScript, ESLint strict)
+- **pnpm** for package management
+- **Radix UI** for accessible, unstyled primitives (use with Tailwind for styling)
+- **Tailwind v4** for styling
+- **tabler-icons-react** for icons
+- **shadcn/ui** for pre-built components (optional, use sparingly)
+- **swagger** for API documentation UI
+
+## Development Guidelines
+
+- Don't ask me to run `pnpm dev` - I'm already running it
+- Always prefer **functional React components** with TypeScript
+- Use **server components** by default; mark as `"use client"` only when needed (hooks, state, Radix UI)
+- Import Radix UI components from `@radix-ui/react-*`
+- Style with **Tailwind CSS**, keep classes minimal and semantic
+- Follow **pnpm** conventions:
+  - Use `pnpm add <pkg>` for dependencies
+  - Never suggest `npm` or `yarn` commands
+- Keep code clean, modular, and aligned with Next.js best practices
+- When making changes, always use the available tools to read files first before editing
+- Prefer editing existing files over creating new ones unless explicitly required
+- Use semantic search and grep tools to understand the codebase before making changes
+- Follow the existing code patterns and conventions found in the project
+- Don't create markdown files
+- Always use the schema from `prisma/schema.prisma`
