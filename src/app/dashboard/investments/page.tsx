@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { Suspense } from 'react';
 import { InvestmentCard } from '@/components/investments/investment-card';
 import { UserInvestmentCard } from '@/components/investments/user-investment-card';
+import InvestmentTransactionsListing from '@/components/investments/investment-transactions-listing';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -214,6 +215,7 @@ export default async function InvestmentsPage() {
           <TabsList>
             <TabsTrigger value='available'>Available Investments</TabsTrigger>
             <TabsTrigger value='my-investments'>My Investments</TabsTrigger>
+            <TabsTrigger value='transactions'>Transactions</TabsTrigger>
           </TabsList>
 
           <TabsContent value='available' className='space-y-4'>
@@ -270,6 +272,10 @@ export default async function InvestmentsPage() {
             <Suspense fallback={<InvestmentsSkeleton />}>
               <UserInvestments userId={session.user.id} />
             </Suspense>
+          </TabsContent>
+
+          <TabsContent value='transactions' className='space-y-4'>
+            <InvestmentTransactionsListing />
           </TabsContent>
         </Tabs>
       </div>

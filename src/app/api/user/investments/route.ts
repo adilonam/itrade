@@ -202,6 +202,16 @@ export async function POST(request: NextRequest) {
         data: { balance: user.balance - amount }
       });
 
+      // Create transaction record for investment
+      await tx.transaction.create({
+        data: {
+          userId: user.id,
+          type: 'WITHDRAW',
+          absoluteAmount: amount,
+          description: `Investment in ${investment.title} - ${investment.country}`
+        }
+      });
+
       // Update investment current capacity
       await tx.investment.update({
         where: { id: investmentId },
