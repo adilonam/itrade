@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { SidebarTrigger } from '../ui/sidebar';
 import { Separator } from '../ui/separator';
 import { Breadcrumbs } from '../breadcrumbs';
@@ -10,9 +10,52 @@ import { useSession } from 'next-auth/react';
 import { Badge } from '../ui/badge';
 import { Wallet } from 'lucide-react';
 
+interface FinancialData {
+  balance: number;
+  usedMargin: number;
+  equity: number;
+  freeMargin: number;
+  marginLevel: number | null;
+  totalPnL: number;
+  leverage: number;
+}
+
 export default function Header() {
   const { data: session } = useSession();
-  const userBalance = session?.user?.balance ?? 0;
+  const [financialData, setFinancialData] = useState<FinancialData | null>(
+    null
+  );
+
+  // Load financial data from API
+  const loadFinancialData = useCallback(async () => {
+    try {
+      const response = await fetch('/api/user/financial');
+      if (!response.ok) {
+        throw new Error('Failed to fetch financial data');
+      }
+      const data = await response.json();
+      setFinancialData(data);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('Failed to load financial data:', err);
+    }
+  }, []);
+
+  // Fetch financial data every 5 seconds
+  useEffect(() => {
+    if (!session?.user) return;
+
+    // Initial fetch
+    loadFinancialData();
+
+    // Set up interval to fetch every 5 seconds
+    const interval = setInterval(() => {
+      loadFinancialData();
+    }, 5000);
+
+    // Cleanup interval on unmount
+    return () => clearInterval(interval);
+  }, [loadFinancialData, session?.user]);
 
   return (
     <header className='flex h-16 shrink-0 items-center justify-between gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12'>
@@ -26,14 +69,18 @@ export default function Header() {
         <div className='hidden md:flex'>
           <SearchInput />
         </div>
-        {session?.user && (
+        {session?.user && financialData && (
           <Badge
             variant='outline'
-            className='hidden items-center gap-1 border-green-200 bg-green-50 px-3 py-1 text-green-700 hover:bg-green-100 sm:flex'
+            className={`hidden items-center gap-1 px-3 py-1 sm:flex ${
+              financialData.freeMargin >= 0
+                ? 'border-green-200 bg-green-50 text-green-700 hover:bg-green-100'
+                : 'border-red-200 bg-red-50 text-red-700 hover:bg-red-100'
+            }`}
           >
             <Wallet className='h-3 w-3' />
             <span className='text-xs font-medium'>
-              ${userBalance.toFixed(2)}
+              ${financialData.freeMargin.toFixed(2)}
             </span>
           </Badge>
         )}
