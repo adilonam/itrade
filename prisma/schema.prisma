@@ -108,6 +108,8 @@ model Market {
   spread     Float      @default(0)
   lastPrice  Float      @default(0)
   lastChange Float      @default(0)
+  lastPercentChange Float      @default(0)
+  lastPreviousClose Float      @default(0)
   visible    Boolean    @default(true)
   createdAt  DateTime   @default(now()) @map("created_at")
   updatedAt  DateTime   @updatedAt @map("updated_at")

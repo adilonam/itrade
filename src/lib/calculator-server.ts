@@ -212,14 +212,10 @@ export async function refreshSaveMarkets(
             data: {
               lastPrice: parseFloat(marketData.current_price),
               lastChange: parseFloat(marketData.change),
+              lastPercentChange: parseFloat(marketData.percent_change),
+              lastPreviousClose: parseFloat(marketData.previous_close),
               updatedAt: new Date()
             }
-          });
-
-          console.log(`Updated market ${market.symbol} with fresh data:`, {
-            lastPrice: updatedMarket.lastPrice,
-            lastChange: updatedMarket.lastChange,
-            spread: updatedMarket.spread
           });
 
           return updatedMarket;
