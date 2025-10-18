@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Card,
   CardContent,
@@ -39,7 +41,7 @@ interface PortfolioSummaryProps {
     equity: number;
     freeMargin: number;
   };
-  onClosePosition: (positionId: string) => void;
+  onClosePosition: (positionId: string, amount?: number) => void;
 }
 
 export function PortfolioSummary({
@@ -48,6 +50,7 @@ export function PortfolioSummary({
   onClosePosition
 }: PortfolioSummaryProps) {
   const [realTimePnL, setRealTimePnL] = useState<Record<string, number>>({});
+  const [sellAmounts, setSellAmounts] = useState<Record<string, string>>({});
   const { realTimePrices, isConnected, subscribe } = useMarketsWebSocket();
 
   const placedPositions = useMemo(
@@ -181,6 +184,14 @@ export function PortfolioSummary({
                               variant='outline'
                               size='sm'
                               className='h-8 border-red-200 bg-red-50 px-3 text-xs text-red-700 hover:border-red-300 hover:bg-red-100'
+                              onClick={() => {
+                                // Initialize with full quantity
+                                setSellAmounts((prev) => ({
+                                  ...prev,
+                                  [position.id]:
+                                    position.quantity?.toString() || ''
+                                }));
+                              }}
                             >
                               <IconTrendingDown className='mr-1 h-3 w-3' />
                               Sell
@@ -189,26 +200,73 @@ export function PortfolioSummary({
                           <AlertDialogContent>
                             <AlertDialogHeader>
                               <AlertDialogTitle>Sell Position</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Are you sure you want to sell your{' '}
-                                {position.type} position in {symbol}?
-                                <br />
-                                <br />
-                                <strong>Position Details:</strong>
-                                <br />• Quantity:{' '}
-                                {position.quantity?.toFixed(4)} shares
-                                <br />• Current P&L: {pnl >= 0 ? '+' : ''}$
-                                {pnl.toFixed(2)}
-                                <br />
-                                <br />
-                                This action cannot be undone.
+                              <AlertDialogDescription asChild>
+                                <div className='space-y-4'>
+                                  <div>
+                                    Are you sure you want to sell your{' '}
+                                    {position.type} position in {symbol}?
+                                  </div>
+                                  <div>
+                                    <strong>Position Details:</strong>
+                                    <br />• Total Quantity:{' '}
+                                    {position.quantity?.toFixed(4)} shares
+                                    <br />• Current P&L: {pnl >= 0 ? '+' : ''}$
+                                    {pnl.toFixed(2)}
+                                  </div>
+                                  <div className='space-y-2'>
+                                    <Label
+                                      htmlFor={`sell-amount-${position.id}`}
+                                    >
+                                      Amount to Sell (shares)
+                                    </Label>
+                                    <Input
+                                      id={`sell-amount-${position.id}`}
+                                      type='number'
+                                      min='0.0001'
+                                      max={position.quantity || 0}
+                                      step='0.0001'
+                                      value={
+                                        sellAmounts[position.id] ||
+                                        position.quantity?.toString() ||
+                                        ''
+                                      }
+                                      onChange={(e) => {
+                                        setSellAmounts((prev) => ({
+                                          ...prev,
+                                          [position.id]: e.target.value
+                                        }));
+                                      }}
+                                      placeholder={`Max: ${position.quantity?.toFixed(4)}`}
+                                    />
+                                    <p className='text-muted-foreground text-xs'>
+                                      Enter the amount you want to sell. Leave
+                                      as is to sell all shares.
+                                    </p>
+                                  </div>
+                                  <p className='text-destructive text-sm font-medium'>
+                                    This action cannot be undone.
+                                  </p>
+                                </div>
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
                               <AlertDialogCancel>Cancel</AlertDialogCancel>
                               <AlertDialogAction
-                                onClick={() => onClosePosition(position.id)}
+                                onClick={() => {
+                                  const amount = parseFloat(
+                                    sellAmounts[position.id] ||
+                                      position.quantity?.toString() ||
+                                      '0'
+                                  );
+                                  onClosePosition(position.id, amount);
+                                }}
                                 className='bg-red-600 hover:bg-red-700'
+                                disabled={
+                                  !sellAmounts[position.id] ||
+                                  parseFloat(sellAmounts[position.id]) <= 0 ||
+                                  parseFloat(sellAmounts[position.id]) >
+                                    (position.quantity || 0)
+                                }
                               >
                                 Sell Position
                               </AlertDialogAction>

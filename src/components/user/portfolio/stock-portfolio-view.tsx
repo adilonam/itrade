@@ -195,14 +195,14 @@ export function StockPortfolioView() {
   };
 
   // Handle position close
-  const handleClosePosition = async (positionId: string) => {
+  const handleClosePosition = async (positionId: string, amount?: number) => {
     try {
       const response = await fetch(`/api/user/positions/${positionId}/close`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ status: 'CLOSED' })
+        body: JSON.stringify({ status: 'CLOSED', amount })
       });
 
       if (!response.ok) {
@@ -212,6 +212,7 @@ export function StockPortfolioView() {
 
       toast.success('Position closed successfully');
       loadPositions(pagination.page, currentFilters);
+      loadFinancialData();
     } catch (err) {
       toast.error(
         err instanceof Error ? err.message : 'Failed to close position'
