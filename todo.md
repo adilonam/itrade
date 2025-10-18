@@ -10,3 +10,4 @@
 - [ ] manage postion on admin on change pnl ( transaction desc equilibre admin -8 , balance -8)
 - [x] market check for twelve data
 - [ ] sell specific amount (stock)
+- [ ] help to invest or trade for amount usd
