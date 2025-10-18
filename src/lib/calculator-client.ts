@@ -116,3 +116,67 @@ export async function calculateRequiredMargin(
     return null;
   }
 }
+
+/**
+ * Calculate lot size (quantity in lots) from a required margin amount
+ * This is the inverse of calculateRequiredMargin
+ * Formula: quantity = (requiredMargin * leverage) / (price * lotSize)
+ *
+ * @param market - Market object with type, room, and lastPrice
+ * @param user - User object with leverage
+ * @param requiredMargin - The margin amount to calculate lots from
+ * @returns Lot size (quantity) or null if calculation fails
+ */
+export function calculateLotSizeFromMargin(
+  market: Market,
+  user: User,
+  requiredMargin: number
+): number | null {
+  try {
+    // Validate inputs
+    if (!market || !user) {
+      console.warn('Market or user is missing for lot size calculation');
+      return null;
+    }
+
+    if (!requiredMargin || requiredMargin <= 0) {
+      console.warn('Required margin must be greater than 0');
+      return null;
+    }
+
+    // Use lastPrice from market as the position price
+    if (!market.lastPrice || market.lastPrice <= 0) {
+      console.warn(`No valid price for market ${market.symbol}`);
+      return null;
+    }
+
+    const price = market.lastPrice;
+
+    // Get lot size multiplier based on market type
+    const lotSize = getLotSize(market.type);
+
+    // Calculate leverage
+    // For stock room, always use leverage = 1, otherwise use user's leverage
+    const leverage = market.room === 'STOCK' ? 1 : user.leverage || 1;
+
+    // Calculate quantity in lots
+    // Formula: quantity = (requiredMargin * leverage) / (price * lotSize)
+    const quantity = (requiredMargin * leverage) / (price * lotSize);
+
+    console.log(
+      `Calculated lot size from margin for market ${market.symbol}:`,
+      {
+        requiredMargin,
+        leverage,
+        price,
+        lotSize,
+        quantity
+      }
+    );
+
+    return quantity;
+  } catch (error) {
+    console.error('Error calculating lot size from margin:', error);
+    return null;
+  }
+}

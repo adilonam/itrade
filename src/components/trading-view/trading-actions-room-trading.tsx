@@ -34,10 +34,16 @@ import { toast } from 'sonner';
 import {
   IconTrendingUp,
   IconTrendingDown,
-  IconLoader2
+  IconLoader2,
+  IconChartBar,
+  IconCash,
+  IconSwitchHorizontal
 } from '@tabler/icons-react';
 import type { Market } from '@prisma/client';
-import { calculateRequiredMargin } from '@/lib/calculator-client';
+import {
+  calculateRequiredMargin,
+  calculateLotSizeFromMargin
+} from '@/lib/calculator-client';
 
 interface TradingActionsRoomTradingProps {
   market?: Market | null;
@@ -47,7 +53,8 @@ export function TradingActionsRoomTrading({
   market: propMarket
 }: TradingActionsRoomTradingProps) {
   const { data: session } = useSession();
-  const [quantity, setQuantity] = useState<string>('');
+  const [inputMode, setInputMode] = useState<'LOT' | 'AMOUNT'>('LOT');
+  const [inputValue, setInputValue] = useState<string>('');
   const [limitPrice, setLimitPrice] = useState<string>('');
   const [takeProfit, setTakeProfit] = useState<string>('');
   const [stopLoss, setStopLoss] = useState<string>('');
@@ -55,62 +62,87 @@ export function TradingActionsRoomTrading({
   const [isCreatingPosition, setIsCreatingPosition] = useState(false);
   const [showBuyDialog, setShowBuyDialog] = useState(false);
   const [showSellDialog, setShowSellDialog] = useState(false);
+  const [calculatedLotSize, setCalculatedLotSize] = useState<number | null>(
+    null
+  );
   const [requiredMargin, setRequiredMargin] = useState<number | null>(null);
 
-  // Calculate required margin when quantity or market changes
+  // Calculate lot size and margin based on input mode
   useEffect(() => {
-    const calculateMargin = async () => {
-      if (!quantity || !propMarket || !session?.user) {
+    const calculate = async () => {
+      if (!inputValue || !propMarket || !session?.user) {
+        setCalculatedLotSize(null);
         setRequiredMargin(null);
         return;
       }
 
       try {
-        const quantityNum = parseFloat(quantity);
-        if (isNaN(quantityNum) || quantityNum <= 0) {
+        const inputNum = parseFloat(inputValue);
+        if (isNaN(inputNum) || inputNum <= 0) {
+          setCalculatedLotSize(null);
           setRequiredMargin(null);
           return;
         }
 
-        // Create a temporary position object for margin calculation
-        const tempPosition = {
-          id: 'temp',
-          userId: session.user.id,
-          type: 'BUY' as const, // We'll calculate for both BUY and SELL, but use BUY as default
-          status: 'PLACED' as const,
-          room: 'TRADING' as const,
-          marketId: propMarket.id,
-          quantity: quantityNum,
-          executedPrice:
-            orderType === 'MARKET'
-              ? propMarket.lastPrice
-              : parseFloat(limitPrice) || propMarket.lastPrice,
-          closedPrice: null,
-          takeProfit: takeProfit ? parseFloat(takeProfit) : null,
-          stopLoss: stopLoss ? parseFloat(stopLoss) : null,
-          description: null,
-          executedAt: new Date(),
-          closedAt: null,
-          pnl: null,
-          user: {
-            id: session.user.id,
-            balance: session.user.balance || 0,
-            leverage: session.user.leverage || 1
-          },
-          market: propMarket
+        const userObj = {
+          id: session.user.id,
+          balance: session.user.balance || 0,
+          leverage: session.user.leverage || 1
         };
 
-        const margin = await calculateRequiredMargin(tempPosition as any);
-        setRequiredMargin(margin);
+        if (inputMode === 'LOT') {
+          // User entered lot size directly
+          setCalculatedLotSize(inputNum);
+
+          // Calculate required margin from lot size
+          const tempPosition = {
+            id: 'temp',
+            userId: session.user.id,
+            type: 'BUY' as const,
+            status: 'PLACED' as const,
+            room: 'TRADING' as const,
+            marketId: propMarket.id,
+            quantity: inputNum,
+            executedPrice:
+              orderType === 'MARKET'
+                ? propMarket.lastPrice
+                : parseFloat(limitPrice) || propMarket.lastPrice,
+            closedPrice: null,
+            takeProfit: takeProfit ? parseFloat(takeProfit) : null,
+            stopLoss: stopLoss ? parseFloat(stopLoss) : null,
+            description: null,
+            executedAt: new Date(),
+            closedAt: null,
+            pnl: null,
+            user: userObj,
+            market: propMarket
+          };
+
+          const margin = await calculateRequiredMargin(tempPosition as any);
+          setRequiredMargin(margin);
+        } else {
+          // User entered amount (margin)
+          setRequiredMargin(inputNum);
+
+          // Calculate lot size from margin
+          const lotSize = calculateLotSizeFromMargin(
+            propMarket,
+            userObj as any,
+            inputNum
+          );
+          setCalculatedLotSize(lotSize);
+        }
       } catch (error) {
-        console.error('Error calculating required margin:', error);
+        console.error('Error calculating lot size and margin:', error);
+        setCalculatedLotSize(null);
         setRequiredMargin(null);
       }
     };
 
-    calculateMargin();
+    calculate();
   }, [
-    quantity,
+    inputValue,
+    inputMode,
     propMarket,
     session?.user,
     orderType,
@@ -130,9 +162,10 @@ export function TradingActionsRoomTrading({
       return;
     }
 
-    const quantityNum = parseFloat(quantity);
-    if (isNaN(quantityNum) || quantityNum <= 0) {
-      toast.error('Please enter a valid quantity');
+    if (!calculatedLotSize || calculatedLotSize <= 0) {
+      toast.error(
+        `Please enter a valid ${inputMode === 'LOT' ? 'lot size' : 'amount'}`
+      );
       return;
     }
 
@@ -160,10 +193,10 @@ export function TradingActionsRoomTrading({
           executedPrice:
             orderType === 'LIMIT' ? parseFloat(limitPrice) : undefined,
           marketId: propMarket.id,
-          quantity: quantityNum,
+          quantity: calculatedLotSize, // Always send lot size to API
           takeProfit: takeProfit ? parseFloat(takeProfit) : undefined,
           stopLoss: stopLoss ? parseFloat(stopLoss) : undefined,
-          description: `${type} ${quantityNum} units of ${propMarket.symbol} (${orderType} order)`
+          description: `${type} ${calculatedLotSize.toFixed(4)} lots of ${propMarket.symbol} (${orderType} order)`
         })
       });
 
@@ -176,7 +209,7 @@ export function TradingActionsRoomTrading({
       toast.success(`${type} ${orderType} order placed successfully!`);
 
       // Reset form
-      setQuantity('');
+      setInputValue('');
       setLimitPrice('');
       setTakeProfit('');
       setStopLoss('');
@@ -234,18 +267,52 @@ export function TradingActionsRoomTrading({
           </Select>
         </div>
 
-        {/* Quantity Input */}
+        {/* Quantity/Amount Input with Mode Toggle */}
         <div className='space-y-2'>
-          <Label htmlFor='quantity'>Quantity</Label>
-          <Input
-            id='quantity'
-            type='number'
-            placeholder='Enter quantity'
-            value={quantity}
-            onChange={(e) => setQuantity(e.target.value)}
-            min='0'
-            step='0.01'
-          />
+          <Label htmlFor='input-value'>
+            {inputMode === 'LOT' ? 'Lot Size' : 'Amount ($)'}
+          </Label>
+          <div className='flex gap-2'>
+            <Input
+              id='input-value'
+              type='number'
+              placeholder={
+                inputMode === 'LOT'
+                  ? 'Enter lot size'
+                  : 'Enter amount in dollars'
+              }
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              min='0'
+              step='0.01'
+              className='flex-1'
+            />
+            <Button
+              type='button'
+              variant='outline'
+              size='icon'
+              onClick={() => {
+                setInputMode((prev) => (prev === 'LOT' ? 'AMOUNT' : 'LOT'));
+                setInputValue(''); // Clear input when switching modes
+              }}
+              title={`Current: ${inputMode === 'LOT' ? 'Lot Size' : 'Amount'}. Click to switch`}
+              className='relative shrink-0'
+            >
+              {inputMode === 'LOT' ? (
+                <IconChartBar className='h-4 w-4' />
+              ) : (
+                <IconCash className='h-4 w-4' />
+              )}
+              <IconSwitchHorizontal className='absolute right-1 bottom-1 h-2.5 w-2.5 opacity-60' />
+            </Button>
+          </div>
+          {calculatedLotSize !== null && (
+            <p className='text-muted-foreground text-xs'>
+              {inputMode === 'LOT'
+                ? `Required Margin: $${requiredMargin?.toFixed(2) || '0.00'}`
+                : `Lot Size: ${calculatedLotSize.toFixed(4)} lots`}
+            </p>
+          )}
         </div>
 
         {/* Limit Price Input - Only show for limit orders */}
@@ -300,12 +367,15 @@ export function TradingActionsRoomTrading({
         </div>
 
         {/* Order Summary */}
-        {quantity && propMarket && (
+        {inputValue && propMarket && calculatedLotSize !== null && (
           <div className='bg-muted rounded-lg p-3 text-sm'>
             <div className='font-medium'>Order Summary</div>
             <div className='mt-1 space-y-1'>
               <div>Type: {orderType} Order</div>
-              <div>Quantity: {quantity} units</div>
+              <div>
+                Input: {inputMode === 'LOT' ? 'Lot Size' : 'Amount (Margin)'}
+              </div>
+              <div>Lot Size: {calculatedLotSize.toFixed(4)} lots</div>
               <div>
                 Price:{' '}
                 {orderType === 'MARKET'
@@ -315,7 +385,9 @@ export function TradingActionsRoomTrading({
               {takeProfit && <div>Take Profit: ${takeProfit}</div>}
               {stopLoss && <div>Stop Loss: ${stopLoss}</div>}
               {requiredMargin !== null && (
-                <div>Required Margin: ${requiredMargin.toFixed(2)}</div>
+                <div className='font-medium'>
+                  Required Margin: ${requiredMargin.toFixed(2)}
+                </div>
               )}
             </div>
           </div>
@@ -329,7 +401,7 @@ export function TradingActionsRoomTrading({
                 variant='default'
                 disabled={
                   isCreatingPosition ||
-                  !quantity ||
+                  !calculatedLotSize ||
                   (orderType === 'LIMIT' && !limitPrice)
                 }
               >
@@ -348,41 +420,40 @@ export function TradingActionsRoomTrading({
                 </AlertDialogTitle>
                 <AlertDialogDescription>
                   Are you sure you want to place a {orderType.toLowerCase()} buy
-                  order for {quantity} units of {propMarket.symbol}?
+                  order for {calculatedLotSize?.toFixed(4)} lots of{' '}
+                  {propMarket.symbol}?
+                  <br />
+                  <br />
+                  <strong>Lot Size:</strong> {calculatedLotSize?.toFixed(4)}{' '}
+                  lots
                   <br />
                   {orderType === 'MARKET' ? (
                     <>
-                      Price: Market price (${propMarket.lastPrice.toFixed(5)})
-                      <br />
-                      <strong>
-                        Total: $
-                        {(parseFloat(quantity) * propMarket.lastPrice).toFixed(
-                          2
-                        )}
-                      </strong>
+                      <strong>Price:</strong> Market price ($
+                      {propMarket.lastPrice.toFixed(5)})
                     </>
                   ) : (
                     <>
-                      Limit Price: ${limitPrice}
+                      <strong>Limit Price:</strong> ${limitPrice}
+                    </>
+                  )}
+                  <br />
+                  {requiredMargin !== null && (
+                    <>
+                      <strong>Required Margin:</strong> $
+                      {requiredMargin.toFixed(2)}
                       <br />
-                      <strong>
-                        Total: $
-                        {(
-                          parseFloat(quantity) * parseFloat(limitPrice)
-                        ).toFixed(2)}
-                      </strong>
                     </>
                   )}
                   {takeProfit && (
                     <>
+                      <strong>Take Profit:</strong> ${takeProfit}
                       <br />
-                      Take Profit: ${takeProfit}
                     </>
                   )}
                   {stopLoss && (
                     <>
-                      <br />
-                      Stop Loss: ${stopLoss}
+                      <strong>Stop Loss:</strong> ${stopLoss}
                     </>
                   )}
                 </AlertDialogDescription>
@@ -406,7 +477,7 @@ export function TradingActionsRoomTrading({
                 variant='destructive'
                 disabled={
                   isCreatingPosition ||
-                  !quantity ||
+                  !calculatedLotSize ||
                   (orderType === 'LIMIT' && !limitPrice)
                 }
               >
@@ -425,41 +496,40 @@ export function TradingActionsRoomTrading({
                 </AlertDialogTitle>
                 <AlertDialogDescription>
                   Are you sure you want to place a {orderType.toLowerCase()}{' '}
-                  sell order for {quantity} units of {propMarket.symbol}?
+                  sell order for {calculatedLotSize?.toFixed(4)} lots of{' '}
+                  {propMarket.symbol}?
+                  <br />
+                  <br />
+                  <strong>Lot Size:</strong> {calculatedLotSize?.toFixed(4)}{' '}
+                  lots
                   <br />
                   {orderType === 'MARKET' ? (
                     <>
-                      Price: Market price (${propMarket.lastPrice.toFixed(5)})
-                      <br />
-                      <strong>
-                        Total: $
-                        {(parseFloat(quantity) * propMarket.lastPrice).toFixed(
-                          2
-                        )}
-                      </strong>
+                      <strong>Price:</strong> Market price ($
+                      {propMarket.lastPrice.toFixed(5)})
                     </>
                   ) : (
                     <>
-                      Limit Price: ${limitPrice}
+                      <strong>Limit Price:</strong> ${limitPrice}
+                    </>
+                  )}
+                  <br />
+                  {requiredMargin !== null && (
+                    <>
+                      <strong>Required Margin:</strong> $
+                      {requiredMargin.toFixed(2)}
                       <br />
-                      <strong>
-                        Total: $
-                        {(
-                          parseFloat(quantity) * parseFloat(limitPrice)
-                        ).toFixed(2)}
-                      </strong>
                     </>
                   )}
                   {takeProfit && (
                     <>
+                      <strong>Take Profit:</strong> ${takeProfit}
                       <br />
-                      Take Profit: ${takeProfit}
                     </>
                   )}
                   {stopLoss && (
                     <>
-                      <br />
-                      Stop Loss: ${stopLoss}
+                      <strong>Stop Loss:</strong> ${stopLoss}
                     </>
                   )}
                 </AlertDialogDescription>
