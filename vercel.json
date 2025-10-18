@@ -3,6 +3,10 @@
     {
       "path": "/api/refresh-position",
       "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/schedule/mature-investments",
+      "schedule": "0 0 * * *"
     }
   ]
 }
