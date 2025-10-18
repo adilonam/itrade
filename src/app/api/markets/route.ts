@@ -160,6 +160,12 @@ export async function GET(request: NextRequest) {
             marketData.current_price ?? marketData.close ?? '0'
           );
           const lastChange = parseFloat(marketData.change ?? '0');
+          const lastPercentChange = parseFloat(
+            marketData.percent_change ?? '0'
+          );
+          const lastPreviousClose = parseFloat(
+            marketData.previous_close ?? '0'
+          );
 
           // Update the market in database
           const updatedMarket = await prisma.market.update({
@@ -167,6 +173,12 @@ export async function GET(request: NextRequest) {
             data: {
               lastPrice: isFinite(lastPrice) ? lastPrice : market.lastPrice,
               lastChange: isFinite(lastChange) ? lastChange : market.lastChange,
+              lastPercentChange: isFinite(lastPercentChange)
+                ? lastPercentChange
+                : market.lastPercentChange,
+              lastPreviousClose: isFinite(lastPreviousClose)
+                ? lastPreviousClose
+                : market.lastPreviousClose,
               updatedAt: new Date()
             }
           });

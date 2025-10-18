@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState, useMemo, useCallback } from 'react';
-import { useSession } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -62,9 +61,21 @@ interface PaginationInfo {
   pages: number;
 }
 
+interface FinancialData {
+  balance: number;
+  usedMargin: number;
+  equity: number;
+  freeMargin: number;
+  marginLevel: number | null;
+  totalPnL: number;
+  leverage: number;
+}
+
 export function StockPortfolioView() {
-  const { data: session } = useSession();
   const [positions, setPositions] = useState<PositionWithRelations[]>([]);
+  const [financialData, setFinancialData] = useState<FinancialData | null>(
+    null
+  );
   const [pagination, setPagination] = useState<PaginationInfo>({
     page: 1,
     limit: 10,
@@ -126,10 +137,39 @@ export function StockPortfolioView() {
     [pagination.limit]
   );
 
+  // Load financial data from API
+  const loadFinancialData = useCallback(async () => {
+    try {
+      const response = await fetch('/api/user/financial');
+      if (!response.ok) {
+        throw new Error('Failed to fetch financial data');
+      }
+      const data = await response.json();
+      setFinancialData(data);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('Failed to load financial data:', err);
+    }
+  }, []);
+
   // Load data on mount and when filters change
   useEffect(() => {
     loadPositions(1, currentFilters);
   }, [currentFilters, loadPositions]);
+
+  // Fetch financial data every 1 second
+  useEffect(() => {
+    // Initial fetch
+    loadFinancialData();
+
+    // Set up interval to fetch every 1 second
+    const interval = setInterval(() => {
+      loadFinancialData();
+    }, 1000);
+
+    // Cleanup interval on unmount
+    return () => clearInterval(interval);
+  }, [loadFinancialData]);
 
   // Handle filter changes
   const handleFilterChange = (key: keyof PositionFilters, value: any) => {
@@ -182,41 +222,6 @@ export function StockPortfolioView() {
   const handleRefresh = () => {
     loadPositions(pagination.page, currentFilters);
   };
-
-  // Calculate financial metrics
-  const financialMetrics = useMemo(() => {
-    // Get user balance from session
-    const userBalance = session?.user?.balance || 0;
-
-    // Sum of required margins only from PLACED positions
-    const usedMargin = positions.reduce((sum, position) => {
-      if (position.status === 'PLACED') {
-        return sum + (position.requiredMargin || 0);
-      }
-      return sum;
-    }, 0);
-
-    // Sum of all PnL from positions
-    const totalPnL = positions
-      .filter((position) => position.status === 'PLACED')
-      .reduce((sum, position) => {
-        return sum + (position.pnl || 0);
-      }, 0);
-
-    // Equity = balance + total PnL
-    const equity = userBalance + totalPnL;
-
-    // Free margin = equity - used margin
-    const freeMargin = equity - usedMargin;
-
-    return {
-      usedMargin,
-      totalPnL,
-      equity,
-      freeMargin,
-      userBalance
-    };
-  }, [positions, session?.user?.balance]);
 
   // Calculate summary statistics
   const summaryStats = useMemo(() => {
@@ -305,23 +310,27 @@ export function StockPortfolioView() {
       </div>
 
       {/* Finance Card */}
-      <UserFinanceCard
-        balance={financialMetrics.userBalance}
-        usedMargin={financialMetrics.usedMargin}
-        equity={financialMetrics.equity}
-      />
+      {financialData && (
+        <UserFinanceCard
+          balance={financialData.balance}
+          usedMargin={financialData.usedMargin}
+          equity={financialData.equity}
+        />
+      )}
 
       {/* Portfolio Summary */}
-      <PortfolioSummary
-        positions={positions}
-        financialMetrics={{
-          userBalance: financialMetrics.userBalance,
-          usedMargin: financialMetrics.usedMargin,
-          equity: financialMetrics.equity,
-          freeMargin: financialMetrics.freeMargin
-        }}
-        onClosePosition={handleClosePosition}
-      />
+      {financialData && (
+        <PortfolioSummary
+          positions={positions}
+          financialMetrics={{
+            userBalance: financialData.balance,
+            usedMargin: financialData.usedMargin,
+            equity: financialData.equity,
+            freeMargin: financialData.freeMargin
+          }}
+          onClosePosition={handleClosePosition}
+        />
+      )}
 
       {/* Filters */}
       <Card>
