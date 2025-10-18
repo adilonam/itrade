@@ -56,10 +56,22 @@ interface PaginationInfo {
   pages: number;
 }
 
+interface FinancialData {
+  balance: number;
+  usedMargin: number;
+  equity: number;
+  freeMargin: number;
+  marginLevel: number | null;
+  totalPnL: number;
+  leverage: number;
+}
+
 export function UserPositionsViewRoomTrading() {
-  const { data: session } = useSession();
   const [positions, setPositions] = useState<PositionWithRelations[]>([]);
   const [realTimePnL, setRealTimePnL] = useState<Record<string, number>>({});
+  const [financialData, setFinancialData] = useState<FinancialData | null>(
+    null
+  );
   const [pagination, setPagination] = useState<PaginationInfo>({
     page: 1,
     limit: 10,
@@ -121,10 +133,39 @@ export function UserPositionsViewRoomTrading() {
     [pagination.limit]
   );
 
+  // Load financial data from API
+  const loadFinancialData = useCallback(async () => {
+    try {
+      const response = await fetch('/api/user/financial');
+      if (!response.ok) {
+        throw new Error('Failed to fetch financial data');
+      }
+      const data = await response.json();
+      setFinancialData(data);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('Failed to load financial data:', err);
+    }
+  }, []);
+
   // Load data on mount and when filters change
   useEffect(() => {
     loadPositions(1, currentFilters);
   }, [currentFilters, loadPositions]);
+
+  // Fetch financial data every 1 second
+  useEffect(() => {
+    // Initial fetch
+    loadFinancialData();
+
+    // Set up interval to fetch every 1 second
+    const interval = setInterval(() => {
+      loadFinancialData();
+    }, 1000);
+
+    // Cleanup interval on unmount
+    return () => clearInterval(interval);
+  }, [loadFinancialData]);
 
   // Handle filter changes
   const handleFilterChange = (key: keyof PositionFilters, value: any) => {
@@ -185,46 +226,6 @@ export function UserPositionsViewRoomTrading() {
       [positionId]: pnl
     }));
   }, []);
-
-  // Calculate financial metrics
-  const financialMetrics = useMemo(() => {
-    // Get user balance from session
-    const userBalance = session?.user?.balance || 0;
-
-    // Sum of required margins only from PLACED positions
-    const usedMargin = positions.reduce((sum, position) => {
-      if (position.status === 'PLACED') {
-        return sum + (position.requiredMargin || 0);
-      }
-      return sum;
-    }, 0);
-
-    // Sum of all PnL from positions (using real-time PnL when available)
-    const totalPnL = positions
-      .filter((position) => position.status === 'PLACED')
-      .reduce((sum, position) => {
-        // Use real-time PnL if available, otherwise use stored PnL
-        const currentPnL =
-          realTimePnL[position.id] !== undefined
-            ? realTimePnL[position.id]
-            : position.pnl || 0;
-        return sum + currentPnL;
-      }, 0);
-
-    // Equity = balance + total PnL (reactive to real-time changes)
-    const equity = userBalance + totalPnL;
-
-    // Free margin = equity - used margin (reactive to real-time changes)
-    const freeMargin = equity - usedMargin;
-
-    return {
-      usedMargin,
-      totalPnL,
-      equity,
-      freeMargin,
-      userBalance
-    };
-  }, [positions, session?.user?.balance, realTimePnL]);
 
   // Calculate summary statistics
   const summaryStats = useMemo(() => {
@@ -315,11 +316,13 @@ export function UserPositionsViewRoomTrading() {
       </div>
 
       {/* Finance Card */}
-      <UserFinanceCard
-        balance={financialMetrics.userBalance}
-        usedMargin={financialMetrics.usedMargin}
-        equity={financialMetrics.equity}
-      />
+      {financialData && (
+        <UserFinanceCard
+          balance={financialData.balance}
+          usedMargin={financialData.usedMargin}
+          equity={financialData.equity}
+        />
+      )}
 
       {/* Filters */}
       <Card>

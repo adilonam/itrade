@@ -65,8 +65,13 @@ export function MarketList({
             // Use real-time data if available, otherwise fall back to market data
             const currentPrice = realTimeData?.price ?? market.lastPrice;
             const currentChange = realTimeData
-              ? realTimeData.price - (market.lastPrice - market.lastChange)
+              ? realTimeData.price - market.lastPreviousClose
               : market.lastChange;
+            const currentPercentChange = realTimeData
+              ? ((realTimeData.price - market.lastPreviousClose) /
+                  market.lastPreviousClose) *
+                100
+              : market.lastPercentChange;
 
             const isPositive = currentChange >= 0;
             const changeColor = isPositive ? 'text-green-600' : 'text-red-600';
@@ -130,7 +135,7 @@ export function MarketList({
                     )}
                     <span className='font-medium'>
                       {isPositive ? '+' : ''}
-                      {formatNumber(currentChange * 100)}%
+                      {currentPercentChange.toFixed(2).toString()}%
                     </span>
                   </div>
                 </TableCell>
