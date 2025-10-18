@@ -21,9 +21,14 @@ import { prisma } from '@/lib/prisma';
  */
 export async function POST(request: NextRequest) {
   try {
-    // Verify the request is from an authorized source (e.g., cron job)
+    // Verify the request is from an authorized source (e.g., cron job or Vercel)
     const authHeader = request.headers.get('authorization');
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    const vercelCronHeader = request.headers.get('x-vercel-cron');
+
+    const isAuthorizedCron = authHeader === `Bearer ${process.env.CRON_SECRET}`;
+    const isVercelCron = vercelCronHeader === '1';
+
+    if (!isAuthorizedCron && !isVercelCron) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -76,7 +81,8 @@ export async function POST(request: NextRequest) {
             where: { id: userInvestment.id },
             data: {
               status: 'COMPLETED',
-              actualReturn: userInvestment.expectedReturn
+              actualReturn: userInvestment.expectedReturn,
+              completedAt: now
             }
           });
 
