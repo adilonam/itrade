@@ -284,6 +284,116 @@ export async function calculateRequiredMargin(
 }
 
 /**
+ * Calculate comprehensive financial information for a user
+ * @param user - User object from Prisma with id, balance, and leverage
+ * @returns Object containing balance, margins, equity, PnL, and leverage
+ */
+export async function calculateUserFinancialInfo(user: User): Promise<{
+  balance: number;
+  usedMargin: number;
+  equity: number;
+  freeMargin: number;
+  marginLevel: number | null;
+  totalPnL: number;
+  leverage: number;
+} | null> {
+  try {
+    if (!user) {
+      // eslint-disable-next-line no-console
+      console.warn('User object is null or undefined');
+      return null;
+    }
+
+    // Get all PLACED positions for the user
+    const placedPositions = await prisma.position.findMany({
+      where: {
+        userId: user.id,
+        status: 'PLACED'
+      },
+      include: {
+        market: true
+      }
+    });
+
+    // Get all unique markets from user positions
+    const marketMap = new Map();
+    placedPositions.forEach((pos) => {
+      if (pos.market) {
+        marketMap.set(pos.market.id, pos.market);
+      }
+    });
+
+    const markets = Array.from(marketMap.values());
+
+    // Refresh market data for all unique markets
+    if (markets.length > 0) {
+      await refreshSaveMarkets(markets);
+    }
+
+    // Calculate total PnL and used margin
+    let totalPnL = 0;
+    let usedMargin = 0;
+
+    // Calculate PnL for each PLACED position
+    for (const position of placedPositions) {
+      if (
+        position.market &&
+        position.executedPrice &&
+        position.executedPrice > 0
+      ) {
+        // Calculate current price based on position type
+        const midPrice = position.market.lastPrice ?? 0;
+        const spread = position.market.spread ?? 0;
+        const bidPrice = midPrice - spread / 2;
+        const askPrice = midPrice + spread / 2;
+        const currentPrice = position.type === 'BUY' ? askPrice : bidPrice;
+
+        // Calculate PnL
+        const lotSize = await getLotSize(position.market.type);
+
+        let pnl = 0;
+        if (position.type === 'BUY') {
+          pnl =
+            (currentPrice - position.executedPrice) *
+            position.quantity *
+            lotSize;
+        } else if (position.type === 'SELL') {
+          pnl =
+            (position.executedPrice - currentPrice) *
+            position.quantity *
+            lotSize;
+        }
+
+        totalPnL += pnl;
+      }
+
+      // Sum up used margin
+      usedMargin += position.requiredMargin || 0;
+    }
+
+    // Calculate financial metrics
+    const balance = user.balance;
+    const equity = balance + totalPnL;
+    const freeMargin = equity - usedMargin;
+    const marginLevel = usedMargin > 0 ? (equity / usedMargin) * 100 : null;
+
+    return {
+      balance: Number(balance.toFixed(2)),
+      usedMargin: Number(usedMargin.toFixed(2)),
+      equity: Number(equity.toFixed(2)),
+      freeMargin: Number(freeMargin.toFixed(2)),
+      marginLevel: marginLevel !== null ? Number(marginLevel.toFixed(2)) : null,
+      totalPnL: Number(totalPnL.toFixed(2)),
+      leverage: user.leverage
+    };
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('Error calculating user financial info:', error);
+    return null;
+  }
+}
+
+/**
  * Check if a user can open a new position based on their current positions, PnL, required margin, and leverage
  * @param position - The new position to potentially open (with user and market data)
  * @returns Object containing whether position can be opened and relevant calculations

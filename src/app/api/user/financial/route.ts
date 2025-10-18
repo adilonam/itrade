@@ -1,9 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { calculatePositionPnL } from '@/lib/calculator-server';
-import { Market, Position } from '@prisma/client';
+import { calculateUserFinancialInfo } from '@/lib/calculator-server';
 
 /**
  * @swagger
@@ -55,75 +53,27 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Get user with balance and leverage
+    // Get user with required fields
+    const { prisma } = await import('@/lib/prisma');
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: {
-        id: true,
-        balance: true,
-        leverage: true
-      }
+      where: { id: session.user.id }
     });
 
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // Get all PLACED positions for the user
-    const placedPositions = await prisma.position.findMany({
-      where: {
-        userId: session.user.id,
-        status: 'PLACED'
-      },
-      include: {
-        market: true
-      }
-    });
+    // Use the centralized financial calculation function
+    const financialInfo = await calculateUserFinancialInfo(user);
 
-    // Calculate total PnL and used margin
-    // Note: refreshSaveMarkets is called inside calculatePositionPnL for each position
-    let totalPnL = 0;
-    let usedMargin = 0;
+    if (!financialInfo) {
+      return NextResponse.json(
+        { error: 'Failed to calculate financial information' },
+        { status: 500 }
+      );
+    }
 
-    // Calculate PnL for each PLACED position
-    const pnlCalculations = await Promise.all(
-      placedPositions.map(async (position) => {
-        // Calculate PnL
-        const pnl = await calculatePositionPnL(
-          position as Position & { market: Market }
-        );
-
-        // Sum up used margin
-        const positionMargin = position.requiredMargin || 0;
-
-        return {
-          pnl: pnl || 0,
-          margin: positionMargin
-        };
-      })
-    );
-
-    // Sum all PnLs and margins
-    pnlCalculations.forEach((calc) => {
-      totalPnL += calc.pnl;
-      usedMargin += calc.margin;
-    });
-
-    // Calculate financial metrics
-    const balance = user.balance;
-    const equity = balance + totalPnL;
-    const freeMargin = equity - usedMargin;
-    const marginLevel = usedMargin > 0 ? (equity / usedMargin) * 100 : null;
-
-    return NextResponse.json({
-      balance: Number(balance.toFixed(2)),
-      usedMargin: Number(usedMargin.toFixed(2)),
-      equity: Number(equity.toFixed(2)),
-      freeMargin: Number(freeMargin.toFixed(2)),
-      marginLevel: marginLevel !== null ? Number(marginLevel.toFixed(2)) : null,
-      totalPnL: Number(totalPnL.toFixed(2)),
-      leverage: user.leverage
-    });
+    return NextResponse.json(financialInfo);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('Financial metrics calculation error:', error);
