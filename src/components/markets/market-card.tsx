@@ -28,24 +28,21 @@ export function MarketCard({
 }: MarketCardProps) {
   // Get real-time price data for this market   lastChange = nprice - oprice , lastchagenG = Gprice -oprice   , oprice = nprice - lastChange
 
-  // Use real-time data if available, otherwise fall back to market data
-  const currentPrice = realTimeData?.price ?? market.lastPrice;
-  const currentChange = realTimeData
-    ? realTimeData.price - market.lastPreviousClose
-    : market.lastChange;
-
-  const currentPercentChange = realTimeData
-    ? ((realTimeData.price - market.lastPreviousClose) /
-        market.lastPreviousClose) *
-      100
-    : market.lastPercentChange;
+  // Calculate current values with real-time data
+  const currentPrice = realTimeData?.price ?? market.lastPrice ?? 0;
+  const currentChange = market.lastChange ?? 0;
+  const currentPercentChange = market.lastPercentChange ?? 0;
 
   const isPositive = currentChange >= 0;
   const changeColor = isPositive ? 'text-green-600' : 'text-red-600';
   const badgeVariant = isPositive ? 'default' : 'destructive';
 
-  const formatNumber = (num: number) => {
-    return parseFloat(num.toFixed(5)).toString();
+  // Format number with proper decimal places
+  const formatNumber = (value: number | null | undefined): string => {
+    if (value === null || value === undefined || isNaN(value)) {
+      return '0.00000';
+    }
+    return value.toFixed(5);
   };
 
   // Calculate bid/ask from real-time data or use market data
