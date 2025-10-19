@@ -190,6 +190,15 @@ export const fakeUsers = {
         balance: faker.number.float({ min: 0, max: 10000, fractionDigits: 2 }),
         role: faker.helpers.arrayElement(roles),
         leverage: faker.number.int({ min: 1, max: 10 }),
+        themeMode: faker.helpers.arrayElement(['light', 'dark', 'system']),
+        themeColor: faker.helpers.arrayElement([
+          'default',
+          'blue',
+          'green',
+          'red'
+        ]),
+        reducedMotion: faker.datatype.boolean(),
+        highContrast: faker.datatype.boolean(),
         createdAt,
         updatedAt
       };
