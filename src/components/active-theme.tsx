@@ -7,6 +7,7 @@ import {
   useEffect,
   useState
 } from 'react';
+import { useSession } from 'next-auth/react';
 
 const COOKIE_NAME = 'active_theme';
 const DEFAULT_THEME = 'default';
@@ -20,6 +21,7 @@ function setThemeCookie(theme: string) {
 type ThemeContextType = {
   activeTheme: string;
   setActiveTheme: (theme: string) => void;
+  isLoading: boolean;
 };
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -31,12 +33,62 @@ export function ActiveThemeProvider({
   children: ReactNode;
   initialTheme?: string;
 }) {
-  const [activeTheme, setActiveTheme] = useState<string>(
+  const { data: session, status } = useSession();
+  const [activeTheme, setActiveThemeState] = useState<string>(
     () => initialTheme || DEFAULT_THEME
   );
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Load global theme settings from database
+  useEffect(() => {
+    const loadGlobalTheme = async () => {
+      try {
+        const response = await fetch('/api/global-theme-settings');
+        if (response.ok) {
+          const data = await response.json();
+          setActiveThemeState(data.themeColor || DEFAULT_THEME);
+        } else {
+          // Fallback to initial theme or default
+          setActiveThemeState(initialTheme || DEFAULT_THEME);
+        }
+      } catch (error) {
+        console.error('Failed to load global theme settings:', error);
+        // Fallback to initial theme or default
+        setActiveThemeState(initialTheme || DEFAULT_THEME);
+      }
+      setIsLoading(false);
+    };
+
+    loadGlobalTheme();
+  }, []); // Only run once on mount
+
+  const setActiveTheme = async (theme: string) => {
+    setActiveThemeState(theme);
+
+    // Only super-admins can change global theme settings
+    if (session?.user?.role === 'SUPERADMIN') {
+      try {
+        await fetch('/api/super-admin/global-theme-settings', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ themeColor: theme })
+        });
+      } catch (error) {
+        console.error('Failed to save global theme settings:', error);
+      }
+    } else {
+      // For non-super-admin users, just update local state (no persistence)
+      // The theme will revert to global setting on page refresh
+      console.log(
+        'Theme change is temporary - only super-admins can save global themes'
+      );
+    }
+  };
 
   useEffect(() => {
-    setThemeCookie(activeTheme);
+    if (isLoading) return;
 
     Array.from(document.body.classList)
       .filter((className) => className.startsWith('theme-'))
@@ -47,10 +99,10 @@ export function ActiveThemeProvider({
     if (activeTheme.endsWith('-scaled')) {
       document.body.classList.add('theme-scaled');
     }
-  }, [activeTheme]);
+  }, [activeTheme, isLoading]);
 
   return (
-    <ThemeContext.Provider value={{ activeTheme, setActiveTheme }}>
+    <ThemeContext.Provider value={{ activeTheme, setActiveTheme, isLoading }}>
       {children}
     </ThemeContext.Provider>
   );

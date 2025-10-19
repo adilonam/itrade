@@ -136,8 +136,30 @@ export function TradingMarketsView({
       )}
 
       {/* Controls */}
-      <div className='flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0'>
-        <div className='flex flex-col space-y-2 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-4'>
+      <div className='flex flex-col space-y-4'>
+        {/* Type Filter Buttons */}
+        <div className='flex flex-wrap gap-2'>
+          <Button
+            variant={selectedType === 'all' ? 'default' : 'outline'}
+            size='sm'
+            onClick={() => setSelectedType('all')}
+          >
+            All
+          </Button>
+          {marketTypes.map((type) => (
+            <Button
+              key={type}
+              variant={selectedType === type ? 'default' : 'outline'}
+              size='sm'
+              onClick={() => setSelectedType(type)}
+            >
+              {type}
+            </Button>
+          ))}
+        </div>
+
+        {/* Search and Controls */}
+        <div className='flex flex-col space-y-3 sm:flex-row sm:items-center sm:justify-between sm:space-y-0'>
           {/* Search */}
           <div className='relative flex-1 sm:max-w-sm'>
             <IconSearch className='absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400' />
@@ -149,61 +171,45 @@ export function TradingMarketsView({
             />
           </div>
 
-          {/* Type Filter */}
-          <div className='flex space-x-2'>
+          {/* Status and Controls */}
+          <div className='flex items-center justify-between space-x-2 sm:justify-end'>
+            {/* Connection Status */}
+            <div className='flex items-center space-x-2 text-sm text-gray-600'>
+              {isConnecting ? (
+                <div className='flex items-center space-x-1'>
+                  <div className='h-2 w-2 animate-pulse rounded-full bg-yellow-500' />
+                  <span>Connecting...</span>
+                </div>
+              ) : isConnected ? (
+                <div className='flex items-center space-x-1'>
+                  <IconWifi className='h-4 w-4 text-green-500' />
+                  <span>Live</span>
+                </div>
+              ) : (
+                <div className='flex items-center space-x-1'>
+                  <IconWifiOff className='h-4 w-4 text-red-500' />
+                  <span>Offline</span>
+                </div>
+              )}
+            </div>
+
+            {/* Refresh Button */}
             <Button
-              variant={selectedType === 'all' ? 'default' : 'outline'}
+              variant='outline'
               size='sm'
-              onClick={() => setSelectedType('all')}
+              onClick={handleRefresh}
+              disabled={isConnecting}
+              className='h-7 px-2'
             >
-              All
+              <IconRefresh className='h-3 w-3' />
             </Button>
-            {marketTypes.map((type) => (
-              <Button
-                key={type}
-                variant={selectedType === type ? 'default' : 'outline'}
-                size='sm'
-                onClick={() => setSelectedType(type)}
-              >
-                {type}
-              </Button>
-            ))}
+
+            {/* View Toggle */}
+            <ViewToggle
+              currentView={currentView}
+              onViewChange={setCurrentView}
+            />
           </div>
-        </div>
-
-        <div className='flex items-center space-x-2'>
-          {/* Connection Status */}
-          <div className='flex items-center space-x-2 text-sm text-gray-600'>
-            {isConnecting ? (
-              <div className='flex items-center space-x-1'>
-                <div className='h-2 w-2 animate-pulse rounded-full bg-yellow-500' />
-                <span>Connecting...</span>
-              </div>
-            ) : isConnected ? (
-              <div className='flex items-center space-x-1'>
-                <IconWifi className='h-4 w-4 text-green-500' />
-                <span>Live</span>
-              </div>
-            ) : (
-              <div className='flex items-center space-x-1'>
-                <IconWifiOff className='h-4 w-4 text-red-500' />
-                <span>Offline</span>
-              </div>
-            )}
-          </div>
-
-          {/* Refresh Button */}
-          <Button
-            variant='outline'
-            size='sm'
-            onClick={handleRefresh}
-            disabled={isConnecting}
-          >
-            <IconRefresh className='h-4 w-4' />
-          </Button>
-
-          {/* View Toggle */}
-          <ViewToggle currentView={currentView} onViewChange={setCurrentView} />
         </div>
       </div>
 

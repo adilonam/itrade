@@ -44,17 +44,23 @@ export function MarketList({
   };
 
   return (
-    <div className='rounded-md border'>
+    <div className='overflow-x-auto rounded-md border'>
       <Table>
         <TableHeader>
           <TableRow>
             <TableHead>Market</TableHead>
-            <TableHead>Type</TableHead>
+            <TableHead className='hidden sm:table-cell'>Type</TableHead>
             <TableHead className='text-right'>Price</TableHead>
-            <TableHead className='text-right'>24h Change</TableHead>
+            <TableHead className='hidden text-right md:table-cell'>
+              24h Change
+            </TableHead>
             <TableHead className='text-right'>24h %</TableHead>
-            <TableHead className='text-right'>Bid</TableHead>
-            <TableHead className='text-right'>Ask</TableHead>
+            <TableHead className='hidden text-right lg:table-cell'>
+              Bid
+            </TableHead>
+            <TableHead className='hidden text-right lg:table-cell'>
+              Ask
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -91,34 +97,45 @@ export function MarketList({
                 }
               >
                 <TableCell>
-                  <div className='flex items-center space-x-3'>
-                    <div className='min-w-0'>
+                  <div className='flex min-w-0 items-center space-x-2'>
+                    <div className='min-w-0 flex-1'>
                       <div className='flex items-center space-x-2'>
-                        <div className='text-sm font-semibold'>
+                        <div className='truncate text-sm font-semibold'>
                           {market.symbol}
                         </div>
                         {isConnected && realTimeData && (
-                          <IconWifi className='h-3 w-3 text-green-500' />
+                          <IconWifi className='h-3 w-3 flex-shrink-0 text-green-500' />
                         )}
                         {isConnected && !realTimeData && (
-                          <IconWifiOff className='h-3 w-3 text-yellow-500' />
+                          <IconWifiOff className='h-3 w-3 flex-shrink-0 text-yellow-500' />
                         )}
                       </div>
                       <div className='text-muted-foreground truncate text-xs'>
                         {market.name}
                       </div>
+                      {/* Show type on mobile as a small badge */}
+                      <div className='mt-1 sm:hidden'>
+                        <Badge variant={'default'} className='text-xs'>
+                          {market.type}
+                        </Badge>
+                      </div>
                     </div>
                   </div>
                 </TableCell>
-                <TableCell>
+                <TableCell className='hidden sm:table-cell'>
                   <Badge variant={'default'} className='text-xs'>
                     {market.type}
                   </Badge>
                 </TableCell>
-                <TableCell className='text-right font-mono'>
+                <TableCell className='text-right font-mono text-sm'>
                   {formatNumber(currentPrice)}
                 </TableCell>
-                <TableCell className={cn('text-right font-mono', changeColor)}>
+                <TableCell
+                  className={cn(
+                    'hidden text-right font-mono text-sm md:table-cell',
+                    changeColor
+                  )}
+                >
                   {formatChange(currentChange)}
                 </TableCell>
                 <TableCell className='text-right'>
@@ -129,20 +146,20 @@ export function MarketList({
                     )}
                   >
                     {isPositive ? (
-                      <IconTrendingUp className='h-4 w-4' />
+                      <IconTrendingUp className='h-3 w-3 sm:h-4 sm:w-4' />
                     ) : (
-                      <IconTrendingDown className='h-4 w-4' />
+                      <IconTrendingDown className='h-3 w-3 sm:h-4 sm:w-4' />
                     )}
-                    <span className='font-medium'>
+                    <span className='text-xs font-medium sm:text-sm'>
                       {isPositive ? '+' : ''}
                       {currentPercentChange.toFixed(2).toString()}%
                     </span>
                   </div>
                 </TableCell>
-                <TableCell className='text-right font-mono'>
+                <TableCell className='hidden text-right font-mono text-sm lg:table-cell'>
                   {formatNumber(bidPrice)}
                 </TableCell>
-                <TableCell className='text-right font-mono'>
+                <TableCell className='hidden text-right font-mono text-sm lg:table-cell'>
                   {formatNumber(askPrice)}
                 </TableCell>
               </TableRow>

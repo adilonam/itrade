@@ -2,17 +2,34 @@
 
 import { IconBrightness } from '@tabler/icons-react';
 import { useTheme } from 'next-themes';
+import { useSession } from 'next-auth/react';
 import * as React from 'react';
 
 import { Button } from '@/components/ui/button';
 
 export function ModeToggle() {
   const { setTheme, resolvedTheme } = useTheme();
+  const { data: session } = useSession();
 
   const handleThemeToggle = React.useCallback(
-    (e?: React.MouseEvent) => {
+    async (e?: React.MouseEvent) => {
       const newMode = resolvedTheme === 'dark' ? 'light' : 'dark';
       const root = document.documentElement;
+
+      // Save to user preferences if authenticated
+      if (session?.user) {
+        try {
+          await fetch('/api/user/theme-settings', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ themeMode: newMode })
+          });
+        } catch (error) {
+          console.error('Failed to save theme mode:', error);
+        }
+      }
 
       if (!document.startViewTransition) {
         setTheme(newMode);
@@ -29,7 +46,7 @@ export function ModeToggle() {
         setTheme(newMode);
       });
     },
-    [resolvedTheme, setTheme]
+    [resolvedTheme, setTheme, session]
   );
 
   return (

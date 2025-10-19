@@ -115,18 +115,18 @@ export function UserInvestmentCard({
       )}
     >
       <CardHeader className='pb-3'>
-        <div className='flex items-start justify-between'>
-          <div className='space-y-1'>
-            <CardTitle className='text-lg font-semibold'>
+        <div className='flex flex-col space-y-3 sm:flex-row sm:items-start sm:justify-between sm:space-y-0'>
+          <div className='min-w-0 flex-1 space-y-1'>
+            <CardTitle className='truncate text-lg font-semibold'>
               {userInvestment.investment.title}
             </CardTitle>
-            <div className='text-muted-foreground flex items-center space-x-3 text-sm'>
+            <div className='text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-1 text-sm'>
               <div className='flex items-center'>
-                <IconMapPin className='mr-1 h-3 w-3' />
+                <IconMapPin className='mr-1 h-3 w-3 flex-shrink-0' />
                 {userInvestment.investment.country}
               </div>
               <div className='flex items-center'>
-                <IconCalendar className='mr-1 h-3 w-3' />
+                <IconCalendar className='mr-1 h-3 w-3 flex-shrink-0' />
                 {userInvestment.investment.duration} months
               </div>
               <div
@@ -135,19 +135,24 @@ export function UserInvestmentCard({
                   getRiskColor(userInvestment.investment.riskLevel)
                 )}
               >
-                <IconShield className='mr-1 h-3 w-3' />
+                <IconShield className='mr-1 h-3 w-3 flex-shrink-0' />
                 {userInvestment.investment.riskLevel}
               </div>
             </div>
           </div>
-          <div className='flex items-center space-x-2'>
+          <div className='flex flex-wrap items-center gap-2 sm:flex-nowrap'>
             {userInvestment.autoReinvest && (
-              <Badge variant='outline' className='text-xs'>
-                <IconRefresh className='mr-1 h-3 w-3' />
+              <Badge variant='outline' className='text-xs whitespace-nowrap'>
+                <IconRefresh className='mr-1 h-3 w-3 flex-shrink-0' />
                 Auto-reinvest
               </Badge>
             )}
-            <Badge className={cn(getStatusColor(userInvestment.status))}>
+            <Badge
+              className={cn(
+                getStatusColor(userInvestment.status),
+                'whitespace-nowrap'
+              )}
+            >
               {userInvestment.status}
             </Badge>
           </div>
