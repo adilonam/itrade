@@ -134,7 +134,10 @@ export async function PUT(
 
     // Check if position exists
     const existingPosition = await prisma.position.findUnique({
-      where: { id }
+      where: { id },
+      include: {
+        user: true
+      }
     });
 
     if (!existingPosition) {
@@ -166,37 +169,78 @@ export async function PUT(
       }
     }
 
-    const position = await prisma.position.update({
-      where: { id },
-      data: {
-        type: body.type,
-        status: body.status,
-        marketId: body.marketId,
-        quantity: body.quantity,
-        description: body.description,
-        executedAt: body.executedAt,
-        pnl: body.pnl
-      },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true
-          }
+    // Handle P&L changes with balance updates and transaction history
+    let balanceChange = 0;
+    let shouldCreateTransaction = false;
+
+    if (body.pnl !== undefined && body.pnl !== existingPosition.pnl) {
+      const oldPnl = existingPosition.pnl || 0;
+      const newPnl = body.pnl || 0;
+      balanceChange = newPnl - oldPnl;
+      shouldCreateTransaction = true;
+    }
+
+    // Use transaction to ensure data consistency
+    const result = await prisma.$transaction(async (tx) => {
+      // Update the position
+      const updatedPosition = await tx.position.update({
+        where: { id },
+        data: {
+          type: body.type,
+          status: body.status,
+          marketId: body.marketId,
+          quantity: body.quantity,
+          description: body.description,
+          executedAt: body.executedAt,
+          pnl: body.pnl
         },
-        market: {
-          select: {
-            id: true,
-            symbol: true,
-            name: true,
-            type: true
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              balance: true
+            }
+          },
+          market: {
+            select: {
+              id: true,
+              symbol: true,
+              name: true,
+              type: true
+            }
           }
         }
+      });
+
+      // Update user balance and create transaction if P&L changed
+      if (shouldCreateTransaction && balanceChange !== 0) {
+        // Update user balance
+        await tx.user.update({
+          where: { id: existingPosition.userId },
+          data: {
+            balance: {
+              increment: balanceChange
+            }
+          }
+        });
+
+        // Create transaction record for history
+        await tx.transaction.create({
+          data: {
+            userId: existingPosition.userId,
+            type: balanceChange > 0 ? 'GAIN' : 'LOSS',
+            absoluteAmount: Math.abs(balanceChange),
+            description: `Admin P&L adjustment for position ${id.slice(0, 8)}... - Balance ${balanceChange > 0 ? '+' : ''}${balanceChange.toFixed(2)}`
+          }
+        });
       }
+
+      return updatedPosition;
     });
 
-    return NextResponse.json(position);
+    return NextResponse.json(result);
   } catch (error) {
     console.error('Error updating position:', error);
     return NextResponse.json(
