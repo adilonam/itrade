@@ -141,12 +141,6 @@ export function UserInvestmentCard({
             </div>
           </div>
           <div className='flex flex-wrap items-center gap-2 sm:flex-nowrap'>
-            {userInvestment.autoReinvest && (
-              <Badge variant='outline' className='text-xs whitespace-nowrap'>
-                <IconRefresh className='mr-1 h-3 w-3 flex-shrink-0' />
-                Auto-reinvest
-              </Badge>
-            )}
             <Badge
               className={cn(
                 getStatusColor(userInvestment.status),
