@@ -21,6 +21,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { UserFinanceCard } from '@/components/user/finance/user-finance-card';
 import { UserPositionsTableRoomStock } from '@/components/user/portfolio/user-positions-table-room-stock';
 import { PortfolioSummary } from '@/components/user/portfolio/portfolio-summary';
+import { PortfolioPieChart } from '@/components/user/portfolio/portfolio-pie-chart';
 import type { Position, Market, User } from '@prisma/client';
 
 // Extended position type with relations
@@ -332,6 +333,9 @@ export function StockPortfolioView() {
           onClosePosition={handleClosePosition}
         />
       )}
+
+      {/* Portfolio Distribution Chart */}
+      <PortfolioPieChart positions={positions} loading={loading} />
 
       {/* Filters */}
       <Card>
