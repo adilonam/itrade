@@ -129,8 +129,9 @@ export function StockMarketsView({
       )}
 
       {/* Header Controls */}
-      <div className='flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0'>
-        <div className='flex items-center space-x-2'>
+      <div className='flex flex-col space-y-4'>
+        {/* Type Filter Buttons */}
+        <div className='flex flex-wrap gap-2'>
           <Button
             variant={selectedType === 'all' ? 'default' : 'outline'}
             size='sm'
@@ -156,8 +157,9 @@ export function StockMarketsView({
           ))}
         </div>
 
-        <div className='flex items-center space-x-4'>
-          {/* WebSocket Status Indicator */}
+        {/* Search and Controls */}
+        <div className='flex flex-col space-y-3 sm:flex-row sm:items-center sm:justify-between sm:space-y-0'>
+          {/* WebSocket Status and Refresh */}
           <div className='flex items-center space-x-2'>
             {isConnected ? (
               <div className='flex items-center space-x-1 text-green-600'>
@@ -186,16 +188,22 @@ export function StockMarketsView({
             </Button>
           </div>
 
-          <div className='relative'>
-            <IconSearch className='text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform' />
-            <Input
-              placeholder='Search stocks...'
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className='w-64 pl-10'
+          {/* Search and View Toggle */}
+          <div className='flex flex-col space-y-3 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-4'>
+            <div className='relative flex-1 sm:flex-initial'>
+              <IconSearch className='text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform' />
+              <Input
+                placeholder='Search stocks...'
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className='w-full pl-10 sm:w-64'
+              />
+            </div>
+            <ViewToggle
+              currentView={currentView}
+              onViewChange={setCurrentView}
             />
           </div>
-          <ViewToggle currentView={currentView} onViewChange={setCurrentView} />
         </div>
       </div>
 

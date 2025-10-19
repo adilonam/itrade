@@ -62,6 +62,11 @@ model User {
   createdAt       DateTime         @default(now()) @map("created_at")
   updatedAt       DateTime         @updatedAt @map("updated_at")
   leverage        Int              @default(1) @map("leverage")
+  // Theme preferences
+  themeMode       String?          @default("system") @map("theme_mode") // "light", "dark", "system"
+  themeColor      String?          @default("default") @map("theme_color") // "default", "blue", "green", etc.
+  reducedMotion   Boolean          @default(false) @map("reduced_motion")
+  highContrast    Boolean          @default(false) @map("high_contrast")
   accounts        Account[]
   sessions        Session[]
   mfaChallenges   MfaChallenge[]
@@ -100,20 +105,20 @@ enum Room {
 }
 
 model Market {
-  id         String     @id @default(cuid())
-  type       MarketType
-  symbol     String
-  name       String
-  room       Room       @default(TRADING)
-  spread     Float      @default(0)
-  lastPrice  Float      @default(0)
-  lastChange Float      @default(0)
+  id                String     @id @default(cuid())
+  type              MarketType
+  symbol            String
+  name              String
+  room              Room       @default(TRADING)
+  spread            Float      @default(0)
+  lastPrice         Float      @default(0)
+  lastChange        Float      @default(0)
   lastPercentChange Float      @default(0)
   lastPreviousClose Float      @default(0)
-  visible    Boolean    @default(true)
-  createdAt  DateTime   @default(now()) @map("created_at")
-  updatedAt  DateTime   @updatedAt @map("updated_at")
-  positions  Position[]
+  visible           Boolean    @default(true)
+  createdAt         DateTime   @default(now()) @map("created_at")
+  updatedAt         DateTime   @updatedAt @map("updated_at")
+  positions         Position[]
 
   @@map("markets")
 }
@@ -260,11 +265,16 @@ enum TransactionType {
 
 // App Settings model for global configuration
 model AppSettings {
-  id        String   @id @default("default")
-  appIcon   String?  @map("app_icon") // Path to uploaded icon
-  appName   String   @default("Trading Dashboard") @map("app_name")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id            String   @id @default("default")
+  appIcon       String?  @map("app_icon") // Path to uploaded icon
+  appName       String   @default("Trading Dashboard") @map("app_name")
+  // Global theme settings
+  themeMode     String   @default("system") @map("theme_mode") // "light", "dark", "system"
+  themeColor    String   @default("green") @map("theme_color") // "default", "blue", "green", etc.
+  reducedMotion Boolean  @default(false) @map("reduced_motion")
+  highContrast  Boolean  @default(false) @map("high_contrast")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
 
   @@map("app_settings")
 }

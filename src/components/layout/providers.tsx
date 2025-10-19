@@ -12,9 +12,11 @@ export default function Providers({
 }) {
   return (
     <>
-      <ActiveThemeProvider initialTheme={activeThemeValue}>
-        <SessionProvider>{children}</SessionProvider>
-      </ActiveThemeProvider>
+      <SessionProvider>
+        <ActiveThemeProvider initialTheme={activeThemeValue}>
+          {children}
+        </ActiveThemeProvider>
+      </SessionProvider>
     </>
   );
 }

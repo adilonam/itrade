@@ -27,19 +27,19 @@ export function ViewToggle({
         variant={currentView === 'cards' ? 'default' : 'ghost'}
         size='sm'
         onClick={() => onViewChange('cards')}
-        className='h-8 px-3'
+        className='h-8 px-2 sm:px-3'
       >
-        <IconLayoutGrid className='mr-2 h-4 w-4' />
-        Cards
+        <IconLayoutGrid className='h-4 w-4 sm:mr-2' />
+        <span className='hidden sm:inline'>Cards</span>
       </Button>
       <Button
         variant={currentView === 'list' ? 'default' : 'ghost'}
         size='sm'
         onClick={() => onViewChange('list')}
-        className='h-8 px-3'
+        className='h-8 px-2 sm:px-3'
       >
-        <IconList className='mr-2 h-4 w-4' />
-        List
+        <IconList className='h-4 w-4 sm:mr-2' />
+        <span className='hidden sm:inline'>List</span>
       </Button>
     </div>
   );

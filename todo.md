@@ -3,9 +3,9 @@
 
 ## new for 18 oct
 
-- [ ] check schedule api src/app/api/schedule inverstment
+- [x] check schedule api src/app/api/schedule inverstment
 - [ ] responsive on phone
-- [ ] graph on portfolio stock
+- [x] graph on portfolio stock
 - [ ] remove unused btn
 - [ ] manage postion on admin on change pnl ( transaction desc equilibre admin -8 , balance -8)
 - [x] market check for twelve data

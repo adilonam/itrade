@@ -13,10 +13,83 @@ import { ThemeSelector } from '@/components/theme-selector';
 import { ModeToggle } from '@/components/layout/ThemeToggle/theme-toggle';
 import { useTheme } from 'next-themes';
 import { Switch } from '@/components/ui/switch';
+import { useSession } from 'next-auth/react';
+import { useState, useEffect } from 'react';
+import { toast } from 'sonner';
 
 export function ThemeControlsCard() {
   const { theme, systemTheme } = useTheme();
+  const { data: session } = useSession();
   const currentTheme = theme === 'system' ? systemTheme : theme;
+
+  const [reducedMotion, setReducedMotion] = useState(false);
+  const [highContrast, setHighContrast] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Load user's theme preferences
+  useEffect(() => {
+    const loadUserSettings = async () => {
+      if (!session?.user) {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/user/theme-settings');
+        if (response.ok) {
+          const data = await response.json();
+          setReducedMotion(data.reducedMotion || false);
+          setHighContrast(data.highContrast || false);
+        }
+      } catch (error) {
+        console.error('Failed to load user theme settings:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadUserSettings();
+  }, [session]);
+
+  const updateUserSetting = async (setting: string, value: boolean) => {
+    if (!session?.user) return;
+
+    try {
+      const response = await fetch('/api/user/theme-settings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ [setting]: value })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update setting');
+      }
+
+      toast.success('Theme setting updated successfully');
+    } catch (error) {
+      console.error('Failed to update theme setting:', error);
+      toast.error('Failed to update theme setting');
+
+      // Revert the state on error
+      if (setting === 'reducedMotion') {
+        setReducedMotion(!value);
+      } else if (setting === 'highContrast') {
+        setHighContrast(!value);
+      }
+    }
+  };
+
+  const handleReducedMotionChange = (checked: boolean) => {
+    setReducedMotion(checked);
+    updateUserSetting('reducedMotion', checked);
+  };
+
+  const handleHighContrastChange = (checked: boolean) => {
+    setHighContrast(checked);
+    updateUserSetting('highContrast', checked);
+  };
 
   return (
     <Card>
@@ -73,7 +146,11 @@ export function ThemeControlsCard() {
                 Minimize animations and transitions
               </div>
             </div>
-            <Switch />
+            <Switch
+              checked={reducedMotion}
+              onCheckedChange={handleReducedMotionChange}
+              disabled={isLoading || !session?.user}
+            />
           </div>
 
           <div className='flex items-center justify-between rounded-lg border p-4'>
@@ -83,7 +160,11 @@ export function ThemeControlsCard() {
                 Increase contrast for better visibility
               </div>
             </div>
-            <Switch />
+            <Switch
+              checked={highContrast}
+              onCheckedChange={handleHighContrastChange}
+              disabled={isLoading || !session?.user}
+            />
           </div>
         </div>
 
