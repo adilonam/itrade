@@ -2,12 +2,15 @@
 
 import { useMemo } from 'react';
 import {
-  PieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
   Tooltip,
-  Legend
+  Legend,
+  ResponsiveContainer,
+  Cell
 } from 'recharts';
 import {
   Card,
@@ -17,13 +20,12 @@ import {
   CardTitle
 } from '@/components/ui/card';
 import type { Position, Market } from '@prisma/client';
-import { useEffect } from 'react';
 
 type PositionWithMarket = Position & {
   market: Market | null;
 };
 
-interface PortfolioPieChartProps {
+interface PortfolioBarChartProps {
   positions: PositionWithMarket[];
   realTimePrices: Map<string, any>;
   loading?: boolean;
@@ -37,7 +39,7 @@ interface PortfolioData {
   symbol: string;
 }
 
-// Generate consistent colors for different assets
+// Generate consistent colors for different assets (same as pie chart)
 const COLORS = [
   '#0088FE',
   '#00C49F',
@@ -76,29 +78,11 @@ const CustomTooltip = ({ active, payload }: any) => {
   return null;
 };
 
-const CustomLegend = ({ payload }: any) => {
-  return (
-    <div className='mt-4 flex flex-wrap justify-center gap-2'>
-      {payload?.map((entry: any, index: number) => (
-        <div key={index} className='flex items-center gap-1 text-sm'>
-          <div
-            className='h-3 w-3 rounded-full'
-            style={{ backgroundColor: entry.color }}
-          />
-          <span className='text-muted-foreground'>
-            {entry.value} ({entry.payload.percentage.toFixed(1)}%)
-          </span>
-        </div>
-      ))}
-    </div>
-  );
-};
-
-export function PortfolioPieChart({
+export function PortfolioBarChart({
   positions,
   realTimePrices,
   loading = false
-}: PortfolioPieChartProps) {
+}: PortfolioBarChartProps) {
   const portfolioData = useMemo(() => {
     if (!positions || positions.length === 0) return [];
 
@@ -173,7 +157,7 @@ export function PortfolioPieChart({
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Portfolio Distribution</CardTitle>
+          <CardTitle>Portfolio Value Distribution</CardTitle>
           <CardDescription>
             Your asset allocation by market value
           </CardDescription>
@@ -189,7 +173,7 @@ export function PortfolioPieChart({
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Portfolio Distribution</CardTitle>
+          <CardTitle>Portfolio Value Distribution</CardTitle>
           <CardDescription>
             Your asset allocation by market value
           </CardDescription>
@@ -212,7 +196,7 @@ export function PortfolioPieChart({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Portfolio Distribution</CardTitle>
+        <CardTitle>Portfolio Value Distribution</CardTitle>
         <CardDescription>
           Your asset allocation by market value (Total: ${totalValue.toFixed(2)}
           )
@@ -221,24 +205,37 @@ export function PortfolioPieChart({
       <CardContent>
         <div className='h-[400px]'>
           <ResponsiveContainer width='100%' height='100%'>
-            <PieChart>
-              <Pie
-                data={portfolioData}
-                cx='50%'
-                cy='50%'
-                labelLine={false}
-                label={({ percentage }) => `${percentage.toFixed(1)}%`}
-                outerRadius={120}
-                fill='#8884d8'
-                dataKey='value'
-              >
+            <BarChart
+              data={portfolioData}
+              margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
+            >
+              <CartesianGrid strokeDasharray='3 3' className='stroke-muted' />
+              <XAxis
+                dataKey='symbol'
+                angle={-45}
+                textAnchor='end'
+                height={80}
+                className='text-muted-foreground text-xs'
+              />
+              <YAxis
+                className='text-muted-foreground text-xs'
+                label={{
+                  value: 'Value ($)',
+                  angle: -90,
+                  position: 'insideLeft'
+                }}
+              />
+              <Tooltip content={<CustomTooltip />} />
+              <Legend
+                wrapperStyle={{ paddingTop: '20px' }}
+                formatter={(value) => 'Portfolio Value'}
+              />
+              <Bar dataKey='value' name='Value ($)' radius={[8, 8, 0, 0]}>
                 {portfolioData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
-              </Pie>
-              <Tooltip content={<CustomTooltip />} />
-              <Legend content={<CustomLegend />} />
-            </PieChart>
+              </Bar>
+            </BarChart>
           </ResponsiveContainer>
         </div>
       </CardContent>

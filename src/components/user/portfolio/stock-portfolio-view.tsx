@@ -22,6 +22,8 @@ import { UserFinanceCard } from '@/components/user/finance/user-finance-card';
 import { UserPositionsTableRoomStock } from '@/components/user/portfolio/user-positions-table-room-stock';
 import { PortfolioSummary } from '@/components/user/portfolio/portfolio-summary';
 import { PortfolioPieChart } from '@/components/user/portfolio/portfolio-pie-chart';
+import { PortfolioBarChart } from '@/components/user/portfolio/portfolio-bar-chart';
+import { useMarketsWebSocket } from '@/contexts/markets-websocket-context';
 import type { Position, Market, User } from '@prisma/client';
 
 // Extended position type with relations
@@ -85,6 +87,9 @@ export function StockPortfolioView() {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // WebSocket for real-time prices
+  const { realTimePrices, isConnected, subscribe } = useMarketsWebSocket();
 
   // Filters
   const [filters, setFilters] = useState<PositionFilters>({
@@ -171,6 +176,19 @@ export function StockPortfolioView() {
     // Cleanup interval on unmount
     return () => clearInterval(interval);
   }, [loadFinancialData]);
+
+  // Subscribe to market data for real-time updates
+  useEffect(() => {
+    const placedPositions = positions.filter((p) => p.status === 'PLACED');
+    const marketSymbols = placedPositions
+      .map((p) => p.market?.symbol)
+      .filter((symbol): symbol is string => Boolean(symbol))
+      .filter((symbol, index, array) => array.indexOf(symbol) === index);
+
+    if (isConnected && marketSymbols.length > 0) {
+      subscribe(marketSymbols);
+    }
+  }, [isConnected, positions, subscribe]);
 
   // Handle filter changes
   const handleFilterChange = (key: keyof PositionFilters, value: any) => {
@@ -324,18 +342,25 @@ export function StockPortfolioView() {
       {financialData && (
         <PortfolioSummary
           positions={positions}
-          financialMetrics={{
-            userBalance: financialData.balance,
-            usedMargin: financialData.usedMargin,
-            equity: financialData.equity,
-            freeMargin: financialData.freeMargin
-          }}
+          financialData={financialData}
+          realTimePrices={realTimePrices}
           onClosePosition={handleClosePosition}
         />
       )}
 
       {/* Portfolio Distribution Chart */}
-      <PortfolioPieChart positions={positions} loading={loading} />
+      <PortfolioPieChart
+        positions={positions}
+        realTimePrices={realTimePrices}
+        loading={loading}
+      />
+
+      {/* Portfolio Bar Chart */}
+      <PortfolioBarChart
+        positions={positions}
+        realTimePrices={realTimePrices}
+        loading={loading}
+      />
 
       {/* Filters */}
       <Card>

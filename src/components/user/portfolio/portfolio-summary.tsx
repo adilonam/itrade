@@ -23,7 +23,6 @@ import {
   AlertDialogTrigger
 } from '@/components/ui/alert-dialog';
 import { IconCoins, IconTrendingDown } from '@tabler/icons-react';
-import { useMarketsWebSocket } from '@/contexts/markets-websocket-context';
 import { calculatePnLClient } from '@/lib/calculator-client';
 import type { Position, Market, User } from '@prisma/client';
 
@@ -35,43 +34,32 @@ type PositionWithRelations = Position & {
 
 interface PortfolioSummaryProps {
   positions: PositionWithRelations[];
-  financialMetrics: {
-    userBalance: number;
+  financialData: {
+    balance: number;
     usedMargin: number;
     equity: number;
     freeMargin: number;
+    marginLevel: number | null;
+    totalPnL: number;
+    leverage: number;
   };
+  realTimePrices: Map<string, any>;
   onClosePosition: (positionId: string, amount?: number) => void;
 }
 
 export function PortfolioSummary({
   positions,
-  financialMetrics,
+  financialData,
+  realTimePrices,
   onClosePosition
 }: PortfolioSummaryProps) {
   const [realTimePnL, setRealTimePnL] = useState<Record<string, number>>({});
   const [sellAmounts, setSellAmounts] = useState<Record<string, string>>({});
-  const { realTimePrices, isConnected, subscribe } = useMarketsWebSocket();
 
   const placedPositions = useMemo(
     () => positions.filter((position) => position.status === 'PLACED'),
     [positions]
   );
-
-  // Memoize market symbols to prevent unnecessary re-subscriptions
-  const marketSymbols = useMemo(() => {
-    return placedPositions
-      .map((p) => p.market?.symbol)
-      .filter((symbol): symbol is string => Boolean(symbol))
-      .filter((symbol, index, array) => array.indexOf(symbol) === index);
-  }, [placedPositions]);
-
-  // Subscribe to market data for real-time PnL updates
-  useEffect(() => {
-    if (isConnected && marketSymbols.length > 0) {
-      subscribe(marketSymbols);
-    }
-  }, [isConnected, marketSymbols, subscribe]);
 
   // Update real-time PnL when market data changes
   useEffect(() => {
@@ -98,9 +86,8 @@ export function PortfolioSummary({
     }
   }, [placedPositions, realTimePrices]);
 
-  // Calculate stock balance (balance - used margin)
-  const stockBalance =
-    financialMetrics.userBalance - financialMetrics.usedMargin;
+  // Calculate stock balance (equity - used margin = free margin)
+  const stockBalance = financialData.equity - financialData.usedMargin;
 
   return (
     <Card>
@@ -125,9 +112,6 @@ export function PortfolioSummary({
             </div>
             <div className='text-right'>
               <p className='text-2xl font-bold'>${stockBalance.toFixed(2)}</p>
-              <p className='text-muted-foreground text-sm'>
-                Balance: ${financialMetrics.userBalance.toFixed(2)}
-              </p>
             </div>
           </div>
 
