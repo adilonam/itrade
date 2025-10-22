@@ -18,13 +18,14 @@
 - [ ] availabel bal on investement -> free margin mekaoui
 - [ ] remove auto reinvest mekaoui
 
-- [ ] add room field and other field to position admin  and filter pos admin with all critere mekaoui
+- [ ] add room field and other field to position admin and filter pos admin with all critere mekaoui
 - [?] show investors users for investement mekaoui
 - [?] keep profile btn1, add deposit and withdraw process btn2, transaction btn3 adil
 
 ## meet
+
 - [ ] update balance to free margin on pos stock --free margin adil
 - [ ] show all symbol of twevle data mekaoui
 - [ ] add logo for market base64 mekaoui
-- [ ] change logo live data en gris - socket adil 
+- [ ] change logo live data en gris - socket adil
 - [ ] organisation portefeuil adil
