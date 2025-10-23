@@ -27,6 +27,6 @@
 - [x] update balance to free margin on pos stock --free margin adil
 - [ ] show all symbol of twevle data mekaoui
 - [ ] add logo for market base64 mekaoui
-- [ ] change logo live data en gris - socket adil
-- [ ] organisation portefeuil adil
+- [x] change logo live data en gris - socket adil
+- [x] organisation portefeuil adil
 - [x] bars of charts
