@@ -117,7 +117,7 @@ export function MarketList({
                           <IconWifi className='h-3 w-3 flex-shrink-0 text-green-500' />
                         )}
                         {isConnected && !realTimeData && (
-                          <IconWifiOff className='h-3 w-3 flex-shrink-0 text-gray-400' />
+                          <IconWifi className='h-3 w-3 flex-shrink-0 text-gray-400' />
                         )}
                       </div>
                       <div className='text-muted-foreground truncate text-xs'>

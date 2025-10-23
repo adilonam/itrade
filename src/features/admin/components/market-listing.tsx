@@ -16,7 +16,7 @@ import {
   useQueryStates,
   parseAsStringEnum
 } from 'nuqs';
-import { IconPlus } from '@tabler/icons-react';
+import { IconPlus, IconExternalLink } from '@tabler/icons-react';
 
 type MarketListingPageProps = {};
 
@@ -91,7 +91,16 @@ export default function MarketListingPage({}: MarketListingPageProps) {
 
   return (
     <>
-      <div className='mb-4 flex justify-end'>
+      <div className='mb-4 flex items-center justify-end gap-2'>
+        <Button
+          variant='outline'
+          onClick={() =>
+            window.open('https://twelvedata.com/markets', '_blank')
+          }
+        >
+          <IconExternalLink className='mr-2 h-4 w-4' />
+          Available Data
+        </Button>
         <Button onClick={() => setIsAddDialogOpen(true)}>
           <IconPlus className='mr-2 h-4 w-4' />
           Add Market
