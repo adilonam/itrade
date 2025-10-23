@@ -74,7 +74,7 @@ export function MarketCard({
                   )}
                   {isConnected && !realTimeData && (
                     <div className='flex items-center'>
-                      <IconWifiOff className='h-3 w-3 text-yellow-500' />
+                      <IconWifiOff className='h-3 w-3 text-gray-400' />
                     </div>
                   )}
                 </div>
