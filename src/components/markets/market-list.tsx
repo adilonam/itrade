@@ -19,6 +19,7 @@ import {
 } from '@tabler/icons-react';
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 interface MarketListProps {
   markets: Market[];
@@ -98,6 +99,15 @@ export function MarketList({
               >
                 <TableCell>
                   <div className='flex min-w-0 items-center space-x-2'>
+                    {market.image && (
+                      <Image
+                        src={market.image}
+                        alt={market.name}
+                        width={24}
+                        height={24}
+                        className='rounded object-cover'
+                      />
+                    )}
                     <div className='min-w-0 flex-1'>
                       <div className='flex items-center space-x-2'>
                         <div className='truncate text-sm font-semibold'>

@@ -315,17 +315,6 @@ export function InvestmentDetails({
               </p>
             </div>
 
-            <div className='flex items-center space-x-2'>
-              <Switch
-                id='auto-reinvest'
-                checked={autoReinvest}
-                onCheckedChange={setAutoReinvest}
-              />
-              <Label htmlFor='auto-reinvest' className='text-sm'>
-                Auto-reinvest returns
-              </Label>
-            </div>
-
             {errors.length > 0 && (
               <Alert variant='destructive'>
                 <IconInfoCircle className='h-4 w-4' />

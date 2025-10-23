@@ -26,6 +26,7 @@ import {
 } from '@tabler/icons-react';
 import PageContainer from '@/components/layout/page-container';
 import { prisma } from '@/lib/prisma';
+import { calculateUserFinancialInfo } from '@/lib/calculator-server';
 
 async function getInvestments() {
   try {
@@ -54,7 +55,15 @@ async function getUserBalance(userId: string) {
       where: { id: userId }
     });
 
-    return (user as any)?.balance || 0;
+    if (!user) {
+      return 0;
+    }
+
+    // Use the comprehensive financial calculation to get free margin
+    const financialInfo = await calculateUserFinancialInfo(user);
+
+    // Return free margin as the available balance for investments
+    return financialInfo?.freeMargin || 0;
   } catch (error) {
     // Return fallback value if error occurs
     return 0;
@@ -126,7 +135,9 @@ export default async function InvestmentsPage() {
           </div>
           <div className='flex items-center space-x-2'>
             <div className='text-right'>
-              <p className='text-sm font-medium'>Available Balance</p>
+              <p className='text-sm font-medium'>
+                Available Balance (Free Margin)
+              </p>
               <p className='text-xl font-bold text-green-600'>
                 {new Intl.NumberFormat('en-US', {
                   style: 'currency',

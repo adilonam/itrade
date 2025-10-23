@@ -116,6 +116,7 @@ model Market {
   lastPercentChange Float      @default(0)
   lastPreviousClose Float      @default(0)
   visible           Boolean    @default(true)
+  image             String?    @db.Text // Base64 encoded image data
   createdAt         DateTime   @default(now()) @map("created_at")
   updatedAt         DateTime   @updatedAt @map("updated_at")
   positions         Position[]

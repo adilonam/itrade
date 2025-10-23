@@ -153,7 +153,8 @@ const createMarketSchema = z.object({
   type: z.enum(['FOREX', 'CRYPTO', 'STOCKS', 'COMMODITIES', 'INDICES']),
   room: z.enum(['STOCK', 'TRADING']),
   spread: z.number().min(0).optional(),
-  visible: z.boolean().optional()
+  visible: z.boolean().optional(),
+  image: z.string().optional()
 });
 
 export async function GET(request: NextRequest) {
@@ -260,7 +261,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { symbol, type, room, spread = 0, visible = true } = validation.data;
+    const {
+      symbol,
+      type,
+      room,
+      spread = 0,
+      visible = true,
+      image
+    } = validation.data;
     const upperSymbol = symbol.toUpperCase();
 
     // Check if market already exists (symbol + type combination should be unique)
@@ -312,7 +320,8 @@ export async function POST(request: NextRequest) {
         spread,
         visible,
         lastPrice: isFinite(lastPrice) ? lastPrice : 0,
-        lastChange: isFinite(lastChange) ? lastChange : 0
+        lastChange: isFinite(lastChange) ? lastChange : 0,
+        ...(image && { image })
       }
     });
 

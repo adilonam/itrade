@@ -16,6 +16,7 @@ export interface CreateMarketParams {
   room: 'STOCK' | 'TRADING';
   spread?: number;
   visible?: boolean;
+  image?: string;
 }
 
 export interface UpdateMarketParams {

@@ -15,10 +15,10 @@
 ## urgent
 
 - [ ] pos stock trading fixed after comma for float (BTC) mekaoui
-- [ ] availabel bal on investement -> free margin mekaoui
-- [ ] remove auto reinvest mekaoui
+- [x] availabel bal on investement -> free margin mekaoui
+- [x] remove auto reinvest mekaoui
 
-- [ ] add room field and other field to position admin and filter pos admin with all critere mekaoui
+- [x] add room field and other field to position admin and filter pos admin with all critere mekaoui
 - [?] show investors users for investement mekaoui
 - [?] keep profile btn1, add deposit and withdraw process btn2, transaction btn3 adil
 
@@ -26,7 +26,7 @@
 
 - [x] update balance to free margin on pos stock --free margin adil
 - [ ] show all symbol of twevle data mekaoui
-- [ ] add logo for market base64 mekaoui
+- [x] add logo for market base64 mekaoui
 - [x] change logo live data en gris - socket adil
 - [x] organisation portefeuil adil
 - [x] bars of charts
