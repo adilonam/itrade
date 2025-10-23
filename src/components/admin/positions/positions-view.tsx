@@ -73,6 +73,7 @@ export function PositionsView() {
     positionTypes: string[];
     positionStatuses: string[];
   } | null>(null);
+  const [markets, setMarkets] = useState<Market[]>([]);
   const [pagination, setPagination] = useState<PaginationInfo>({
     page: 1,
     limit: 10,
@@ -90,6 +91,8 @@ export function PositionsView() {
     search: '',
     type: undefined,
     status: undefined,
+    room: undefined,
+    marketId: undefined,
     userId: undefined
   });
 
@@ -161,6 +164,22 @@ export function PositionsView() {
     }
   }, [currentFilters]);
 
+  // Load markets
+  const loadMarkets = useCallback(async () => {
+    try {
+      const response = await fetch('/api/admin/markets?limit=1000');
+      if (!response.ok) {
+        throw new Error('Failed to fetch markets');
+      }
+
+      const data = await response.json();
+      setMarkets(data.markets || []);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('Failed to load markets:', err);
+    }
+  }, []);
+
   // Load data on mount and when filters change
   useEffect(() => {
     loadPositions(1, currentFilters);
@@ -168,7 +187,8 @@ export function PositionsView() {
 
   useEffect(() => {
     loadStats();
-  }, [loadStats]);
+    loadMarkets();
+  }, [loadStats, loadMarkets]);
 
   // Handle filter changes
   const handleFilterChange = (key: keyof PositionFilters, value: any) => {
@@ -296,14 +316,40 @@ export function PositionsView() {
             </div>
 
             <div className='space-y-2'>
-              <label className='text-sm font-medium'>User ID</label>
-              <Input
-                placeholder='User ID...'
-                value={filters.userId || ''}
-                onChange={(e) =>
-                  handleFilterChange('userId', e.target.value || undefined)
-                }
-              />
+              <label className='text-sm font-medium'>Room</label>
+              <Select
+                value={filters.room || 'all'}
+                onValueChange={(value) => handleFilterChange('room', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder='All rooms' />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value='all'>All rooms</SelectItem>
+                  <SelectItem value='STOCK'>STOCK</SelectItem>
+                  <SelectItem value='TRADING'>TRADING</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className='space-y-2'>
+              <label className='text-sm font-medium'>Market</label>
+              <Select
+                value={filters.marketId || 'all'}
+                onValueChange={(value) => handleFilterChange('marketId', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder='All markets' />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value='all'>All markets</SelectItem>
+                  {markets.map((market) => (
+                    <SelectItem key={market.id} value={market.id}>
+                      {market.symbol} - {market.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 

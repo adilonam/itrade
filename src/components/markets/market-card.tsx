@@ -12,6 +12,7 @@ import {
 } from '@tabler/icons-react';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface MarketCardProps {
   market: Market;
@@ -63,7 +64,19 @@ export function MarketCard({
           className='block'
         >
           <div className='mb-3 flex cursor-pointer items-center justify-between'>
-            <div className='flex items-center space-x-2'>
+            <div className='flex items-center space-x-3'>
+              {/* Market Image */}
+              {market.image && (
+                <div className='flex-shrink-0'>
+                  <Image
+                    src={market.image}
+                    alt={`${market.symbol} logo`}
+                    width={32}
+                    height={32}
+                    className='rounded-full object-cover'
+                  />
+                </div>
+              )}
               <div>
                 <div className='flex items-center space-x-2'>
                   <h3 className='text-sm font-semibold'>{market.symbol}</h3>

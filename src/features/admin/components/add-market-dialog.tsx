@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import Image from 'next/image';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -31,6 +32,7 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 
 import { createMarket, CreateMarketParams } from '../services/markets';
 import { toast } from 'sonner';
@@ -51,7 +53,8 @@ const formSchema = z.object({
     required_error: 'Please select a market room'
   }),
   spread: z.coerce.number().min(0, 'Spread must be non-negative').optional(),
-  visible: z.boolean().optional()
+  visible: z.boolean().optional(),
+  image: z.string().optional()
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -68,6 +71,7 @@ export function AddMarketDialog({
   onSuccess
 }: AddMarketDialogProps) {
   const [loading, setLoading] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -75,7 +79,8 @@ export function AddMarketDialog({
       symbol: '',
       room: 'TRADING',
       spread: 0,
-      visible: true
+      visible: true,
+      image: undefined
     }
   });
 
@@ -88,7 +93,8 @@ export function AddMarketDialog({
         type: data.type,
         room: data.room,
         ...(data.spread !== undefined && { spread: data.spread }),
-        ...(data.visible !== undefined && { visible: data.visible })
+        ...(data.visible !== undefined && { visible: data.visible }),
+        ...(data.image && { image: data.image })
       };
 
       await createMarket(marketData);
@@ -110,7 +116,38 @@ export function AddMarketDialog({
 
   const handleClose = () => {
     form.reset();
+    setImagePreview(null);
     onOpenChange(false);
+  };
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        toast.error('Please select a valid image file');
+        return;
+      }
+
+      // Validate file size (max 2MB)
+      if (file.size > 2 * 1024 * 1024) {
+        toast.error('Image size must be less than 2MB');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const base64 = e.target?.result as string;
+        setImagePreview(base64);
+        form.setValue('image', base64);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setImagePreview(null);
+    form.setValue('image', undefined);
   };
 
   return (
@@ -246,6 +283,46 @@ export function AddMarketDialog({
                 </FormItem>
               )}
             />
+
+            {/* Market Image Upload */}
+            <div className='space-y-2'>
+              <Label htmlFor='image'>Market Image (Optional)</Label>
+              <div className='space-y-4'>
+                <Input
+                  id='image'
+                  type='file'
+                  accept='image/*'
+                  onChange={handleImageUpload}
+                  disabled={loading}
+                  className='cursor-pointer'
+                />
+                {imagePreview && (
+                  <div className='relative inline-block'>
+                    <Image
+                      src={imagePreview}
+                      alt='Market preview'
+                      width={100}
+                      height={100}
+                      className='rounded-lg border object-cover'
+                    />
+                    <Button
+                      type='button'
+                      variant='destructive'
+                      size='sm'
+                      className='absolute -top-2 -right-2 h-6 w-6 rounded-full p-0'
+                      onClick={removeImage}
+                      disabled={loading}
+                    >
+                      ×
+                    </Button>
+                  </div>
+                )}
+                <p className='text-muted-foreground text-sm'>
+                  Upload an image for this market. Max size: 2MB. Supported
+                  formats: JPG, PNG, GIF, WebP.
+                </p>
+              </div>
+            </div>
 
             <DialogFooter>
               <Button

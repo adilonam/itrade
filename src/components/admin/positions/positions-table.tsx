@@ -181,6 +181,7 @@ export function PositionsTable({
                         <TableHead>User</TableHead>
                         <TableHead>Type</TableHead>
                         <TableHead>Status</TableHead>
+                        <TableHead>Room</TableHead>
                         <TableHead>Market</TableHead>
                         <TableHead>Quantity</TableHead>
                         <TableHead>Exec Price</TableHead>
@@ -216,6 +217,9 @@ export function PositionsTable({
                             <Badge className={getStatusColor(position.status)}>
                               {position.status}
                             </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant='outline'>{position.room}</Badge>
                           </TableCell>
                           <TableCell>
                             {position.market ? (

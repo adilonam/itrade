@@ -195,6 +195,7 @@ export async function GET(request: NextRequest) {
     const userId = searchParams.get('userId');
     const type = searchParams.get('type');
     const status = searchParams.get('status');
+    const room = searchParams.get('room');
     const marketId = searchParams.get('marketId');
     const search = searchParams.get('search');
 
@@ -205,12 +206,57 @@ export async function GET(request: NextRequest) {
     if (userId) where.userId = userId;
     if (type) where.type = type;
     if (status) where.status = status;
+    if (room) where.room = room;
     if (marketId) where.marketId = marketId;
+
+    // Enhanced search functionality - search across multiple fields
     if (search) {
-      where.description = {
-        contains: search,
-        mode: 'insensitive'
-      };
+      where.OR = [
+        {
+          description: {
+            contains: search,
+            mode: 'insensitive'
+          }
+        },
+        {
+          user: {
+            name: {
+              contains: search,
+              mode: 'insensitive'
+            }
+          }
+        },
+        {
+          user: {
+            email: {
+              contains: search,
+              mode: 'insensitive'
+            }
+          }
+        },
+        {
+          market: {
+            symbol: {
+              contains: search,
+              mode: 'insensitive'
+            }
+          }
+        },
+        {
+          market: {
+            name: {
+              contains: search,
+              mode: 'insensitive'
+            }
+          }
+        },
+        {
+          id: {
+            contains: search,
+            mode: 'insensitive'
+          }
+        }
+      ];
     }
 
     const [positions, total] = await Promise.all([
