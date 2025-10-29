@@ -77,10 +77,6 @@ export async function calculatePositionPnL(
         return null;
       }
     }
-    console.log('currentPrice', currentPrice);
-    console.log('executedPrice', executedPrice);
-    console.log('quantity', quantity);
-    console.log('type', position.type);
 
     // If we can't get current price, return null
     if (currentPrice === null) {
@@ -92,7 +88,11 @@ export async function calculatePositionPnL(
 
     // Calculate PnL based on position type
     let pnl: number;
-    const lotSize = await getLotSize(position.market.type);
+    // For STOCK room, always use lot size of 1
+    const lotSize =
+      position.room === 'STOCK' || position.market.room === 'STOCK'
+        ? 1
+        : await getLotSize(position.market.type);
 
     if (position.type === 'BUY') {
       // For BUY: PnL = (current_price - executed_price) * quantity
@@ -257,7 +257,11 @@ export async function calculateRequiredMargin(
     const positionPrice = position.executedPrice;
 
     // Calculate position value (price * quantity * lot size)
-    const lotSize = await getLotSize(position.market.type);
+    // For STOCK room, always use lot size of 1
+    const lotSize =
+      position.room === 'STOCK' || position.market.room === 'STOCK'
+        ? 1
+        : await getLotSize(position.market.type);
     const positionValue = positionPrice * position.quantity * lotSize;
 
     // Calculate required margin based on leverage
@@ -349,7 +353,11 @@ export async function calculateUserFinancialInfo(user: User): Promise<{
         const currentPrice = position.type === 'BUY' ? askPrice : bidPrice;
 
         // Calculate PnL
-        const lotSize = await getLotSize(position.market.type);
+        // For STOCK room, always use lot size of 1
+        const lotSize =
+          position.room === 'STOCK' || position.market.room === 'STOCK'
+            ? 1
+            : await getLotSize(position.market.type);
 
         let pnl = 0;
         if (position.type === 'BUY') {
@@ -462,7 +470,11 @@ export async function couldOpenPosition(
           const currentPrice = pos.type === 'BUY' ? askPrice : bidPrice;
 
           // Calculate PnL
-          const lotSize = await getLotSize(pos.market.type);
+          // For STOCK room, always use lot size of 1
+          const lotSize =
+            pos.room === 'STOCK' || pos.market.room === 'STOCK'
+              ? 1
+              : await getLotSize(pos.market.type);
 
           let pnl = 0;
           if (pos.type === 'BUY') {

@@ -116,11 +116,8 @@ export function PortfolioPieChart({
         const marketName = position.market!.name;
 
         // Use real-time price if available, otherwise fallback to stored price
-        const realTimeData = realTimePrices.get(marketSymbol);
-        const currentPrice =
-          position.market!.lastPrice || position.executedPrice || 0;
-        const quantity = Number(position.quantity) || 0;
-        const positionValue = Math.abs(currentPrice * quantity);
+
+        const positionValue = position.requiredMargin || 0;
 
         if (!acc[marketSymbol]) {
           acc[marketSymbol] = {

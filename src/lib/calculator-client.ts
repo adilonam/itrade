@@ -53,7 +53,11 @@ export function calculatePnLClient(
   const executedPrice = position.executedPrice;
   const quantity = position.quantity;
 
-  const lotSize = getLotSize(position.market.type);
+  // For STOCK room, always use lot size of 1
+  const lotSize =
+    position.room === 'STOCK' || position.market.room === 'STOCK'
+      ? 1
+      : getLotSize(position.market.type);
 
   // Calculate P&L based on position type
   if (position.type === 'BUY') {
@@ -91,7 +95,11 @@ export async function calculateRequiredMargin(
     const positionPrice = position.executedPrice;
 
     // Calculate position value (price * quantity * lot size)
-    const lotSize = getLotSize(position.market.type);
+    // For STOCK room, always use lot size of 1
+    const lotSize =
+      position.room === 'STOCK' || position.market.room === 'STOCK'
+        ? 1
+        : getLotSize(position.market.type);
     const positionValue = positionPrice * position.quantity * lotSize;
 
     // Calculate required margin based on leverage
@@ -153,7 +161,8 @@ export function calculateLotSizeFromMargin(
     const price = market.lastPrice;
 
     // Get lot size multiplier based on market type
-    const lotSize = getLotSize(market.type);
+    // For STOCK room, always use lot size of 1
+    const lotSize = market.room === 'STOCK' ? 1 : getLotSize(market.type);
 
     // Calculate leverage
     // For stock room, always use leverage = 1, otherwise use user's leverage

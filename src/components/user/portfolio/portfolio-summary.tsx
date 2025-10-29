@@ -128,7 +128,7 @@ export function PortfolioSummary({
         position.market?.lastPrice ||
         position.executedPrice ||
         0;
-      const value = quantity * currentPrice;
+      const value = position.requiredMargin || 0;
       const pnl =
         realTimePnL[position.id] !== undefined
           ? realTimePnL[position.id]
@@ -251,16 +251,7 @@ export function PortfolioSummary({
                               realTimePnL[position.id] !== undefined
                                 ? realTimePnL[position.id]
                                 : position.pnl || 0;
-                            const realTimeData = realTimePrices.get(
-                              group.symbol
-                            );
-                            const currentPrice =
-                              realTimeData?.price ||
-                              position.market?.lastPrice ||
-                              position.executedPrice ||
-                              0;
-                            const positionValue =
-                              (Number(position.quantity) || 0) * currentPrice;
+                            const positionValue = position.requiredMargin || 0;
 
                             return (
                               <div

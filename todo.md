@@ -25,8 +25,16 @@
 ## meet
 
 - [x] update balance to free margin on pos stock --free margin adil
-- [x] show all symbol of twevle data mekaoui done 
-- [x] add logo for market base64 mekaoui
+- [x] show all symbol of twevle data mekaoui done
+- [ ] add logo for market base64 mekaoui
 - [x] change logo live data en gris - socket adil
 - [x] organisation portefeuil adil
 - [x] bars of charts
+
+## bud
+- [x] achat stock position
+- [ ] change name of postion stock pour portfolio 
+- [ ] fix design pos trading mobile
+- [ ] mobile page 
+- [ ] prix euro pour trading 
+- [ ] icoon switch lot et amount
