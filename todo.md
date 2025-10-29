@@ -32,9 +32,9 @@
 - [x] bars of charts
 
 ## bud
+
 - [x] achat stock position
-- [ ] change name of postion stock pour portfolio 
+- [x] change name of postion stock pour portfolio
 - [ ] fix design pos trading mobile
-- [ ] mobile page 
-- [ ] prix euro pour trading 
+- [ ] value of positions
 - [ ] icoon switch lot et amount

@@ -13,8 +13,8 @@ export default async function Page() {
       <div className='flex flex-1 flex-col space-y-6'>
         <div className='flex items-start justify-between'>
           <Heading
-            title='My Stock Portfolio'
-            description='View and manage your stock holdings.'
+            title='My Portfolio'
+            description='View and manage your portfolio.'
           />
         </div>
         <Separator />

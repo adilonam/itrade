@@ -14,6 +14,15 @@ export type Product = {
 //Info: The following data is used for the sidebar navigation and Cmd K bar.
 export const navItems: NavItem[] = [
   {
+    title: 'Dashboard',
+    url: '/dashboard',
+    icon: 'dashboard',
+    isActive: false,
+    shortcut: ['d', 'd'],
+    items: [], // Empty array as there are no child items
+    isAdmin: false
+  },
+  {
     title: 'Room Trading',
     url: '/dashboard/markets-room-trading',
     icon: 'trendingUp',
@@ -32,7 +41,7 @@ export const navItems: NavItem[] = [
     isAdmin: false
   },
   {
-    title: 'My Positions RT',
+    title: 'My Positions',
     url: '/dashboard/positions-room-trading',
     icon: 'switchVertical',
     isActive: false,
@@ -41,7 +50,7 @@ export const navItems: NavItem[] = [
     isAdmin: false
   },
   {
-    title: 'My Positions RS',
+    title: 'My Portfolio',
     url: '/dashboard/positions-room-stock',
     icon: 'switchVertical',
     isActive: false,
