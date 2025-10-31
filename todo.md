@@ -26,7 +26,7 @@
 
 - [x] update balance to free margin on pos stock --free margin adil
 - [x] show all symbol of twevle data mekaoui done
-- [ ] add logo for market base64 mekaoui
+- [x] add logo for market base64 mekaoui
 - [x] change logo live data en gris - socket adil
 - [x] organisation portefeuil adil
 - [x] bars of charts
@@ -35,6 +35,10 @@
 
 - [x] achat stock position
 - [x] change name of postion stock pour portfolio
-- [ ] fix design pos trading mobile
-- [ ] value of positions
-- [ ] icoon switch lot et amount
+- [ ] fix design pos trading : mobile mekaoui
+- [ ] design desktop : mekaoui
+- [ ] value of positions  just tradfing , add requiredmargin with label value on datatable psotion : mekaoui 
+- [ ] icoon switch lot et amount : adil
+- [ ] logic seller : adil
+- [ ] depot / withdraw virtuell : mekaoui
+- [ ] dashboard 
