@@ -208,6 +208,7 @@ export function UserPositionsTableRoomTrading({
                         <TableHead>Closed Price</TableHead>
                         <TableHead>Take Profit</TableHead>
                         <TableHead>Stop Loss</TableHead>
+                        <TableHead>Required Margin</TableHead>
                         <TableHead>P&L</TableHead>
                         <TableHead>Status</TableHead>
                         <TableHead>Date</TableHead>
@@ -263,6 +264,11 @@ export function UserPositionsTableRoomTrading({
                           <TableCell className='text-xs'>
                             {position.stopLoss
                               ? `$${position.stopLoss.toFixed(2)}`
+                              : '-'}
+                          </TableCell>
+                          <TableCell className='text-xs'>
+                            {position.requiredMargin
+                              ? `$${position.requiredMargin.toFixed(2)}`
                               : '-'}
                           </TableCell>
                           <TableCell className='text-xs'>

@@ -16,6 +16,7 @@ import {
   CardHeader,
   CardTitle
 } from '@/components/ui/card';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import type { Market, Position } from '@prisma/client';
 import { IconLoader2 } from '@tabler/icons-react';
 
@@ -89,83 +90,89 @@ export function UserPositionsTableRoomStock({
         <CardTitle>History</CardTitle>
         <CardDescription>View your trading history</CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className='rounded-md border'>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Market</TableHead>
-                <TableHead>Quantity</TableHead>
-                <TableHead>Exec Price</TableHead>
-                <TableHead>Closed Price</TableHead>
-                <TableHead>P&L</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Closed</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {positions.map((position) => (
-                <TableRow key={position.id}>
-                  <TableCell>
-                    {position.market ? (
-                      <div>
-                        <div className='font-medium'>
-                          {position.market.symbol}
-                        </div>
-                        <div className='text-muted-foreground text-sm'>
-                          {position.market.name}
-                        </div>
-                      </div>
-                    ) : (
-                      <span className='text-muted-foreground'>-</span>
-                    )}
-                  </TableCell>
-                  <TableCell className='text-xs'>
-                    {position.quantity ? position.quantity.toFixed(4) : '-'}
-                  </TableCell>
-                  <TableCell className='text-xs'>
-                    {position.executedPrice
-                      ? `$${position.executedPrice.toFixed(2)}`
-                      : '-'}
-                  </TableCell>
-                  <TableCell className='text-xs'>
-                    {position.closedPrice
-                      ? `$${position.closedPrice.toFixed(2)}`
-                      : '-'}
-                  </TableCell>
-                  <TableCell className='text-xs'>
-                    {position.pnl !== null ? (
-                      <span
-                        className={
-                          position.pnl >= 0 ? 'text-green-600' : 'text-red-600'
-                        }
-                      >
-                        {position.pnl >= 0 ? '+' : ''}${position.pnl.toFixed(2)}
-                      </span>
-                    ) : (
-                      <span className='text-muted-foreground'>-</span>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <Badge
-                      variant={getStatusBadgeVariant(position.status)}
-                      className='text-xs'
-                    >
-                      {position.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className='text-muted-foreground text-xs'>
-                    {formatDate(position.executedAt || new Date())}
-                  </TableCell>
-                  <TableCell className='text-muted-foreground text-xs'>
-                    {position.closedAt ? formatDate(position.closedAt) : '-'}
-                  </TableCell>
+      <CardContent className='min-w-0'>
+        <ScrollArea className='w-full overflow-x-auto'>
+          <div className='min-w-[800px] rounded-md border'>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className='min-w-[120px]'>Market</TableHead>
+                  <TableHead className='min-w-[100px]'>Quantity</TableHead>
+                  <TableHead className='min-w-[100px]'>Exec Price</TableHead>
+                  <TableHead className='min-w-[100px]'>Closed Price</TableHead>
+                  <TableHead className='min-w-[80px]'>P&L</TableHead>
+                  <TableHead className='min-w-[80px]'>Status</TableHead>
+                  <TableHead className='min-w-[120px]'>Date</TableHead>
+                  <TableHead className='min-w-[120px]'>Closed</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+              </TableHeader>
+              <TableBody>
+                {positions.map((position) => (
+                  <TableRow key={position.id}>
+                    <TableCell>
+                      {position.market ? (
+                        <div>
+                          <div className='font-medium'>
+                            {position.market.symbol}
+                          </div>
+                          <div className='text-muted-foreground text-sm'>
+                            {position.market.name}
+                          </div>
+                        </div>
+                      ) : (
+                        <span className='text-muted-foreground'>-</span>
+                      )}
+                    </TableCell>
+                    <TableCell className='text-xs'>
+                      {position.quantity ? position.quantity.toFixed(4) : '-'}
+                    </TableCell>
+                    <TableCell className='text-xs'>
+                      {position.executedPrice
+                        ? `$${position.executedPrice.toFixed(2)}`
+                        : '-'}
+                    </TableCell>
+                    <TableCell className='text-xs'>
+                      {position.closedPrice
+                        ? `$${position.closedPrice.toFixed(2)}`
+                        : '-'}
+                    </TableCell>
+                    <TableCell className='text-xs'>
+                      {position.pnl !== null ? (
+                        <span
+                          className={
+                            position.pnl >= 0
+                              ? 'text-green-600'
+                              : 'text-red-600'
+                          }
+                        >
+                          {position.pnl >= 0 ? '+' : ''}$
+                          {position.pnl.toFixed(2)}
+                        </span>
+                      ) : (
+                        <span className='text-muted-foreground'>-</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant={getStatusBadgeVariant(position.status)}
+                        className='text-xs'
+                      >
+                        {position.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className='text-muted-foreground text-xs'>
+                      {formatDate(position.executedAt || new Date())}
+                    </TableCell>
+                    <TableCell className='text-muted-foreground text-xs'>
+                      {position.closedAt ? formatDate(position.closedAt) : '-'}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+          <ScrollBar orientation='horizontal' />
+        </ScrollArea>
       </CardContent>
     </Card>
   );

@@ -166,21 +166,25 @@ export function PortfolioSummary({
           Your stock portfolio balance and positions
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className='min-w-0'>
         <div className='space-y-4'>
           {/* Stock Balance */}
-          <div className='bg-muted/50 flex items-center justify-between rounded-lg p-4'>
+          <div className='bg-muted/50 flex flex-col gap-2 rounded-lg p-3 sm:flex-row sm:items-center sm:justify-between sm:gap-0 sm:p-4'>
             <div className='flex items-center gap-3'>
               <IconCoins className='h-5 w-5 text-blue-600' />
               <div>
-                <p className='font-medium'>Stock Balance</p>
-                <p className='text-muted-foreground text-sm'>
+                <p className='text-sm font-medium sm:text-base'>
+                  Stock Balance
+                </p>
+                <p className='text-muted-foreground text-xs sm:text-sm'>
                   Available for stock trading
                 </p>
               </div>
             </div>
-            <div className='text-right'>
-              <p className='text-2xl font-bold'>${stockBalance.toFixed(2)}</p>
+            <div className='text-left sm:text-right'>
+              <p className='text-xl font-bold sm:text-2xl'>
+                ${stockBalance.toFixed(2)}
+              </p>
             </div>
           </div>
 
@@ -256,7 +260,7 @@ export function PortfolioSummary({
                             return (
                               <div
                                 key={position.id}
-                                className='hover:bg-muted/30 flex items-center justify-between rounded-lg border p-3 transition-colors'
+                                className='hover:bg-muted/30 flex flex-col gap-2 rounded-lg border p-3 transition-colors sm:flex-row sm:items-center sm:justify-between sm:gap-0'
                               >
                                 <div className='flex items-center gap-3'>
                                   <div>
@@ -269,8 +273,8 @@ export function PortfolioSummary({
                                     </p>
                                   </div>
                                 </div>
-                                <div className='flex items-center gap-3'>
-                                  <div className='text-right'>
+                                <div className='flex items-center justify-between gap-3 sm:justify-end'>
+                                  <div className='text-left sm:text-right'>
                                     <p
                                       className={`text-sm font-medium ${
                                         pnl >= 0
@@ -290,7 +294,7 @@ export function PortfolioSummary({
                                       <Button
                                         variant='outline'
                                         size='sm'
-                                        className='h-8 border-red-200 bg-red-50 px-3 text-xs text-red-700 hover:border-red-300 hover:bg-red-100 dark:border-red-900 dark:bg-red-950/30 dark:text-red-400 dark:hover:border-red-800 dark:hover:bg-red-950/50'
+                                        className='h-8 border-red-200 bg-red-50 px-2 text-xs text-red-700 hover:border-red-300 hover:bg-red-100 sm:px-3 dark:border-red-900 dark:bg-red-950/30 dark:text-red-400 dark:hover:border-red-800 dark:hover:bg-red-950/50'
                                         onClick={(e) => {
                                           e.stopPropagation();
                                           // Initialize with full quantity
@@ -303,7 +307,10 @@ export function PortfolioSummary({
                                         }}
                                       >
                                         <IconTrendingDown className='mr-1 h-3 w-3' />
-                                        Sell
+                                        <span className='hidden sm:inline'>
+                                          Sell
+                                        </span>
+                                        <span className='sm:hidden'>S</span>
                                       </Button>
                                     </AlertDialogTrigger>
                                     <AlertDialogContent>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import {
   BarChart,
   Bar,
@@ -83,6 +83,18 @@ export function PortfolioBarChart({
   realTimePrices,
   loading = false
 }: PortfolioBarChartProps) {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+
+    handleResize(); // Set initial value
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const portfolioData = useMemo(() => {
     if (!positions || positions.length === 0) return [];
 
@@ -158,7 +170,7 @@ export function PortfolioBarChart({
             Your asset allocation by market value
           </CardDescription>
         </CardHeader>
-        <CardContent className='flex h-[400px] items-center justify-center'>
+        <CardContent className='flex h-[400px] min-w-0 items-center justify-center'>
           <div className='text-muted-foreground'>Loading portfolio data...</div>
         </CardContent>
       </Card>
@@ -174,7 +186,7 @@ export function PortfolioBarChart({
             Your asset allocation by market value
           </CardDescription>
         </CardHeader>
-        <CardContent className='flex h-[400px] items-center justify-center'>
+        <CardContent className='flex h-[400px] min-w-0 items-center justify-center'>
           <div className='text-center'>
             <p className='text-muted-foreground'>No active positions found</p>
             <p className='text-muted-foreground mt-1 text-sm'>
@@ -198,23 +210,30 @@ export function PortfolioBarChart({
           )
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className='h-[400px]'>
+      <CardContent className='min-w-0'>
+        <div className='h-[300px] min-w-0 sm:h-[400px]'>
           <ResponsiveContainer width='100%' height='100%'>
             <BarChart
               data={portfolioData}
-              margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
+              margin={{
+                top: 20,
+                right: 10,
+                left: 10,
+                bottom: isMobile ? 80 : 60
+              }}
             >
               <CartesianGrid strokeDasharray='3 3' className='stroke-muted' />
               <XAxis
                 dataKey='symbol'
                 angle={-45}
                 textAnchor='end'
-                height={80}
+                height={isMobile ? 100 : 80}
                 className='text-muted-foreground text-xs'
+                fontSize={isMobile ? 10 : 12}
               />
               <YAxis
                 className='text-muted-foreground text-xs'
+                fontSize={isMobile ? 10 : 12}
                 label={{
                   value: 'Value ($)',
                   angle: -90,
@@ -223,7 +242,10 @@ export function PortfolioBarChart({
               />
               <Tooltip content={<CustomTooltip />} />
               <Legend
-                wrapperStyle={{ paddingTop: '20px' }}
+                wrapperStyle={{
+                  paddingTop: '12px',
+                  fontSize: isMobile ? '11px' : '12px'
+                }}
                 formatter={(value) => 'Portfolio Value'}
               />
               <Bar dataKey='value' name='Value ($)' radius={[8, 8, 0, 0]}>

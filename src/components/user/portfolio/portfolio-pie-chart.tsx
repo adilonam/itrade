@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import {
   PieChart,
   Pie,
@@ -17,7 +17,6 @@ import {
   CardTitle
 } from '@/components/ui/card';
 import type { Position, Market } from '@prisma/client';
-import { useEffect } from 'react';
 
 type PositionWithMarket = Position & {
   market: Market | null;
@@ -99,6 +98,18 @@ export function PortfolioPieChart({
   realTimePrices,
   loading = false
 }: PortfolioPieChartProps) {
+  const [outerRadius, setOuterRadius] = useState(120);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setOuterRadius(window.innerWidth < 640 ? 80 : 120);
+    };
+
+    handleResize(); // Set initial value
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const portfolioData = useMemo(() => {
     if (!positions || positions.length === 0) return [];
 
@@ -175,7 +186,7 @@ export function PortfolioPieChart({
             Your asset allocation by market value
           </CardDescription>
         </CardHeader>
-        <CardContent className='flex h-[400px] items-center justify-center'>
+        <CardContent className='flex h-[400px] min-w-0 items-center justify-center'>
           <div className='text-muted-foreground'>Loading portfolio data...</div>
         </CardContent>
       </Card>
@@ -191,7 +202,7 @@ export function PortfolioPieChart({
             Your asset allocation by market value
           </CardDescription>
         </CardHeader>
-        <CardContent className='flex h-[400px] items-center justify-center'>
+        <CardContent className='flex h-[400px] min-w-0 items-center justify-center'>
           <div className='text-center'>
             <p className='text-muted-foreground'>No active positions found</p>
             <p className='text-muted-foreground mt-1 text-sm'>
@@ -215,8 +226,8 @@ export function PortfolioPieChart({
           )
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className='h-[400px]'>
+      <CardContent className='min-w-0'>
+        <div className='h-[300px] min-w-0 sm:h-[400px]'>
           <ResponsiveContainer width='100%' height='100%'>
             <PieChart>
               <Pie
@@ -225,7 +236,7 @@ export function PortfolioPieChart({
                 cy='50%'
                 labelLine={false}
                 label={({ percentage }) => `${percentage.toFixed(1)}%`}
-                outerRadius={120}
+                outerRadius={outerRadius}
                 fill='#8884d8'
                 dataKey='value'
               >

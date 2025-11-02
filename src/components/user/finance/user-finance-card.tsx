@@ -32,49 +32,51 @@ export function UserFinanceCard({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-5'>
-          <div className='space-y-2'>
-            <div className='text-muted-foreground text-sm font-medium'>
+        <div className='xs:gap-3 grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-5'>
+          <div className='min-w-0 space-y-1 sm:space-y-2'>
+            <div className='text-muted-foreground text-xs font-medium sm:text-sm'>
               Balance
             </div>
-            <div className='text-2xl font-bold'>${balance.toFixed(2)}</div>
+            <div className='truncate text-lg font-bold sm:text-2xl'>
+              ${balance.toFixed(2)}
+            </div>
           </div>
 
-          <div className='space-y-2'>
-            <div className='text-muted-foreground text-sm font-medium'>
+          <div className='min-w-0 space-y-1 sm:space-y-2'>
+            <div className='text-muted-foreground text-xs font-medium sm:text-sm'>
               Used Margin
             </div>
-            <div className='text-2xl font-bold text-orange-600'>
+            <div className='truncate text-lg font-bold text-orange-600 sm:text-2xl'>
               ${usedMargin.toFixed(2)}
             </div>
           </div>
 
-          <div className='space-y-2'>
-            <div className='text-muted-foreground text-sm font-medium'>
+          <div className='min-w-0 space-y-1 sm:space-y-2'>
+            <div className='text-muted-foreground text-xs font-medium sm:text-sm'>
               Equity
             </div>
-            <div className='text-2xl font-bold text-blue-600'>
+            <div className='truncate text-lg font-bold text-blue-600 sm:text-2xl'>
               ${calculatedEquity.toFixed(2)}
             </div>
           </div>
 
-          <div className='space-y-2'>
-            <div className='text-muted-foreground text-sm font-medium'>
+          <div className='min-w-0 space-y-1 sm:space-y-2'>
+            <div className='text-muted-foreground text-xs font-medium sm:text-sm'>
               Free Margin
             </div>
             <div
-              className={`text-2xl font-bold ${freeMargin >= 0 ? 'text-green-600' : 'text-red-600'}`}
+              className={`truncate text-lg font-bold sm:text-2xl ${freeMargin >= 0 ? 'text-green-600' : 'text-red-600'}`}
             >
               ${freeMargin.toFixed(2)}
             </div>
           </div>
 
-          <div className='space-y-2'>
-            <div className='text-muted-foreground text-sm font-medium'>
+          <div className='col-span-2 min-w-0 space-y-1 sm:col-span-1 sm:space-y-2'>
+            <div className='text-muted-foreground text-xs font-medium sm:text-sm'>
               Margin Level
             </div>
             <div
-              className={`text-2xl font-bold ${
+              className={`truncate text-lg font-bold sm:text-2xl ${
                 marginLevel >= 200
                   ? 'text-green-600'
                   : marginLevel >= 100

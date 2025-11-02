@@ -84,6 +84,20 @@ export const navItems: NavItem[] = [
         isAdmin: false
       },
       {
+        title: 'Deposit',
+        url: '/dashboard/deposit',
+        icon: 'add',
+        shortcut: ['d', 'p'],
+        isAdmin: false
+      },
+      {
+        title: 'Withdraw',
+        url: '/dashboard/withdraw',
+        icon: 'minus',
+        shortcut: ['w', 'd'],
+        isAdmin: false
+      },
+      {
         title: 'Login',
         shortcut: ['l', 'l'],
         url: '/',
