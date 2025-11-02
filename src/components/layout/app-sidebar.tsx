@@ -31,6 +31,7 @@ import {
 import { UserAvatarProfile } from '@/components/user-avatar-profile';
 import {
   navItemsUser,
+  navItemsSeller,
   navItemsAdmin,
   navItemsSuperAdmin
 } from '@/constants/data';
@@ -66,15 +67,27 @@ export default function AppSidebar() {
   const user = session?.user;
 
   // Dynamic tenants based on user role
+  // Hierarchy: USER, SELLER, ADMIN, SUPERADMIN
   const tenants = React.useMemo(() => {
     const baseTenants = [{ id: '1', name: 'Dashboard' }];
 
-    if (user?.role === 'ADMIN' || user?.role === 'SUPERADMIN') {
-      baseTenants.push({ id: '2', name: 'Admin' });
+    // Seller tenant (ID 2) - for SELLER role
+    if (
+      user?.role === 'SELLER' ||
+      user?.role === 'ADMIN' ||
+      user?.role === 'SUPERADMIN'
+    ) {
+      baseTenants.push({ id: '2', name: 'Seller' });
     }
 
+    // Admin tenant (ID 3) - for ADMIN or SUPERADMIN roles
+    if (user?.role === 'ADMIN' || user?.role === 'SUPERADMIN') {
+      baseTenants.push({ id: '3', name: 'Admin' });
+    }
+
+    // Super Admin tenant (ID 4) - for SUPERADMIN role only
     if (user?.role === 'SUPERADMIN') {
-      baseTenants.push({ id: '3', name: 'Super Admin' });
+      baseTenants.push({ id: '4', name: 'Super Admin' });
     }
 
     return baseTenants;
@@ -100,14 +113,19 @@ export default function AppSidebar() {
   React.useEffect(() => {
     // Auto-select tenant based on current path
     if (pathname.startsWith('/super-admin')) {
-      const superAdminTenant = tenants.find((t) => t.id === '3');
+      const superAdminTenant = tenants.find((t) => t.id === '4');
       if (superAdminTenant) {
         setSelectedTenant(superAdminTenant); // Super Admin tenant
       }
     } else if (pathname.startsWith('/admin')) {
-      const adminTenant = tenants.find((t) => t.id === '2');
+      const adminTenant = tenants.find((t) => t.id === '3');
       if (adminTenant) {
         setSelectedTenant(adminTenant); // Admin tenant
+      }
+    } else if (pathname.startsWith('/seller')) {
+      const sellerTenant = tenants.find((t) => t.id === '2');
+      if (sellerTenant) {
+        setSelectedTenant(sellerTenant); // Seller tenant
       }
     } else if (pathname.startsWith('/dashboard')) {
       const dashboardTenant = tenants.find((t) => t.id === '1');
@@ -125,14 +143,17 @@ export default function AppSidebar() {
 
   // Get navigation items based on selected tenant
   const getNavItems = React.useMemo(() => {
-    if (selectedTenant.id === '3') {
+    if (selectedTenant.id === '4') {
       // Super Admin tenant - show super admin items
       return navItemsSuperAdmin;
-    } else if (selectedTenant.id === '2') {
+    } else if (selectedTenant.id === '3') {
       // Admin tenant - show admin items
       return navItemsAdmin;
+    } else if (selectedTenant.id === '2') {
+      // Seller tenant - show seller items
+      return navItemsSeller;
     } else {
-      // Dashboard tenant - show user items
+      // Dashboard tenant (ID 1) - show user items
       return navItemsUser;
     }
   }, [selectedTenant.id]);

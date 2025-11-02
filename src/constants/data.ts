@@ -21,8 +21,7 @@ export const navItemsUser: NavItem[] = [
     icon: 'dashboard',
     isActive: false,
     shortcut: ['d', 'd'],
-    items: [],
-    isAdmin: false
+    items: []
   },
   {
     title: 'Room Trading',
@@ -30,8 +29,7 @@ export const navItemsUser: NavItem[] = [
     icon: 'trendingUp',
     isActive: false,
     shortcut: ['r', 't'],
-    items: [],
-    isAdmin: false
+    items: []
   },
   {
     title: 'Room Stock',
@@ -39,8 +37,7 @@ export const navItemsUser: NavItem[] = [
     icon: 'trendingUp',
     isActive: false,
     shortcut: ['s', 's'],
-    items: [],
-    isAdmin: false
+    items: []
   },
   {
     title: 'My Positions',
@@ -48,8 +45,7 @@ export const navItemsUser: NavItem[] = [
     icon: 'switchVertical',
     isActive: false,
     shortcut: ['m', 'r'],
-    items: [],
-    isAdmin: false
+    items: []
   },
   {
     title: 'My Portfolio',
@@ -57,8 +53,7 @@ export const navItemsUser: NavItem[] = [
     icon: 'switchVertical',
     isActive: false,
     shortcut: ['m', 't'],
-    items: [],
-    isAdmin: false
+    items: []
   },
   {
     title: 'Investments',
@@ -66,31 +61,39 @@ export const navItemsUser: NavItem[] = [
     icon: 'pigMoney',
     isActive: false,
     shortcut: ['i', 'v'],
-    items: [],
-    isAdmin: false
+    items: []
   },
   {
     title: 'Account',
     url: '#',
     icon: 'billing',
     isActive: true,
-    isAdmin: false,
     items: [
       {
         title: 'Profile',
         url: '/dashboard/profile',
         icon: 'userPen',
-        shortcut: ['m', 'm'],
-        isAdmin: false
+        shortcut: ['m', 'm']
       },
       {
         title: 'Login',
         shortcut: ['l', 'l'],
         url: '/',
-        icon: 'login',
-        isAdmin: false
+        icon: 'login'
       }
     ]
+  }
+];
+
+// Seller navigation items (for SELLER role)
+export const navItemsSeller: NavItem[] = [
+  {
+    title: 'My Users',
+    url: '/seller/users',
+    icon: 'user',
+    isActive: false,
+    shortcut: ['s', 'u'],
+    items: []
   }
 ];
 
@@ -102,8 +105,7 @@ export const navItemsAdmin: NavItem[] = [
     icon: 'user',
     isActive: false,
     shortcut: ['u', 'u'],
-    items: [],
-    isAdmin: true
+    items: []
   },
   {
     title: 'Markets',
@@ -111,8 +113,7 @@ export const navItemsAdmin: NavItem[] = [
     icon: 'market',
     isActive: false,
     shortcut: ['a', 'm'],
-    items: [],
-    isAdmin: true
+    items: []
   },
   {
     title: 'Investments',
@@ -120,8 +121,7 @@ export const navItemsAdmin: NavItem[] = [
     icon: 'pigMoney',
     isActive: false,
     shortcut: ['a', 'i'],
-    items: [],
-    isAdmin: true
+    items: []
   },
   {
     title: 'Positions',
@@ -129,8 +129,7 @@ export const navItemsAdmin: NavItem[] = [
     icon: 'switchVertical',
     isActive: false,
     shortcut: ['t', 't'],
-    items: [],
-    isAdmin: true
+    items: []
   }
 ];
 
@@ -142,9 +141,7 @@ export const navItemsSuperAdmin: NavItem[] = [
     icon: 'settings',
     isActive: false,
     shortcut: ['s', 'a'],
-    items: [],
-    isAdmin: true,
-    isSuperAdmin: true
+    items: []
   },
   {
     title: 'Theme Settings',
@@ -152,15 +149,14 @@ export const navItemsSuperAdmin: NavItem[] = [
     icon: 'palette',
     isActive: false,
     shortcut: ['t', 's'],
-    items: [],
-    isAdmin: true,
-    isSuperAdmin: true
+    items: []
   }
 ];
 
 // Legacy export for backward compatibility (if needed elsewhere)
 export const navItems: NavItem[] = [
   ...navItemsUser,
+  ...navItemsSeller,
   ...navItemsAdmin,
   ...navItemsSuperAdmin
 ];
