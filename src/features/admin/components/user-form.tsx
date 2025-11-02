@@ -28,6 +28,7 @@ import { createUser, updateUser } from '../services/users';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import SellerUsersSection from './seller-users-section';
 
 const createFormSchema = z.object({
   name: z.string().min(2, {
@@ -39,7 +40,7 @@ const createFormSchema = z.object({
   password: z.string().min(8, {
     message: 'Password must be at least 8 characters.'
   }),
-  role: z.enum(['USER', 'ADMIN', 'SUPERADMIN'], {
+  role: z.enum(['USER', 'SELLER', 'ADMIN', 'SUPERADMIN'], {
     required_error: 'Please select a role.'
   }),
   balance: z
@@ -73,7 +74,7 @@ const updateFormSchema = z.object({
     })
     .optional()
     .or(z.literal('')),
-  role: z.enum(['USER', 'ADMIN', 'SUPERADMIN'], {
+  role: z.enum(['USER', 'SELLER', 'ADMIN', 'SUPERADMIN'], {
     required_error: 'Please select a role.'
   }),
   balance: z
@@ -100,6 +101,9 @@ export default function UserForm({
 }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [currentRole, setCurrentRole] = useState<string | null>(
+    initialData?.role || null
+  );
   const isEdit = !!initialData;
 
   const formSchema = isEdit ? updateFormSchema : createFormSchema;
@@ -235,7 +239,10 @@ export default function UserForm({
                   <FormItem>
                     <FormLabel>Role</FormLabel>
                     <Select
-                      onValueChange={field.onChange}
+                      onValueChange={(value) => {
+                        field.onChange(value);
+                        setCurrentRole(value);
+                      }}
                       value={field.value}
                       disabled={loading}
                     >
@@ -246,6 +253,7 @@ export default function UserForm({
                       </FormControl>
                       <SelectContent>
                         <SelectItem value='USER'>User</SelectItem>
+                        <SelectItem value='SELLER'>Seller</SelectItem>
                         <SelectItem value='ADMIN'>Admin</SelectItem>
                         <SelectItem value='SUPERADMIN'>Super Admin</SelectItem>
                       </SelectContent>
@@ -334,6 +342,13 @@ export default function UserForm({
                 </FormItem>
               )}
             />
+
+            {/* Seller Users Management Section - Only show when editing a seller */}
+            {isEdit &&
+              initialData &&
+              (currentRole === 'SELLER' || initialData.role === 'SELLER') && (
+                <SellerUsersSection sellerId={initialData.id} />
+              )}
 
             <div className='flex items-center gap-2'>
               <Button

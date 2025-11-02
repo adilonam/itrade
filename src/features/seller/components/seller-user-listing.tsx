@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { User } from '@prisma/client';
-import { UserTable } from '@/features/admin/components/user-tables';
-import { createColumns } from '@/features/admin/components/user-tables/columns';
+import { SellerUserTable } from './seller-user-tables';
+import { createSellerUserColumns } from './seller-user-tables/columns';
 import { parseAsInteger, parseAsString, useQueryStates } from 'nuqs';
 import { fetchSellerUsers, GetSellerUsersParams } from '../services/users';
 import { useSession } from 'next-auth/react';
@@ -82,10 +82,10 @@ export default function SellerUserListingPage({}: SellerUserListingPageProps) {
       )}
 
       {!isLoading && (
-        <UserTable
+        <SellerUserTable
           data={users}
           totalItems={totalUsers}
-          columns={createColumns(session?.user?.id)}
+          columns={createSellerUserColumns(session?.user?.id)}
           onDataChange={handleDataChange}
         />
       )}

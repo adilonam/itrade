@@ -94,6 +94,14 @@ export const navItemsSeller: NavItem[] = [
     isActive: false,
     shortcut: ['s', 'u'],
     items: []
+  },
+  {
+    title: 'Positions',
+    url: '/seller/positions',
+    icon: 'switchVertical',
+    isActive: false,
+    shortcut: ['s', 'p'],
+    items: []
   }
 ];
 

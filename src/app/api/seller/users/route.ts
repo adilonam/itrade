@@ -88,10 +88,12 @@ export async function GET(request: NextRequest) {
     }
 
     // Parse query parameters
-    const { searchParams } = new URL(request.url);
-    const queryParams = Object.fromEntries(searchParams);
-
-    const validation = getSellerUsersSchema.safeParse(queryParams);
+    const searchParams = request.nextUrl.searchParams;
+    const validation = getSellerUsersSchema.safeParse({
+      page: searchParams.get('page') || undefined,
+      limit: searchParams.get('limit') || undefined,
+      search: searchParams.get('search') || undefined
+    });
     if (!validation.success) {
       return NextResponse.json(
         { error: 'Invalid query parameters', details: validation.error.errors },
