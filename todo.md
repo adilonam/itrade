@@ -39,6 +39,6 @@
 - [ ] design desktop : mekaoui
 - [ ] value of positions just tradfing , add requiredmargin with label value on datatable psotion : mekaoui
 - [ ] icoon switch lot et amount : adil
-- [ ] logic seller : adil
+- [x] logic seller : adil
 - [ ] depot / withdraw virtuell : mekaoui
 - [ ] dashboard
