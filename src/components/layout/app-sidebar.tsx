@@ -29,7 +29,11 @@ import {
   SidebarRail
 } from '@/components/ui/sidebar';
 import { UserAvatarProfile } from '@/components/user-avatar-profile';
-import { navItems } from '@/constants/data';
+import {
+  navItemsUser,
+  navItemsAdmin,
+  navItemsSuperAdmin
+} from '@/constants/data';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { useSession, signOut } from 'next-auth/react';
 import {
@@ -119,6 +123,20 @@ export default function AppSidebar() {
 
   const isLoading = status === 'loading' || !pathname || !user;
 
+  // Get navigation items based on selected tenant
+  const getNavItems = React.useMemo(() => {
+    if (selectedTenant.id === '3') {
+      // Super Admin tenant - show super admin items
+      return navItemsSuperAdmin;
+    } else if (selectedTenant.id === '2') {
+      // Admin tenant - show admin items
+      return navItemsAdmin;
+    } else {
+      // Dashboard tenant - show user items
+      return navItemsUser;
+    }
+  }, [selectedTenant.id]);
+
   return (
     <Sidebar collapsible='icon'>
       <SidebarHeader>
@@ -140,97 +158,59 @@ export default function AppSidebar() {
                 <div className='h-6 w-6 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600'></div>
               </div>
             ) : (
-              navItems
-                .filter((item) => {
-                  // When super admin tenant is selected, show ONLY super admin items
-                  if (selectedTenant.id === '3') {
-                    return item.isSuperAdmin;
-                  }
-
-                  // When admin tenant is selected, show admin items (excluding super admin only)
-                  if (selectedTenant.id === '2') {
-                    return item.isAdmin && !item.isSuperAdmin;
-                  }
-
-                  // Otherwise, show non-admin items
-                  if (item.isAdmin) {
-                    return false;
-                  }
-                  return true;
-                })
-                .map((item) => {
-                  const Icon = item.icon ? Icons[item.icon] : Icons.logo;
-                  return item?.items && item?.items?.length > 0 ? (
-                    <Collapsible
-                      key={item.title}
-                      asChild
-                      defaultOpen={item.isActive}
-                      className='group/collapsible'
-                    >
-                      <SidebarMenuItem>
-                        <CollapsibleTrigger asChild>
-                          <SidebarMenuButton
-                            tooltip={item.title}
-                            isActive={pathname === item.url}
-                          >
-                            {item.icon && <Icon />}
-                            <span>{item.title}</span>
-                            <IconChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
-                          </SidebarMenuButton>
-                        </CollapsibleTrigger>
-                        <CollapsibleContent>
-                          <SidebarMenuSub>
-                            {item.items
-                              ?.filter((subItem) => {
-                                // When super admin tenant is selected, show ONLY super admin sub-items
-                                if (selectedTenant.id === '3') {
-                                  return subItem.isSuperAdmin;
-                                }
-
-                                // When admin tenant is selected, show admin sub-items (excluding super admin only)
-                                if (selectedTenant.id === '2') {
-                                  return (
-                                    subItem.isAdmin && !subItem.isSuperAdmin
-                                  );
-                                }
-
-                                // Otherwise, show non-admin sub-items
-                                if (subItem.isAdmin) {
-                                  return false;
-                                }
-                                return true;
-                              })
-                              .map((subItem) => (
-                                <SidebarMenuSubItem key={subItem.title}>
-                                  <SidebarMenuSubButton
-                                    asChild
-                                    isActive={pathname === subItem.url}
-                                  >
-                                    <Link href={subItem.url}>
-                                      <span>{subItem.title}</span>
-                                    </Link>
-                                  </SidebarMenuSubButton>
-                                </SidebarMenuSubItem>
-                              ))}
-                          </SidebarMenuSub>
-                        </CollapsibleContent>
-                      </SidebarMenuItem>
-                    </Collapsible>
-                  ) : (
-                    <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton
-                        asChild
-                        tooltip={item.title}
-                        isActive={pathname === item.url}
-                      >
-                        <Link href={item.url}>
-                          <Icon />
+              getNavItems.map((item) => {
+                const Icon = item.icon ? Icons[item.icon] : Icons.logo;
+                return item?.items && item?.items?.length > 0 ? (
+                  <Collapsible
+                    key={item.title}
+                    asChild
+                    defaultOpen={item.isActive}
+                    className='group/collapsible'
+                  >
+                    <SidebarMenuItem>
+                      <CollapsibleTrigger asChild>
+                        <SidebarMenuButton
+                          tooltip={item.title}
+                          isActive={pathname === item.url}
+                        >
+                          {item.icon && <Icon />}
                           <span>{item.title}</span>
-                        </Link>
-                      </SidebarMenuButton>
+                          <IconChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
+                        </SidebarMenuButton>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent>
+                        <SidebarMenuSub>
+                          {item.items?.map((subItem) => (
+                            <SidebarMenuSubItem key={subItem.title}>
+                              <SidebarMenuSubButton
+                                asChild
+                                isActive={pathname === subItem.url}
+                              >
+                                <Link href={subItem.url}>
+                                  <span>{subItem.title}</span>
+                                </Link>
+                              </SidebarMenuSubButton>
+                            </SidebarMenuSubItem>
+                          ))}
+                        </SidebarMenuSub>
+                      </CollapsibleContent>
                     </SidebarMenuItem>
-                  );
-                })
+                  </Collapsible>
+                ) : (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton
+                      asChild
+                      tooltip={item.title}
+                      isActive={pathname === item.url}
+                    >
+                      <Link href={item.url}>
+                        <Icon />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })
             )}
           </SidebarMenu>
         </SidebarGroup>
