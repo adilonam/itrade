@@ -269,32 +269,32 @@ export function StockPortfolioView() {
   }, [positions]);
 
   return (
-    <div className='max-w-[1000px] space-y-6 overflow-x-auto'>
+    <div className='w-full space-y-6'>
       {/* Summary Cards */}
-      <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4'>
-        <Card>
-          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-            <CardTitle className='text-sm font-medium'>
+      <div className='grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4'>
+        <Card className='min-w-0'>
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 px-4 py-3 pb-2'>
+            <CardTitle className='text-sm leading-tight font-medium'>
               Total Stock Positions
             </CardTitle>
-            <IconCoins className='text-muted-foreground h-4 w-4' />
+            <IconCoins className='text-muted-foreground h-4 w-4 flex-shrink-0' />
           </CardHeader>
-          <CardContent>
+          <CardContent className='px-4 pb-4'>
             <div className='text-2xl font-bold'>
               {summaryStats.totalPositions}
             </div>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+        <Card className='min-w-0'>
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 px-4 py-3 pb-2'>
             <CardTitle className='text-sm font-medium'>Total P&L</CardTitle>
             {summaryStats.totalPnL >= 0 ? (
-              <IconTrendingUp className='h-4 w-4 text-green-600' />
+              <IconTrendingUp className='h-4 w-4 flex-shrink-0 text-green-600' />
             ) : (
-              <IconTrendingDown className='h-4 w-4 text-red-600' />
+              <IconTrendingDown className='h-4 w-4 flex-shrink-0 text-red-600' />
             )}
           </CardHeader>
-          <CardContent>
+          <CardContent className='px-4 pb-4'>
             <div
               className={`text-2xl font-bold ${
                 summaryStats.totalPnL >= 0 ? 'text-green-600' : 'text-red-600'
@@ -305,23 +305,23 @@ export function StockPortfolioView() {
             </div>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+        <Card className='min-w-0'>
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 px-4 py-3 pb-2'>
             <CardTitle className='text-sm font-medium'>Profitable</CardTitle>
-            <IconChartBar className='text-muted-foreground h-4 w-4' />
+            <IconChartBar className='text-muted-foreground h-4 w-4 flex-shrink-0' />
           </CardHeader>
-          <CardContent>
+          <CardContent className='px-4 pb-4'>
             <div className='text-2xl font-bold text-green-600'>
               {summaryStats.profitablePositions}
             </div>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+        <Card className='min-w-0'>
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 px-4 py-3 pb-2'>
             <CardTitle className='text-sm font-medium'>Losing</CardTitle>
-            <IconChartBar className='text-muted-foreground h-4 w-4' />
+            <IconChartBar className='text-muted-foreground h-4 w-4 flex-shrink-0' />
           </CardHeader>
-          <CardContent>
+          <CardContent className='px-4 pb-4'>
             <div className='text-2xl font-bold text-red-600'>
               {summaryStats.losingPositions}
             </div>
@@ -374,7 +374,7 @@ export function StockPortfolioView() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3'>
+          <div className='grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3'>
             <div className='space-y-2'>
               <label className='text-sm font-medium'>Search</label>
               <div className='relative'>

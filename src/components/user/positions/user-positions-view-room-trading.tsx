@@ -265,50 +265,56 @@ export function UserPositionsViewRoomTrading() {
   }, [positions, realTimePnL]);
 
   return (
-    <div className='max-w-[1000px] space-y-6 overflow-x-auto'>
+    <div className='w-full space-y-6'>
       {/* Summary Cards */}
-      <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4'>
-        <Card>
-          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-            <CardTitle className='text-sm font-medium'>
+      <div className='xs:gap-3 grid grid-cols-2 gap-2 sm:grid-cols-2 sm:gap-4 md:grid-cols-2 lg:grid-cols-4'>
+        <Card className='min-w-0'>
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 px-3 pb-2 sm:px-6'>
+            <CardTitle className='text-xs leading-tight font-medium sm:text-sm'>
               Total Room Trading Positions
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className='text-2xl font-bold'>
+          <CardContent className='px-3 sm:px-6'>
+            <div className='text-lg font-bold sm:text-2xl'>
               {summaryStats.totalPositions}
             </div>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-            <CardTitle className='text-sm font-medium'>Total P&L</CardTitle>
+        <Card className='min-w-0'>
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 px-3 pb-2 sm:px-6'>
+            <CardTitle className='text-xs font-medium sm:text-sm'>
+              Total P&L
+            </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className='px-3 sm:px-6'>
             <div
-              className={`text-2xl font-bold ${summaryStats.totalPnL >= 0 ? 'text-green-600' : 'text-red-600'}`}
+              className={`text-lg font-bold sm:text-2xl ${summaryStats.totalPnL >= 0 ? 'text-green-600' : 'text-red-600'}`}
             >
               {summaryStats.totalPnL >= 0 ? '+' : ''}$
               {summaryStats.totalPnL.toFixed(2)}
             </div>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-            <CardTitle className='text-sm font-medium'>Profitable</CardTitle>
+        <Card className='min-w-0'>
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 px-3 pb-2 sm:px-6'>
+            <CardTitle className='text-xs font-medium sm:text-sm'>
+              Profitable
+            </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className='text-2xl font-bold text-green-600'>
+          <CardContent className='px-3 sm:px-6'>
+            <div className='text-lg font-bold text-green-600 sm:text-2xl'>
               {summaryStats.profitablePositions}
             </div>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-            <CardTitle className='text-sm font-medium'>Losing</CardTitle>
+        <Card className='min-w-0'>
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 px-3 pb-2 sm:px-6'>
+            <CardTitle className='text-xs font-medium sm:text-sm'>
+              Losing
+            </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className='text-2xl font-bold text-red-600'>
+          <CardContent className='px-3 sm:px-6'>
+            <div className='text-lg font-bold text-red-600 sm:text-2xl'>
               {summaryStats.losingPositions}
             </div>
           </CardContent>
@@ -336,7 +342,7 @@ export function UserPositionsViewRoomTrading() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3'>
+          <div className='grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3'>
             <div className='space-y-2'>
               <label className='text-sm font-medium'>Search</label>
               <div className='relative'>
