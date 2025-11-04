@@ -38,7 +38,8 @@
 - [ ] fix design pos trading : mobile mekaoui
 - [ ] design desktop : mekaoui
 - [ ] value of positions just tradfing , add requiredmargin with label value on datatable psotion : mekaoui
-- [ ] icoon switch lot et amount : adil
+- [ ] icoon switch lot et amount : adil   
 - [x] logic seller : adil
 - [ ] depot / withdraw virtuell : mekaoui
 - [ ] dashboard
+- [ ] position ouvert droit seller
