@@ -12,15 +12,16 @@ export type Product = {
 };
 
 //Info: The following data is used for the sidebar navigation and Cmd K bar.
-export const navItems: NavItem[] = [
+
+// User navigation items (regular users)
+export const navItemsUser: NavItem[] = [
   {
     title: 'Dashboard',
     url: '/dashboard',
     icon: 'dashboard',
     isActive: false,
     shortcut: ['d', 'd'],
-    items: [], // Empty array as there are no child items
-    isAdmin: false
+    items: []
   },
   {
     title: 'Room Trading',
@@ -28,8 +29,7 @@ export const navItems: NavItem[] = [
     icon: 'trendingUp',
     isActive: false,
     shortcut: ['r', 't'],
-    items: [], // Empty array as there are no child items
-    isAdmin: false
+    items: []
   },
   {
     title: 'Room Stock',
@@ -37,8 +37,7 @@ export const navItems: NavItem[] = [
     icon: 'trendingUp',
     isActive: false,
     shortcut: ['s', 's'],
-    items: [], // Empty array as there are no child items
-    isAdmin: false
+    items: []
   },
   {
     title: 'My Positions',
@@ -46,8 +45,7 @@ export const navItems: NavItem[] = [
     icon: 'switchVertical',
     isActive: false,
     shortcut: ['m', 'r'],
-    items: [], // Empty array as there are no child items
-    isAdmin: false
+    items: []
   },
   {
     title: 'My Portfolio',
@@ -55,33 +53,27 @@ export const navItems: NavItem[] = [
     icon: 'switchVertical',
     isActive: false,
     shortcut: ['m', 't'],
-    items: [], // Empty array as there are no child items
-    isAdmin: false
+    items: []
   },
-
   {
     title: 'Investments',
     url: '/dashboard/investments',
     icon: 'pigMoney',
     isActive: false,
     shortcut: ['i', 'v'],
-    items: [], // Empty array as there are no child items
-    isAdmin: false
+    items: []
   },
   {
     title: 'Account',
-    url: '#', // Placeholder as there is no direct link for the parent
+    url: '#',
     icon: 'billing',
     isActive: true,
-    isAdmin: false,
-
     items: [
       {
         title: 'Profile',
         url: '/dashboard/profile',
         icon: 'userPen',
-        shortcut: ['m', 'm'],
-        isAdmin: false
+        shortcut: ['m', 'm']
       },
       {
         title: 'Deposit',
@@ -101,19 +93,41 @@ export const navItems: NavItem[] = [
         title: 'Login',
         shortcut: ['l', 'l'],
         url: '/',
-        icon: 'login',
-        isAdmin: false
+        icon: 'login'
       }
     ]
+  }
+];
+
+// Seller navigation items (for SELLER role)
+export const navItemsSeller: NavItem[] = [
+  {
+    title: 'My Users',
+    url: '/seller/users',
+    icon: 'user',
+    isActive: false,
+    shortcut: ['s', 'u'],
+    items: []
   },
+  {
+    title: 'Positions',
+    url: '/seller/positions',
+    icon: 'switchVertical',
+    isActive: false,
+    shortcut: ['s', 'p'],
+    items: []
+  }
+];
+
+// Admin navigation items (for ADMIN role)
+export const navItemsAdmin: NavItem[] = [
   {
     title: 'Users',
     url: '/admin/users',
     icon: 'user',
     isActive: false,
     shortcut: ['u', 'u'],
-    items: [], // Empty array as there are no child items for Dashboard
-    isAdmin: true
+    items: []
   },
   {
     title: 'Markets',
@@ -121,8 +135,7 @@ export const navItems: NavItem[] = [
     icon: 'market',
     isActive: false,
     shortcut: ['a', 'm'],
-    items: [], // Empty array as there are no child items
-    isAdmin: true
+    items: []
   },
   {
     title: 'Investments',
@@ -130,8 +143,7 @@ export const navItems: NavItem[] = [
     icon: 'pigMoney',
     isActive: false,
     shortcut: ['a', 'i'],
-    items: [], // Empty array as there are no child items
-    isAdmin: true
+    items: []
   },
   {
     title: 'Positions',
@@ -139,18 +151,19 @@ export const navItems: NavItem[] = [
     icon: 'switchVertical',
     isActive: false,
     shortcut: ['t', 't'],
-    items: [], // Empty array as there are no child items
-    isAdmin: true
-  },
+    items: []
+  }
+];
+
+// Super Admin navigation items (for SUPERADMIN role)
+export const navItemsSuperAdmin: NavItem[] = [
   {
     title: 'App Settings',
     url: '/super-admin/app-settings',
     icon: 'settings',
     isActive: false,
     shortcut: ['s', 'a'],
-    items: [], // Empty array as there are no child items
-    isAdmin: true,
-    isSuperAdmin: true
+    items: []
   },
   {
     title: 'Theme Settings',
@@ -158,10 +171,16 @@ export const navItems: NavItem[] = [
     icon: 'palette',
     isActive: false,
     shortcut: ['t', 's'],
-    items: [], // Empty array as there are no child items
-    isAdmin: true,
-    isSuperAdmin: true
+    items: []
   }
+];
+
+// Legacy export for backward compatibility (if needed elsewhere)
+export const navItems: NavItem[] = [
+  ...navItemsUser,
+  ...navItemsSeller,
+  ...navItemsAdmin,
+  ...navItemsSuperAdmin
 ];
 
 export interface SaleUser {

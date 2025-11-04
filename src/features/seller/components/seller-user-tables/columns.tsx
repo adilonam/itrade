@@ -13,10 +13,11 @@ import {
   DollarSign
 } from 'lucide-react';
 import Image from 'next/image';
-import { CellAction } from './cell-action';
-import { ROLE_OPTIONS } from './options';
+import { ROLE_OPTIONS } from '@/features/admin/components/user-tables/options';
 
-export const createColumns = (currentUserId?: string): ColumnDef<User>[] => [
+export const createSellerUserColumns = (
+  currentUserId?: string
+): ColumnDef<User>[] => [
   {
     accessorKey: 'image',
     header: 'AVATAR',
@@ -183,15 +184,8 @@ export const createColumns = (currentUserId?: string): ColumnDef<User>[] => [
         </span>
       );
     }
-  },
-  {
-    id: 'actions',
-    cell: ({ row, table }) => {
-      const onDataChange = (table.options.meta as any)?.onDataChange;
-      return <CellAction data={row.original} onDataChange={onDataChange} />;
-    }
   }
 ];
 
-// Export the original columns for backward compatibility
-export const columns = createColumns();
+// Export default columns
+export const sellerUserColumns = createSellerUserColumns();

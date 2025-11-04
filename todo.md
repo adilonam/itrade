@@ -37,8 +37,9 @@
 - [x] change name of postion stock pour portfolio
 - [ ] fix design pos trading : mobile mekaoui
 - [x] design desktop : mekaoui
-- [x] value of positions  just tradfing , add requiredmargin with label value on datatable psotion : mekaoui 
+- [x] value of positions just tradfing , add requiredmargin with label value on datatable psotion : mekaoui
 - [ ] icoon switch lot et amount : adil
-- [ ] logic seller : adil
+- [x] logic seller : adil
 - [x] depot / withdraw virtuell : mekaoui
-- [ ] dashboard 
+- [x] dashboard
+- [ ] position ouvert droit seller

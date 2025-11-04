@@ -120,7 +120,7 @@ const updateUserSchema = z
     name: z.string().min(1).optional(),
     email: z.string().email().optional(),
     password: z.string().min(8).optional(),
-    role: z.enum(['USER', 'ADMIN', 'SUPERADMIN']).optional(),
+    role: z.enum(['USER', 'SELLER', 'ADMIN', 'SUPERADMIN']).optional(),
     balance: z.number().min(0, 'Balance cannot be negative').optional(),
     leverage: z.number().min(1, 'Leverage must be at least 1').optional(),
     emailVerified: z
