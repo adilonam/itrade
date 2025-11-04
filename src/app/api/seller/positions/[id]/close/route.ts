@@ -96,7 +96,10 @@ export async function PATCH(
       );
     }
 
-    const sellerId = session.user.id;
+    const sellerId = session?.user.id;
+    if (!sellerId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
     // Find the position and verify it belongs to a user linked to this seller
     const existingPosition = await prisma.position.findUnique({

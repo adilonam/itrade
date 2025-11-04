@@ -229,8 +229,10 @@ export function SellerPositionsTable({
                           } else {
                             // Calculate using market's lastPrice as current price
                             const currentPriceData = {
+                              event: 'price' as const,
+                              symbol: position.market.symbol,
                               price: position.market.lastPrice,
-                              timestamp: new Date().toISOString()
+                              timestamp: Date.now()
                             };
                             const calculatedPnL = calculatePnLClient(
                               position as any,

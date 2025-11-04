@@ -79,15 +79,13 @@ export const navItemsUser: NavItem[] = [
         title: 'Deposit',
         url: '/dashboard/deposit',
         icon: 'add',
-        shortcut: ['d', 'p'],
-        isAdmin: false
+        shortcut: ['d', 'p']
       },
       {
         title: 'Withdraw',
         url: '/dashboard/withdraw',
         icon: 'minus',
-        shortcut: ['w', 'd'],
-        isAdmin: false
+        shortcut: ['w', 'd']
       },
       {
         title: 'Login',
