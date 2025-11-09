@@ -39,7 +39,12 @@ import {
   IconPigMoney,
   IconTrendingUp,
   IconPalette,
-  IconMail
+  IconMail,
+  IconReceipt,
+  IconNews,
+  IconLink,
+  IconBriefcase,
+  IconServer
 } from '@tabler/icons-react';
 
 export type Icon = React.ComponentType<IconProps>;
@@ -84,5 +89,10 @@ export const Icons = {
   pigMoney: IconPigMoney,
   trendingUp: IconTrendingUp,
   palette: IconPalette,
-  message: IconMail
+  message: IconMail,
+  transaction: IconReceipt,
+  news: IconNews,
+  link: IconLink,
+  portfolio: IconBriefcase,
+  server: IconServer
 };

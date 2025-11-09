@@ -29,13 +29,9 @@ import {
   SidebarRail
 } from '@/components/ui/sidebar';
 import { UserAvatarProfile } from '@/components/user-avatar-profile';
-import {
-  navItemsUser,
-  navItemsSeller,
-  navItemsAdmin,
-  navItemsSuperAdmin
-} from '@/constants/data';
+import { tenantNavItems } from '@/constants/data';
 import { useMediaQuery } from '@/hooks/use-media-query';
+import { NavItem } from '@/types';
 import { useSession, signOut } from 'next-auth/react';
 import {
   IconBell,
@@ -66,32 +62,17 @@ export default function AppSidebar() {
   const router = useRouter();
   const user = session?.user;
 
-  // Dynamic tenants based on user role
-  // Hierarchy: USER, SELLER, ADMIN, SUPERADMIN
+  // Dynamic tenants - all users get all tenants, but nav items vary by role
   const tenants = React.useMemo(() => {
-    const baseTenants = [{ id: '1', name: 'Dashboard' }];
-
-    // Seller tenant (ID 2) - for SELLER role
-    if (
-      user?.role === 'SELLER' ||
-      user?.role === 'ADMIN' ||
-      user?.role === 'SUPERADMIN'
-    ) {
-      baseTenants.push({ id: '2', name: 'Seller' });
-    }
-
-    // Admin tenant (ID 3) - for ADMIN or SUPERADMIN roles
-    if (user?.role === 'ADMIN' || user?.role === 'SUPERADMIN') {
-      baseTenants.push({ id: '3', name: 'Admin' });
-    }
-
-    // Super Admin tenant (ID 4) - for SUPERADMIN role only
-    if (user?.role === 'SUPERADMIN') {
-      baseTenants.push({ id: '4', name: 'Super Admin' });
-    }
-
-    return baseTenants;
-  }, [user?.role]);
+    return [
+      { id: '1', name: 'Dashboard' },
+      { id: '2', name: 'Room Trading' },
+      { id: '3', name: 'Room Stock' },
+      { id: '4', name: 'Invest' },
+      { id: '5', name: 'Administration' },
+      { id: '6', name: 'Configuration' }
+    ];
+  }, []);
 
   // Track the selected tenant
   const [selectedTenant, setSelectedTenant] = React.useState(() => tenants[0]);
@@ -113,24 +94,45 @@ export default function AppSidebar() {
   React.useEffect(() => {
     // Auto-select tenant based on current path
     if (pathname.startsWith('/super-admin')) {
-      const superAdminTenant = tenants.find((t) => t.id === '4');
-      if (superAdminTenant) {
-        setSelectedTenant(superAdminTenant); // Super Admin tenant
+      const configTenant = tenants.find((t) => t.id === '6');
+      if (configTenant) {
+        setSelectedTenant(configTenant); // Configuration
       }
     } else if (pathname.startsWith('/admin')) {
-      const adminTenant = tenants.find((t) => t.id === '3');
+      const adminTenant = tenants.find((t) => t.id === '5');
       if (adminTenant) {
-        setSelectedTenant(adminTenant); // Admin tenant
+        setSelectedTenant(adminTenant); // Administration
       }
     } else if (pathname.startsWith('/seller')) {
-      const sellerTenant = tenants.find((t) => t.id === '2');
-      if (sellerTenant) {
-        setSelectedTenant(sellerTenant); // Seller tenant
+      const adminTenant = tenants.find((t) => t.id === '5');
+      if (adminTenant) {
+        setSelectedTenant(adminTenant); // Administration
+      }
+    } else if (
+      pathname.includes('/markets-room-trading') ||
+      pathname.includes('/positions-room-trading')
+    ) {
+      const roomTradingTenant = tenants.find((t) => t.id === '2');
+      if (roomTradingTenant) {
+        setSelectedTenant(roomTradingTenant); // Room Trading
+      }
+    } else if (
+      pathname.includes('/markets-room-stock') ||
+      pathname.includes('/positions-room-stock')
+    ) {
+      const roomStockTenant = tenants.find((t) => t.id === '3');
+      if (roomStockTenant) {
+        setSelectedTenant(roomStockTenant); // Room Stock
+      }
+    } else if (pathname.includes('/investments')) {
+      const investTenant = tenants.find((t) => t.id === '4');
+      if (investTenant) {
+        setSelectedTenant(investTenant); // Invest
       }
     } else if (pathname.startsWith('/dashboard')) {
       const dashboardTenant = tenants.find((t) => t.id === '1');
       if (dashboardTenant) {
-        setSelectedTenant(dashboardTenant); // Dashboard tenant
+        setSelectedTenant(dashboardTenant); // Dashboard
       }
     }
   }, [pathname, tenants]);
@@ -141,22 +143,23 @@ export default function AppSidebar() {
 
   const isLoading = status === 'loading' || !pathname || !user;
 
-  // Get navigation items based on selected tenant
+  // Get navigation items based on selected tenant and user role
   const getNavItems = React.useMemo(() => {
-    if (selectedTenant.id === '4') {
-      // Super Admin tenant - show super admin items
-      return navItemsSuperAdmin;
-    } else if (selectedTenant.id === '3') {
-      // Admin tenant - show admin items
-      return navItemsAdmin;
-    } else if (selectedTenant.id === '2') {
-      // Seller tenant - show seller items
-      return navItemsSeller;
-    } else {
-      // Dashboard tenant (ID 1) - show user items
-      return navItemsUser;
+    if (!selectedTenant || !user?.role) {
+      return [];
     }
-  }, [selectedTenant.id]);
+
+    const tenantName = selectedTenant.name;
+    const userRole = user.role as 'USER' | 'SELLER' | 'ADMIN' | 'SUPERADMIN';
+
+    // Get nav items for the selected tenant and user role
+    const tenantData = tenantNavItems[tenantName];
+    if (!tenantData) {
+      return [];
+    }
+
+    return tenantData[userRole] || [];
+  }, [selectedTenant, user?.role]);
 
   return (
     <Sidebar collapsible='icon'>
@@ -179,7 +182,7 @@ export default function AppSidebar() {
                 <div className='h-6 w-6 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600'></div>
               </div>
             ) : (
-              getNavItems.map((item) => {
+              getNavItems.map((item: NavItem) => {
                 const Icon = item.icon ? Icons[item.icon] : Icons.logo;
                 return item?.items && item?.items?.length > 0 ? (
                   <Collapsible
@@ -201,7 +204,7 @@ export default function AppSidebar() {
                       </CollapsibleTrigger>
                       <CollapsibleContent>
                         <SidebarMenuSub>
-                          {item.items?.map((subItem) => (
+                          {item.items?.map((subItem: NavItem) => (
                             <SidebarMenuSubItem key={subItem.title}>
                               <SidebarMenuSubButton
                                 asChild
