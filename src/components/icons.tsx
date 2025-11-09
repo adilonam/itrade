@@ -38,7 +38,8 @@ import {
   IconSwitchVertical,
   IconPigMoney,
   IconTrendingUp,
-  IconPalette
+  IconPalette,
+  IconMail
 } from '@tabler/icons-react';
 
 export type Icon = React.ComponentType<IconProps>;
@@ -82,5 +83,6 @@ export const Icons = {
   switchVertical: IconSwitchVertical,
   pigMoney: IconPigMoney,
   trendingUp: IconTrendingUp,
-  palette: IconPalette
+  palette: IconPalette,
+  message: IconMail
 };

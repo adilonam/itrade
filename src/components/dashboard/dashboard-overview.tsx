@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   IconTrendingUp,
   IconTrendingDown,
-  IconWallet,
   IconChartBar,
   IconPigMoney,
   IconCoins,
@@ -15,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { DashboardStatsGrid } from './dashboard-stats-grid';
 import { DashboardCharts } from './dashboard-charts';
 import { UserInfoCard } from './user-info-card';
+import { UserMessages } from './user-messages';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface FinancialData {
@@ -306,6 +306,9 @@ export function DashboardOverview() {
         investments={data.investments}
         financial={data.financial}
       />
+
+      {/* Messages */}
+      <UserMessages />
     </div>
   );
 }

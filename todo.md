@@ -44,3 +44,6 @@
 - [x] dashboard
 - [ ] position ouvert droit seller
 - [ ] switch from pro
+- [ ] free margion pour chque room
+- [ ] recherche room trading all market
+- [ ] symbol name

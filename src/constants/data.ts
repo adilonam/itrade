@@ -64,6 +64,14 @@ export const navItemsUser: NavItem[] = [
     items: []
   },
   {
+    title: 'Messages',
+    url: '/dashboard/messages',
+    icon: 'message',
+    isActive: false,
+    shortcut: ['m', 's'],
+    items: []
+  },
+  {
     title: 'Account',
     url: '#',
     icon: 'billing',
@@ -113,6 +121,14 @@ export const navItemsSeller: NavItem[] = [
     icon: 'switchVertical',
     isActive: false,
     shortcut: ['s', 'p'],
+    items: []
+  },
+  {
+    title: 'Messages',
+    url: '/seller/messages',
+    icon: 'message',
+    isActive: false,
+    shortcut: ['s', 'm'],
     items: []
   }
 ];
