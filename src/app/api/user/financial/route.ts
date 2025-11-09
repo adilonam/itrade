@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { calculateUserFinancialInfo } from '@/lib/calculator-server';
@@ -10,6 +10,13 @@ import { calculateUserFinancialInfo } from '@/lib/calculator-server';
  *     summary: Get current user's financial metrics
  *     tags: [User, Financial]
  *     description: Calculates and returns comprehensive financial metrics including balance, margin, equity, and PnL
+ *     parameters:
+ *       - in: query
+ *         name: room
+ *         schema:
+ *           type: string
+ *           enum: [STOCK, TRADING, ALL]
+ *         description: Filter positions by room (STOCK, TRADING, or ALL). Defaults to ALL (calculates for both rooms).
  *     responses:
  *       200:
  *         description: User's financial metrics
@@ -45,13 +52,21 @@ import { calculateUserFinancialInfo } from '@/lib/calculator-server';
  *       500:
  *         description: Internal server error
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    // Get room query parameter
+    const searchParams = request.nextUrl.searchParams;
+    const roomParam = searchParams.get('room');
+    const room: 'STOCK' | 'TRADING' | 'ALL' =
+      roomParam && ['STOCK', 'TRADING', 'ALL'].includes(roomParam)
+        ? (roomParam as 'STOCK' | 'TRADING' | 'ALL')
+        : 'ALL';
 
     // Get user with required fields
     const { prisma } = await import('@/lib/prisma');
@@ -64,7 +79,7 @@ export async function GET() {
     }
 
     // Use the centralized financial calculation function
-    const financialInfo = await calculateUserFinancialInfo(user);
+    const financialInfo = await calculateUserFinancialInfo(user, room);
 
     if (!financialInfo) {
       return NextResponse.json(

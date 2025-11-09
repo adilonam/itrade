@@ -146,7 +146,7 @@ export function StockPortfolioView() {
   // Load financial data from API
   const loadFinancialData = useCallback(async () => {
     try {
-      const response = await fetch('/api/user/financial');
+      const response = await fetch('/api/user/financial?room=STOCK');
       if (!response.ok) {
         throw new Error('Failed to fetch financial data');
       }

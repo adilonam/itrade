@@ -208,7 +208,7 @@ export function UserPositionsTableRoomTrading({
                         <TableHead>Closed Price</TableHead>
                         <TableHead>Take Profit</TableHead>
                         <TableHead>Stop Loss</TableHead>
-                        <TableHead>Required Margin</TableHead>
+                        <TableHead>Value</TableHead>
                         <TableHead>P&L</TableHead>
                         <TableHead>Status</TableHead>
                         <TableHead>Date</TableHead>

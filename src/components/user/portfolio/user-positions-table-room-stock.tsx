@@ -100,6 +100,7 @@ export function UserPositionsTableRoomStock({
                   <TableHead className='min-w-[100px]'>Quantity</TableHead>
                   <TableHead className='min-w-[100px]'>Exec Price</TableHead>
                   <TableHead className='min-w-[100px]'>Closed Price</TableHead>
+                  <TableHead className='min-w-[100px]'>Value</TableHead>
                   <TableHead className='min-w-[80px]'>P&L</TableHead>
                   <TableHead className='min-w-[80px]'>Status</TableHead>
                   <TableHead className='min-w-[120px]'>Date</TableHead>
@@ -134,6 +135,11 @@ export function UserPositionsTableRoomStock({
                     <TableCell className='text-xs'>
                       {position.closedPrice
                         ? `$${position.closedPrice.toFixed(2)}`
+                        : '-'}
+                    </TableCell>
+                    <TableCell className='text-xs'>
+                      {position.requiredMargin
+                        ? `$${position.requiredMargin.toFixed(2)}`
                         : '-'}
                     </TableCell>
                     <TableCell className='text-xs'>

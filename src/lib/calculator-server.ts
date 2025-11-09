@@ -290,9 +290,13 @@ export async function calculateRequiredMargin(
 /**
  * Calculate comprehensive financial information for a user
  * @param user - User object from Prisma with id, balance, and leverage
+ * @param room - Room filter (STOCK, TRADING, or ALL). Defaults to ALL (calculates for both rooms).
  * @returns Object containing balance, margins, equity, PnL, and leverage
  */
-export async function calculateUserFinancialInfo(user: User): Promise<{
+export async function calculateUserFinancialInfo(
+  user: User,
+  room: 'STOCK' | 'TRADING' | 'ALL' = 'ALL'
+): Promise<{
   balance: number;
   usedMargin: number;
   equity: number;
@@ -308,12 +312,20 @@ export async function calculateUserFinancialInfo(user: User): Promise<{
       return null;
     }
 
-    // Get all PLACED positions for the user
+    // Build where clause for positions
+    const whereClause: any = {
+      userId: user.id,
+      status: 'PLACED'
+    };
+
+    // Filter by room if specified (not ALL)
+    if (room !== 'ALL') {
+      whereClause.room = room;
+    }
+
+    // Get all PLACED positions for the user (filtered by room if specified)
     const placedPositions = await prisma.position.findMany({
-      where: {
-        userId: user.id,
-        status: 'PLACED'
-      },
+      where: whereClause,
       include: {
         market: true
       }
