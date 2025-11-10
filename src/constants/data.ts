@@ -25,7 +25,7 @@ export const tenantNavItems: TenantNavItems = {
     USER: [
       {
         title: 'Overview',
-        url: '/dashboard',
+        url: '/overview',
         icon: 'dashboard',
         isActive: false,
         shortcut: ['d', 'd'],
@@ -33,7 +33,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Mes transaction',
-        url: '/dashboard/transactions',
+        url: '/transactions',
         icon: 'transaction',
         isActive: false,
         shortcut: ['t', 'r'],
@@ -41,7 +41,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Messagerie',
-        url: '/dashboard/messages',
+        url: '/messages',
         icon: 'message',
         isActive: false,
         shortcut: ['m', 's'],
@@ -49,7 +49,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Withdraw',
-        url: '/dashboard/withdraw',
+        url: '/withdraw',
         icon: 'minus',
         isActive: false,
         shortcut: ['w', 'd'],
@@ -57,7 +57,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Deposit',
-        url: '/dashboard/deposit',
+        url: '/deposit',
         icon: 'add',
         isActive: false,
         shortcut: ['d', 'p'],
@@ -65,7 +65,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Toutes actualité confondus en fonction activation',
-        url: '/dashboard/news',
+        url: '/news',
         icon: 'news',
         isActive: false,
         shortcut: ['n', 'w'],
@@ -73,7 +73,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Liens Utiles',
-        url: '/dashboard/useful-links',
+        url: '/useful-links',
         icon: 'link',
         isActive: false,
         shortcut: ['l', 'u'],
@@ -87,7 +87,7 @@ export const tenantNavItems: TenantNavItems = {
         items: [
           {
             title: 'Profile',
-            url: '/dashboard/profile',
+            url: '/profile',
             icon: 'userPen',
             shortcut: ['p', 'r']
           }
@@ -97,7 +97,7 @@ export const tenantNavItems: TenantNavItems = {
     SELLER: [
       {
         title: 'Overview',
-        url: '/dashboard',
+        url: '/overview',
         icon: 'dashboard',
         isActive: false,
         shortcut: ['d', 'd'],
@@ -105,7 +105,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Mes transaction',
-        url: '/dashboard/transactions',
+        url: '/transactions',
         icon: 'transaction',
         isActive: false,
         shortcut: ['t', 'r'],
@@ -113,7 +113,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Messagerie',
-        url: '/dashboard/messages',
+        url: '/messages',
         icon: 'message',
         isActive: false,
         shortcut: ['m', 's'],
@@ -121,7 +121,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Withdraw',
-        url: '/dashboard/withdraw',
+        url: '/withdraw',
         icon: 'minus',
         isActive: false,
         shortcut: ['w', 'd'],
@@ -129,7 +129,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Deposit',
-        url: '/dashboard/deposit',
+        url: '/deposit',
         icon: 'add',
         isActive: false,
         shortcut: ['d', 'p'],
@@ -137,7 +137,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Toutes actualité confondus en fonction activation',
-        url: '/dashboard/news',
+        url: '/news',
         icon: 'news',
         isActive: false,
         shortcut: ['n', 'w'],
@@ -145,7 +145,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Liens Utiles',
-        url: '/dashboard/useful-links',
+        url: '/useful-links',
         icon: 'link',
         isActive: false,
         shortcut: ['l', 'u'],
@@ -159,7 +159,7 @@ export const tenantNavItems: TenantNavItems = {
         items: [
           {
             title: 'Profile',
-            url: '/dashboard/profile',
+            url: '/profile',
             icon: 'userPen',
             shortcut: ['p', 'r']
           }
@@ -169,7 +169,7 @@ export const tenantNavItems: TenantNavItems = {
     ADMIN: [
       {
         title: 'Overview',
-        url: '/dashboard',
+        url: '/overview',
         icon: 'dashboard',
         isActive: false,
         shortcut: ['d', 'd'],
@@ -177,7 +177,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Mes transaction',
-        url: '/dashboard/transactions',
+        url: '/transactions',
         icon: 'transaction',
         isActive: false,
         shortcut: ['t', 'r'],
@@ -185,7 +185,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Messagerie',
-        url: '/dashboard/messages',
+        url: '/messages',
         icon: 'message',
         isActive: false,
         shortcut: ['m', 's'],
@@ -193,7 +193,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Withdraw',
-        url: '/dashboard/withdraw',
+        url: '/withdraw',
         icon: 'minus',
         isActive: false,
         shortcut: ['w', 'd'],
@@ -201,7 +201,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Deposit',
-        url: '/dashboard/deposit',
+        url: '/deposit',
         icon: 'add',
         isActive: false,
         shortcut: ['d', 'p'],
@@ -209,7 +209,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Toutes actualité confondus en fonction activation',
-        url: '/dashboard/news',
+        url: '/news',
         icon: 'news',
         isActive: false,
         shortcut: ['n', 'w'],
@@ -217,7 +217,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Liens Utiles',
-        url: '/dashboard/useful-links',
+        url: '/useful-links',
         icon: 'link',
         isActive: false,
         shortcut: ['l', 'u'],
@@ -231,7 +231,7 @@ export const tenantNavItems: TenantNavItems = {
         items: [
           {
             title: 'Profile',
-            url: '/dashboard/profile',
+            url: '/profile',
             icon: 'userPen',
             shortcut: ['p', 'r']
           }
@@ -241,7 +241,7 @@ export const tenantNavItems: TenantNavItems = {
     SUPERADMIN: [
       {
         title: 'Overview',
-        url: '/dashboard',
+        url: '/overview',
         icon: 'dashboard',
         isActive: false,
         shortcut: ['d', 'd'],
@@ -249,7 +249,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Mes transaction',
-        url: '/dashboard/transactions',
+        url: '/transactions',
         icon: 'transaction',
         isActive: false,
         shortcut: ['t', 'r'],
@@ -257,7 +257,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Messagerie',
-        url: '/dashboard/messages',
+        url: '/messages',
         icon: 'message',
         isActive: false,
         shortcut: ['m', 's'],
@@ -265,7 +265,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Withdraw',
-        url: '/dashboard/withdraw',
+        url: '/withdraw',
         icon: 'minus',
         isActive: false,
         shortcut: ['w', 'd'],
@@ -273,7 +273,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Deposit',
-        url: '/dashboard/deposit',
+        url: '/deposit',
         icon: 'add',
         isActive: false,
         shortcut: ['d', 'p'],
@@ -281,7 +281,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Toutes actualité confondus en fonction activation',
-        url: '/dashboard/news',
+        url: '/news',
         icon: 'news',
         isActive: false,
         shortcut: ['n', 'w'],
@@ -289,7 +289,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Liens Utiles',
-        url: '/dashboard/useful-links',
+        url: '/useful-links',
         icon: 'link',
         isActive: false,
         shortcut: ['l', 'u'],
@@ -303,7 +303,7 @@ export const tenantNavItems: TenantNavItems = {
         items: [
           {
             title: 'Profile',
-            url: '/dashboard/profile',
+            url: '/profile',
             icon: 'userPen',
             shortcut: ['p', 'r']
           }
@@ -315,7 +315,7 @@ export const tenantNavItems: TenantNavItems = {
     USER: [
       {
         title: 'Dashboard',
-        url: '/dashboard/markets-room-trading',
+        url: '/markets-room-trading',
         icon: 'dashboard',
         isActive: false,
         shortcut: ['d', 'd'],
@@ -323,7 +323,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'My Positions',
-        url: '/dashboard/positions-room-trading',
+        url: '/positions-room-trading',
         icon: 'switchVertical',
         isActive: false,
         shortcut: ['m', 'p'],
@@ -331,7 +331,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Mes transaction',
-        url: '/dashboard/transactions?type=trade',
+        url: '/transactions?type=trade',
         icon: 'transaction',
         isActive: false,
         shortcut: ['t', 'r'],
@@ -339,7 +339,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'actualité',
-        url: '/dashboard/news?type=trade',
+        url: '/news?type=trade',
         icon: 'news',
         isActive: false,
         shortcut: ['n', 'w'],
@@ -347,7 +347,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Withdraw',
-        url: '/dashboard/withdraw',
+        url: '/withdraw',
         icon: 'minus',
         isActive: false,
         shortcut: ['w', 'd'],
@@ -355,7 +355,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Deposit',
-        url: '/dashboard/deposit',
+        url: '/deposit',
         icon: 'add',
         isActive: false,
         shortcut: ['d', 'p'],
@@ -369,7 +369,7 @@ export const tenantNavItems: TenantNavItems = {
         items: [
           {
             title: 'Profile',
-            url: '/dashboard/profile',
+            url: '/profile',
             icon: 'userPen',
             shortcut: ['p', 'r']
           }
@@ -379,7 +379,7 @@ export const tenantNavItems: TenantNavItems = {
     SELLER: [
       {
         title: 'Dashboard',
-        url: '/dashboard/markets-room-trading',
+        url: '/markets-room-trading',
         icon: 'dashboard',
         isActive: false,
         shortcut: ['d', 'd'],
@@ -387,7 +387,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'My Positions',
-        url: '/dashboard/positions-room-trading',
+        url: '/positions-room-trading',
         icon: 'switchVertical',
         isActive: false,
         shortcut: ['m', 'p'],
@@ -395,7 +395,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Mes transaction',
-        url: '/dashboard/transactions?type=trade',
+        url: '/transactions?type=trade',
         icon: 'transaction',
         isActive: false,
         shortcut: ['t', 'r'],
@@ -403,7 +403,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'actualité',
-        url: '/dashboard/news?type=trade',
+        url: '/news?type=trade',
         icon: 'news',
         isActive: false,
         shortcut: ['n', 'w'],
@@ -411,7 +411,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Withdraw',
-        url: '/dashboard/withdraw',
+        url: '/withdraw',
         icon: 'minus',
         isActive: false,
         shortcut: ['w', 'd'],
@@ -419,7 +419,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Deposit',
-        url: '/dashboard/deposit',
+        url: '/deposit',
         icon: 'add',
         isActive: false,
         shortcut: ['d', 'p'],
@@ -433,7 +433,7 @@ export const tenantNavItems: TenantNavItems = {
         items: [
           {
             title: 'Profile',
-            url: '/dashboard/profile',
+            url: '/profile',
             icon: 'userPen',
             shortcut: ['p', 'r']
           }
@@ -443,7 +443,7 @@ export const tenantNavItems: TenantNavItems = {
     ADMIN: [
       {
         title: 'Dashboard',
-        url: '/dashboard/markets-room-trading',
+        url: '/markets-room-trading',
         icon: 'dashboard',
         isActive: false,
         shortcut: ['d', 'd'],
@@ -451,7 +451,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'My Positions',
-        url: '/dashboard/positions-room-trading',
+        url: '/positions-room-trading',
         icon: 'switchVertical',
         isActive: false,
         shortcut: ['m', 'p'],
@@ -459,7 +459,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Mes transaction',
-        url: '/dashboard/transactions?type=trade',
+        url: '/transactions?type=trade',
         icon: 'transaction',
         isActive: false,
         shortcut: ['t', 'r'],
@@ -467,7 +467,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'actualité',
-        url: '/dashboard/news?type=trade',
+        url: '/news?type=trade',
         icon: 'news',
         isActive: false,
         shortcut: ['n', 'w'],
@@ -475,7 +475,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Withdraw',
-        url: '/dashboard/withdraw',
+        url: '/withdraw',
         icon: 'minus',
         isActive: false,
         shortcut: ['w', 'd'],
@@ -483,7 +483,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Deposit',
-        url: '/dashboard/deposit',
+        url: '/deposit',
         icon: 'add',
         isActive: false,
         shortcut: ['d', 'p'],
@@ -497,7 +497,7 @@ export const tenantNavItems: TenantNavItems = {
         items: [
           {
             title: 'Profile',
-            url: '/dashboard/profile',
+            url: '/profile',
             icon: 'userPen',
             shortcut: ['p', 'r']
           }
@@ -507,7 +507,7 @@ export const tenantNavItems: TenantNavItems = {
     SUPERADMIN: [
       {
         title: 'Dashboard',
-        url: '/dashboard/markets-room-trading',
+        url: '/markets-room-trading',
         icon: 'dashboard',
         isActive: false,
         shortcut: ['d', 'd'],
@@ -515,7 +515,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'My Positions',
-        url: '/dashboard/positions-room-trading',
+        url: '/positions-room-trading',
         icon: 'switchVertical',
         isActive: false,
         shortcut: ['m', 'p'],
@@ -523,7 +523,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Mes transaction',
-        url: '/dashboard/transactions?type=trade',
+        url: '/transactions?type=trade',
         icon: 'transaction',
         isActive: false,
         shortcut: ['t', 'r'],
@@ -531,7 +531,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'actualité',
-        url: '/dashboard/news?type=trade',
+        url: '/news?type=trade',
         icon: 'news',
         isActive: false,
         shortcut: ['n', 'w'],
@@ -539,7 +539,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Withdraw',
-        url: '/dashboard/withdraw',
+        url: '/withdraw',
         icon: 'minus',
         isActive: false,
         shortcut: ['w', 'd'],
@@ -547,7 +547,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Deposit',
-        url: '/dashboard/deposit',
+        url: '/deposit',
         icon: 'add',
         isActive: false,
         shortcut: ['d', 'p'],
@@ -561,7 +561,7 @@ export const tenantNavItems: TenantNavItems = {
         items: [
           {
             title: 'Profile',
-            url: '/dashboard/profile',
+            url: '/profile',
             icon: 'userPen',
             shortcut: ['p', 'r']
           }
@@ -573,7 +573,7 @@ export const tenantNavItems: TenantNavItems = {
     USER: [
       {
         title: 'Dashboard',
-        url: '/dashboard/markets-room-stock',
+        url: '/markets-room-stock',
         icon: 'dashboard',
         isActive: false,
         shortcut: ['d', 'd'],
@@ -581,7 +581,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'My Portfolio',
-        url: '/dashboard/positions-room-stock',
+        url: '/positions-room-stock',
         icon: 'portfolio',
         isActive: false,
         shortcut: ['m', 'p'],
@@ -589,7 +589,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Mes transaction',
-        url: '/dashboard/transactions?type=stock',
+        url: '/transactions?type=stock',
         icon: 'transaction',
         isActive: false,
         shortcut: ['t', 'r'],
@@ -597,7 +597,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'actualité',
-        url: '/dashboard/news?type=stock',
+        url: '/news?type=stock',
         icon: 'news',
         isActive: false,
         shortcut: ['n', 'w'],
@@ -605,7 +605,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Withdraw',
-        url: '/dashboard/withdraw',
+        url: '/withdraw',
         icon: 'minus',
         isActive: false,
         shortcut: ['w', 'd'],
@@ -613,7 +613,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Deposit',
-        url: '/dashboard/deposit',
+        url: '/deposit',
         icon: 'add',
         isActive: false,
         shortcut: ['d', 'p'],
@@ -627,7 +627,7 @@ export const tenantNavItems: TenantNavItems = {
         items: [
           {
             title: 'Profile',
-            url: '/dashboard/profile',
+            url: '/profile',
             icon: 'userPen',
             shortcut: ['p', 'r']
           }
@@ -637,7 +637,7 @@ export const tenantNavItems: TenantNavItems = {
     SELLER: [
       {
         title: 'Dashboard',
-        url: '/dashboard/markets-room-stock',
+        url: '/markets-room-stock',
         icon: 'dashboard',
         isActive: false,
         shortcut: ['d', 'd'],
@@ -645,7 +645,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'My Portfolio',
-        url: '/dashboard/positions-room-stock',
+        url: '/positions-room-stock',
         icon: 'portfolio',
         isActive: false,
         shortcut: ['m', 'p'],
@@ -653,7 +653,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Mes transaction',
-        url: '/dashboard/transactions?type=stock',
+        url: '/transactions?type=stock',
         icon: 'transaction',
         isActive: false,
         shortcut: ['t', 'r'],
@@ -661,7 +661,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'actualité',
-        url: '/dashboard/news?type=stock',
+        url: '/news?type=stock',
         icon: 'news',
         isActive: false,
         shortcut: ['n', 'w'],
@@ -669,7 +669,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Withdraw',
-        url: '/dashboard/withdraw',
+        url: '/withdraw',
         icon: 'minus',
         isActive: false,
         shortcut: ['w', 'd'],
@@ -677,7 +677,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Deposit',
-        url: '/dashboard/deposit',
+        url: '/deposit',
         icon: 'add',
         isActive: false,
         shortcut: ['d', 'p'],
@@ -691,7 +691,7 @@ export const tenantNavItems: TenantNavItems = {
         items: [
           {
             title: 'Profile',
-            url: '/dashboard/profile',
+            url: '/profile',
             icon: 'userPen',
             shortcut: ['p', 'r']
           }
@@ -701,7 +701,7 @@ export const tenantNavItems: TenantNavItems = {
     ADMIN: [
       {
         title: 'Dashboard',
-        url: '/dashboard/markets-room-stock',
+        url: '/markets-room-stock',
         icon: 'dashboard',
         isActive: false,
         shortcut: ['d', 'd'],
@@ -709,7 +709,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'My Portfolio',
-        url: '/dashboard/positions-room-stock',
+        url: '/positions-room-stock',
         icon: 'portfolio',
         isActive: false,
         shortcut: ['m', 'p'],
@@ -717,7 +717,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Mes transaction',
-        url: '/dashboard/transactions?type=stock',
+        url: '/transactions?type=stock',
         icon: 'transaction',
         isActive: false,
         shortcut: ['t', 'r'],
@@ -725,7 +725,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'actualité',
-        url: '/dashboard/news?type=stock',
+        url: '/news?type=stock',
         icon: 'news',
         isActive: false,
         shortcut: ['n', 'w'],
@@ -733,7 +733,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Withdraw',
-        url: '/dashboard/withdraw',
+        url: '/withdraw',
         icon: 'minus',
         isActive: false,
         shortcut: ['w', 'd'],
@@ -741,7 +741,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Deposit',
-        url: '/dashboard/deposit',
+        url: '/deposit',
         icon: 'add',
         isActive: false,
         shortcut: ['d', 'p'],
@@ -755,7 +755,7 @@ export const tenantNavItems: TenantNavItems = {
         items: [
           {
             title: 'Profile',
-            url: '/dashboard/profile',
+            url: '/profile',
             icon: 'userPen',
             shortcut: ['p', 'r']
           }
@@ -765,7 +765,7 @@ export const tenantNavItems: TenantNavItems = {
     SUPERADMIN: [
       {
         title: 'Dashboard',
-        url: '/dashboard/markets-room-stock',
+        url: '/markets-room-stock',
         icon: 'dashboard',
         isActive: false,
         shortcut: ['d', 'd'],
@@ -773,7 +773,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'My Portfolio',
-        url: '/dashboard/positions-room-stock',
+        url: '/positions-room-stock',
         icon: 'portfolio',
         isActive: false,
         shortcut: ['m', 'p'],
@@ -781,7 +781,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Mes transaction',
-        url: '/dashboard/transactions?type=stock',
+        url: '/transactions?type=stock',
         icon: 'transaction',
         isActive: false,
         shortcut: ['t', 'r'],
@@ -789,7 +789,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'actualité',
-        url: '/dashboard/news?type=stock',
+        url: '/news?type=stock',
         icon: 'news',
         isActive: false,
         shortcut: ['n', 'w'],
@@ -797,7 +797,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Withdraw',
-        url: '/dashboard/withdraw',
+        url: '/withdraw',
         icon: 'minus',
         isActive: false,
         shortcut: ['w', 'd'],
@@ -805,7 +805,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Deposit',
-        url: '/dashboard/deposit',
+        url: '/deposit',
         icon: 'add',
         isActive: false,
         shortcut: ['d', 'p'],
@@ -819,7 +819,7 @@ export const tenantNavItems: TenantNavItems = {
         items: [
           {
             title: 'Profile',
-            url: '/dashboard/profile',
+            url: '/profile',
             icon: 'userPen',
             shortcut: ['p', 'r']
           }
@@ -831,7 +831,7 @@ export const tenantNavItems: TenantNavItems = {
     USER: [
       {
         title: 'Dashboard',
-        url: '/dashboard/investments',
+        url: '/overview',
         icon: 'dashboard',
         isActive: false,
         shortcut: ['d', 'd'],
@@ -839,7 +839,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'My Invest',
-        url: '/dashboard/investments',
+        url: '/investments',
         icon: 'pigMoney',
         isActive: false,
         shortcut: ['m', 'i'],
@@ -847,7 +847,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Mes transaction',
-        url: '/dashboard/transactions?type=invest',
+        url: '/transactions?type=invest',
         icon: 'transaction',
         isActive: false,
         shortcut: ['t', 'r'],
@@ -855,7 +855,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'actualité',
-        url: '/dashboard/news?type=invest',
+        url: '/news?type=invest',
         icon: 'news',
         isActive: false,
         shortcut: ['n', 'w'],
@@ -863,7 +863,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Withdraw',
-        url: '/dashboard/withdraw',
+        url: '/withdraw',
         icon: 'minus',
         isActive: false,
         shortcut: ['w', 'd'],
@@ -871,7 +871,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Deposit',
-        url: '/dashboard/deposit',
+        url: '/deposit',
         icon: 'add',
         isActive: false,
         shortcut: ['d', 'p'],
@@ -885,7 +885,7 @@ export const tenantNavItems: TenantNavItems = {
         items: [
           {
             title: 'Profile',
-            url: '/dashboard/profile',
+            url: '/profile',
             icon: 'userPen',
             shortcut: ['p', 'r']
           }
@@ -895,7 +895,7 @@ export const tenantNavItems: TenantNavItems = {
     SELLER: [
       {
         title: 'Dashboard',
-        url: '/dashboard/investments',
+        url: '/overview',
         icon: 'dashboard',
         isActive: false,
         shortcut: ['d', 'd'],
@@ -903,7 +903,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'My Invest',
-        url: '/dashboard/investments',
+        url: '/investments',
         icon: 'pigMoney',
         isActive: false,
         shortcut: ['m', 'i'],
@@ -911,7 +911,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Mes transaction',
-        url: '/dashboard/transactions?type=invest',
+        url: '/transactions?type=invest',
         icon: 'transaction',
         isActive: false,
         shortcut: ['t', 'r'],
@@ -919,7 +919,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'actualité',
-        url: '/dashboard/news?type=invest',
+        url: '/news?type=invest',
         icon: 'news',
         isActive: false,
         shortcut: ['n', 'w'],
@@ -927,7 +927,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Withdraw',
-        url: '/dashboard/withdraw',
+        url: '/withdraw',
         icon: 'minus',
         isActive: false,
         shortcut: ['w', 'd'],
@@ -935,7 +935,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Deposit',
-        url: '/dashboard/deposit',
+        url: '/deposit',
         icon: 'add',
         isActive: false,
         shortcut: ['d', 'p'],
@@ -949,7 +949,7 @@ export const tenantNavItems: TenantNavItems = {
         items: [
           {
             title: 'Profile',
-            url: '/dashboard/profile',
+            url: '/profile',
             icon: 'userPen',
             shortcut: ['p', 'r']
           }
@@ -959,7 +959,7 @@ export const tenantNavItems: TenantNavItems = {
     ADMIN: [
       {
         title: 'Dashboard',
-        url: '/dashboard/investments',
+        url: '/overview',
         icon: 'dashboard',
         isActive: false,
         shortcut: ['d', 'd'],
@@ -967,7 +967,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'My Invest',
-        url: '/dashboard/investments',
+        url: '/investments',
         icon: 'pigMoney',
         isActive: false,
         shortcut: ['m', 'i'],
@@ -975,7 +975,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Mes transaction',
-        url: '/dashboard/transactions?type=invest',
+        url: '/transactions?type=invest',
         icon: 'transaction',
         isActive: false,
         shortcut: ['t', 'r'],
@@ -983,7 +983,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'actualité',
-        url: '/dashboard/news?type=invest',
+        url: '/news?type=invest',
         icon: 'news',
         isActive: false,
         shortcut: ['n', 'w'],
@@ -991,7 +991,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Withdraw',
-        url: '/dashboard/withdraw',
+        url: '/withdraw',
         icon: 'minus',
         isActive: false,
         shortcut: ['w', 'd'],
@@ -999,7 +999,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Deposit',
-        url: '/dashboard/deposit',
+        url: '/deposit',
         icon: 'add',
         isActive: false,
         shortcut: ['d', 'p'],
@@ -1013,7 +1013,7 @@ export const tenantNavItems: TenantNavItems = {
         items: [
           {
             title: 'Profile',
-            url: '/dashboard/profile',
+            url: '/profile',
             icon: 'userPen',
             shortcut: ['p', 'r']
           }
@@ -1023,7 +1023,7 @@ export const tenantNavItems: TenantNavItems = {
     SUPERADMIN: [
       {
         title: 'Dashboard',
-        url: '/dashboard/investments',
+        url: '/overview',
         icon: 'dashboard',
         isActive: false,
         shortcut: ['d', 'd'],
@@ -1031,7 +1031,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'My Invest',
-        url: '/dashboard/investments',
+        url: '/investments',
         icon: 'pigMoney',
         isActive: false,
         shortcut: ['m', 'i'],
@@ -1039,7 +1039,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Mes transaction',
-        url: '/dashboard/transactions?type=invest',
+        url: '/transactions?type=invest',
         icon: 'transaction',
         isActive: false,
         shortcut: ['t', 'r'],
@@ -1047,7 +1047,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'actualité',
-        url: '/dashboard/news?type=invest',
+        url: '/news?type=invest',
         icon: 'news',
         isActive: false,
         shortcut: ['n', 'w'],
@@ -1055,7 +1055,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Withdraw',
-        url: '/dashboard/withdraw',
+        url: '/withdraw',
         icon: 'minus',
         isActive: false,
         shortcut: ['w', 'd'],
@@ -1063,7 +1063,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Deposit',
-        url: '/dashboard/deposit',
+        url: '/deposit',
         icon: 'add',
         isActive: false,
         shortcut: ['d', 'p'],
@@ -1077,7 +1077,7 @@ export const tenantNavItems: TenantNavItems = {
         items: [
           {
             title: 'Profile',
-            url: '/dashboard/profile',
+            url: '/profile',
             icon: 'userPen',
             shortcut: ['p', 'r']
           }

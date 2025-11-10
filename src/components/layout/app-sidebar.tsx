@@ -62,25 +62,48 @@ export default function AppSidebar() {
   const router = useRouter();
   const user = session?.user;
 
-  // Dynamic tenants - all users get all tenants, but nav items vary by role
+  // Dynamic tenants - get from data.ts and filter based on user role
+  // Only show tenants that have navigation items for the current user role
   const tenants = React.useMemo(() => {
-    return [
-      { id: '1', name: 'Dashboard' },
-      { id: '2', name: 'Room Trading' },
-      { id: '3', name: 'Room Stock' },
-      { id: '4', name: 'Invest' },
-      { id: '5', name: 'Administration' },
-      { id: '6', name: 'Configuration' }
-    ];
-  }, []);
+    if (!user?.role) {
+      return [];
+    }
+
+    const userRole = user.role as 'USER' | 'SELLER' | 'ADMIN' | 'SUPERADMIN';
+    const tenantNames = Object.keys(tenantNavItems);
+
+    return tenantNames
+      .map((name, index) => ({
+        id: String(index + 1),
+        name
+      }))
+      .filter((tenant) => {
+        const tenantData = tenantNavItems[tenant.name];
+        if (!tenantData) {
+          return false;
+        }
+        const navItems = tenantData[userRole] || [];
+        // Only include tenant if it has navigation items for this role
+        return navItems.length > 0;
+      });
+  }, [user?.role]);
 
   // Track the selected tenant
-  const [selectedTenant, setSelectedTenant] = React.useState(() => tenants[0]);
+  const [selectedTenant, setSelectedTenant] = React.useState<{
+    id: string;
+    name: string;
+  } | null>(null);
 
   // Update selected tenant when tenants change (e.g., when user role is loaded)
   React.useEffect(() => {
-    if (!selectedTenant || !tenants.find((t) => t.id === selectedTenant.id)) {
-      setSelectedTenant(tenants[0]);
+    if (tenants.length > 0) {
+      // If no tenant is selected or current tenant is not in the list, select the first one
+      if (!selectedTenant || !tenants.find((t) => t.id === selectedTenant.id)) {
+        setSelectedTenant(tenants[0]);
+      }
+    } else {
+      // If no tenants available, clear selection
+      setSelectedTenant(null);
     }
   }, [tenants, selectedTenant]);
 
@@ -94,45 +117,45 @@ export default function AppSidebar() {
   React.useEffect(() => {
     // Auto-select tenant based on current path
     if (pathname.startsWith('/super-admin')) {
-      const configTenant = tenants.find((t) => t.id === '6');
+      const configTenant = tenants.find((t) => t.name === 'Configuration');
       if (configTenant) {
-        setSelectedTenant(configTenant); // Configuration
+        setSelectedTenant(configTenant);
       }
     } else if (pathname.startsWith('/admin')) {
-      const adminTenant = tenants.find((t) => t.id === '5');
+      const adminTenant = tenants.find((t) => t.name === 'Administration');
       if (adminTenant) {
-        setSelectedTenant(adminTenant); // Administration
+        setSelectedTenant(adminTenant);
       }
     } else if (pathname.startsWith('/seller')) {
-      const adminTenant = tenants.find((t) => t.id === '5');
+      const adminTenant = tenants.find((t) => t.name === 'Administration');
       if (adminTenant) {
-        setSelectedTenant(adminTenant); // Administration
+        setSelectedTenant(adminTenant);
       }
     } else if (
       pathname.includes('/markets-room-trading') ||
       pathname.includes('/positions-room-trading')
     ) {
-      const roomTradingTenant = tenants.find((t) => t.id === '2');
+      const roomTradingTenant = tenants.find((t) => t.name === 'Room Trading');
       if (roomTradingTenant) {
-        setSelectedTenant(roomTradingTenant); // Room Trading
+        setSelectedTenant(roomTradingTenant);
       }
     } else if (
       pathname.includes('/markets-room-stock') ||
       pathname.includes('/positions-room-stock')
     ) {
-      const roomStockTenant = tenants.find((t) => t.id === '3');
+      const roomStockTenant = tenants.find((t) => t.name === 'Room Stock');
       if (roomStockTenant) {
-        setSelectedTenant(roomStockTenant); // Room Stock
+        setSelectedTenant(roomStockTenant);
       }
     } else if (pathname.includes('/investments')) {
-      const investTenant = tenants.find((t) => t.id === '4');
+      const investTenant = tenants.find((t) => t.name === 'Invest');
       if (investTenant) {
-        setSelectedTenant(investTenant); // Invest
+        setSelectedTenant(investTenant);
       }
     } else if (pathname.startsWith('/dashboard')) {
-      const dashboardTenant = tenants.find((t) => t.id === '1');
+      const dashboardTenant = tenants.find((t) => t.name === 'Dashboard');
       if (dashboardTenant) {
-        setSelectedTenant(dashboardTenant); // Dashboard
+        setSelectedTenant(dashboardTenant);
       }
     }
   }, [pathname, tenants]);
@@ -165,7 +188,7 @@ export default function AppSidebar() {
     <Sidebar collapsible='icon'>
       <SidebarHeader>
         <AppBranding className='px-2 py-3' />
-        {!isLoading && (
+        {!isLoading && selectedTenant && (
           <OrgSwitcher
             tenants={tenants}
             selectedTenant={selectedTenant}
