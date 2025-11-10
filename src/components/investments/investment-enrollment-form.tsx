@@ -70,7 +70,7 @@ export function InvestmentEnrollmentForm({
         );
 
         // Redirect to investments page after success
-        router.push('/dashboard/investments');
+        router.push('/investments');
         router.refresh();
       } catch (error) {
         toast.error(

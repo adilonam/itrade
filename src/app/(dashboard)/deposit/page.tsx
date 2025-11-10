@@ -113,7 +113,7 @@ export default function DepositPage() {
         });
         setPaypalDetails({ email: '' });
 
-        router.push('/dashboard/overview');
+        router.push('/overview');
       } else {
         toast.error(
           data.error || 'Failed to process deposit. Please try again.'

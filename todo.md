@@ -47,3 +47,4 @@
 - [x] free margion pour chque room
 - [ ] recherche room trading all market
 - [ ] symbol name
+- [ ] appel d marge seulement pour trading

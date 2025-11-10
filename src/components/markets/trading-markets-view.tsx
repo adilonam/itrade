@@ -242,7 +242,7 @@ export function TradingMarketsView({
             <MarketCard
               key={market.id}
               market={market}
-              tradingRoute='/dashboard/trading-view-room-trading'
+              tradingRoute='/trading-view-room-trading'
               realTimeData={realTimePrices.get(market.symbol)}
               isConnected={isConnected}
             />
@@ -251,7 +251,7 @@ export function TradingMarketsView({
       ) : (
         <MarketList
           markets={paginatedMarkets}
-          tradingRoute='/dashboard/trading-view-room-trading'
+          tradingRoute='/trading-view-room-trading'
           realTimePrices={realTimePrices}
           isConnected={isConnected}
         />

@@ -157,7 +157,7 @@ export default function WithdrawPage() {
         setUserBalance(data.newBalance);
 
         // Redirect to dashboard or transactions page
-        router.push('/dashboard/overview');
+        router.push('/overview');
       } else {
         toast.error(
           data.error || 'Failed to process withdrawal. Please try again.'

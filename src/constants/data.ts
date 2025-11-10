@@ -81,17 +81,11 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Account',
-        url: '#',
+        url: '/profile',
         icon: 'billing',
-        isActive: true,
-        items: [
-          {
-            title: 'Profile',
-            url: '/profile',
-            icon: 'userPen',
-            shortcut: ['p', 'r']
-          }
-        ]
+        isActive: false,
+        shortcut: ['p', 'r'],
+        items: []
       }
     ],
     SELLER: [
@@ -153,17 +147,11 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Account',
-        url: '#',
+        url: '/profile',
         icon: 'billing',
-        isActive: true,
-        items: [
-          {
-            title: 'Profile',
-            url: '/profile',
-            icon: 'userPen',
-            shortcut: ['p', 'r']
-          }
-        ]
+        isActive: false,
+        shortcut: ['p', 'r'],
+        items: []
       }
     ],
     ADMIN: [
@@ -225,17 +213,11 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Account',
-        url: '#',
+        url: '/profile',
         icon: 'billing',
-        isActive: true,
-        items: [
-          {
-            title: 'Profile',
-            url: '/profile',
-            icon: 'userPen',
-            shortcut: ['p', 'r']
-          }
-        ]
+        isActive: false,
+        shortcut: ['p', 'r'],
+        items: []
       }
     ],
     SUPERADMIN: [
@@ -297,17 +279,11 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Account',
-        url: '#',
+        url: '/profile',
         icon: 'billing',
-        isActive: true,
-        items: [
-          {
-            title: 'Profile',
-            url: '/profile',
-            icon: 'userPen',
-            shortcut: ['p', 'r']
-          }
-        ]
+        isActive: false,
+        shortcut: ['p', 'r'],
+        items: []
       }
     ]
   },
@@ -363,17 +339,11 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Account',
-        url: '#',
+        url: '/profile',
         icon: 'billing',
-        isActive: true,
-        items: [
-          {
-            title: 'Profile',
-            url: '/profile',
-            icon: 'userPen',
-            shortcut: ['p', 'r']
-          }
-        ]
+        isActive: false,
+        shortcut: ['p', 'r'],
+        items: []
       }
     ],
     SELLER: [
@@ -427,17 +397,11 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Account',
-        url: '#',
+        url: '/profile',
         icon: 'billing',
-        isActive: true,
-        items: [
-          {
-            title: 'Profile',
-            url: '/profile',
-            icon: 'userPen',
-            shortcut: ['p', 'r']
-          }
-        ]
+        isActive: false,
+        shortcut: ['p', 'r'],
+        items: []
       }
     ],
     ADMIN: [
@@ -491,17 +455,11 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Account',
-        url: '#',
+        url: '/profile',
         icon: 'billing',
-        isActive: true,
-        items: [
-          {
-            title: 'Profile',
-            url: '/profile',
-            icon: 'userPen',
-            shortcut: ['p', 'r']
-          }
-        ]
+        isActive: false,
+        shortcut: ['p', 'r'],
+        items: []
       }
     ],
     SUPERADMIN: [
@@ -555,17 +513,11 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Account',
-        url: '#',
+        url: '/profile',
         icon: 'billing',
-        isActive: true,
-        items: [
-          {
-            title: 'Profile',
-            url: '/profile',
-            icon: 'userPen',
-            shortcut: ['p', 'r']
-          }
-        ]
+        isActive: false,
+        shortcut: ['p', 'r'],
+        items: []
       }
     ]
   },
@@ -621,17 +573,11 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Account',
-        url: '#',
+        url: '/profile',
         icon: 'billing',
-        isActive: true,
-        items: [
-          {
-            title: 'Profile',
-            url: '/profile',
-            icon: 'userPen',
-            shortcut: ['p', 'r']
-          }
-        ]
+        isActive: false,
+        shortcut: ['p', 'r'],
+        items: []
       }
     ],
     SELLER: [
@@ -685,17 +631,11 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Account',
-        url: '#',
+        url: '/profile',
         icon: 'billing',
-        isActive: true,
-        items: [
-          {
-            title: 'Profile',
-            url: '/profile',
-            icon: 'userPen',
-            shortcut: ['p', 'r']
-          }
-        ]
+        isActive: false,
+        shortcut: ['p', 'r'],
+        items: []
       }
     ],
     ADMIN: [
@@ -749,17 +689,11 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Account',
-        url: '#',
+        url: '/profile',
         icon: 'billing',
-        isActive: true,
-        items: [
-          {
-            title: 'Profile',
-            url: '/profile',
-            icon: 'userPen',
-            shortcut: ['p', 'r']
-          }
-        ]
+        isActive: false,
+        shortcut: ['p', 'r'],
+        items: []
       }
     ],
     SUPERADMIN: [
@@ -813,17 +747,11 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Account',
-        url: '#',
+        url: '/profile',
         icon: 'billing',
-        isActive: true,
-        items: [
-          {
-            title: 'Profile',
-            url: '/profile',
-            icon: 'userPen',
-            shortcut: ['p', 'r']
-          }
-        ]
+        isActive: false,
+        shortcut: ['p', 'r'],
+        items: []
       }
     ]
   },
@@ -879,17 +807,11 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Account',
-        url: '#',
+        url: '/profile',
         icon: 'billing',
-        isActive: true,
-        items: [
-          {
-            title: 'Profile',
-            url: '/profile',
-            icon: 'userPen',
-            shortcut: ['p', 'r']
-          }
-        ]
+        isActive: false,
+        shortcut: ['p', 'r'],
+        items: []
       }
     ],
     SELLER: [
@@ -943,17 +865,11 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Account',
-        url: '#',
+        url: '/profile',
         icon: 'billing',
-        isActive: true,
-        items: [
-          {
-            title: 'Profile',
-            url: '/profile',
-            icon: 'userPen',
-            shortcut: ['p', 'r']
-          }
-        ]
+        isActive: false,
+        shortcut: ['p', 'r'],
+        items: []
       }
     ],
     ADMIN: [
@@ -1007,17 +923,11 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Account',
-        url: '#',
+        url: '/profile',
         icon: 'billing',
-        isActive: true,
-        items: [
-          {
-            title: 'Profile',
-            url: '/profile',
-            icon: 'userPen',
-            shortcut: ['p', 'r']
-          }
-        ]
+        isActive: false,
+        shortcut: ['p', 'r'],
+        items: []
       }
     ],
     SUPERADMIN: [
@@ -1071,17 +981,11 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Account',
-        url: '#',
+        url: '/profile',
         icon: 'billing',
-        isActive: true,
-        items: [
-          {
-            title: 'Profile',
-            url: '/profile',
-            icon: 'userPen',
-            shortcut: ['p', 'r']
-          }
-        ]
+        isActive: false,
+        shortcut: ['p', 'r'],
+        items: []
       }
     ]
   },
@@ -1102,14 +1006,6 @@ export const tenantNavItems: TenantNavItems = {
         icon: 'switchVertical',
         isActive: false,
         shortcut: ['l', 'p'],
-        items: []
-      },
-      {
-        title: 'List Stocks',
-        url: '/seller/positions',
-        icon: 'trendingUp',
-        isActive: false,
-        shortcut: ['l', 's'],
         items: []
       },
       {
@@ -1140,7 +1036,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'List Seller',
-        url: '/admin/sellers',
+        url: '/seller/users',
         icon: 'user',
         isActive: false,
         shortcut: ['l', 's'],
@@ -1152,14 +1048,6 @@ export const tenantNavItems: TenantNavItems = {
         icon: 'switchVertical',
         isActive: false,
         shortcut: ['l', 'p'],
-        items: []
-      },
-      {
-        title: 'List Stocks',
-        url: '/admin/positions',
-        icon: 'trendingUp',
-        isActive: false,
-        shortcut: ['l', 's'],
         items: []
       },
       {
@@ -1184,14 +1072,6 @@ export const tenantNavItems: TenantNavItems = {
         icon: 'link',
         isActive: false,
         shortcut: ['l', 'l'],
-        items: []
-      },
-      {
-        title: 'Accès Messagerie Centralisée',
-        url: '/admin/messages',
-        icon: 'message',
-        isActive: false,
-        shortcut: ['a', 'm'],
         items: []
       },
       {
@@ -1214,7 +1094,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'List Seller',
-        url: '/admin/sellers',
+        url: '/seller/users',
         icon: 'user',
         isActive: false,
         shortcut: ['l', 's'],
@@ -1226,14 +1106,6 @@ export const tenantNavItems: TenantNavItems = {
         icon: 'switchVertical',
         isActive: false,
         shortcut: ['l', 'p'],
-        items: []
-      },
-      {
-        title: 'List Stocks',
-        url: '/admin/stocks',
-        icon: 'trendingUp',
-        isActive: false,
-        shortcut: ['l', 's'],
         items: []
       },
       {
@@ -1258,14 +1130,6 @@ export const tenantNavItems: TenantNavItems = {
         icon: 'link',
         isActive: false,
         shortcut: ['l', 'l'],
-        items: []
-      },
-      {
-        title: 'Accès Messagerie Centralisée',
-        url: '/admin/messages',
-        icon: 'message',
-        isActive: false,
-        shortcut: ['a', 'm'],
         items: []
       }
     ]
