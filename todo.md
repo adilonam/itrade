@@ -49,3 +49,4 @@
 - [x] symbol name
 - [x] appel d marge seulement pour trading
 - [ ] add invest for seller
+- [x] close check

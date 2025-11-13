@@ -76,9 +76,14 @@ export async function GET() {
             ) {
               continue;
             }
-
+            const refreshedMarkets = await refreshSaveMarkets([
+              position.market
+            ]);
+            if (!refreshedMarkets) {
+              continue;
+            }
             // Calculate current price
-            const midPrice = position.market.lastPrice ?? 0;
+            const midPrice = refreshedMarkets[0].lastPrice ?? 0;
             const spread = position.market.spread ?? 0;
             const bidPrice = midPrice - spread / 2;
             const askPrice = midPrice + spread / 2;
