@@ -34,10 +34,5 @@ export function toTwelveDataSymbol(market: Market): string {
  */
 export function toTradingViewSymbol(market: Market): string {
   const symbol = market.symbol.replace(/\//g, '');
-
-  if (market.type === 'CRYPTO') {
-    return `BINANCE:${symbol}`;
-  }
-
-  return `FX:${symbol}`;
+  return `${symbol}`;
 }

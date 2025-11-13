@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState, useMemo, useCallback } from 'react';
-import { useSession } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -327,6 +326,7 @@ export function UserPositionsViewRoomTrading() {
           balance={financialData.balance}
           usedMargin={financialData.usedMargin}
           equity={financialData.equity}
+          showMarginLevel={true}
         />
       )}
 

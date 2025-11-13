@@ -335,6 +335,7 @@ export function StockPortfolioView() {
           balance={financialData.balance}
           usedMargin={financialData.usedMargin}
           equity={financialData.equity}
+          showMarginLevel={false}
         />
       )}
 

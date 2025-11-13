@@ -35,7 +35,7 @@
 
 - [x] achat stock position
 - [x] change name of postion stock pour portfolio
-- [ ] fix design pos trading : mobile mekaoui
+- [x] fix design pos trading : mobile mekaoui
 - [x] design desktop : mekaoui
 - [x] value of positions just tradfing , add requiredmargin with label value on datatable psotion : mekaoui
 - [ ] icoon switch lot et amount : adil
@@ -43,8 +43,9 @@
 - [x] depot / withdraw virtuell : mekaoui
 - [x] dashboard
 - [ ] position ouvert droit seller
-- [ ] switch from pro
+- [?] switch from pro
 - [x] free margion pour chque room
-- [ ] recherche room trading all market
-- [ ] symbol name
-- [ ] appel d marge seulement pour trading
+- [?] recherche room trading all market
+- [x] symbol name
+- [x] appel d marge seulement pour trading
+- [ ] add invest for seller

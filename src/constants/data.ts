@@ -993,7 +993,7 @@ export const tenantNavItems: TenantNavItems = {
     USER: [],
     SELLER: [
       {
-        title: 'List Users',
+        title: 'List Users (Seller)',
         url: '/seller/users',
         icon: 'user',
         isActive: false,
@@ -1001,19 +1001,11 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'List Positions',
+        title: 'List Positions (Seller)',
         url: '/seller/positions',
         icon: 'switchVertical',
         isActive: false,
         shortcut: ['l', 'p'],
-        items: []
-      },
-      {
-        title: 'List Investments',
-        url: '/seller/investments',
-        icon: 'pigMoney',
-        isActive: false,
-        shortcut: ['l', 'i'],
         items: []
       },
       {
@@ -1027,7 +1019,7 @@ export const tenantNavItems: TenantNavItems = {
     ],
     ADMIN: [
       {
-        title: 'List Users',
+        title: 'List Users (Admin)',
         url: '/admin/users',
         icon: 'user',
         isActive: false,
@@ -1035,7 +1027,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'List Seller',
+        title: 'List Users (Seller)',
         url: '/seller/users',
         icon: 'user',
         isActive: false,
@@ -1043,8 +1035,16 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'List Positions',
+        title: 'List Positions (Admin)',
         url: '/admin/positions',
+        icon: 'switchVertical',
+        isActive: false,
+        shortcut: ['l', 'p'],
+        items: []
+      },
+      {
+        title: 'List Positions (Seller)',
+        url: '/seller/positions',
         icon: 'switchVertical',
         isActive: false,
         shortcut: ['l', 'p'],
@@ -1085,7 +1085,7 @@ export const tenantNavItems: TenantNavItems = {
     ],
     SUPERADMIN: [
       {
-        title: 'List Users',
+        title: 'List Users (Admin)',
         url: '/admin/users',
         icon: 'user',
         isActive: false,
@@ -1093,7 +1093,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'List Seller',
+        title: 'List Users (Seller)',
         url: '/seller/users',
         icon: 'user',
         isActive: false,
@@ -1101,8 +1101,16 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'List Positions',
+        title: 'List Positions (Admin)',
         url: '/admin/positions',
+        icon: 'switchVertical',
+        isActive: false,
+        shortcut: ['l', 'p'],
+        items: []
+      },
+      {
+        title: 'List Positions (Seller)',
+        url: '/seller/positions',
         icon: 'switchVertical',
         isActive: false,
         shortcut: ['l', 'p'],

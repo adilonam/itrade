@@ -10,12 +10,14 @@ interface UserFinanceCardProps {
   balance: number;
   usedMargin: number;
   equity?: number;
+  showMarginLevel?: boolean;
 }
 
 export function UserFinanceCard({
   balance,
   usedMargin,
-  equity
+  equity,
+  showMarginLevel = true
 }: UserFinanceCardProps) {
   // Calculate financial metrics
   const calculatedEquity = equity ?? balance; // Use provided equity or default to balance
@@ -32,7 +34,9 @@ export function UserFinanceCard({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className='xs:gap-3 grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-5'>
+        <div
+          className={`xs:gap-3 grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-4 md:grid-cols-3 ${showMarginLevel ? 'lg:grid-cols-5' : 'lg:grid-cols-4'}`}
+        >
           <div className='min-w-0 space-y-1 sm:space-y-2'>
             <div className='text-muted-foreground text-xs font-medium sm:text-sm'>
               Balance
@@ -71,22 +75,24 @@ export function UserFinanceCard({
             </div>
           </div>
 
-          <div className='col-span-2 min-w-0 space-y-1 sm:col-span-1 sm:space-y-2'>
-            <div className='text-muted-foreground text-xs font-medium sm:text-sm'>
-              Margin Level
+          {showMarginLevel && (
+            <div className='col-span-2 min-w-0 space-y-1 sm:col-span-1 sm:space-y-2'>
+              <div className='text-muted-foreground text-xs font-medium sm:text-sm'>
+                Margin Level
+              </div>
+              <div
+                className={`truncate text-lg font-bold sm:text-2xl ${
+                  marginLevel >= 200
+                    ? 'text-green-600'
+                    : marginLevel >= 100
+                      ? 'text-yellow-600'
+                      : 'text-red-600'
+                }`}
+              >
+                {marginLevel.toFixed(1)}%
+              </div>
             </div>
-            <div
-              className={`truncate text-lg font-bold sm:text-2xl ${
-                marginLevel >= 200
-                  ? 'text-green-600'
-                  : marginLevel >= 100
-                    ? 'text-yellow-600'
-                    : 'text-red-600'
-              }`}
-            >
-              {marginLevel.toFixed(1)}%
-            </div>
-          </div>
+          )}
         </div>
       </CardContent>
     </Card>
