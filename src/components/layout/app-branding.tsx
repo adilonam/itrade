@@ -47,15 +47,9 @@ export function AppBranding({ className }: AppBrandingProps) {
 
   return (
     <div className={`flex items-center gap-3 ${className}`}>
-      <div className='bg-primary flex h-10 w-10 items-center justify-center overflow-hidden rounded-lg'>
+      <div className='flex h-10 w-10 items-center justify-center overflow-hidden rounded-lg'>
         {appIcon ? (
-          <Image
-            src={appIcon}
-            alt={`${appName} logo`}
-            width={40}
-            height={40}
-            className='h-full w-full object-cover'
-          />
+          <Image src={appIcon} alt={`${appName} logo`} width={40} height={40} />
         ) : (
           <IconPhotoUp className='text-primary-foreground h-5 w-5' />
         )}

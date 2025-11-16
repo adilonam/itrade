@@ -50,3 +50,85 @@
 - [x] appel d marge seulement pour trading
 - [ ] add invest for seller
 - [x] close check
+
+# 📌 TRADING APP – 05/11/2025
+
+- [ ] Breadcrumb : changer tous les noms
+- [x] Barre de Recherche : améliorer, ne fait pas de recherche
+- [ ] Menu Gauche :
+  - [x] Quand menu fermé : problème affichage logo app + logo account + accès sous-menu
+  - [x] Vérifier utilité du bouton "Login" dans le menu
+  - [x] Différencier les icônes pour : Rooms / My Position / My Portfolio
+- [ ] Position Room Trading :
+  - [?] Améliorer affichage tableau mobile (afficher infos essentielles)
+- [ ] Positions Room Stock :
+  - [ ] Corriger affichage mobile (comme Position Room Trading)
+- [ ] Création Invest : permettre upload fichier ORDI + URL (pas seulement URL)
+- [ ] En mobile : menu doit se fermer automatiquement quand on clique sur un champ
+- [ ] Ajouter des boutons retour partout (navigation mobile)
+- [x] Séparer marges et comptes de trading avec portefeuille & invest
+- [ ] Robot trading configurable (copy trading avec % de capital)
+- [ ] Quand modification du PL en Admin : afficher LIVE (pas seulement sur close)
+- [ ] Gestion des marges + alertes marge sur positions (scheduler nécessaire)
+- [ ] Historique de toutes les transactions (deposit, withdraw, etc.)
+
+---
+
+# 🛠️ A AJUSTER POUR SUPERADMIN
+
+- [x] Installation rapide
+- [ ] Sauvegarde rapide BDD (automatique ?)
+- [ ] Sauvegarde rapide fichiers (automatique ?)
+- [ ] Liste des API à acheter
+- [ ] Documentation : installation & déploiement complet + erreurs fréquentes
+- [ ] Modification Design / Logo / Infos Société
+- [ ] Mode Debug rapide (symfony = `app_dev`)
+- [x] Configuration rapide email (2FA)
+- [ ] Recherche symbol stock via TwelveData (superadmin only)  
+       OU extraction liste complète interne (admin ne voit pas TwelveData)
+- [ ] Toggle activation/désactivation compte admin/seller/client  
+       (par défaut désactiver nouveaux comptes Google/inscription)
+- [ ] Export/Import CSV : produits (invest)
+- [ ] Export/Import CSV : stocks & logos
+- [ ] Export/Import CSV : design (logo, couleurs, infos société)
+
+---
+
+# 🧑‍💼 A AJUSTER POUR ADMIN / SELLER
+
+- [ ] Créer une Fiche Client (depuis liste user) regroupant :
+  - [ ] Infos User
+  - [ ] Markets
+  - [ ] Invest
+  - [ ] Positions
+  - [ ] Actions rapides : ouvrir position, investir, market
+- [ ] Système de notification :
+  - [ ] Log journal
+  - [ ] Création de rappels (RDV, mail, documents…)
+  - [ ] Notifs : qui a fait quoi / quand / où
+  - [ ] Liste derniers clients connectés + IP + appareil
+- [ ] Toggle activer/désactiver client / seller (si admin)
+- [ ] Pour admin : graphiques + analyses des sellers
+- [ ] Simplifier edit position : user id / market id trop complexe
+- [ ] Recherche dans liste positions : valider avec "Entrée"
+- [ ] Ajouter filtres + recherches dans Market
+- [ ] Ajouter filtres + recherches dans Invest
+- [ ] Ajouter images / backgrounds pour habiller le site (Vuexy style)
+- [ ] Messagerie intégrée (fichiers joints : pdf, png, jpg…)
+- [ ] (Admin) Actualités + catégories + visibilité clients
+- [ ] (Admin) Liens utiles + affichage infos société
+- [ ] (Admin) Changement disposition du menu
+- [ ] (Admin) Mentions légales / CGV / CGU : editor + toggle affichage footer
+- [ ] Dashboard : widgets modulables (afficher / cacher)
+- [ ] Toggle affichage catégories par client : trade / stock / invest
+
+---
+
+# 🔄 AUTRES
+
+- [ ] Ajouter système Prospect :
+  - [ ] Ajout prospect en masse
+  - [ ] Gestion des statuts
+  - [ ] CRM
+  - [ ] Calendrier
+  - [ ] Conversion Prospect -> Client

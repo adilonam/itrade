@@ -1009,7 +1009,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'Accès Messagerie Centralisée',
+        title: 'Messagerie (Seller)',
         url: '/seller/messages',
         icon: 'message',
         isActive: false,
@@ -1056,6 +1056,14 @@ export const tenantNavItems: TenantNavItems = {
         icon: 'pigMoney',
         isActive: false,
         shortcut: ['l', 'i'],
+        items: []
+      },
+      {
+        title: 'Messagerie (Seller)',
+        url: '/seller/messages',
+        icon: 'message',
+        isActive: false,
+        shortcut: ['a', 'm'],
         items: []
       },
       {
@@ -1122,6 +1130,14 @@ export const tenantNavItems: TenantNavItems = {
         icon: 'pigMoney',
         isActive: false,
         shortcut: ['l', 'i'],
+        items: []
+      },
+      {
+        title: 'Messagerie (Seller)',
+        url: '/seller/messages',
+        icon: 'message',
+        isActive: false,
+        shortcut: ['a', 'm'],
         items: []
       },
       {
