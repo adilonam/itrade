@@ -1,12 +1,16 @@
 {
   "crons": [
     {
-      "path": "/api/refresh-position",
-      "schedule": "* * * * *"
+      "path": "/api/schedule/close-positions",
+      "schedule": "*/20 * * * *"
     },
     {
       "path": "/api/schedule/mature-investments",
-      "schedule": "0 0 * * *"
+      "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/schedule/open-positions",
+      "schedule": "*/30 * * * *"
     }
   ]
 }

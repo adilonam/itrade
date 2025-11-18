@@ -132,3 +132,6 @@
   - [ ] CRM
   - [ ] Calendrier
   - [ ] Conversion Prospect -> Client
+
+
+- [ ] protection of cron vercel
