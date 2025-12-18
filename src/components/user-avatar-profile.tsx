@@ -1,14 +1,10 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { User } from '@prisma/client';
 
 interface UserAvatarProfileProps {
   className?: string;
   showInfo?: boolean;
-  user: {
-    id: string;
-    name?: string | null;
-    email?: string | null;
-    image?: string | null;
-  } | null;
+  user: User | null;
 }
 
 export function UserAvatarProfile({
@@ -27,7 +23,12 @@ export function UserAvatarProfile({
 
       {showInfo && (
         <div className='grid flex-1 text-left text-sm leading-tight'>
-          <span className='truncate font-semibold'>{user?.name || ''}</span>
+          <span className='truncate font-semibold'>
+            {user?.name || ''}
+            {user?.role && user.role !== 'USER' && (
+              <span className='ml-2 text-green-600'>{user.role}</span>
+            )}
+          </span>
           <span className='truncate text-xs'>{user?.email || ''}</span>
         </div>
       )}

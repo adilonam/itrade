@@ -35,6 +35,11 @@ export function UserNav() {
             <div className='flex flex-col space-y-1'>
               <p className='text-sm leading-none font-medium'>
                 {session.user.name}
+                {session.user.role && session.user.role !== 'USER' && (
+                  <span className='ml-2 text-green-600'>
+                    {session.user.role}
+                  </span>
+                )}
               </p>
               <p className='text-muted-foreground text-xs leading-none'>
                 {session.user.email}

@@ -1035,6 +1035,14 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
+        title: 'List Markets',
+        url: '/admin/markets',
+        icon: 'market',
+        isActive: false,
+        shortcut: ['l', 'm'],
+        items: []
+      },
+      {
         title: 'List Positions (Admin)',
         url: '/admin/positions',
         icon: 'switchVertical',
@@ -1106,6 +1114,14 @@ export const tenantNavItems: TenantNavItems = {
         icon: 'user',
         isActive: false,
         shortcut: ['l', 's'],
+        items: []
+      },
+      {
+        title: 'List Markets',
+        url: '/admin/markets',
+        icon: 'market',
+        isActive: false,
+        shortcut: ['l', 'm'],
         items: []
       },
       {
