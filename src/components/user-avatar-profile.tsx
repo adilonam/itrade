@@ -1,10 +1,17 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { User } from '@prisma/client';
 
 interface UserAvatarProfileProps {
   className?: string;
   showInfo?: boolean;
-  user: User | null;
+  user: {
+    id: string;
+    name?: string | null;
+    email?: string | null;
+    image?: string | null;
+    balance?: number | null;
+    leverage?: number | null;
+    role?: string | null;
+  } | null;
 }
 
 export function UserAvatarProfile({
