@@ -1,0 +1,101 @@
+---------------------------------------------------------
+		    BUGS & AUTRES
+---------------------------------------------------------
+
+Profil :
+	-> Edit profil ne fonctionne pas pour changer le Nom et la Photo du profile
+	-> Change Password depuis le profil
+	-> Ajouter des infos : téléphone, date de naissance, adresse, code postale, ville
+	-> Ajouter la possibilité de Link ou Unlink avec Google
+
+
+
+TRADING APP / DASHBOARD
+---------------------------------------------------------
+
+Actualité :
+	-> Erreur 404, n'existe pas
+
+Liens Utiles :
+	-> Erreur 404, n'existe pas
+
+Account :
+	-> Edit profil ne fonctionne pas pour changer le Nom et la Photo du profile
+	-> Change Password depuis le profil
+	-> Ajouter des infos : téléphone, date de naissance, adresse, code postale, ville
+	-> Ajouter la possibilité de Link ou Unlink avec Google
+
+
+
+TRADING APP / ROOM TRADING
+---------------------------------------------------------
+
+Actualité :
+	-> Erreur 404, n'existe pas
+
+
+
+TRADING APP / ROOM STOCK
+---------------------------------------------------------
+
+Actualité :
+	-> Erreur 404, n'existe pas
+
+
+
+TRADING APP / INVEST
+---------------------------------------------------------
+
+Actualité :
+	-> Erreur 404, n'existe pas
+
+
+
+
+
+TRADING APP / ADMINISTRATION (SUPER ADMIN)
+---------------------------------------------------------
+
+List Users (Admin) :
+	-> Quand Add New User et qu'on active le switch "Mark this user's email as verified", cela ne marque pas le statut comme verified
+	-> Doit pouvoir Activer ou Désactiver n'importe quels comptes (Switch On/Off)
+
+List Users (Seller) :
+	-> Quand on crée un Seller, il n'apparait pas dans la liste (seller)
+	-> Doit pouvoir Attribuer des Users a des Sellers (actuellement faisable uniquement depuis Prisma BDD)
+
+
+
+
+
+TRADING APP / ADMINISTRATION (SELLER)
+---------------------------------------------------------
+
+List Users (Seller) :
+	-> Search users & Search by email ne fonctionnent pas
+	-> Doit pourvoir Edit ses propres Users a lui
+	-> Doit pouvoir créer ses propres Users a lui
+	-> Doit pouvoir activer pour chacun de ses Users si POSITIONS / STOCKS / INVEST -> visible ou pas visible
+	-> Doit pouvoir Activer ou Désactiver un compte de ses propre Users a lui (Switch On/Off)
+
+List Positions (Seller) :
+	-> Create Position : Filter by email ne fonctionne pas, seul Select user fonctionne
+	-> Create Position : Filter by Symbol or Name ne fonctionne pas, seul Select a Market fonctionne
+
+Messagerie (Seller) :
+	-> New Message : Search by email ne fonctionne pas, seul Select a linked user fonctionne
+	-> Pouvoir ouvrir les messages dans des modals et qu'il se marque comme Read automatiquement
+	-> Dans liste message, colonne Action, le BTN sert a marquer comme Read, il faudrait plutôt un BTN pour REPONDRE 
+	-> Le Seller doit recevoir une Notif quand il reçoit un nouveau message d'un User
+
+Liste des Invest (Seller) :
+	-> Il faudrait créer la liste des Invest qui ont été fais par les Users du Seller en question
+	-> Avec un BTN Create Invest et un formulaire pour créer un invest a un de ses Users
+
+---------------------------------------------------------
+
+Messagerie :
+	-> Pouvoir ouvrir les message dans des modals et qu'il se marque comme Read automatiquement
+	-> Dans liste message Action, le btn sert a marquer comme Read il faudrait plutôt un btn Réponse
+	-> Le User doit recevoir une notif quand il reçoit un nouveau message, et le seller/admin doit recevoir un notif quand il reçoit un 	   message ou une réponse
+	-> Seller/ Messagerie (Seller) New message : la barre de recherche ne fonctionne pas

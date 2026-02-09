@@ -42,96 +42,89 @@
 - [x] logic seller : adil
 - [x] depot / withdraw virtuell : mekaoui
 - [x] dashboard
-- [ ] position ouvert droit seller
+- [x] position ouvert droit seller
 - [?] switch from pro
 - [x] free margion pour chque room
 - [?] recherche room trading all market
 - [x] symbol name
 - [x] appel d marge seulement pour trading
-- [ ] add invest for seller
+- [x] add invest for seller
 - [x] close check
 
-# 📌 TRADING APP – 05/11/2025
+## Bugs & Issues
 
-- [ ] Breadcrumb : changer tous les noms
-- [x] Barre de Recherche : améliorer, ne fait pas de recherche
-- [ ] Menu Gauche :
-  - [x] Quand menu fermé : problème affichage logo app + logo account + accès sous-menu
-  - [x] Vérifier utilité du bouton "Login" dans le menu
-  - [x] Différencier les icônes pour : Rooms / My Position / My Portfolio
-- [ ] Position Room Trading :
-  - [?] Améliorer affichage tableau mobile (afficher infos essentielles)
-- [ ] Positions Room Stock :
-  - [ ] Corriger affichage mobile (comme Position Room Trading)
-- [ ] Création Invest : permettre upload fichier ORDI + URL (pas seulement URL)
-- [ ] En mobile : menu doit se fermer automatiquement quand on clique sur un champ
-- [ ] Ajouter des boutons retour partout (navigation mobile)
-- [x] Séparer marges et comptes de trading avec portefeuille & invest
-- [ ] Robot trading configurable (copy trading avec % de capital)
-- [ ] Quand modification du PL en Admin : afficher LIVE (pas seulement sur close)
-- [ ] Gestion des marges + alertes marge sur positions (scheduler nécessaire)
-- [ ] Historique de toutes les transactions (deposit, withdraw, etc.)
+### Profil
+- [ ] Edit profil ne fonctionne pas pour changer le Nom et la Photo du profile
+- [ ] Change Password depuis le profil
+- [ ] Ajouter des infos : téléphone, date de naissance, adresse, code postale, ville
+- [ ] Ajouter la possibilité de Link ou Unlink avec Google
 
----
+### TRADING APP / DASHBOARD
 
-# 🛠️ A AJUSTER POUR SUPERADMIN
+#### Actualité
+- [ ] Erreur 404, n'existe pas
 
-- [x] Installation rapide
-- [ ] Sauvegarde rapide BDD (automatique ?)
-- [ ] Sauvegarde rapide fichiers (automatique ?)
-- [ ] Liste des API à acheter
-- [ ] Documentation : installation & déploiement complet + erreurs fréquentes
-- [ ] Modification Design / Logo / Infos Société
-- [ ] Mode Debug rapide (symfony = `app_dev`)
-- [x] Configuration rapide email (2FA)
-- [ ] Recherche symbol stock via TwelveData (superadmin only)  
-       OU extraction liste complète interne (admin ne voit pas TwelveData)
-- [ ] Toggle activation/désactivation compte admin/seller/client  
-       (par défaut désactiver nouveaux comptes Google/inscription)
-- [ ] Export/Import CSV : produits (invest)
-- [ ] Export/Import CSV : stocks & logos
-- [ ] Export/Import CSV : design (logo, couleurs, infos société)
+#### Liens Utiles
+- [ ] Erreur 404, n'existe pas
 
----
+#### Account
+- [ ] Edit profil ne fonctionne pas pour changer le Nom et la Photo du profile
+- [ ] Change Password depuis le profil
+- [ ] Ajouter des infos : téléphone, date de naissance, adresse, code postale, ville
+- [ ] Ajouter la possibilité de Link ou Unlink avec Google
 
-# 🧑‍💼 A AJUSTER POUR ADMIN / SELLER
+### TRADING APP / ROOM TRADING
 
-- [ ] Créer une Fiche Client (depuis liste user) regroupant :
-  - [ ] Infos User
-  - [ ] Markets
-  - [ ] Invest
-  - [ ] Positions
-  - [ ] Actions rapides : ouvrir position, investir, market
-- [ ] Système de notification :
-  - [ ] Log journal
-  - [ ] Création de rappels (RDV, mail, documents…)
-  - [ ] Notifs : qui a fait quoi / quand / où
-  - [ ] Liste derniers clients connectés + IP + appareil
-- [ ] Toggle activer/désactiver client / seller (si admin)
-- [ ] Pour admin : graphiques + analyses des sellers
-- [ ] Simplifier edit position : user id / market id trop complexe
-- [ ] Recherche dans liste positions : valider avec "Entrée"
-- [ ] Ajouter filtres + recherches dans Market
-- [ ] Ajouter filtres + recherches dans Invest
-- [ ] Ajouter images / backgrounds pour habiller le site (Vuexy style)
-- [ ] Messagerie intégrée (fichiers joints : pdf, png, jpg…)
-- [ ] (Admin) Actualités + catégories + visibilité clients
-- [ ] (Admin) Liens utiles + affichage infos société
-- [ ] (Admin) Changement disposition du menu
-- [ ] (Admin) Mentions légales / CGV / CGU : editor + toggle affichage footer
-- [ ] Dashboard : widgets modulables (afficher / cacher)
-- [ ] Toggle affichage catégories par client : trade / stock / invest
+#### Actualité
+- [ ] Erreur 404, n'existe pas
 
----
+### TRADING APP / ROOM STOCK
 
-# 🔄 AUTRES
+#### Actualité
+- [ ] Erreur 404, n'existe pas
 
-- [ ] Ajouter système Prospect :
-  - [ ] Ajout prospect en masse
-  - [ ] Gestion des statuts
-  - [ ] CRM
-  - [ ] Calendrier
-  - [ ] Conversion Prospect -> Client
+### TRADING APP / INVEST
 
+#### Actualité
+- [ ] Erreur 404, n'existe pas
 
-- [ ] protection of cron vercel
+### TRADING APP / ADMINISTRATION (SUPER ADMIN)
+
+#### List Users (Admin)
+- [ ] Quand Add New User et qu'on active le switch "Mark this user's email as verified", cela ne marque pas le statut comme verified
+- [ ] Doit pouvoir Activer ou Désactiver n'importe quels comptes (Switch On/Off)
+
+#### List Users (Seller)
+- [ ] Quand on crée un Seller, il n'apparait pas dans la liste (seller)
+- [ ] Doit pouvoir Attribuer des Users a des Sellers (actuellement faisable uniquement depuis Prisma BDD)
+
+### TRADING APP / ADMINISTRATION (SELLER)
+
+#### List Users (Seller)
+- [ ] Search users & Search by email ne fonctionnent pas
+- [ ] Doit pourvoir Edit ses propres Users a lui
+- [ ] Doit pouvoir créer ses propres Users a lui
+- [ ] Doit pouvoir activer pour chacun de ses Users si POSITIONS / STOCKS / INVEST -> visible ou pas visible
+- [ ] Doit pouvoir Activer ou Désactiver un compte de ses propre Users a lui (Switch On/Off)
+
+#### List Positions (Seller)
+- [ ] Create Position : Filter by email ne fonctionne pas, seul Select user fonctionne
+- [ ] Create Position : Filter by Symbol or Name ne fonctionne pas, seul Select a Market fonctionne
+
+#### Messagerie (Seller)
+- [ ] New Message : Search by email ne fonctionne pas, seul Select a linked user fonctionne
+- [ ] Pouvoir ouvrir les messages dans des modals et qu'il se marque comme Read automatiquement
+- [ ] Dans liste message, colonne Action, le BTN sert a marquer comme Read, il faudrait plutôt un BTN pour REPONDRE
+- [ ] Le Seller doit recevoir une Notif quand il reçoit un nouveau message d'un User
+
+#### Liste des Invest (Seller)
+- [ ] Il faudrait créer la liste des Invest qui ont été fais par les Users du Seller en question
+- [ ] Avec un BTN Create Invest et un formulaire pour créer un invest a un de ses Users
+
+### Messagerie
+- [ ] Pouvoir ouvrir les message dans des modals et qu'il se marque comme Read automatiquement
+- [ ] Dans liste message Action, le btn sert a marquer comme Read il faudrait plutôt un btn Réponse
+- [ ] Le User doit recevoir une notif quand il reçoit un nouveau message, et le seller/admin doit recevoir un notif quand il reçoit un message ou une réponse
+- [ ] Seller/ Messagerie (Seller) New message : la barre de recherche ne fonctionne pas
+
+##
