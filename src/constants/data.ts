@@ -315,7 +315,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'actualité',
-        url: '/news?type=trade',
+        url: '/news',
         icon: 'news',
         isActive: false,
         shortcut: ['n', 'w'],
@@ -373,7 +373,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'actualité',
-        url: '/news?type=trade',
+        url: '/news',
         icon: 'news',
         isActive: false,
         shortcut: ['n', 'w'],
@@ -431,7 +431,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'actualité',
-        url: '/news?type=trade',
+        url: '/news',
         icon: 'news',
         isActive: false,
         shortcut: ['n', 'w'],
@@ -489,7 +489,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'actualité',
-        url: '/news?type=trade',
+        url: '/news',
         icon: 'news',
         isActive: false,
         shortcut: ['n', 'w'],
@@ -549,7 +549,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'actualité',
-        url: '/news?type=stock',
+        url: '/news',
         icon: 'news',
         isActive: false,
         shortcut: ['n', 'w'],
@@ -607,7 +607,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'actualité',
-        url: '/news?type=stock',
+        url: '/news',
         icon: 'news',
         isActive: false,
         shortcut: ['n', 'w'],
@@ -665,7 +665,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'actualité',
-        url: '/news?type=stock',
+        url: '/news',
         icon: 'news',
         isActive: false,
         shortcut: ['n', 'w'],
@@ -723,7 +723,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'actualité',
-        url: '/news?type=stock',
+        url: '/news',
         icon: 'news',
         isActive: false,
         shortcut: ['n', 'w'],
@@ -783,7 +783,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'actualité',
-        url: '/news?type=invest',
+        url: '/news',
         icon: 'news',
         isActive: false,
         shortcut: ['n', 'w'],
@@ -841,7 +841,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'actualité',
-        url: '/news?type=invest',
+        url: '/news',
         icon: 'news',
         isActive: false,
         shortcut: ['n', 'w'],
@@ -899,7 +899,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'actualité',
-        url: '/news?type=invest',
+        url: '/news',
         icon: 'news',
         isActive: false,
         shortcut: ['n', 'w'],
@@ -957,7 +957,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'actualité',
-        url: '/news?type=invest',
+        url: '/news',
         icon: 'news',
         isActive: false,
         shortcut: ['n', 'w'],

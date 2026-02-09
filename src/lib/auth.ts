@@ -80,19 +80,21 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
+        if (user.image) token.image = user.image;
       }
 
-      // Fetch user role from database and add to token
+      // Fetch user data from database and add to token
       if (token.id) {
         const dbUser = await prisma.user.findUnique({
           where: { id: token.id as string },
-          select: { role: true, balance: true, leverage: true }
+          select: { role: true, balance: true, leverage: true, image: true }
         });
 
         if (dbUser) {
           token.role = dbUser.role;
           token.balance = dbUser.balance;
           token.leverage = dbUser.leverage;
+          token.image = dbUser.image ?? token.image;
         }
       }
 
@@ -104,6 +106,7 @@ export const authOptions: NextAuthOptions = {
         session.user.role = (token.role as string) || 'USER';
         session.user.balance = (token.balance as number) || 0;
         session.user.leverage = (token.leverage as number) || 1;
+        session.user.image = (token.image as string) ?? session.user.image;
       }
       return session;
     }

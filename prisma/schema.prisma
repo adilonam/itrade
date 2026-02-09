@@ -51,12 +51,23 @@ model Session {
   @@map("sessions")
 }
 
+model File {
+  id        String   @id @default(cuid())
+  path      String // path on disk relative to public, e.g. /uploads/xxx.jpg
+  filename  String
+  mimeType  String?  @map("mime_type")
+  size      Int?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("files")
+}
+
 model User {
   id               String           @id @default(cuid())
   name             String?
   email            String           @unique
   emailVerified    DateTime?        @map("email_verified")
-  image            String?
+  image            String? // link to file, e.g. /api/files/[id] or path
   password         String? // For credentials provider
   balance          Float            @default(0) @map("balance")
   role             Role             @default(USER)
@@ -68,6 +79,11 @@ model User {
   themeColor       String?          @default("default") @map("theme_color") // "default", "blue", "green", etc.
   reducedMotion    Boolean          @default(false) @map("reduced_motion")
   highContrast     Boolean          @default(false) @map("high_contrast")
+  phone            String?          @map("phone")
+  dateOfBirth      DateTime?        @map("date_of_birth")
+  address          String?          @map("address")
+  postalCode       String?          @map("postal_code")
+  city             String?          @map("city")
   accounts         Account[]
   sessions         Session[]
   mfaChallenges    MfaChallenge[]

@@ -22,5 +22,6 @@ declare module 'next-auth/jwt' {
     role: string;
     balance: number;
     leverage: number;
+    image?: string | null;
   }
 }

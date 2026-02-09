@@ -68,10 +68,10 @@
 - [ ] Erreur 404, n'existe pas
 
 #### Account
-- [ ] Edit profil ne fonctionne pas pour changer le Nom et la Photo du profile
-- [ ] Change Password depuis le profil
-- [ ] Ajouter des infos : téléphone, date de naissance, adresse, code postale, ville
-- [ ] Ajouter la possibilité de Link ou Unlink avec Google
+- [x] Edit profil ne fonctionne pas pour changer le Nom et la Photo du profile
+- [x] Change Password depuis le profil
+- [x] Ajouter des infos : téléphone, date de naissance, adresse, code postale, ville
+- [x] Ajouter la possibilité de Link ou Unlink avec Google
 
 ### TRADING APP / ROOM TRADING
 
