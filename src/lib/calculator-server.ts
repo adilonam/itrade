@@ -2,7 +2,12 @@
 
 import { twelveDataService } from '@/lib/twelvedata';
 import { prisma } from '@/lib/prisma';
-import { Market, Position, User, MarketType } from '@prisma/client';
+import {
+  Market,
+  Position,
+  User,
+  MarketType
+} from '@/lib/prisma/generated/client';
 
 /**
  * Get lot size based on market type

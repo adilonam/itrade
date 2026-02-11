@@ -29,7 +29,7 @@ import {
   IconChevronRight
 } from '@tabler/icons-react';
 import { calculatePnLClient } from '@/lib/calculator-client';
-import type { Position, Market, User } from '@prisma/client';
+import type { Position, Market, User } from '@/lib/prisma/generated/client';
 
 // Extended position type with relations
 type PositionWithRelations = Position & {

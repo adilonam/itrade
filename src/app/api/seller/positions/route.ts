@@ -7,7 +7,7 @@ import {
   refreshSaveMarkets,
   calculatePositionPnL
 } from '@/lib/calculator-server';
-import { Market, Position } from '@prisma/client';
+import { Market, Position } from '@/lib/prisma/generated/client';
 
 /**
  * @swagger

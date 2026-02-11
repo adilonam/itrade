@@ -1,4 +1,4 @@
-import { Market } from '@prisma/client';
+import { Market } from '@/lib/prisma/generated/client';
 
 export interface AdminMarket extends Market {}
 

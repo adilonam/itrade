@@ -9,7 +9,7 @@ import {
 } from '@/lib/calculator-server';
 // Create position data type
 type CreatePositionData = Position;
-import { Market, Position } from '@prisma/client';
+import { Market, Position } from '@/lib/prisma/generated/client';
 
 /**
  * @swagger

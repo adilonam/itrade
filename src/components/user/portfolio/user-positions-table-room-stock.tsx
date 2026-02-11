@@ -17,7 +17,7 @@ import {
   CardTitle
 } from '@/components/ui/card';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
-import type { Market, Position } from '@prisma/client';
+import type { Market, Position } from '@/lib/prisma/generated/client';
 import { IconLoader2 } from '@tabler/icons-react';
 
 type PositionWithMarket = Position & {

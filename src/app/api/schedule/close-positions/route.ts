@@ -5,7 +5,11 @@ import {
   calculatePositionPnL,
   calculateUserFinancialInfo
 } from '@/lib/calculator-server';
-import { Market, Position, TransactionType } from '@prisma/client';
+import {
+  Market,
+  Position,
+  TransactionType
+} from '@/lib/prisma/generated/client';
 
 /**
  * @swagger

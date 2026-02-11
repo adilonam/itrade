@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table';
-import type { Market } from '@prisma/client';
+import type { Market } from '@/lib/prisma/generated/client';
 import type { TwelveDataWebSocketPriceData } from '@/types/twelvedata';
 import {
   IconTrendingUp,

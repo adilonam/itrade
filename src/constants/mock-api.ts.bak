@@ -4,7 +4,7 @@
 
 import { faker } from '@faker-js/faker';
 import { matchSorter } from 'match-sorter'; // For filtering
-import { User } from '@prisma/client';
+import { User } from '@/lib/prisma/generated/client';
 
 export const delay = (ms: number) =>
   new Promise((resolve) => setTimeout(resolve, ms));

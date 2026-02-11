@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { fetchUserById } from '../services/users';
 import { useRouter } from 'next/navigation';
 import UserForm from './user-form';
-import { User } from '@prisma/client';
+import { User } from '@/lib/prisma/generated/client';
 import FormCardSkeleton from '@/components/form-card-skeleton';
 
 type TUserViewPageProps = {

@@ -39,7 +39,7 @@ import {
   IconSwitchHorizontal,
   IconX
 } from '@tabler/icons-react';
-import type { Market, User } from '@prisma/client';
+import type { Market, User } from '@/lib/prisma/generated/client';
 import {
   calculateRequiredMargin,
   calculateLotSizeFromMargin

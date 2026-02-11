@@ -1,4 +1,4 @@
-import { User } from '@prisma/client';
+import { User } from '@/lib/prisma/generated/client';
 
 export type GetUsersParams = {
   page?: number;

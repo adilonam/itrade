@@ -51,7 +51,7 @@ next-env.d.ts
 
 
 .pnpm-store/
-prisma/generated
+src/lib/prisma/generated
 
 
 .env

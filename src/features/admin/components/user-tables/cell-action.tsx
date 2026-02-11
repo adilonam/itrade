@@ -8,7 +8,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { User } from '@prisma/client';
+import { User } from '@/lib/prisma/generated/client';
 import {
   Edit,
   MoreHorizontal,

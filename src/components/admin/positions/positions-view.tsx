@@ -21,7 +21,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { PositionsTable } from './positions-table';
 import { PositionForm } from './positions-form';
 import { PositionStats, PositionEnums } from './positions-stats';
-import type { Position, Market, User } from '@prisma/client';
+import type { Position, Market, User } from '@/lib/prisma/generated/client';
 
 // Extended position type with relations
 type PositionWithRelations = Position & {

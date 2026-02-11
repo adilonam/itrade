@@ -2,7 +2,7 @@
 
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import type { Market } from '@prisma/client';
+import type { Market } from '@/lib/prisma/generated/client';
 import type { TwelveDataWebSocketPriceData } from '@/types/twelvedata';
 import {
   IconTrendingUp,

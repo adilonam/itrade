@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import type { Market } from '@prisma/client';
+import type { Market } from '@/lib/prisma/generated/client';
 import {
   IconSearch,
   IconChevronLeft,

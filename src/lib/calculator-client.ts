@@ -1,6 +1,11 @@
 'use client';
 
-import type { Market, Position, User, MarketType } from '@prisma/client';
+import type {
+  Market,
+  Position,
+  User,
+  MarketType
+} from '@/lib/prisma/generated/client';
 import type { TwelveDataWebSocketPriceData } from '@/types/twelvedata';
 
 /**

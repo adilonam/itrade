@@ -8,7 +8,7 @@ import React, {
   useCallback
 } from 'react';
 import { useTwelveDataWebSocket } from '@/hooks/use-twelve-data-websocket';
-import type { Market } from '@prisma/client';
+import type { Market } from '@/lib/prisma/generated/client';
 import type { TwelveDataWebSocketPriceData } from '@/types/twelvedata';
 
 interface MarketsWebSocketContextType {

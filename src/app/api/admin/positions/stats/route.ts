@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { PositionType, PositionStatus } from '@prisma/client';
+import { PositionType, PositionStatus } from '@/lib/prisma/generated/client';
 // Position stats type
 type PositionStats = {
   totalPositions: number;

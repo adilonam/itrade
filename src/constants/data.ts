@@ -32,7 +32,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'Mes transaction',
+        title: 'My Transactions',
         url: '/transactions',
         icon: 'transaction',
         isActive: false,
@@ -40,7 +40,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'Messagerie',
+        title: 'Messages',
         url: '/messages',
         icon: 'message',
         isActive: false,
@@ -64,7 +64,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'Toutes actualité confondus en fonction activation',
+        title: 'News',
         url: '/news',
         icon: 'news',
         isActive: false,
@@ -98,7 +98,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'Mes transaction',
+        title: 'My Transactions',
         url: '/transactions',
         icon: 'transaction',
         isActive: false,
@@ -106,7 +106,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'Messagerie',
+        title: 'Messages',
         url: '/messages',
         icon: 'message',
         isActive: false,
@@ -130,7 +130,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'Toutes actualité confondus en fonction activation',
+        title: 'News',
         url: '/news',
         icon: 'news',
         isActive: false,
@@ -164,7 +164,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'Mes transaction',
+        title: 'My Transactions',
         url: '/transactions',
         icon: 'transaction',
         isActive: false,
@@ -172,7 +172,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'Messagerie',
+        title: 'Messages',
         url: '/messages',
         icon: 'message',
         isActive: false,
@@ -196,7 +196,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'Toutes actualité confondus en fonction activation',
+        title: 'News',
         url: '/news',
         icon: 'news',
         isActive: false,
@@ -230,7 +230,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'Mes transaction',
+        title: 'My Transactions',
         url: '/transactions',
         icon: 'transaction',
         isActive: false,
@@ -238,7 +238,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'Messagerie',
+        title: 'Messages',
         url: '/messages',
         icon: 'message',
         isActive: false,
@@ -262,7 +262,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'Toutes actualité confondus en fonction activation',
+        title: 'News',
         url: '/news',
         icon: 'news',
         isActive: false,
@@ -306,7 +306,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'Mes transaction',
+        title: 'My Transactions',
         url: '/transactions?type=trade',
         icon: 'transaction',
         isActive: false,
@@ -314,7 +314,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'actualité',
+        title: 'News',
         url: '/news',
         icon: 'news',
         isActive: false,
@@ -364,7 +364,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'Mes transaction',
+        title: 'My Transactions',
         url: '/transactions?type=trade',
         icon: 'transaction',
         isActive: false,
@@ -372,7 +372,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'actualité',
+        title: 'News',
         url: '/news',
         icon: 'news',
         isActive: false,
@@ -422,7 +422,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'Mes transaction',
+        title: 'My Transactions',
         url: '/transactions?type=trade',
         icon: 'transaction',
         isActive: false,
@@ -430,7 +430,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'actualité',
+        title: 'News',
         url: '/news',
         icon: 'news',
         isActive: false,
@@ -480,7 +480,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'Mes transaction',
+        title: 'My Transactions',
         url: '/transactions?type=trade',
         icon: 'transaction',
         isActive: false,
@@ -488,7 +488,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'actualité',
+        title: 'News',
         url: '/news',
         icon: 'news',
         isActive: false,
@@ -540,7 +540,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'Mes transaction',
+        title: 'My Transactions',
         url: '/transactions?type=stock',
         icon: 'transaction',
         isActive: false,
@@ -548,7 +548,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'actualité',
+        title: 'News',
         url: '/news',
         icon: 'news',
         isActive: false,
@@ -598,7 +598,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'Mes transaction',
+        title: 'My Transactions',
         url: '/transactions?type=stock',
         icon: 'transaction',
         isActive: false,
@@ -606,7 +606,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'actualité',
+        title: 'News',
         url: '/news',
         icon: 'news',
         isActive: false,
@@ -656,7 +656,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'Mes transaction',
+        title: 'My Transactions',
         url: '/transactions?type=stock',
         icon: 'transaction',
         isActive: false,
@@ -664,7 +664,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'actualité',
+        title: 'News',
         url: '/news',
         icon: 'news',
         isActive: false,
@@ -714,7 +714,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'Mes transaction',
+        title: 'My Transactions',
         url: '/transactions?type=stock',
         icon: 'transaction',
         isActive: false,
@@ -722,7 +722,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'actualité',
+        title: 'News',
         url: '/news',
         icon: 'news',
         isActive: false,
@@ -774,7 +774,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'Mes transaction',
+        title: 'My Transactions',
         url: '/transactions?type=invest',
         icon: 'transaction',
         isActive: false,
@@ -782,7 +782,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'actualité',
+        title: 'News',
         url: '/news',
         icon: 'news',
         isActive: false,
@@ -832,7 +832,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'Mes transaction',
+        title: 'My Transactions',
         url: '/transactions?type=invest',
         icon: 'transaction',
         isActive: false,
@@ -840,7 +840,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'actualité',
+        title: 'News',
         url: '/news',
         icon: 'news',
         isActive: false,
@@ -890,7 +890,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'Mes transaction',
+        title: 'My Transactions',
         url: '/transactions?type=invest',
         icon: 'transaction',
         isActive: false,
@@ -898,7 +898,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'actualité',
+        title: 'News',
         url: '/news',
         icon: 'news',
         isActive: false,
@@ -948,7 +948,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'Mes transaction',
+        title: 'My Transactions',
         url: '/transactions?type=invest',
         icon: 'transaction',
         isActive: false,
@@ -956,7 +956,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'actualité',
+        title: 'News',
         url: '/news',
         icon: 'news',
         isActive: false,
@@ -1009,7 +1009,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'Messagerie (Seller)',
+        title: 'Messages (Seller)',
         url: '/seller/messages',
         icon: 'message',
         isActive: false,
@@ -1067,7 +1067,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'Messagerie (Seller)',
+        title: 'Messages (Seller)',
         url: '/seller/messages',
         icon: 'message',
         isActive: false,
@@ -1075,7 +1075,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'List Actualité',
+        title: 'List News',
         url: '/admin/news',
         icon: 'news',
         isActive: false,
@@ -1149,7 +1149,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'Messagerie (Seller)',
+        title: 'Messages (Seller)',
         url: '/seller/messages',
         icon: 'message',
         isActive: false,
@@ -1157,7 +1157,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'List Actualité',
+        title: 'List News',
         url: '/admin/news',
         icon: 'news',
         isActive: false,
@@ -1196,7 +1196,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'Config serveur mail pour 2FA',
+        title: 'Mail server config for 2FA',
         url: '/super-admin/mail-config',
         icon: 'server',
         isActive: false,
@@ -1204,7 +1204,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'Mode DEBUG',
+        title: 'Debug Mode',
         url: '/super-admin/debug',
         icon: 'settings',
         isActive: false,

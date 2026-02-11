@@ -20,7 +20,7 @@ import {
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { UserPositionsTableRoomTrading } from './user-positions-table-room-trading';
 import { UserFinanceCard } from '@/components/user/finance/user-finance-card';
-import type { Position, Market, User } from '@prisma/client';
+import type { Position, Market, User } from '@/lib/prisma/generated/client';
 
 // Extended position type with relations
 type PositionWithRelations = Position & {

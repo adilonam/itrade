@@ -20,7 +20,7 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { User } from '@prisma/client';
+import { User } from '@/lib/prisma/generated/client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';

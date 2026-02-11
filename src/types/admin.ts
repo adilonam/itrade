@@ -1,4 +1,4 @@
-import { User as PrismaUser } from '@prisma/client';
+import { User as PrismaUser } from '@/lib/prisma/generated/client';
 
 /**
  * Extended User type that includes additional fields for admin operations

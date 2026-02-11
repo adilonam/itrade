@@ -16,7 +16,7 @@ import {
   CardHeader,
   CardTitle
 } from '@/components/ui/card';
-import type { Position, Market } from '@prisma/client';
+import type { Position, Market } from '@/lib/prisma/generated/client';
 
 type PositionWithMarket = Position & {
   market: Market | null;

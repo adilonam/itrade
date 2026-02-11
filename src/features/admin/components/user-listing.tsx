@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { User } from '@prisma/client';
+import { User } from '@/lib/prisma/generated/client';
 import { UserTable } from './user-tables';
 import { createColumns } from './user-tables/columns';
 import { parseAsInteger, parseAsString, useQueryStates } from 'nuqs';

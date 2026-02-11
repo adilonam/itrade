@@ -7,7 +7,7 @@ import { ViewToggle } from './view-toggle';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import type { Market } from '@prisma/client';
+import type { Market } from '@/lib/prisma/generated/client';
 import {
   IconSearch,
   IconChevronLeft,

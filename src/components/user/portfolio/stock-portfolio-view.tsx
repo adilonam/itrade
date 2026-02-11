@@ -24,7 +24,7 @@ import { PortfolioSummary } from '@/components/user/portfolio/portfolio-summary'
 import { PortfolioPieChart } from '@/components/user/portfolio/portfolio-pie-chart';
 import { PortfolioBarChart } from '@/components/user/portfolio/portfolio-bar-chart';
 import { useMarketsWebSocket } from '@/contexts/markets-websocket-context';
-import type { Position, Market, User } from '@prisma/client';
+import type { Position, Market, User } from '@/lib/prisma/generated/client';
 
 // Extended position type with relations
 type PositionWithRelations = Position & {

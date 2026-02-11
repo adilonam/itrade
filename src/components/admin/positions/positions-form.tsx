@@ -27,7 +27,7 @@ import type {
   Position,
   Market,
   User
-} from '@prisma/client';
+} from '@/lib/prisma/generated/client';
 
 // Extended position type with relations
 type PositionWithRelations = Position & {

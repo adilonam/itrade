@@ -62,10 +62,10 @@
 ### TRADING APP / DASHBOARD
 
 #### Actualité
-- [ ] Erreur 404, n'existe pas
+- [x] Erreur 404, n'existe pas
 
 #### Liens Utiles
-- [ ] Erreur 404, n'existe pas
+- [x] Erreur 404, n'existe pas
 
 #### Account
 - [x] Edit profil ne fonctionne pas pour changer le Nom et la Photo du profile
@@ -76,17 +76,17 @@
 ### TRADING APP / ROOM TRADING
 
 #### Actualité
-- [ ] Erreur 404, n'existe pas
+- [x] Erreur 404, n'existe pas
 
 ### TRADING APP / ROOM STOCK
 
 #### Actualité
-- [ ] Erreur 404, n'existe pas
+- [x] Erreur 404, n'existe pas
 
 ### TRADING APP / INVEST
 
 #### Actualité
-- [ ] Erreur 404, n'existe pas
+- [x] Erreur 404, n'existe pas
 
 ### TRADING APP / ADMINISTRATION (SUPER ADMIN)
 

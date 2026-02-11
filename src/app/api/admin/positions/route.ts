@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { calculatePositionPnL } from '@/lib/calculator-server';
-import { Market, Position } from '@prisma/client';
+import { Market, Position } from '@/lib/prisma/generated/client';
 
 // Create position data type
 type CreatePositionData = Position;

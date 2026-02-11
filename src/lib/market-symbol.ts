@@ -1,4 +1,4 @@
-import type { Market } from '@prisma/client';
+import type { Market } from '@/lib/prisma/generated/client';
 
 /**
  * Convert market symbol to TwelveData API format

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import type { Position } from '@prisma/client';
+import type { Position } from '@/lib/prisma/generated/client';
 
 // Update position data type
 type UpdatePositionData = Partial<Position>;
