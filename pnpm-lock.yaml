@@ -27,10 +27,10 @@ importers:
         specifier: ^1.0.7
         version: 1.0.7(@prisma/client@7.3.0(prisma@7.3.0(@types/react@19.0.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.7.2))(typescript@5.7.2))(next-auth@4.24.11(next@15.3.8(@babel/core@7.27.1)(@opentelemetry/api@1.9.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(nodemailer@7.0.6)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))
       '@prisma/adapter-pg':
-        specifier: ^7.3.0
+        specifier: ^7.0.0
         version: 7.3.0
       '@prisma/client':
-        specifier: ^7.3.0
+        specifier: ^7.0.0
         version: 7.3.0(prisma@7.3.0(@types/react@19.0.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.7.2))(typescript@5.7.2)
       '@radix-ui/react-accordion':
         specifier: ^1.2.3
@@ -156,7 +156,7 @@ importers:
         specifier: ^4.1.0
         version: 4.1.0
       dotenv:
-        specifier: ^16.6.1
+        specifier: ^16.4.5
         version: 16.6.1
       eslint:
         specifier: 8.48.0
@@ -201,7 +201,7 @@ importers:
         specifier: 8.4.49
         version: 8.4.49
       prisma:
-        specifier: ^7.3.0
+        specifier: ^7.0.0
         version: 7.3.0(@types/react@19.0.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.7.2)
       react:
         specifier: 19.0.0
@@ -4680,9 +4680,6 @@ packages:
     peerDependencies:
       pg: '>=8.0'
 
-  pg-protocol@1.10.0:
-    resolution: {integrity: sha512-IpdytjudNuLv8nhlHs/UrVBhU0e78J0oIS/0AVdTbWxSOkFUVdsHC/NrorO6nXsQNDTT1kzDSOMJubBQviX18Q==}
-
   pg-protocol@1.11.0:
     resolution: {integrity: sha512-pfsxk2M9M3BuGgDOfuy37VNRRX3jmKgMjcvAcWqNDpZSf4cUmv8HSOl5ViRQFsfARFn0KuUQTgLxVMbNq5NW3g==}
 
@@ -8765,7 +8762,7 @@ snapshots:
   '@types/pg@8.6.1':
     dependencies:
       '@types/node': 22.10.2
-      pg-protocol: 1.10.0
+      pg-protocol: 1.11.0
       pg-types: 2.2.0
 
   '@types/ramda@0.30.2':
@@ -10990,8 +10987,6 @@ snapshots:
   pg-pool@3.11.0(pg@8.18.0):
     dependencies:
       pg: 8.18.0
-
-  pg-protocol@1.10.0: {}
 
   pg-protocol@1.11.0: {}
 
