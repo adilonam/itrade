@@ -170,9 +170,7 @@ export function InvestmentCard({ investment, className }: InvestmentCardProps) {
             {investment._count?.userInvestments || 0} investors
           </div>
           <Button asChild size='sm'>
-            <Link href={`/dashboard/investments/${investment.id}`}>
-              View Details
-            </Link>
+            <Link href={`/investments/${investment.id}`}>View Details</Link>
           </Button>
         </div>
       </CardContent>

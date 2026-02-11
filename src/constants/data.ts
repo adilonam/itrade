@@ -72,7 +72,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'Liens Utiles',
+        title: 'Useful Links',
         url: '/useful-links',
         icon: 'link',
         isActive: false,
@@ -138,7 +138,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'Liens Utiles',
+        title: 'Useful Links',
         url: '/useful-links',
         icon: 'link',
         isActive: false,
@@ -204,7 +204,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'Liens Utiles',
+        title: 'Useful Links',
         url: '/useful-links',
         icon: 'link',
         isActive: false,
@@ -270,7 +270,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'Liens Utiles',
+        title: 'Useful Links',
         url: '/useful-links',
         icon: 'link',
         isActive: false,
@@ -766,7 +766,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'My Invest',
+        title: 'My Investments',
         url: '/investments',
         icon: 'pigMoney',
         isActive: false,
@@ -824,7 +824,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'My Invest',
+        title: 'My Investments',
         url: '/investments',
         icon: 'pigMoney',
         isActive: false,
@@ -882,7 +882,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'My Invest',
+        title: 'My Investments',
         url: '/investments',
         icon: 'pigMoney',
         isActive: false,
@@ -940,7 +940,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'My Invest',
+        title: 'My Investments',
         url: '/investments',
         icon: 'pigMoney',
         isActive: false,
@@ -1083,7 +1083,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'List Liens utiles',
+        title: 'List Useful Links',
         url: '/admin/useful-links',
         icon: 'link',
         isActive: false,
@@ -1165,7 +1165,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'List Liens utiles',
+        title: 'List Useful Links',
         url: '/admin/useful-links',
         icon: 'link',
         isActive: false,
