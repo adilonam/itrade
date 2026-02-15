@@ -1009,6 +1009,14 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
+        title: 'List Investments (Seller)',
+        url: '/seller/investments',
+        icon: 'pigMoney',
+        isActive: false,
+        shortcut: ['l', 'i'],
+        items: []
+      },
+      {
         title: 'Messages (Seller)',
         url: '/seller/messages',
         icon: 'message',
@@ -1059,8 +1067,16 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'List Investments',
+        title: 'List Investments (Admin)',
         url: '/admin/investments',
+        icon: 'pigMoney',
+        isActive: false,
+        shortcut: ['l', 'i'],
+        items: []
+      },
+      {
+        title: 'List Investments (Seller)',
+        url: '/seller/investments',
         icon: 'pigMoney',
         isActive: false,
         shortcut: ['l', 'i'],
@@ -1141,8 +1157,16 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'List Investments',
+        title: 'List Investments (Admin)',
         url: '/admin/investments',
+        icon: 'pigMoney',
+        isActive: false,
+        shortcut: ['l', 'i'],
+        items: []
+      },
+      {
+        title: 'List Investments (Seller)',
+        url: '/seller/investments',
         icon: 'pigMoney',
         isActive: false,
         shortcut: ['l', 'i'],

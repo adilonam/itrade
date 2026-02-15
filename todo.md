@@ -118,13 +118,13 @@
 - [x] Le Seller doit recevoir une Notif quand il reçoit un nouveau message d'un User-> dans dashboard   
 
 #### Liste des Invest (Seller)
-- [ ] Il faudrait créer la liste des Invest qui ont été fais par les Users du Seller en question
-- [ ] Avec un BTN Create Invest et un formulaire pour créer un invest a un de ses Users
+- [x] Il faudrait créer la liste des Invest qui ont été fais par les Users du Seller en question-> done
+- [x] Avec un BTN Create Invest et un formulaire pour créer un invest a un de ses Users
 
 ### Messagerie
-- [ ] Pouvoir ouvrir les message dans des modals et qu'il se marque comme Read automatiquement
-- [ ] Dans liste message Action, le btn sert a marquer comme Read il faudrait plutôt un btn Réponse
-- [ ] Le User doit recevoir une notif quand il reçoit un nouveau message, et le seller/admin doit recevoir un notif quand il reçoit un message ou une réponse
-- [ ] Seller/ Messagerie (Seller) New message : la barre de recherche ne fonctionne pas
+- [x] Pouvoir ouvrir les message dans des modals et qu'il se marque comme Read automatiquement
+- [x] Dans liste message Action, le btn sert a marquer comme Read il faudrait plutôt un btn Réponse
+- [x] Le User doit recevoir une notif quand il reçoit un nouveau message, et le seller/admin doit recevoir un notif quand il reçoit un message ou une réponse-> dand dashboard
+- [x] Seller/ Messagerie (Seller) New message : la barre de recherche ne fonctionne pas-> c gerer avec le modal
 
 ##
