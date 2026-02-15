@@ -51,29 +51,18 @@ model Session {
   @@map("sessions")
 }
 
-model File {
-  id        String   @id @default(cuid())
-  path      String // path on disk relative to public, e.g. /uploads/xxx.jpg
-  filename  String
-  mimeType  String?  @map("mime_type")
-  size      Int?
-  createdAt DateTime @default(now()) @map("created_at")
-
-  @@map("files")
-}
-
 model User {
   id               String           @id @default(cuid())
   name             String?
   email            String           @unique
   emailVerified    DateTime?        @map("email_verified")
-  image            String? // link to file, e.g. /api/files/[id] or path
+  image            String? // profile image URL (e.g. Vercel Blob URL)
   password         String? // For credentials provider
   balance          Float            @default(0) @map("balance")
   role             Role             @default(USER)
   createdAt        DateTime         @default(now()) @map("created_at")
   updatedAt        DateTime         @updatedAt @map("updated_at")
-  leverage         Int              @default(1) @map("leverage")
+  leverage         Int              @default(1000) @map("leverage")
   // Theme preferences
   themeMode        String?          @default("system") @map("theme_mode") // "light", "dark", "system"
   themeColor       String?          @default("default") @map("theme_color") // "default", "blue", "green", etc.

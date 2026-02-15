@@ -111,6 +111,20 @@ export default function AppSidebar() {
     const tenant = tenants.find((t) => t.id === tenantId);
     if (tenant) {
       setSelectedTenant(tenant);
+      // Navigate to the first nav item of the selected tenant for current user role
+      if (user?.role) {
+        const userRole = user.role as
+          | 'USER'
+          | 'SELLER'
+          | 'ADMIN'
+          | 'SUPERADMIN';
+        const tenantData = tenantNavItems[tenant.name];
+        const navItems = tenantData?.[userRole] ?? [];
+        const firstItem = navItems[0];
+        if (firstItem?.url) {
+          router.push(firstItem.url);
+        }
+      }
     }
   };
 

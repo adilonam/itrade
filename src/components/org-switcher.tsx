@@ -47,10 +47,7 @@ export function OrgSwitcher({
               <div className='bg-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg'>
                 <GalleryVerticalEnd className='size-4' />
               </div>
-              <div className='flex flex-col gap-0.5 leading-none'>
-                <span className='font-semibold'>Trading App</span>
-                <span className=''>{selectedTenant.name}</span>
-              </div>
+              <span className='font-semibold'>{selectedTenant.name}</span>
               <ChevronsUpDown className='ml-auto' />
             </SidebarMenuButton>
           </DropdownMenuTrigger>

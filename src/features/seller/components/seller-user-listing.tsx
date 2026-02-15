@@ -4,9 +4,21 @@ import { useState, useEffect, useCallback } from 'react';
 import { User } from '@/lib/prisma/generated/client';
 import { SellerUserTable } from './seller-user-tables';
 import { createSellerUserColumns } from './seller-user-tables/columns';
-import { parseAsInteger, parseAsString, useQueryStates } from 'nuqs';
+import { parseAsInteger, useQueryStates } from 'nuqs';
 import { fetchSellerUsers, GetSellerUsersParams } from '../services/users';
 import { useSession } from 'next-auth/react';
+
+export type SellerSearchFilters = {
+  name: string;
+  email: string;
+  role: string[];
+};
+
+const defaultSearchFilters: SellerSearchFilters = {
+  name: '',
+  email: '',
+  role: []
+};
 
 type SellerUserListingPageProps = {};
 
@@ -15,13 +27,13 @@ export default function SellerUserListingPage({}: SellerUserListingPageProps) {
   const [totalUsers, setTotalUsers] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchFilters, setSearchFilters] =
+    useState<SellerSearchFilters>(defaultSearchFilters);
   const { data: session } = useSession();
 
-  // Use query states to sync with URL parameters
   const [queryParams] = useQueryStates({
     page: parseAsInteger.withDefault(1),
-    perPage: parseAsInteger.withDefault(10),
-    name: parseAsString
+    perPage: parseAsInteger.withDefault(10)
   });
 
   const loadUsers = useCallback(async () => {
@@ -29,10 +41,12 @@ export default function SellerUserListingPage({}: SellerUserListingPageProps) {
       setIsLoading(true);
       setError(null);
 
+      const search = searchFilters.name || searchFilters.email || undefined;
+
       const params: GetSellerUsersParams = {
         page: queryParams.page,
         limit: queryParams.perPage,
-        ...(queryParams.name && { search: queryParams.name })
+        ...(search && { search })
       };
 
       const data = await fetchSellerUsers(params);
@@ -43,7 +57,12 @@ export default function SellerUserListingPage({}: SellerUserListingPageProps) {
     } finally {
       setIsLoading(false);
     }
-  }, [queryParams.page, queryParams.perPage, queryParams.name]);
+  }, [
+    queryParams.page,
+    queryParams.perPage,
+    searchFilters.name,
+    searchFilters.email
+  ]);
 
   useEffect(() => {
     loadUsers();
@@ -87,6 +106,8 @@ export default function SellerUserListingPage({}: SellerUserListingPageProps) {
           totalItems={totalUsers}
           columns={createSellerUserColumns(session?.user?.id)}
           onDataChange={handleDataChange}
+          searchFilters={searchFilters}
+          onSearchApply={setSearchFilters}
         />
       )}
     </div>

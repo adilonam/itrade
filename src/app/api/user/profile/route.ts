@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
+import { put } from '@vercel/blob';
 import { prisma } from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
-import { writeFile, mkdir } from 'fs/promises';
-import { join } from 'path';
-import { existsSync } from 'fs';
 
 /**
  * @swagger
@@ -109,35 +107,13 @@ export async function PATCH(request: NextRequest) {
     let imageLink: string | undefined;
 
     if (imageFile && imageFile.size > 0) {
-      const bytes = await imageFile.arrayBuffer();
-      const buffer = Buffer.from(bytes);
-      const uploadsDir = join(process.cwd(), 'public', 'uploads');
-      if (!existsSync(uploadsDir)) {
-        await mkdir(uploadsDir, { recursive: true });
-      }
-      const timestamp = Date.now();
       const ext = imageFile.name.split('.').pop() || 'jpg';
-      const filename = `profile-${session.user.id}-${timestamp}.${ext}`;
-      const relativePath = `/uploads/${filename}`;
-      const filepath = join(uploadsDir, filename);
-      await writeFile(filepath, buffer);
-
-      const mimeType =
-        imageFile.type ||
-        (ext === 'jpg' || ext === 'jpeg'
-          ? 'image/jpeg'
-          : ext === 'png'
-            ? 'image/png'
-            : 'application/octet-stream');
-      const fileRecord = await prisma.file.create({
-        data: {
-          path: relativePath,
-          filename: imageFile.name,
-          mimeType,
-          size: buffer.length
-        }
+      const filename = `profile-${session.user.id}-${Date.now()}.${ext}`;
+      const blob = await put(filename, imageFile, {
+        access: 'public',
+        addRandomSuffix: true
       });
-      imageLink = `/api/files/${fileRecord.id}`;
+      imageLink = blob.url;
     }
 
     const dateOfBirth = dateOfBirthRaw ? new Date(dateOfBirthRaw) : undefined;

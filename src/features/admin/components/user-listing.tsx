@@ -4,9 +4,21 @@ import { useState, useEffect, useCallback } from 'react';
 import { User } from '@/lib/prisma/generated/client';
 import { UserTable } from './user-tables';
 import { createColumns } from './user-tables/columns';
-import { parseAsInteger, parseAsString, useQueryStates } from 'nuqs';
+import { parseAsInteger, useQueryStates } from 'nuqs';
 import { fetchUsers, GetUsersParams } from '../services/users';
 import { useSession } from 'next-auth/react';
+
+export type SearchFilters = {
+  name: string;
+  email: string;
+  role: string[];
+};
+
+const defaultSearchFilters: SearchFilters = {
+  name: '',
+  email: '',
+  role: []
+};
 
 type UserListingPageProps = {};
 
@@ -15,14 +27,13 @@ export default function UserListingPage({}: UserListingPageProps) {
   const [totalUsers, setTotalUsers] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchFilters, setSearchFilters] =
+    useState<SearchFilters>(defaultSearchFilters);
   const { data: session } = useSession();
 
-  // Use query states to sync with URL parameters
   const [queryParams] = useQueryStates({
     page: parseAsInteger.withDefault(1),
-    perPage: parseAsInteger.withDefault(10),
-    name: parseAsString,
-    role: parseAsString
+    perPage: parseAsInteger.withDefault(10)
   });
 
   const loadUsers = useCallback(async () => {
@@ -30,11 +41,16 @@ export default function UserListingPage({}: UserListingPageProps) {
       setIsLoading(true);
       setError(null);
 
+      const search = searchFilters.name || searchFilters.email || undefined;
+      const role = searchFilters.role.length
+        ? (searchFilters.role[0] as GetUsersParams['role'])
+        : undefined;
+
       const params: GetUsersParams = {
         page: queryParams.page,
         limit: queryParams.perPage,
-        ...(queryParams.name && { search: queryParams.name }),
-        ...(queryParams.role && { role: queryParams.role as any })
+        ...(search && { search }),
+        ...(role && { role })
       };
 
       const data = await fetchUsers(params);
@@ -48,8 +64,9 @@ export default function UserListingPage({}: UserListingPageProps) {
   }, [
     queryParams.page,
     queryParams.perPage,
-    queryParams.name,
-    queryParams.role
+    searchFilters.name,
+    searchFilters.email,
+    searchFilters.role
   ]);
 
   useEffect(() => {
@@ -94,6 +111,8 @@ export default function UserListingPage({}: UserListingPageProps) {
           totalItems={totalUsers}
           columns={createColumns(session?.user?.id)}
           onDataChange={handleDataChange}
+          searchFilters={searchFilters}
+          onSearchApply={setSearchFilters}
         />
       )}
     </div>

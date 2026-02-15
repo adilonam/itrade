@@ -38,10 +38,7 @@ export default function NotFound() {
               <IconArrowLeft className='mr-2 h-4 w-4' />
               Go Back
             </Button>
-            <Button
-              onClick={() => router.push('/dashboard')}
-              className='flex-1'
-            >
+            <Button onClick={() => router.push('/overview')} className='flex-1'>
               <IconHome className='mr-2 h-4 w-4' />
               Dashboard
             </Button>

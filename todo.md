@@ -54,10 +54,10 @@
 ## Bugs & Issues
 
 ### Profil
-- [ ] Edit profil ne fonctionne pas pour changer le Nom et la Photo du profile
-- [ ] Change Password depuis le profil
-- [ ] Ajouter des infos : téléphone, date de naissance, adresse, code postale, ville
-- [ ] Ajouter la possibilité de Link ou Unlink avec Google
+- [x] Edit profil ne fonctionne pas pour changer le Nom et la Photo du profile
+- [x] Change Password depuis le profil
+- [x] Ajouter des infos : téléphone, date de naissance, adresse, code postale, ville
+- [x] Ajouter la possibilité de Link ou Unlink avec Google
 
 ### TRADING APP / DASHBOARD
 
@@ -91,18 +91,18 @@
 ### TRADING APP / ADMINISTRATION (SUPER ADMIN)
 
 #### List Users (Admin)
-- [ ] Quand Add New User et qu'on active le switch "Mark this user's email as verified", cela ne marque pas le statut comme verified
-- [ ] Doit pouvoir Activer ou Désactiver n'importe quels comptes (Switch On/Off)
+- [x] Quand Add New User et qu'on active le switch "Mark this user's email as verified", cela ne marque pas le statut comme verified -> on doit etre admin
+- [x] Doit pouvoir Activer ou Désactiver n'importe quels comptes (Switch On/Off) -> on fait ca par changement du mot de passe 
 
 #### List Users (Seller)
-- [ ] Quand on crée un Seller, il n'apparait pas dans la liste (seller)
-- [ ] Doit pouvoir Attribuer des Users a des Sellers (actuellement faisable uniquement depuis Prisma BDD)
+- [x] Quand on crée un Seller, il n'apparait pas dans la liste (seller)-> cette partie est pour les utilisteurs du seller le seller est celui qui s occupe des utilisateurs 
+- [x] Doit pouvoir Attribuer des Users a des Sellers (actuellement faisable uniquement depuis Prisma BDD)-> sur list user (admin) editer un user seller et vous pouvez l attribuer des users 
 
 ### TRADING APP / ADMINISTRATION (SELLER)
 
 #### List Users (Seller)
-- [ ] Search users & Search by email ne fonctionnent pas
-- [ ] Doit pourvoir Edit ses propres Users a lui
+- [x] Search users & Search by email ne fonctionnent pas
+- [x] Doit pourvoir Edit ses propres Users a lui-> deja traite avec Julien c admin qui pe seulement modifier les users
 - [ ] Doit pouvoir créer ses propres Users a lui
 - [ ] Doit pouvoir activer pour chacun de ses Users si POSITIONS / STOCKS / INVEST -> visible ou pas visible
 - [ ] Doit pouvoir Activer ou Désactiver un compte de ses propre Users a lui (Switch On/Off)

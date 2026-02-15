@@ -4,7 +4,7 @@ export type GetUsersParams = {
   page?: number;
   limit?: number;
   search?: string;
-  role?: 'USER' | 'ADMIN' | 'SUPERADMIN';
+  role?: 'USER' | 'SELLER' | 'ADMIN' | 'SUPERADMIN';
 };
 
 export type UsersApiResponse = {

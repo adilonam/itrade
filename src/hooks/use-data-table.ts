@@ -62,6 +62,10 @@ interface UseDataTableProps<TData>
   scroll?: boolean;
   shallow?: boolean;
   startTransition?: React.TransitionStartFunction;
+  /** Column ids whose filter state is not synced to URL (e.g. for client-only search) */
+  excludeFilterIdsFromUrl?: string[];
+  /** Initial filter values for excluded columns (used when not in URL) */
+  initialFilterState?: Record<string, string | string[] | null>;
 }
 
 export function useDataTable<TData>(props: UseDataTableProps<TData>) {
@@ -77,6 +81,8 @@ export function useDataTable<TData>(props: UseDataTableProps<TData>) {
     scroll = false,
     shallow = true,
     startTransition,
+    excludeFilterIdsFromUrl,
+    initialFilterState,
     ...tableProps
   } = props;
 
@@ -173,22 +179,34 @@ export function useDataTable<TData>(props: UseDataTableProps<TData>) {
   }, [columns, enableAdvancedFilter]);
 
   const filterParsers = React.useMemo(() => {
-    if (enableAdvancedFilter) return {};
+    if (enableAdvancedFilter) return { _: parseAsString.withDefault('') };
 
-    return filterableColumns.reduce<
+    const reduced = filterableColumns.reduce<
       Record<string, Parser<string> | Parser<string[]>>
     >((acc, column) => {
+      const id = column.id;
+      if (id == null || id === '') return acc;
+      if (excludeFilterIdsFromUrl?.includes(id)) return acc;
       if (column.meta?.options) {
-        acc[column.id ?? ''] = parseAsArrayOf(
-          parseAsString,
-          ARRAY_SEPARATOR
-        ).withOptions(queryStateOptions);
+        acc[id] = parseAsArrayOf(parseAsString, ARRAY_SEPARATOR)
+          .withOptions(queryStateOptions)
+          .withDefault([] as string[]);
       } else {
-        acc[column.id ?? ''] = parseAsString.withOptions(queryStateOptions);
+        acc[id] = parseAsString.withOptions(queryStateOptions).withDefault('');
       }
       return acc;
     }, {});
-  }, [filterableColumns, queryStateOptions, enableAdvancedFilter]);
+
+    if (Object.keys(reduced).length === 0) {
+      reduced._ = parseAsString.withDefault('');
+    }
+    return reduced;
+  }, [
+    filterableColumns,
+    queryStateOptions,
+    enableAdvancedFilter,
+    excludeFilterIdsFromUrl
+  ]);
 
   const [filterValues, setFilterValues] = useQueryStates(filterParsers);
 
@@ -203,25 +221,48 @@ export function useDataTable<TData>(props: UseDataTableProps<TData>) {
   const initialColumnFilters: ColumnFiltersState = React.useMemo(() => {
     if (enableAdvancedFilter) return [];
 
-    return Object.entries(filterValues).reduce<ColumnFiltersState>(
+    const fromUrl = Object.entries(filterValues).reduce<ColumnFiltersState>(
       (filters, [key, value]) => {
-        if (value !== null) {
-          const processedValue = Array.isArray(value)
-            ? value
-            : typeof value === 'string' && /[^a-zA-Z0-9]/.test(value)
-              ? value.split(/[^a-zA-Z0-9]+/).filter(Boolean)
-              : [value];
+        if (key === '_' || value === null) return filters;
+        const processedValue = Array.isArray(value)
+          ? value
+          : typeof value === 'string' && /[^a-zA-Z0-9]/.test(value)
+            ? value.split(/[^a-zA-Z0-9]+/).filter(Boolean)
+            : [value];
 
-          filters.push({
-            id: key,
-            value: processedValue
-          });
-        }
+        filters.push({
+          id: key,
+          value: processedValue
+        });
         return filters;
       },
       []
     );
-  }, [filterValues, enableAdvancedFilter]);
+
+    if (!excludeFilterIdsFromUrl?.length || !initialFilterState) return fromUrl;
+
+    const fromInitial = excludeFilterIdsFromUrl
+      .filter(
+        (id) => initialFilterState[id] != null && initialFilterState[id] !== ''
+      )
+      .map((id) => {
+        const value = initialFilterState[id];
+        const processed = Array.isArray(value)
+          ? value
+          : typeof value === 'string'
+            ? [value]
+            : [];
+        return { id, value: processed };
+      })
+      .filter((f) => (f.value as string[]).length > 0);
+
+    return [...fromUrl, ...fromInitial];
+  }, [
+    filterValues,
+    enableAdvancedFilter,
+    excludeFilterIdsFromUrl,
+    initialFilterState
+  ]);
 
   const [columnFilters, setColumnFilters] =
     React.useState<ColumnFiltersState>(initialColumnFilters);
@@ -251,7 +292,14 @@ export function useDataTable<TData>(props: UseDataTableProps<TData>) {
           }
         }
 
-        debouncedSetFilterValues(filterUpdates);
+        const forUrl = excludeFilterIdsFromUrl?.length
+          ? Object.fromEntries(
+              Object.entries(filterUpdates).filter(
+                ([id]) => !excludeFilterIdsFromUrl.includes(id)
+              )
+            )
+          : filterUpdates;
+        debouncedSetFilterValues(forUrl);
         return next;
       });
     },

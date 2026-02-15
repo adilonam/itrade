@@ -30,24 +30,48 @@ interface DataTableFacetedFilterProps<TData, TValue> {
   title?: string;
   options: Option[];
   multiple?: boolean;
+  /** When set, filter is deferred (search-on-click): selection stored here until Search is clicked */
+  pendingValues?: string[];
+  setPendingValues?: (values: string[]) => void;
 }
 
 export function DataTableFacetedFilter<TData, TValue>({
   column,
   title,
   options,
-  multiple
+  multiple,
+  pendingValues,
+  setPendingValues
 }: DataTableFacetedFilterProps<TData, TValue>) {
   const [open, setOpen] = React.useState(false);
 
+  const isDeferred =
+    pendingValues !== undefined && setPendingValues !== undefined;
   const columnFilterValue = column?.getFilterValue();
+  const sourceValues = isDeferred
+    ? pendingValues
+    : Array.isArray(columnFilterValue)
+      ? columnFilterValue
+      : [];
   const selectedValues = React.useMemo(
-    () => new Set(Array.isArray(columnFilterValue) ? columnFilterValue : []),
-    [columnFilterValue]
+    () => new Set(sourceValues),
+    [sourceValues]
   );
 
   const onItemSelect = React.useCallback(
     (option: Option, isSelected: boolean) => {
+      if (isDeferred) {
+        if (multiple) {
+          const newSet = new Set(selectedValues);
+          if (isSelected) newSet.delete(option.value);
+          else newSet.add(option.value);
+          setPendingValues(Array.from(newSet));
+        } else {
+          setPendingValues(isSelected ? [] : [option.value]);
+          setOpen(false);
+        }
+        return;
+      }
       if (!column) return;
 
       if (multiple) {
@@ -64,15 +88,16 @@ export function DataTableFacetedFilter<TData, TValue>({
         setOpen(false);
       }
     },
-    [column, multiple, selectedValues]
+    [column, multiple, selectedValues, isDeferred, setPendingValues]
   );
 
   const onReset = React.useCallback(
     (event?: React.MouseEvent) => {
       event?.stopPropagation();
-      column?.setFilterValue(undefined);
+      if (isDeferred) setPendingValues([]);
+      else column?.setFilterValue(undefined);
     },
-    [column]
+    [column, isDeferred, setPendingValues]
   );
 
   return (

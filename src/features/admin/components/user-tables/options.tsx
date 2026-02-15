@@ -4,6 +4,10 @@ export const ROLE_OPTIONS = [
     label: 'User'
   },
   {
+    value: 'SELLER',
+    label: 'Seller'
+  },
+  {
     value: 'ADMIN',
     label: 'Admin'
   },

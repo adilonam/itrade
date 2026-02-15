@@ -74,7 +74,8 @@ export const createSellerUserColumns = (
       label: 'Name',
       placeholder: 'Search users...',
       variant: 'text',
-      icon: UserIcon
+      icon: UserIcon,
+      searchOnClick: true
     },
     enableColumnFilter: true
   },
@@ -100,7 +101,8 @@ export const createSellerUserColumns = (
       label: 'Email',
       placeholder: 'Search by email...',
       variant: 'text',
-      icon: Mail
+      icon: Mail,
+      searchOnClick: true
     },
     enableColumnFilter: true
   },
@@ -131,9 +133,10 @@ export const createSellerUserColumns = (
     },
     enableColumnFilter: true,
     meta: {
-      label: 'roles',
+      label: 'Role',
       variant: 'multiSelect',
-      options: ROLE_OPTIONS
+      options: ROLE_OPTIONS,
+      searchOnClick: true
     }
   },
   {

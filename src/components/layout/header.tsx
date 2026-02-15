@@ -48,10 +48,10 @@ export default function Header() {
     // Initial fetch
     loadFinancialData();
 
-    // Set up interval to fetch every 5 seconds
+    // Set up interval to fetch every 100 seconds
     const interval = setInterval(() => {
       loadFinancialData();
-    }, 10000);
+    }, 30000);
 
     // Cleanup interval on unmount
     return () => clearInterval(interval);
