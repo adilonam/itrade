@@ -310,3 +310,15 @@ model Message {
   @@index([read])
   @@map("messages")
 }
+
+// Useful links shown to users (e.g. in Liens Utiles)
+model UsefulLink {
+  id        String   @id @default(cuid())
+  title     String   @map("title")
+  url       String   @map("url") @db.Text
+  order     Int      @default(0) @map("order")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("useful_links")
+}

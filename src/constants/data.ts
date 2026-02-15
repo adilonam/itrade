@@ -758,8 +758,8 @@ export const tenantNavItems: TenantNavItems = {
   Invest: {
     USER: [
       {
-        title: 'Dashboard',
-        url: '/overview',
+        title: 'Invest Overview',
+        url: '/invest-overview',
         icon: 'dashboard',
         isActive: false,
         shortcut: ['d', 'd'],
@@ -816,8 +816,8 @@ export const tenantNavItems: TenantNavItems = {
     ],
     SELLER: [
       {
-        title: 'Dashboard',
-        url: '/overview',
+        title: 'Invest Overview',
+        url: '/invest-overview',
         icon: 'dashboard',
         isActive: false,
         shortcut: ['d', 'd'],
@@ -874,8 +874,8 @@ export const tenantNavItems: TenantNavItems = {
     ],
     ADMIN: [
       {
-        title: 'Dashboard',
-        url: '/overview',
+        title: 'Invest Overview',
+        url: '/invest-overview',
         icon: 'dashboard',
         isActive: false,
         shortcut: ['d', 'd'],
@@ -932,8 +932,8 @@ export const tenantNavItems: TenantNavItems = {
     ],
     SUPERADMIN: [
       {
-        title: 'Dashboard',
-        url: '/overview',
+        title: 'Invest Overview',
+        url: '/invest-overview',
         icon: 'dashboard',
         isActive: false,
         shortcut: ['d', 'd'],
@@ -1091,14 +1091,6 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'List News',
-        url: '/admin/news',
-        icon: 'news',
-        isActive: false,
-        shortcut: ['l', 'a'],
-        items: []
-      },
-      {
         title: 'List Useful Links',
         url: '/admin/useful-links',
         icon: 'link',
@@ -1181,14 +1173,6 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'List News',
-        url: '/admin/news',
-        icon: 'news',
-        isActive: false,
-        shortcut: ['l', 'a'],
-        items: []
-      },
-      {
         title: 'List Useful Links',
         url: '/admin/useful-links',
         icon: 'link',
@@ -1217,30 +1201,6 @@ export const tenantNavItems: TenantNavItems = {
         icon: 'palette',
         isActive: false,
         shortcut: ['t', 's'],
-        items: []
-      },
-      {
-        title: 'Mail server config for 2FA',
-        url: '/super-admin/mail-config',
-        icon: 'server',
-        isActive: false,
-        shortcut: ['m', 'c'],
-        items: []
-      },
-      {
-        title: 'Debug Mode',
-        url: '/super-admin/debug',
-        icon: 'settings',
-        isActive: false,
-        shortcut: ['d', 'b'],
-        items: []
-      },
-      {
-        title: 'Save',
-        url: '/super-admin/save',
-        icon: 'check',
-        isActive: false,
-        shortcut: ['s', 'v'],
         items: []
       }
     ]
