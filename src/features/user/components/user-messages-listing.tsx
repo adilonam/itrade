@@ -6,6 +6,7 @@ import { UserMessageCreation } from './user-messages/user-message-creation';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { IconRefresh, IconPlus } from '@tabler/icons-react';
+import { useSession } from 'next-auth/react';
 import { toast } from 'sonner';
 
 type MessageWithUsers = {
@@ -33,6 +34,7 @@ interface PaginationInfo {
 }
 
 export default function UserMessagesListing() {
+  const { data: session } = useSession();
   const [messages, setMessages] = useState<MessageWithUsers[]>([]);
   const [pagination, setPagination] = useState<PaginationInfo>({
     page: 1,
@@ -92,8 +94,9 @@ export default function UserMessagesListing() {
         throw new Error('Failed to mark message as read');
       }
 
-      toast.success('Message marked as read');
-      loadMessages();
+      setMessages((prev) =>
+        prev.map((m) => (m.id === messageId ? { ...m, read: true } : m))
+      );
     } catch (error) {
       toast.error(
         error instanceof Error
@@ -140,6 +143,7 @@ export default function UserMessagesListing() {
         messages={messages}
         loading={loading}
         pagination={pagination}
+        currentUserId={session?.user?.id}
         onMarkAsRead={handleMarkAsRead}
         onPageChange={handlePageChange}
       />

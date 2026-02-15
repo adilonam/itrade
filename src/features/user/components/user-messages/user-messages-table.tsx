@@ -18,14 +18,19 @@ import {
   CardHeader,
   CardTitle
 } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle
+} from '@/components/ui/dialog';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import {
   IconLoader2,
   IconChevronLeft,
   IconChevronRight,
   IconMail,
-  IconMailOpened,
-  IconCheck
+  IconMailOpened
 } from '@tabler/icons-react';
 
 type MessageWithUsers = {
@@ -54,6 +59,7 @@ interface UserMessagesTableProps {
     total: number;
     pages: number;
   };
+  currentUserId?: string;
   onMarkAsRead: (messageId: string) => void;
   onPageChange: (page: number) => void;
 }
@@ -62,17 +68,22 @@ export function UserMessagesTable({
   messages,
   loading,
   pagination,
+  currentUserId,
   onMarkAsRead,
   onPageChange
 }: UserMessagesTableProps) {
-  const [markingAsReadId, setMarkingAsReadId] = useState<string | null>(null);
+  const [selectedMessage, setSelectedMessage] =
+    useState<MessageWithUsers | null>(null);
 
-  const handleMarkAsRead = async (messageId: string) => {
-    setMarkingAsReadId(messageId);
-    try {
-      await onMarkAsRead(messageId);
-    } finally {
-      setMarkingAsReadId(null);
+  const openMessage = async (message: MessageWithUsers) => {
+    setSelectedMessage(message);
+    const isReceiver = currentUserId && message.receiver.id === currentUserId;
+    if (!message.read && isReceiver) {
+      try {
+        await onMarkAsRead(message.id);
+      } catch {
+        // ignore
+      }
     }
   };
 
@@ -131,17 +142,35 @@ export function UserMessagesTable({
                   <Table>
                     <TableHeader className='bg-muted sticky top-0 z-10'>
                       <TableRow>
+                        <TableHead className='w-10' />
                         <TableHead>From</TableHead>
                         <TableHead>To</TableHead>
-                        <TableHead>Message</TableHead>
                         <TableHead>Status</TableHead>
                         <TableHead>Date</TableHead>
-                        <TableHead className='text-right'>Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {messages.map((message) => (
                         <TableRow key={message.id}>
+                          <TableCell className='w-10'>
+                            <Button
+                              variant='ghost'
+                              size='icon'
+                              className='h-8 w-8'
+                              onClick={() => openMessage(message)}
+                              aria-label={
+                                message.read
+                                  ? 'View message'
+                                  : 'View message (unread)'
+                              }
+                            >
+                              {message.read ? (
+                                <IconMailOpened className='h-4 w-4' />
+                              ) : (
+                                <IconMail className='h-4 w-4' />
+                              )}
+                            </Button>
+                          </TableCell>
                           <TableCell>
                             <div>
                               <div className='font-medium'>
@@ -160,11 +189,6 @@ export function UserMessagesTable({
                               <div className='text-muted-foreground text-xs'>
                                 {message.receiver.email}
                               </div>
-                            </div>
-                          </TableCell>
-                          <TableCell className='max-w-md'>
-                            <div className='line-clamp-2 text-sm'>
-                              {message.message}
                             </div>
                           </TableCell>
                           <TableCell>
@@ -188,30 +212,52 @@ export function UserMessagesTable({
                           <TableCell className='text-muted-foreground text-xs'>
                             {formatDate(message.createdAt)}
                           </TableCell>
-                          <TableCell className='text-right'>
-                            <Button
-                              variant='outline'
-                              size='sm'
-                              onClick={() => handleMarkAsRead(message.id)}
-                              disabled={
-                                markingAsReadId === message.id || message.read
-                              }
-                            >
-                              {markingAsReadId === message.id ? (
-                                <IconLoader2 className='h-4 w-4 animate-spin' />
-                              ) : message.read ? (
-                                <IconMailOpened className='h-4 w-4' />
-                              ) : (
-                                <IconCheck className='h-4 w-4' />
-                              )}
-                            </Button>
-                          </TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
                   </Table>
                   <ScrollBar orientation='horizontal' />
                 </ScrollArea>
+
+                <Dialog
+                  open={!!selectedMessage}
+                  onOpenChange={(open) => !open && setSelectedMessage(null)}
+                >
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Message</DialogTitle>
+                    </DialogHeader>
+                    {selectedMessage && (
+                      <div className='space-y-4'>
+                        <div className='grid gap-2 text-sm'>
+                          <div>
+                            <span className='text-muted-foreground'>
+                              From:{' '}
+                            </span>
+                            {selectedMessage.sender.name || 'No Name'} (
+                            {selectedMessage.sender.email})
+                          </div>
+                          <div>
+                            <span className='text-muted-foreground'>To: </span>
+                            {selectedMessage.receiver.name || 'No Name'} (
+                            {selectedMessage.receiver.email})
+                          </div>
+                          <div>
+                            <span className='text-muted-foreground'>
+                              Date:{' '}
+                            </span>
+                            {formatDate(selectedMessage.createdAt)}
+                          </div>
+                        </div>
+                        <div className='bg-muted/50 rounded-md border p-4'>
+                          <p className='text-sm whitespace-pre-wrap'>
+                            {selectedMessage.message}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </DialogContent>
+                </Dialog>
               </div>
             </div>
           </div>

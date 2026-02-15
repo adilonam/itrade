@@ -103,19 +103,19 @@
 #### List Users (Seller)
 - [x] Search users & Search by email ne fonctionnent pas
 - [x] Doit pourvoir Edit ses propres Users a lui-> deja traite avec Julien c admin qui pe seulement modifier les users
-- [ ] Doit pouvoir créer ses propres Users a lui
-- [ ] Doit pouvoir activer pour chacun de ses Users si POSITIONS / STOCKS / INVEST -> visible ou pas visible
-- [ ] Doit pouvoir Activer ou Désactiver un compte de ses propre Users a lui (Switch On/Off)
+- [x] Doit pouvoir créer ses propres Users a lui-> admin qui pe faire ca
+- [x] Doit pouvoir activer pour chacun de ses Users si POSITIONS / STOCKS / INVEST -> visible ou pas visible-> c seulement admin
+- [x] Doit pouvoir Activer ou Désactiver un compte de ses propre Users a lui (Switch On/Off)-> c seulement admin
 
 #### List Positions (Seller)
-- [ ] Create Position : Filter by email ne fonctionne pas, seul Select user fonctionne
-- [ ] Create Position : Filter by Symbol or Name ne fonctionne pas, seul Select a Market fonctionne
+- [x] Create Position : Filter by email ne fonctionne pas, seul Select user fonctionne-> fixed
+- [x] Create Position : Filter by Symbol or Name ne fonctionne pas, seul Select a Market fonctionne-> fixed
 
 #### Messagerie (Seller)
-- [ ] New Message : Search by email ne fonctionne pas, seul Select a linked user fonctionne
-- [ ] Pouvoir ouvrir les messages dans des modals et qu'il se marque comme Read automatiquement
-- [ ] Dans liste message, colonne Action, le BTN sert a marquer comme Read, il faudrait plutôt un BTN pour REPONDRE
-- [ ] Le Seller doit recevoir une Notif quand il reçoit un nouveau message d'un User
+- [x] New Message : Search by email ne fonctionne pas, seul Select a linked user fonctionne-> fixed
+- [x] Pouvoir ouvrir les messages dans des modals et qu'il se marque comme Read automatiquement
+- [x] Dans liste message, colonne Action, le BTN sert a marquer comme Read, il faudrait plutôt un BTN pour REPONDRE-> mnt genere par le model
+- [x] Le Seller doit recevoir une Notif quand il reçoit un nouveau message d'un User-> dans dashboard   
 
 #### Liste des Invest (Seller)
 - [ ] Il faudrait créer la liste des Invest qui ont été fais par les Users du Seller en question

@@ -253,13 +253,13 @@ export default function ProfileViewPage() {
               </div>
             </div>
             <div className='space-y-2'>
-              <Label htmlFor='phone'>Téléphone</Label>
+              <Label htmlFor='phone'>Phone</Label>
               {isEditing ? (
                 <Input
                   id='phone'
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  placeholder='+33 6 12 34 56 78'
+                  placeholder='+1 234 567 8900'
                 />
               ) : (
                 <div className='bg-muted rounded-md px-3 py-2'>
@@ -268,7 +268,7 @@ export default function ProfileViewPage() {
               )}
             </div>
             <div className='space-y-2'>
-              <Label htmlFor='dateOfBirth'>Date de naissance</Label>
+              <Label htmlFor='dateOfBirth'>Date of birth</Label>
               {isEditing ? (
                 <Input
                   id='dateOfBirth'
@@ -284,56 +284,52 @@ export default function ProfileViewPage() {
                 </div>
               )}
             </div>
-          </div>
-
-          {isEditing && (
-            <div className='grid gap-4 sm:grid-cols-2'>
-              <div className='space-y-2 sm:col-span-2'>
-                <Label htmlFor='address'>Adresse</Label>
+            <div className='space-y-2 sm:col-span-2'>
+              <Label htmlFor='address'>Address</Label>
+              {isEditing ? (
                 <Input
                   id='address'
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
-                  placeholder='123 rue Example'
+                  placeholder='123 Main Street'
                 />
-              </div>
-              <div className='space-y-2'>
-                <Label htmlFor='postalCode'>Code postal</Label>
+              ) : (
+                <div className='bg-muted rounded-md px-3 py-2'>
+                  {profile?.address || '—'}
+                </div>
+              )}
+            </div>
+            <div className='space-y-2'>
+              <Label htmlFor='postalCode'>Postal code</Label>
+              {isEditing ? (
                 <Input
                   id='postalCode'
                   value={postalCode}
                   onChange={(e) => setPostalCode(e.target.value)}
-                  placeholder='75001'
+                  placeholder='12345'
                 />
-              </div>
-              <div className='space-y-2'>
-                <Label htmlFor='city'>Ville</Label>
+              ) : (
+                <div className='bg-muted rounded-md px-3 py-2'>
+                  {profile?.postalCode || '—'}
+                </div>
+              )}
+            </div>
+            <div className='space-y-2'>
+              <Label htmlFor='city'>City</Label>
+              {isEditing ? (
                 <Input
                   id='city'
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
-                  placeholder='Paris'
+                  placeholder='City'
                 />
-              </div>
-            </div>
-          )}
-
-          {!isEditing &&
-            (profile?.address || profile?.postalCode || profile?.city) && (
-              <div className='space-y-2'>
-                <Label>Adresse</Label>
+              ) : (
                 <div className='bg-muted rounded-md px-3 py-2'>
-                  {[
-                    profile?.address,
-                    [profile?.postalCode, profile?.city]
-                      .filter(Boolean)
-                      .join(' ')
-                  ]
-                    .filter(Boolean)
-                    .join(', ') || '—'}
+                  {profile?.city || '—'}
                 </div>
-              </div>
-            )}
+              )}
+            </div>
+          </div>
 
           <div className='flex flex-wrap gap-2'>
             {isEditing ? (

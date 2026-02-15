@@ -145,50 +145,52 @@ export function SellerMessageCreation({
       <CardContent>
         <form onSubmit={handleSubmit} className='space-y-4'>
           <div className='space-y-2'>
-            <Label htmlFor='user-search'>Search User by Email</Label>
-            <Input
-              id='user-search'
-              placeholder='Search by email...'
-              value={emailFilter}
-              onChange={(e) => setEmailFilter(e.target.value)}
-            />
-          </div>
-
-          <div className='space-y-2'>
             <Label htmlFor='user-select'>Select User</Label>
-            <Select
-              value={selectedUserId}
-              onValueChange={setSelectedUserId}
-              disabled={loadingUsers || submitting}
-            >
-              <SelectTrigger id='user-select'>
-                <SelectValue placeholder='Select a linked user' />
-              </SelectTrigger>
-              <SelectContent>
-                {loadingUsers ? (
-                  <div className='flex items-center justify-center p-4'>
-                    <IconLoader2 className='h-4 w-4 animate-spin' />
-                  </div>
-                ) : filteredUsers.length === 0 ? (
-                  <div className='text-muted-foreground p-4 text-center text-sm'>
-                    No users found
-                  </div>
-                ) : (
-                  filteredUsers.map((user) => (
-                    <SelectItem key={user.id} value={user.id}>
-                      <div>
-                        <div className='font-medium'>
-                          {user.name || 'No Name'}
+            <div className='flex flex-wrap items-center gap-2'>
+              <Input
+                id='user-search'
+                placeholder='Search by email...'
+                value={emailFilter}
+                onChange={(e) => setEmailFilter(e.target.value)}
+                className='h-9 w-48 shrink-0'
+              />
+              <Select
+                value={selectedUserId}
+                onValueChange={setSelectedUserId}
+                disabled={loadingUsers || submitting}
+              >
+                <SelectTrigger
+                  id='user-select'
+                  className='min-w-[200px] flex-1'
+                >
+                  <SelectValue placeholder='Select a linked user' />
+                </SelectTrigger>
+                <SelectContent>
+                  {loadingUsers ? (
+                    <div className='flex items-center justify-center p-4'>
+                      <IconLoader2 className='h-4 w-4 animate-spin' />
+                    </div>
+                  ) : filteredUsers.length === 0 ? (
+                    <div className='text-muted-foreground p-4 text-center text-sm'>
+                      No users found
+                    </div>
+                  ) : (
+                    filteredUsers.map((user) => (
+                      <SelectItem key={user.id} value={user.id}>
+                        <div>
+                          <div className='font-medium'>
+                            {user.name || 'No Name'}
+                          </div>
+                          <div className='text-muted-foreground text-xs'>
+                            {user.email}
+                          </div>
                         </div>
-                        <div className='text-muted-foreground text-xs'>
-                          {user.email}
-                        </div>
-                      </div>
-                    </SelectItem>
-                  ))
-                )}
-              </SelectContent>
-            </Select>
+                      </SelectItem>
+                    ))
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
             {selectedUser && (
               <div className='text-muted-foreground text-sm'>
                 Selected: {selectedUser.name || 'No Name'} ({selectedUser.email}

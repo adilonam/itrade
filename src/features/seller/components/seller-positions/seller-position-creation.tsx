@@ -357,40 +357,42 @@ export function SellerPositionCreation({
         {/* User Selection with Filter */}
         <div className='space-y-2'>
           <Label htmlFor='user-select'>Select User</Label>
-          <Input
-            id='user-email-filter'
-            type='text'
-            placeholder='Filter by email...'
-            value={userEmailFilter}
-            onChange={(e) => setUserEmailFilter(e.target.value)}
-            className='mb-2'
-          />
-          <Select
-            value={selectedUserId}
-            onValueChange={setSelectedUserId}
-            disabled={loadingUsers}
-          >
-            <SelectTrigger id='user-select'>
-              <SelectValue placeholder='Select a user' />
-            </SelectTrigger>
-            <SelectContent>
-              {loadingUsers ? (
-                <SelectItem value='loading' disabled>
-                  Loading users...
-                </SelectItem>
-              ) : users.length === 0 ? (
-                <SelectItem value='no-users' disabled>
-                  No users found
-                </SelectItem>
-              ) : (
-                users.map((user) => (
-                  <SelectItem key={user.id} value={user.id}>
-                    {user.name || user.email} ({user.email})
+          <div className='flex flex-wrap items-center gap-2'>
+            <Input
+              id='user-email-filter'
+              type='text'
+              placeholder='Filter by email...'
+              value={userEmailFilter}
+              onChange={(e) => setUserEmailFilter(e.target.value)}
+              className='h-9 w-48 shrink-0'
+            />
+            <Select
+              value={selectedUserId}
+              onValueChange={setSelectedUserId}
+              disabled={loadingUsers}
+            >
+              <SelectTrigger id='user-select' className='min-w-[200px] flex-1'>
+                <SelectValue placeholder='Select a user' />
+              </SelectTrigger>
+              <SelectContent>
+                {loadingUsers ? (
+                  <SelectItem value='loading' disabled>
+                    Loading users...
                   </SelectItem>
-                ))
-              )}
-            </SelectContent>
-          </Select>
+                ) : users.length === 0 ? (
+                  <SelectItem value='no-users' disabled>
+                    No users found
+                  </SelectItem>
+                ) : (
+                  users.map((user) => (
+                    <SelectItem key={user.id} value={user.id}>
+                      {user.name || user.email} ({user.email})
+                    </SelectItem>
+                  ))
+                )}
+              </SelectContent>
+            </Select>
+          </div>
           {selectedUser && (
             <p className='text-muted-foreground text-xs'>
               Balance: ${selectedUser.balance.toFixed(2)} | Leverage:{' '}
@@ -402,43 +404,48 @@ export function SellerPositionCreation({
         {/* Market Selection with Filter */}
         <div className='space-y-2'>
           <Label htmlFor='market-select'>Select Market</Label>
-          <Input
-            id='market-symbol-filter'
-            type='text'
-            placeholder='Filter by symbol or name...'
-            value={marketSymbolFilter}
-            onChange={(e) => setMarketSymbolFilter(e.target.value)}
-            className='mb-2'
-          />
-          <Select
-            value={selectedMarket?.id || ''}
-            onValueChange={(value) => {
-              const market = markets.find((m) => m.id === value);
-              setSelectedMarket(market || null);
-            }}
-            disabled={loadingMarkets}
-          >
-            <SelectTrigger id='market-select'>
-              <SelectValue placeholder='Select a market' />
-            </SelectTrigger>
-            <SelectContent>
-              {loadingMarkets ? (
-                <SelectItem value='loading' disabled>
-                  Loading markets...
-                </SelectItem>
-              ) : markets.length === 0 ? (
-                <SelectItem value='no-markets' disabled>
-                  No markets found
-                </SelectItem>
-              ) : (
-                markets.map((market) => (
-                  <SelectItem key={market.id} value={market.id}>
-                    {market.symbol} - {market.name}
+          <div className='flex flex-wrap items-center gap-2'>
+            <Input
+              id='market-symbol-filter'
+              type='text'
+              placeholder='Filter by symbol or name...'
+              value={marketSymbolFilter}
+              onChange={(e) => setMarketSymbolFilter(e.target.value)}
+              className='h-9 w-48 shrink-0'
+            />
+            <Select
+              value={selectedMarket?.id || ''}
+              onValueChange={(value) => {
+                const market = markets.find((m) => m.id === value);
+                setSelectedMarket(market || null);
+              }}
+              disabled={loadingMarkets}
+            >
+              <SelectTrigger
+                id='market-select'
+                className='min-w-[200px] flex-1'
+              >
+                <SelectValue placeholder='Select a market' />
+              </SelectTrigger>
+              <SelectContent>
+                {loadingMarkets ? (
+                  <SelectItem value='loading' disabled>
+                    Loading markets...
                   </SelectItem>
-                ))
-              )}
-            </SelectContent>
-          </Select>
+                ) : markets.length === 0 ? (
+                  <SelectItem value='no-markets' disabled>
+                    No markets found
+                  </SelectItem>
+                ) : (
+                  markets.map((market) => (
+                    <SelectItem key={market.id} value={market.id}>
+                      {market.symbol} - {market.name}
+                    </SelectItem>
+                  ))
+                )}
+              </SelectContent>
+            </Select>
+          </div>
           {selectedMarket && (
             <p className='text-muted-foreground text-xs'>
               Last Price: ${selectedMarket.lastPrice.toFixed(5)}
