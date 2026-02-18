@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import PageContainer from '@/components/layout/page-container';
@@ -59,6 +59,30 @@ export default function WithdrawPage() {
     email: ''
   });
 
+  // Withdraw requests (user's history)
+  const [requests, setRequests] = useState<
+    {
+      id: string;
+      amount: number;
+      method: string;
+      status: string;
+      createdAt: string;
+      details: unknown;
+    }[]
+  >([]);
+
+  const loadRequests = useCallback(async () => {
+    try {
+      const res = await fetch('/api/user/withdraw-requests');
+      if (res.ok) {
+        const data = await res.json();
+        setRequests(data.requests ?? []);
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
   // Fetch user financial data
   useEffect(() => {
     const fetchFinancialData = async () => {
@@ -78,6 +102,10 @@ export default function WithdrawPage() {
       fetchFinancialData();
     }
   }, [session]);
+
+  useEffect(() => {
+    if (session?.user) loadRequests();
+  }, [session?.user, loadRequests]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -140,7 +168,7 @@ export default function WithdrawPage() {
 
       if (response.ok) {
         toast.success(
-          `Withdrawal successful! Your new balance is $${data.newBalance.toFixed(2)}.`
+          'Withdrawal request submitted. You will be notified when it is processed.'
         );
 
         // Reset form
@@ -153,11 +181,9 @@ export default function WithdrawPage() {
         });
         setPaypalDetails({ email: '' });
 
-        // Update local balance
+        // Update local balance and refresh requests table
         setUserBalance(data.newBalance);
-
-        // Redirect to dashboard or transactions page
-        router.push('/overview');
+        loadRequests();
       } else {
         toast.error(
           data.error || 'Failed to process withdrawal. Please try again.'
@@ -366,11 +392,13 @@ export default function WithdrawPage() {
                 <div className='flex items-start space-x-2'>
                   <IconAlertTriangle className='mt-0.5 h-5 w-5 text-blue-600' />
                   <div className='text-sm text-blue-800'>
-                    <p className='font-medium'>Processing Time</p>
+                    <p className='font-medium'>Withdrawal request</p>
                     <p>
+                      Your request will be reviewed by our team. You will be
+                      notified when it is processed.{' '}
                       {withdrawMethod === 'paypal'
-                        ? 'PayPal withdrawals typically process within 1-2 business days.'
-                        : 'Bank transfers typically process within 3-5 business days.'}
+                        ? 'PayPal typically 1-2 business days.'
+                        : 'Bank transfer typically 3-5 business days.'}
                     </p>
                   </div>
                 </div>
@@ -385,9 +413,76 @@ export default function WithdrawPage() {
                   isLoading || parseFloat(amount) > userBalance || !amount
                 }
               >
-                {isLoading ? 'Processing...' : `Withdraw $${amount || '0.00'}`}
+                {isLoading
+                  ? 'Submitting...'
+                  : `Submit request $${amount || '0.00'}`}
               </Button>
             </form>
+          </CardContent>
+        </Card>
+
+        {/* Withdraw requests table */}
+        <Card className='mt-6'>
+          <CardHeader>
+            <CardTitle>Your withdrawal requests</CardTitle>
+            <CardDescription>
+              Status: Pending (under review), Processing, Closed (completed), or
+              Rejected (refunded).
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {requests.length === 0 ? (
+              <p className='text-muted-foreground py-4 text-center text-sm'>
+                No withdrawal requests yet.
+              </p>
+            ) : (
+              <div className='overflow-x-auto rounded-md border'>
+                <table className='w-full text-sm'>
+                  <thead>
+                    <tr className='bg-muted/50 border-b'>
+                      <th className='px-4 py-2 text-left font-medium'>Date</th>
+                      <th className='px-4 py-2 text-left font-medium'>
+                        Amount
+                      </th>
+                      <th className='px-4 py-2 text-left font-medium'>
+                        Method
+                      </th>
+                      <th className='px-4 py-2 text-left font-medium'>
+                        Status
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {requests.map((r) => (
+                      <tr key={r.id} className='border-b last:border-0'>
+                        <td className='text-muted-foreground px-4 py-2'>
+                          {new Date(r.createdAt).toLocaleString()}
+                        </td>
+                        <td className='px-4 py-2 font-medium'>
+                          ${r.amount.toFixed(2)}
+                        </td>
+                        <td className='px-4 py-2'>
+                          {r.method === 'PAYPAL' ? 'PayPal' : 'Bank transfer'}
+                        </td>
+                        <td className='px-4 py-2'>
+                          <span
+                            className={
+                              r.status === 'REJECTED'
+                                ? 'text-destructive'
+                                : r.status === 'CLOSED'
+                                  ? 'text-green-600'
+                                  : ''
+                            }
+                          >
+                            {r.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

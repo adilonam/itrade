@@ -79,6 +79,7 @@ model User {
   positions        Position[]
   userInvestments  UserInvestment[]
   transactions     Transaction[]
+  withdrawRequests WithdrawRequest[]
   seller           User?            @relation("SellerUsers", fields: [sellerId], references: [id], onDelete: SetNull)
   sellerId         String?          @map("seller_id")
   sellerUsers      User[]           @relation("SellerUsers")
@@ -321,4 +322,34 @@ model UsefulLink {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("useful_links")
+}
+
+enum WithdrawMethod {
+  PAYPAL
+  BANK_TRANSFER
+}
+
+enum WithdrawRequestStatus {
+  PENDING
+  REJECTED
+  PROCESSING
+  CLOSED
+}
+
+model WithdrawRequest {
+  id         String               @id @default(cuid())
+  userId     String               @map("user_id")
+  amount     Float                @map("amount")
+  method     WithdrawMethod       @map("method")
+  status     WithdrawRequestStatus @default(PENDING) @map("status")
+  details    Json?                @map("details") // paypal: { email }, bank: { accountHolderName, bankName, accountNumber, routingNumber }
+  adminNotes String?              @map("admin_notes") @db.Text
+  createdAt  DateTime             @default(now()) @map("created_at")
+  updatedAt  DateTime             @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@map("withdraw_requests")
 }

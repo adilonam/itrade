@@ -1099,6 +1099,14 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
+        title: 'Withdraw Requests',
+        url: '/admin/withdraw-requests',
+        icon: 'minus',
+        isActive: false,
+        shortcut: ['w', 'r'],
+        items: []
+      },
+      {
         title: 'Theme Settings',
         url: '/admin/theme-settings',
         icon: 'palette',
@@ -1178,6 +1186,14 @@ export const tenantNavItems: TenantNavItems = {
         icon: 'link',
         isActive: false,
         shortcut: ['l', 'l'],
+        items: []
+      },
+      {
+        title: 'Withdraw Requests',
+        url: '/admin/withdraw-requests',
+        icon: 'minus',
+        isActive: false,
+        shortcut: ['w', 'r'],
         items: []
       }
     ]

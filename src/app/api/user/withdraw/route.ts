@@ -2,7 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
-import { TransactionType } from '@/lib/prisma/generated/client';
+import {
+  TransactionType,
+  WithdrawMethod,
+  WithdrawRequestStatus
+} from '@/lib/prisma/generated/client';
 
 /**
  * @swagger
@@ -84,52 +88,57 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Process withdrawal in a transaction
+    const methodEnum =
+      withdrawMethod === 'paypal'
+        ? WithdrawMethod.PAYPAL
+        : WithdrawMethod.BANK_TRANSFER;
+    const details = body.withdrawDetails ?? {};
+
     const result = await prisma.$transaction(async (tx) => {
-      // Get current user
       const user = await tx.user.findUnique({
         where: { id: session.user.id },
         select: { balance: true }
       });
 
-      if (!user) {
-        throw new Error('User not found');
-      }
+      if (!user) throw new Error('User not found');
+      if (user.balance < amount) throw new Error('Insufficient funds');
 
-      // Check if user has sufficient balance
-      if (user.balance < amount) {
-        throw new Error('Insufficient funds');
-      }
-
-      // Update user balance
       const newBalance = user.balance - amount;
       await tx.user.update({
         where: { id: session.user.id },
         data: { balance: newBalance }
       });
 
-      // Create withdrawal transaction
-      const transaction = await tx.transaction.create({
+      const withdrawRequest = await tx.withdrawRequest.create({
+        data: {
+          userId: session.user.id,
+          amount,
+          method: methodEnum,
+          status: WithdrawRequestStatus.PENDING,
+          details
+        }
+      });
+
+      await tx.transaction.create({
         data: {
           userId: session.user.id,
           type: TransactionType.WITHDRAW,
           absoluteAmount: amount,
-          description: `Withdrawal to ${withdrawMethod === 'paypal' ? 'PayPal' : 'Bank Account'}`
+          description: `Withdrawal request (${withdrawMethod}) - pending`
         }
       });
 
-      return { transaction, newBalance };
+      return { withdrawRequest, newBalance };
     });
 
     return NextResponse.json({
       success: true,
-      message: 'Withdrawal processed successfully',
-      transaction: result.transaction,
+      message:
+        'Withdrawal request submitted. You will be notified when it is processed.',
+      withdrawRequest: result.withdrawRequest,
       newBalance: result.newBalance
     });
   } catch (error) {
-    console.error('Withdrawal error:', error);
-
     if (error instanceof Error && error.message === 'Insufficient funds') {
       return NextResponse.json(
         { error: 'Insufficient funds for this withdrawal' },
@@ -138,7 +147,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(
-      { error: 'Failed to process withdrawal' },
+      { error: 'Failed to submit withdrawal request' },
       { status: 500 }
     );
   }
