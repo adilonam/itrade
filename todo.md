@@ -128,3 +128,7 @@
 - [x] Seller/ Messagerie (Seller) New message : la barre de recherche ne fonctionne pas-> c gerer avec le modal
 
 ##
+
+
+
+- [ ] switch to resend 
