@@ -3,7 +3,6 @@ import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
 import {
-  TransactionType,
   WithdrawMethod,
   WithdrawRequestStatus
 } from '@/lib/prisma/generated/client';
@@ -94,49 +93,30 @@ export async function POST(request: NextRequest) {
         : WithdrawMethod.BANK_TRANSFER;
     const details = body.withdrawDetails ?? {};
 
-    const result = await prisma.$transaction(async (tx) => {
-      const user = await tx.user.findUnique({
-        where: { id: session.user.id },
-        select: { balance: true }
-      });
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { balance: true }
+    });
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
 
-      if (!user) throw new Error('User not found');
-      if (user.balance < amount) throw new Error('Insufficient funds');
-
-      const newBalance = user.balance - amount;
-      await tx.user.update({
-        where: { id: session.user.id },
-        data: { balance: newBalance }
-      });
-
-      const withdrawRequest = await tx.withdrawRequest.create({
-        data: {
-          userId: session.user.id,
-          amount,
-          method: methodEnum,
-          status: WithdrawRequestStatus.PENDING,
-          details
-        }
-      });
-
-      await tx.transaction.create({
-        data: {
-          userId: session.user.id,
-          type: TransactionType.WITHDRAW,
-          absoluteAmount: amount,
-          description: `Withdrawal request (${withdrawMethod}) - pending`
-        }
-      });
-
-      return { withdrawRequest, newBalance };
+    const withdrawRequest = await prisma.withdrawRequest.create({
+      data: {
+        userId: session.user.id,
+        amount,
+        method: methodEnum,
+        status: WithdrawRequestStatus.PENDING,
+        details
+      }
     });
 
     return NextResponse.json({
       success: true,
       message:
         'Withdrawal request submitted. You will be notified when it is processed.',
-      withdrawRequest: result.withdrawRequest,
-      newBalance: result.newBalance
+      withdrawRequest,
+      newBalance: user.balance
     });
   } catch (error) {
     if (error instanceof Error && error.message === 'Insufficient funds') {

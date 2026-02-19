@@ -12,7 +12,7 @@ function isAdmin(session: { user?: { role?: string } } | null) {
 }
 
 const updateSchema = z.object({
-  status: z.enum(['PENDING', 'REJECTED', 'PROCESSING', 'CLOSED']),
+  status: z.enum(['PENDING', 'REJECTED', 'PROCESSING', 'APPROVED']),
   adminNotes: z.string().optional()
 });
 
@@ -39,29 +39,47 @@ export async function PATCH(
       return NextResponse.json({ error: 'Not found' }, { status: 404 });
     }
 
-    if (data.status === 'REJECTED' && existing.status !== 'REJECTED') {
+    if (data.status === 'APPROVED' && existing.status !== 'APPROVED') {
+      const user = await prisma.user.findUnique({
+        where: { id: existing.userId },
+        select: { balance: true }
+      });
+      if (!user || user.balance < existing.amount) {
+        return NextResponse.json(
+          {
+            error: `Cannot approve: user balance (${user?.balance ?? 0}) is less than withdrawal amount (${existing.amount})`
+          },
+          { status: 400 }
+        );
+      }
       await prisma.$transaction(async (tx) => {
         await tx.withdrawRequest.update({
           where: { id },
           data: {
-            status: 'REJECTED',
+            status: 'APPROVED',
             ...(data.adminNotes != null && { adminNotes: data.adminNotes })
           }
         });
         await tx.user.update({
           where: { id: existing.userId },
-          data: {
-            balance: { increment: existing.amount }
-          }
+          data: { balance: { decrement: existing.amount } }
         });
         await tx.transaction.create({
           data: {
             userId: existing.userId,
-            type: TransactionType.DEPOSIT,
+            type: TransactionType.WITHDRAW,
             absoluteAmount: existing.amount,
-            description: 'Refund: withdrawal request rejected'
+            description: 'Withdrawal approved'
           }
         });
+      });
+    } else if (data.status === 'REJECTED') {
+      await prisma.withdrawRequest.update({
+        where: { id },
+        data: {
+          status: 'REJECTED',
+          ...(data.adminNotes != null && { adminNotes: data.adminNotes })
+        }
       });
     } else {
       await prisma.withdrawRequest.update({
@@ -71,7 +89,7 @@ export async function PATCH(
             | 'PENDING'
             | 'REJECTED'
             | 'PROCESSING'
-            | 'CLOSED',
+            | 'APPROVED',
           ...(data.adminNotes != null && { adminNotes: data.adminNotes })
         }
       });

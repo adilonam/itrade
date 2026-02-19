@@ -1105,14 +1105,6 @@ export const tenantNavItems: TenantNavItems = {
         isActive: false,
         shortcut: ['w', 'r'],
         items: []
-      },
-      {
-        title: 'Theme Settings',
-        url: '/admin/theme-settings',
-        icon: 'palette',
-        isActive: false,
-        shortcut: ['t', 's'],
-        items: []
       }
     ],
     SUPERADMIN: [

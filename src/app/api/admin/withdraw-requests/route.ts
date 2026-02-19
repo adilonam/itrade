@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
 
     const status = request.nextUrl.searchParams.get('status');
     const where = status
-      ? { status: status as 'PENDING' | 'REJECTED' | 'PROCESSING' | 'CLOSED' }
+      ? { status: status as 'PENDING' | 'REJECTED' | 'PROCESSING' | 'APPROVED' }
       : {};
 
     const requests = await prisma.withdrawRequest.findMany({

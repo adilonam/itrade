@@ -37,6 +37,27 @@ interface PaypalDetails {
   email: string;
 }
 
+function formatWithdrawDetails(method: string, details: unknown): string {
+  if (!details || typeof details !== 'object') return '—';
+  const d = details as Record<string, unknown>;
+  if (method === 'PAYPAL') {
+    const email = d.email;
+    return typeof email === 'string' ? email : '—';
+  }
+  if (method === 'BANK_TRANSFER') {
+    const parts: string[] = [];
+    if (typeof d.accountHolderName === 'string')
+      parts.push(d.accountHolderName);
+    if (typeof d.bankName === 'string') parts.push(d.bankName);
+    if (typeof d.accountNumber === 'string' && d.accountNumber.length >= 4)
+      parts.push(`••••${d.accountNumber.slice(-4)}`);
+    if (typeof d.routingNumber === 'string')
+      parts.push(`Routing: ${d.routingNumber}`);
+    return parts.length ? parts.join(' · ') : '—';
+  }
+  return '—';
+}
+
 export default function WithdrawPage() {
   const router = useRouter();
   const { data: session } = useSession();
@@ -426,8 +447,8 @@ export default function WithdrawPage() {
           <CardHeader>
             <CardTitle>Your withdrawal requests</CardTitle>
             <CardDescription>
-              Status: Pending (under review), Processing, Closed (completed), or
-              Rejected (refunded).
+              Status: Pending (under review), Processing, Approved (completed),
+              or Rejected.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -448,6 +469,9 @@ export default function WithdrawPage() {
                         Method
                       </th>
                       <th className='px-4 py-2 text-left font-medium'>
+                        Details
+                      </th>
+                      <th className='px-4 py-2 text-left font-medium'>
                         Status
                       </th>
                     </tr>
@@ -464,12 +488,18 @@ export default function WithdrawPage() {
                         <td className='px-4 py-2'>
                           {r.method === 'PAYPAL' ? 'PayPal' : 'Bank transfer'}
                         </td>
+                        <td
+                          className='text-muted-foreground max-w-[200px] truncate px-4 py-2 text-xs'
+                          title={formatWithdrawDetails(r.method, r.details)}
+                        >
+                          {formatWithdrawDetails(r.method, r.details)}
+                        </td>
                         <td className='px-4 py-2'>
                           <span
                             className={
                               r.status === 'REJECTED'
                                 ? 'text-destructive'
-                                : r.status === 'CLOSED'
+                                : r.status === 'APPROVED'
                                   ? 'text-green-600'
                                   : ''
                             }

@@ -33,7 +33,7 @@ type WithdrawRequestRow = {
   user: { id: string; name: string | null; email: string };
 };
 
-const STATUSES = ['PENDING', 'REJECTED', 'PROCESSING', 'CLOSED'] as const;
+const STATUSES = ['PENDING', 'REJECTED', 'PROCESSING', 'APPROVED'] as const;
 
 function methodLabel(m: string) {
   return m === 'PAYPAL' ? 'PayPal' : 'Bank transfer';
@@ -47,11 +47,32 @@ function statusVariant(s: string) {
       return 'destructive';
     case 'PROCESSING':
       return 'default';
-    case 'CLOSED':
+    case 'APPROVED':
       return 'outline';
     default:
       return 'secondary';
   }
+}
+
+function formatDetails(method: string, details: unknown): string {
+  if (!details || typeof details !== 'object') return '—';
+  const d = details as Record<string, unknown>;
+  if (method === 'PAYPAL') {
+    const email = d.email;
+    return typeof email === 'string' ? email : '—';
+  }
+  if (method === 'BANK_TRANSFER') {
+    const parts: string[] = [];
+    if (typeof d.accountHolderName === 'string')
+      parts.push(d.accountHolderName);
+    if (typeof d.bankName === 'string') parts.push(d.bankName);
+    if (typeof d.accountNumber === 'string' && d.accountNumber.length >= 4)
+      parts.push(`••••${d.accountNumber.slice(-4)}`);
+    if (typeof d.routingNumber === 'string')
+      parts.push(`Routing: ${d.routingNumber}`);
+    return parts.length ? parts.join(' · ') : '—';
+  }
+  return '—';
 }
 
 export default function WithdrawRequestsListing() {
@@ -155,6 +176,7 @@ export default function WithdrawRequestsListing() {
                   <TableHead>User</TableHead>
                   <TableHead>Amount</TableHead>
                   <TableHead>Method</TableHead>
+                  <TableHead>Details</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className='w-[180px]'>Change status</TableHead>
                 </TableRow>
@@ -179,6 +201,12 @@ export default function WithdrawRequestsListing() {
                       ${r.amount.toFixed(2)}
                     </TableCell>
                     <TableCell>{methodLabel(r.method)}</TableCell>
+                    <TableCell
+                      className='text-muted-foreground max-w-[220px] truncate text-xs'
+                      title={formatDetails(r.method, r.details)}
+                    >
+                      {formatDetails(r.method, r.details)}
+                    </TableCell>
                     <TableCell>
                       <Badge variant={statusVariant(r.status)}>
                         {r.status}
