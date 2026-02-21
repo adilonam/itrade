@@ -10,6 +10,7 @@ This project uses:
 - **shadcn/ui** for pre-built components (optional, use sparingly)
 - **swagger** for API documentation UI
 - prisma version 7 it s in src/lib/prisma.ts
+- dont creat files markdown
 
 
 

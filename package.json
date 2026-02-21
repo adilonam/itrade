@@ -1,10 +1,10 @@
 {
-  "name": "next-shadcn-dashboard-starter",
+  "name": "trade-nova",
   "version": "1.0.0",
   "private": true,
   "author": {
-    "name": "Kiran",
-    "url": "https://github.com/Kiranism"
+    "name": "adilonam",
+    "url": "https://github.com/adilonam"
   },
   "scripts": {
     "dev": "next dev --turbopack",

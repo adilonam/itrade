@@ -1,7 +1,7 @@
 services:
   postgres:
     image: postgres:15
-    container_name: trading-app-postgres
+    container_name: trade-nova-postgres
     restart: unless-stopped
     environment:
       POSTGRES_USER: trading_user
@@ -14,7 +14,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d
     networks:
-      - trading-app-network
+      - trade-nova-network
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U trading_user -d trading_app_db']
       interval: 10s
@@ -26,5 +26,5 @@ volumes:
     driver: local
 
 networks:
-  trading-app-network:
+  trade-nova-network:
     driver: bridge

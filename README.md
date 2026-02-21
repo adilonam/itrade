@@ -1,115 +1,114 @@
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://user-images.githubusercontent.com/9113740/201498864-2a900c64-d88f-4ed4-b5cf-770bcb57e1f5.png">
-  <source media="(prefers-color-scheme: light)" srcset="https://user-images.githubusercontent.com/9113740/201498152-b171abb8-9225-487a-821c-6ff49ee48579.png">
-</picture>
+# Trade Nova
 
-<div align="center"><strong>Next.js Admin Dashboard Starter Template With Shadcn-ui</strong></div>
-<div align="center">Built with the Next.js 15 App Router</div>
-<br />
-<div align="center">
-<a href="https://dub.sh/shadcn-dashboard">View Demo</a>
-<span>
-</div>
+A multi-tenant trading platform with **Room Trading**, **Room Stock**, and **Invest** — one app, role-based navigation, and shared auth.
 
-## Overview
+## What it does
 
-This is a starter template using the following stack:
+- **Dashboard** — Overview, transactions, messages, deposit/withdraw, news, useful links, account.
+- **Room Trading** — Markets, positions, trade transactions; leverage and margin (configurable).
+- **Room Stock** — Stock markets, portfolio, stock transactions.
+- **Invest** — Investment overview, my investments, invest transactions.
+- **Administration** — Sellers and admins manage users, positions, investments, markets, messages, useful links, withdraw requests.
+- **Configuration** — Super-admin: app settings, theme settings.
 
-- Framework - [Next.js 15](https://nextjs.org/13)
-- Language - [TypeScript](https://www.typescriptlang.org)
-- Auth - [Clerk](https://go.clerk.com/ILdYhn7)
-- Error tracking - [<picture><img alt="Sentry" src="public/assets/sentry.svg">
-  </picture>](https://sentry.io/for/nextjs/?utm_source=github&utm_medium=paid-community&utm_campaign=general-fy26q2-nextjs&utm_content=github-banner-project-tryfree)
-- Styling - [Tailwind CSS v4](https://tailwindcss.com)
-- Components - [Shadcn-ui](https://ui.shadcn.com)
-- Schema Validations - [Zod](https://zod.dev)
-- State Management - [Zustand](https://zustand-demo.pmnd.rs)
-- Search params state manager - [Nuqs](https://nuqs.47ng.com/)
-- Tables - [Tanstack Data Tables](https://ui.shadcn.com/docs/components/data-table) • [Dice table](https://www.diceui.com/docs/components/data-table)
-- Forms - [React Hook Form](https://ui.shadcn.com/docs/components/form)
-- Command+k interface - [kbar](https://kbar.vercel.app/)
-- Linting - [ESLint](https://eslint.org)
-- Pre-commit Hooks - [Husky](https://typicode.github.io/husky/)
-- Formatting - [Prettier](https://prettier.io)
+Navigation is **tenant + role** based (see `src/constants/data.ts`). Roles: `USER`, `SELLER`, `ADMIN`, `SUPERADMIN`.
 
-_If you are looking for a Tanstack start dashboard template, here is the [repo](https://git.new/tanstack-start-dashboard)._
+## Tech stack
 
-## Pages
+- **Framework** — [Next.js 15](https://nextjs.org) (App Router), [React 19](https://react.dev)
+- **Language** — [TypeScript](https://www.typescriptlang.org)
+- **Auth** — [NextAuth.js](https://next-auth.js.org) (credentials + Google)
+- **Database** — [PostgreSQL](https://www.postgresql.org) with [Prisma 7](https://www.prisma.io) (`src/lib/prisma.ts`)
+- **Styling** — [Tailwind CSS v4](https://tailwindcss.com)
+- **UI** — [Radix UI](https://www.radix-ui.com), [tabler-icons-react](https://tabler.io/icons), optional [shadcn/ui](https://ui.shadcn.com)
+- **Validation** — [Zod](https://zod.dev)
+- **State** — [Zustand](https://zustand-demo.pmnd.rs), [Nuqs](https://nuqs.47ng.com/) (search params)
+- **Market data** — Twelve Data API; optional Alpha Vantage for news
+- **Storage** — [Vercel Blob](https://vercel.com/docs/storage/vercel-blob) for profile images
+- **Tooling** — ESLint, Prettier, Husky, lint-staged
 
-| Pages                                                                                                                                                                  | Specifications                                                                                                                                                                                                                                                          |
-| :--------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Signup / Signin](https://go.clerk.com/ILdYhn7)                                                                                                                        | Authentication with **Clerk** provides secure authentication and user management with multiple sign-in options including passwordless authentication, social logins, and enterprise SSO - all designed to enhance security while delivering a seamless user experience. |
-| [Dashboard (Overview)](https://shadcn-dashboard.kiranism.dev/dashboard)                                                                                                | Cards with Recharts graphs for analytics. Parallel routes in the overview sections feature independent loading, error handling, and isolated component rendering.                                                                                                       |
-| [Product](https://shadcn-dashboard.kiranism.dev/dashboard/product)                                                                                                     | Tanstack tables with server side searching, filter, pagination by Nuqs which is a Type-safe search params state manager in nextjs                                                                                                                                       |
-| [Product/new](https://shadcn-dashboard.kiranism.dev/dashboard/product/new)                                                                                             | A Product Form with shadcn form (react-hook-form + zod).                                                                                                                                                                                                                |
-| [Profile](https://shadcn-dashboard.kiranism.dev/dashboard/profile)                                                                                                     | Clerk's full-featured account management UI that allows users to manage their profile and security settings                                                                                                                                                             |
-| [Kanban Board](https://shadcn-dashboard.kiranism.dev/dashboard/kanban)                                                                                                 | A Drag n Drop task management board with dnd-kit and zustand to persist state locally.                                                                                                                                                                                  |
-| [Not Found](https://shadcn-dashboard.kiranism.dev/dashboard/notfound)                                                                                                  | Not Found Page Added in the root level                                                                                                                                                                                                                                  |
-| [Global Error](https://sentry.io/for/nextjs/?utm_source=github&utm_medium=paid-community&utm_campaign=general-fy26q2-nextjs&utm_content=github-banner-project-tryfree) | A centralized error page that captures and displays errors across the application. Integrated with **Sentry** to log errors, provide detailed reports, and enable replay functionality for better debuggin.                                                             |
+## Getting started
 
-## Feature based organization
+### Prerequisites
 
-```plaintext
+- Node.js 18+
+- pnpm
+- PostgreSQL (or use Docker)
+
+### Install and run
+
+```bash
+git clone https://github.com/adilonam/trade-nova.git
+cd trade-nova
+pnpm install
+cp .env.example .env
+# Edit .env with your DB, NextAuth, Twelve Data, SMTP, etc.
+pnpm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000).
+
+### Database
+
+```bash
+pnpm db:generate   # Generate Prisma client
+pnpm db:migrate    # Run migrations (dev)
+pnpm db:push       # Push schema (prototype)
+pnpm db:studio     # Open Prisma Studio
+pnpm db:seed       # Seed database
+```
+
+### Docker
+
+```bash
+pnpm docker:up     # Start PostgreSQL (see docker-compose.yml)
+pnpm docker:down   # Stop
+```
+
+Set `DATABASE_URL` in `.env` to match (e.g. `postgresql://trading_user:trading_password@localhost:5432/trading_app_db`).
+
+## Environment
+
+Copy `.env.example` to `.env` and fill in:
+
+| Variable | Purpose |
+|----------|---------|
+| `DATABASE_URL` | PostgreSQL connection string |
+| `NEXTAUTH_URL`, `NEXTAUTH_SECRET` | NextAuth base URL and secret |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Google OAuth (optional) |
+| `NEXT_PUBLIC_TWELVE_DATA_API_KEY`, `TWELVE_DATA_API_KEY` | Market data (use `"demo"` for testing) |
+| `SMTP_*` | Email (MFA / notifications) |
+| `MIN_MARGIN_LEVEL` | Margin call threshold (default 100) |
+| `ALPHAVANTAGE_API_KEY` | News/sentiment (optional) |
+| `BLOB_READ_WRITE_TOKEN` | Vercel Blob for profile images (optional) |
+
+## Scripts
+
+| Command | Description |
+|---------|-------------|
+| `pnpm dev` | Next.js dev server (Turbopack) |
+| `pnpm build` | Prisma generate + migrate + Next build |
+| `pnpm start` | Production server |
+| `pnpm lint` / `pnpm lint:fix` | ESLint |
+| `pnpm format` | Prettier |
+| `pnpm setup` | Run `./setup.sh` |
+
+## Project layout
+
+```text
 src/
-├── app/ # Next.js App Router directory
-│ ├── (auth)/ # Auth route group
-│ │ ├── (signin)/
-│ ├── (dashboard)/ # Dashboard route group
-│ │ ├── layout.tsx
-│ │ ├── loading.tsx
-│ │ └── page.tsx
-│ └── api/ # API routes
-│
-├── components/ # Shared components
-│ ├── ui/ # UI components (buttons, inputs, etc.)
-│ └── layout/ # Layout components (header, sidebar, etc.)
-│
-├── features/ # Feature-based modules
-│ ├── feature/
-│ │ ├── components/ # Feature-specific components
-│ │ ├── actions/ # Server actions
-│ │ ├── schemas/ # Form validation schemas
-│ │ └── utils/ # Feature-specific utilities
-│ │
-├── lib/ # Core utilities and configurations
-│ ├── auth/ # Auth configuration
-│ ├── db/ # Database utilities
-│ └── utils/ # Shared utilities
-│
-├── hooks/ # Custom hooks
-│ └── use-debounce.ts
-│
-├── stores/ # Zustand stores
-│ └── dashboard-store.ts
-│
-└── types/ # TypeScript types
-└── index.ts
+├── app/              # Next.js App Router (auth, dashboard, API)
+├── components/       # Shared UI (layout, etc.)
+├── constants/        # Navigation, tenants (data.ts)
+├── features/         # Feature modules (components, actions, schemas)
+├── lib/              # Prisma, auth, utils
+├── hooks/            # Custom hooks
+├── stores/           # Zustand stores
+└── types/            # TypeScript types
 ```
 
-## Getting Started
+Tenant and role-based nav is defined in `src/constants/data.ts` (`tenantNavItems`).
 
-> [!NOTE]  
-> We are using **Next 15** with **React 19**, follow these steps:
+## License
 
-Clone the repo:
-
-```
-git clone https://github.com/Kiranism/next-shadcn-dashboard-starter.git
-```
-
-- `pnpm install` ( we have legacy-peer-deps=true added in the .npmrc)
-- Create a `.env.local` file by copying the example environment file:
-  `cp env.example.txt .env.local`
-- Add the required environment variables to the `.env.local` file.
-- `pnpm run dev`
-
-##### Environment Configuration Setup
-
-To configure the environment for this project, refer to the `env.example.txt` file. This file contains the necessary environment variables required for authentication and error tracking.
-
-You should now be able to access the application at http://localhost:3000.
-
-> [!WARNING]
-> After cloning or forking the repository, be cautious when pulling or syncing with the latest changes, as this may result in breaking conflicts.
-
-Cheers! 🥂
+Private. Author: [adilonam](https://github.com/adilonam).
