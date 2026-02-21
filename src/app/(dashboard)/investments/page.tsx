@@ -141,7 +141,7 @@ export default async function InvestmentsPage() {
               <p className='text-xl font-bold text-green-600'>
                 {new Intl.NumberFormat('en-US', {
                   style: 'currency',
-                  currency: 'EUR'
+                  currency: 'USD'
                 }).format(userBalance)}
               </p>
             </div>
@@ -162,7 +162,7 @@ export default async function InvestmentsPage() {
               <div className='text-2xl font-bold'>
                 {new Intl.NumberFormat('en-US', {
                   style: 'currency',
-                  currency: 'EUR'
+                  currency: 'USD'
                 }).format(userStats.totalInvested)}
               </div>
               <p className='text-muted-foreground text-xs'>
@@ -186,11 +186,11 @@ export default async function InvestmentsPage() {
                     +
                     {new Intl.NumberFormat('en-US', {
                       style: 'currency',
-                      currency: 'EUR'
+                      currency: 'USD'
                     }).format(userStats.totalExpectedReturns)}
                   </span>
                 ) : (
-                  '€0'
+                  '$0'
                 )}
               </div>
               <p className='text-muted-foreground text-xs'>

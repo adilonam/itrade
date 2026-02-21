@@ -208,6 +208,11 @@ export function TradingActionsRoomTrading({
       await response.json();
       toast.success(`${type} ${orderType} order placed successfully!`);
 
+      // Notify positions list to refresh
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('room-trading-positions-refresh'));
+      }
+
       // Reset form
       setInputValue('');
       setLimitPrice('');
@@ -240,7 +245,7 @@ export function TradingActionsRoomTrading({
   }
 
   return (
-    <Card>
+    <Card className='flex h-full min-h-[520px] flex-col'>
       <CardHeader>
         <CardTitle className='flex items-center gap-2'>
           Trade {propMarket.symbol}
@@ -249,151 +254,152 @@ export function TradingActionsRoomTrading({
           </span>
         </CardTitle>
       </CardHeader>
-      <CardContent className='space-y-4'>
-        {/* Order Type Selection */}
-        <div className='space-y-2'>
-          <Label htmlFor='order-type'>Order Type</Label>
-          <Select
-            value={orderType}
-            onValueChange={(value: 'MARKET' | 'LIMIT') => setOrderType(value)}
-          >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value='MARKET'>Market Order</SelectItem>
-              <SelectItem value='LIMIT'>Limit Order</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Quantity/Amount Input with Mode Toggle */}
-        <div className='space-y-2'>
-          <Label htmlFor='input-value'>
-            {inputMode === 'LOT' ? 'Lot Size' : 'Amount ($)'}
-          </Label>
-          <div className='flex gap-2'>
-            <Input
-              id='input-value'
-              type='number'
-              placeholder={
-                inputMode === 'LOT'
-                  ? 'Enter lot size'
-                  : 'Enter amount in dollars'
-              }
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              min='0'
-              step='0.01'
-              className='flex-1'
-            />
-            <Button
-              type='button'
-              variant='outline'
-              size='icon'
-              onClick={() => {
-                setInputMode((prev) => (prev === 'LOT' ? 'AMOUNT' : 'LOT'));
-                setInputValue(''); // Clear input when switching modes
-              }}
-              title={`Current: ${inputMode === 'LOT' ? 'Lot Size' : 'Amount'}. Click to switch`}
-              className='relative shrink-0'
+      <CardContent className='flex min-h-0 flex-1 flex-col gap-4 overflow-hidden'>
+        <div className='min-h-0 flex-1 space-y-4 overflow-y-auto'>
+          {/* Order Type Selection */}
+          <div className='space-y-2'>
+            <Label htmlFor='order-type'>Order Type</Label>
+            <Select
+              value={orderType}
+              onValueChange={(value: 'MARKET' | 'LIMIT') => setOrderType(value)}
             >
-              {inputMode === 'LOT' ? (
-                <IconChartBar className='h-4 w-4' />
-              ) : (
-                <IconCash className='h-4 w-4' />
-              )}
-              <IconSwitchHorizontal className='absolute right-1 bottom-1 h-2.5 w-2.5 opacity-60' />
-            </Button>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value='MARKET'>Market Order</SelectItem>
+                <SelectItem value='LIMIT'>Limit Order</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-          {calculatedLotSize !== null && (
-            <p className='text-muted-foreground text-xs'>
-              {inputMode === 'LOT'
-                ? `Required Margin: $${requiredMargin?.toFixed(2) || '0.00'}`
-                : `Lot Size: ${calculatedLotSize.toFixed(4)} lots`}
-            </p>
+
+          {/* Quantity/Amount Input with Mode Toggle */}
+          <div className='space-y-2'>
+            <Label htmlFor='input-value'>
+              {inputMode === 'LOT' ? 'Lot Size' : 'Amount ($)'}
+            </Label>
+            <div className='flex gap-2'>
+              <Input
+                id='input-value'
+                type='number'
+                placeholder={
+                  inputMode === 'LOT'
+                    ? 'Enter lot size'
+                    : 'Enter amount in dollars'
+                }
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                min='0'
+                step='0.01'
+                className='flex-1'
+              />
+              <Button
+                type='button'
+                variant='outline'
+                size='icon'
+                onClick={() => {
+                  setInputMode((prev) => (prev === 'LOT' ? 'AMOUNT' : 'LOT'));
+                  setInputValue(''); // Clear input when switching modes
+                }}
+                title={`Current: ${inputMode === 'LOT' ? 'Lot Size' : 'Amount'}. Click to switch`}
+                className='relative shrink-0'
+              >
+                {inputMode === 'LOT' ? (
+                  <IconChartBar className='h-4 w-4' />
+                ) : (
+                  <IconCash className='h-4 w-4' />
+                )}
+                <IconSwitchHorizontal className='absolute right-1 bottom-1 h-2.5 w-2.5 opacity-60' />
+              </Button>
+            </div>
+            {calculatedLotSize !== null && (
+              <p className='text-muted-foreground text-xs'>
+                {inputMode === 'LOT'
+                  ? `Required Margin: $${requiredMargin?.toFixed(2) || '0.00'}`
+                  : `Lot Size: ${calculatedLotSize.toFixed(4)} lots`}
+              </p>
+            )}
+          </div>
+
+          {/* Limit Price Input - Only show for limit orders */}
+          {orderType === 'LIMIT' && (
+            <div className='space-y-2'>
+              <Label htmlFor='limit-price'>Limit Price</Label>
+              <Input
+                id='limit-price'
+                type='number'
+                placeholder='Enter limit price'
+                value={limitPrice}
+                onChange={(e) => setLimitPrice(e.target.value)}
+                min='0'
+                step='0.01'
+              />
+            </div>
           )}
-        </div>
 
-        {/* Limit Price Input - Only show for limit orders */}
-        {orderType === 'LIMIT' && (
-          <div className='space-y-2'>
-            <Label htmlFor='limit-price'>Limit Price</Label>
-            <Input
-              id='limit-price'
-              type='number'
-              placeholder='Enter limit price'
-              value={limitPrice}
-              onChange={(e) => setLimitPrice(e.target.value)}
-              min='0'
-              step='0.01'
-            />
-          </div>
-        )}
+          {/* Risk Management Section */}
+          <div className='space-y-3'>
+            <div className='text-muted-foreground text-sm font-medium'>
+              Risk Management (Optional)
+            </div>
 
-        {/* Risk Management Section */}
-        <div className='space-y-3'>
-          <div className='text-muted-foreground text-sm font-medium'>
-            Risk Management (Optional)
-          </div>
+            {/* Take Profit Input */}
+            <div className='space-y-2'>
+              <Label htmlFor='take-profit'>Take Profit</Label>
+              <Input
+                id='take-profit'
+                type='number'
+                placeholder='Enter take profit price'
+                value={takeProfit}
+                onChange={(e) => setTakeProfit(e.target.value)}
+                min='0'
+                step='0.01'
+              />
+            </div>
 
-          {/* Take Profit Input */}
-          <div className='space-y-2'>
-            <Label htmlFor='take-profit'>Take Profit</Label>
-            <Input
-              id='take-profit'
-              type='number'
-              placeholder='Enter take profit price'
-              value={takeProfit}
-              onChange={(e) => setTakeProfit(e.target.value)}
-              min='0'
-              step='0.01'
-            />
-          </div>
-
-          {/* Stop Loss Input */}
-          <div className='space-y-2'>
-            <Label htmlFor='stop-loss'>Stop Loss</Label>
-            <Input
-              id='stop-loss'
-              type='number'
-              placeholder='Enter stop loss price'
-              value={stopLoss}
-              onChange={(e) => setStopLoss(e.target.value)}
-              min='0'
-              step='0.01'
-            />
-          </div>
-        </div>
-
-        {/* Order Summary */}
-        {inputValue && propMarket && calculatedLotSize !== null && (
-          <div className='bg-muted rounded-lg p-3 text-sm'>
-            <div className='font-medium'>Order Summary</div>
-            <div className='mt-1 space-y-1'>
-              <div>Type: {orderType} Order</div>
-              <div>
-                Input: {inputMode === 'LOT' ? 'Lot Size' : 'Amount (Margin)'}
-              </div>
-              <div>Lot Size: {calculatedLotSize.toFixed(4)} lots</div>
-              <div>
-                Price:{' '}
-                {orderType === 'MARKET'
-                  ? `Market (${propMarket.lastPrice.toFixed(5)})`
-                  : limitPrice}
-              </div>
-              {takeProfit && <div>Take Profit: ${takeProfit}</div>}
-              {stopLoss && <div>Stop Loss: ${stopLoss}</div>}
-              {requiredMargin !== null && (
-                <div className='font-medium'>
-                  Required Margin: ${requiredMargin.toFixed(2)}
-                </div>
-              )}
+            {/* Stop Loss Input */}
+            <div className='space-y-2'>
+              <Label htmlFor='stop-loss'>Stop Loss</Label>
+              <Input
+                id='stop-loss'
+                type='number'
+                placeholder='Enter stop loss price'
+                value={stopLoss}
+                onChange={(e) => setStopLoss(e.target.value)}
+                min='0'
+                step='0.01'
+              />
             </div>
           </div>
-        )}
 
-        <div className='flex gap-2'>
+          {/* Order Summary */}
+          {inputValue && propMarket && calculatedLotSize !== null && (
+            <div className='bg-muted rounded-lg p-3 text-sm'>
+              <div className='font-medium'>Order Summary</div>
+              <div className='mt-1 space-y-1'>
+                <div>Type: {orderType} Order</div>
+                <div>
+                  Input: {inputMode === 'LOT' ? 'Lot Size' : 'Amount (Margin)'}
+                </div>
+                <div>Lot Size: {calculatedLotSize.toFixed(4)} lots</div>
+                <div>
+                  Price:{' '}
+                  {orderType === 'MARKET'
+                    ? `Market (${propMarket.lastPrice.toFixed(5)})`
+                    : limitPrice}
+                </div>
+                {takeProfit && <div>Take Profit: ${takeProfit}</div>}
+                {stopLoss && <div>Stop Loss: ${stopLoss}</div>}
+                {requiredMargin !== null && (
+                  <div className='font-medium'>
+                    Required Margin: ${requiredMargin.toFixed(2)}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+        <div className='mt-4 flex shrink-0 flex-col gap-2'>
           <AlertDialog open={showBuyDialog} onOpenChange={setShowBuyDialog}>
             <AlertDialogTrigger asChild>
               <Button

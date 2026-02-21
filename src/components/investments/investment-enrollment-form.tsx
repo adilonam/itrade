@@ -65,7 +65,7 @@ export function InvestmentEnrollmentForm({
         toast.success(
           `Successfully invested ${new Intl.NumberFormat('en-US', {
             style: 'currency',
-            currency: 'EUR'
+            currency: 'USD'
           }).format(data.amount)} in ${investment.title}!`
         );
 

@@ -2,6 +2,7 @@ import { Heading } from '@/components/ui/heading';
 import { Separator } from '@/components/ui/separator';
 import { TradingViewRoomTrading } from '@/components/trading-view/trading-view-room-trading';
 import { TradingActionsRoomTrading } from '@/components/trading-view/trading-actions-room-trading';
+import { UserPositionsTableCardRoomTrading } from '@/components/user/positions/user-positions-table-room-trading';
 import { prisma } from '@/lib/prisma';
 import { toTradingViewSymbol } from '@/lib/market-symbol';
 import { notFound } from 'next/navigation';
@@ -53,19 +54,24 @@ export default async function Page(props: PageProps) {
         </div>
         <Separator />
 
-        {/* Trading View - Full width with responsive height */}
-        <div className='h-[500px] w-full md:h-[600px] lg:h-[700px]'>
-          <TradingViewRoomTrading
-            symbol={tradingViewSymbol || undefined}
-            height='100%'
-            width='100%'
-          />
+        {/* Chart left, Trade form right. Small: chart fixed height, form full height (page scrolls). Large: same height, form scrolls inside. */}
+        <div className='flex flex-col gap-4 lg:h-[calc(100dvh-220px)] lg:min-h-[400px] lg:flex-row'>
+          <div className='flex h-[380px] min-w-0 flex-shrink-0 lg:h-full lg:flex-1'>
+            <TradingViewRoomTrading
+              symbol={tradingViewSymbol || undefined}
+              height='100%'
+              width='100%'
+            />
+          </div>
+          <div className='flex w-full max-w-sm shrink-0 flex-col lg:h-full lg:w-72'>
+            <TradingActionsRoomTrading market={market} />
+          </div>
         </div>
 
-        {/* Trading Actions - Full width */}
-        <div className='w-full'>
-          <TradingActionsRoomTrading market={market} />
-        </div>
+        <Separator />
+
+        {/* Positions table card at bottom */}
+        <UserPositionsTableCardRoomTrading />
 
         {/* Bottom spacing */}
         <div className='h-8'></div>

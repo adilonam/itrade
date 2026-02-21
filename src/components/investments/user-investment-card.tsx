@@ -65,7 +65,7 @@ const getRiskColor = (riskLevel: string) => {
 const formatCurrency = (amount: number) => {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
-    currency: 'EUR'
+    currency: 'USD'
   }).format(amount);
 };
 

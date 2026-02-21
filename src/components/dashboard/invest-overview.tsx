@@ -32,8 +32,8 @@ type UserInvestment = {
   };
 };
 
-const formatEur = (value: number) =>
-  new Intl.NumberFormat('en-US', { style: 'currency', currency: 'EUR' }).format(
+const formatUsd = (value: number) =>
+  new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(
     value
   );
 
@@ -152,7 +152,7 @@ export function InvestOverview() {
             <IconPigMoney className='text-muted-foreground h-4 w-4' />
           </CardHeader>
           <CardContent>
-            <div className='text-2xl font-bold'>{formatEur(totalInvested)}</div>
+            <div className='text-2xl font-bold'>{formatUsd(totalInvested)}</div>
             <p className='text-muted-foreground text-xs'>
               {activeInvestments.length} active investment
               {activeInvestments.length !== 1 ? 's' : ''}
@@ -169,7 +169,7 @@ export function InvestOverview() {
           </CardHeader>
           <CardContent>
             <div className='text-2xl font-bold text-green-600'>
-              +{formatEur(totalExpectedReturns)}
+              +{formatUsd(totalExpectedReturns)}
             </div>
             <p className='text-muted-foreground text-xs'>
               From active investments
@@ -199,7 +199,7 @@ export function InvestOverview() {
           </CardHeader>
           <CardContent>
             <div className='text-2xl font-bold text-green-600'>
-              +{formatEur(totalCompletedReturns)}
+              +{formatUsd(totalCompletedReturns)}
             </div>
             <p className='text-muted-foreground text-xs'>
               From completed investments
@@ -236,9 +236,9 @@ export function InvestOverview() {
                     </p>
                   </div>
                   <div className='text-right'>
-                    <p className='font-semibold'>{formatEur(inv.amount)}</p>
+                    <p className='font-semibold'>{formatUsd(inv.amount)}</p>
                     <p className='text-xs text-green-600'>
-                      +{formatEur(inv.expectedReturn)} expected
+                      +{formatUsd(inv.expectedReturn)} expected
                     </p>
                   </div>
                 </li>

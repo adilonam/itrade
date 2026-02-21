@@ -95,7 +95,7 @@ function TradingViewRoomTradingComponent({
 
   return (
     <div
-      className='tradingview-widget-container h-full w-full'
+      className='tradingview-widget-container h-full min-h-[300px] w-full'
       ref={container}
       style={{ height, width }}
     />
