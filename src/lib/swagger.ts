@@ -1,12 +1,14 @@
 import swaggerJsdoc from 'swagger-jsdoc';
 
+const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME ?? 'Trade Nova';
+
 const options: swaggerJsdoc.Options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'Trading App API',
+      title: `${APP_NAME} API`,
       version: '1.0.0',
-      description: 'API documentation for the Trading App',
+      description: `API documentation for the ${APP_NAME}`,
       contact: {
         name: 'API Support',
         email: 'support@tradingapp.com'

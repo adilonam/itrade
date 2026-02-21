@@ -1,6 +1,8 @@
 import nodemailer from 'nodemailer';
 import { prisma } from './prisma';
 
+const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME ?? 'Trade Nova';
+
 const createTransporter = () => {
   return nodemailer.createTransport({
     host: process.env.SMTP_HOST,
@@ -25,7 +27,7 @@ export const sendEmail = async (options: EmailOptions) => {
     const transporter = createTransporter();
 
     const mailOptions = {
-      from: `"${process.env.SMTP_FROM_NAME || 'Trading App'}" <${process.env.SMTP_FROM_EMAIL}>`,
+      from: `"${APP_NAME}" <${process.env.SMTP_FROM_EMAIL}>`,
       to: options.to,
       subject: options.subject,
       text: options.text,
@@ -67,7 +69,7 @@ export const sendMfaVerificationEmail = async (
   code: string,
   name?: string
 ) => {
-  const subject = 'Your Verification Code - Trading App';
+  const subject = `Your Verification Code - ${APP_NAME}`;
 
   const text = `Hello ${name || 'User'},
 
@@ -78,7 +80,7 @@ This code will expire in 10 minutes. Please enter this code to complete your sig
 If you didn't request this code, please ignore this email.
 
 Best regards,
-Trading App Team`;
+${APP_NAME} Team`;
 
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -102,7 +104,7 @@ Trading App Team`;
       
       <p style="color: #666; font-size: 12px; text-align: center;">
         Best regards,<br>
-        Trading App Team
+        ${APP_NAME} Team
       </p>
     </div>
   `;

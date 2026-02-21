@@ -11,12 +11,12 @@ export const metadata: Metadata = {
 
 export default function SignInViewPage() {
   return (
-    <div className='relative h-screen flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0'>
+    <div className='relative flex h-screen flex-col items-center justify-center bg-zinc-900 md:grid lg:max-w-none lg:grid-cols-2 lg:px-0'>
       <Link
         href='/auth/sign-up'
         className={cn(
           buttonVariants({ variant: 'ghost' }),
-          'absolute top-4 right-4 hidden md:top-8 md:right-8'
+          'absolute top-4 right-4 hidden text-zinc-100 hover:bg-zinc-800 hover:text-white md:top-8 md:right-8'
         )}
       >
         Sign Up
@@ -36,7 +36,7 @@ export default function SignInViewPage() {
           >
             <path d='M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3' />
           </svg>
-          Trading App
+          {process.env.NEXT_PUBLIC_APP_NAME ?? 'Trade Nova'}
         </div>
         <div className='relative z-20 mt-auto'>
           <blockquote className='space-y-2'>
@@ -48,11 +48,11 @@ export default function SignInViewPage() {
           </blockquote>
         </div>
       </div>
-      <div className='flex h-full items-center justify-center p-4 lg:p-8'>
+      <div className='dark flex h-full items-center justify-center bg-zinc-900 p-4 text-zinc-100 lg:p-8'>
         <div className='flex w-full max-w-md flex-col items-center justify-center space-y-6'>
           <SignInForm />
 
-          <p className='text-muted-foreground px-8 text-center text-sm'>
+          <p className='px-8 text-center text-sm text-zinc-400'>
             By clicking continue, you agree to our{' '}
             <Link
               href='/terms'
