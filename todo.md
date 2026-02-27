@@ -131,4 +131,5 @@
 
 
 
-- [ ] switch to resend 
+- [no] switch to resend
+- [ ] admin change leverage and market 
