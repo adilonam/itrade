@@ -1,5 +1,5 @@
 {
-  "name": "Trade Nova",
+  "name": "NexAsTrade",
   "dockerComposeFile": "docker-compose.yml",
   "service": "app",
   "workspaceFolder": "/workspaces",
@@ -72,7 +72,7 @@
   "postCreateCommand": "echo 'Container created successfully!'",
 
   // Use 'initializeCommand' to run commands before the container is created
-  "initializeCommand": "echo 'Initializing dev container for Trade Nova...'",
+  "initializeCommand": "echo 'Initializing dev container for NexAsTrade...'",
 
   // Use 'postStartCommand' to run commands after the container starts
   "postStartCommand": "echo 'Dev container is ready! Run pnpm dev to start the development server.'",
