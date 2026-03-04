@@ -70,6 +70,98 @@ body {
   }
 }
 
+/* Match Trader: light mode = white, dark mode = grayish-blue #1A242F */
+.theme-match-trader,
+.theme-match-trader-scaled {
+  /* Default (light) palette - used when no .dark on ancestor */
+  --background: #ffffff;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+  --primary: var(--color-cyan-600);
+  --primary-foreground: #ffffff;
+  --secondary: #f1f5f9;
+  --secondary-foreground: #0f172a;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --accent: #e2e8f0;
+  --accent-foreground: #0f172a;
+  --destructive: oklch(0.65 0.2 25);
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: var(--color-cyan-500);
+  --sidebar: #ffffff;
+  --sidebar-foreground: #0f172a;
+  --sidebar-primary: var(--color-cyan-600);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f1f5f9;
+  --sidebar-accent-foreground: #0f172a;
+  --sidebar-border: #e2e8f0;
+  --sidebar-ring: var(--color-cyan-500);
+
+  @variant dark {
+    /* Dark mode: grayish-blue background (#1A242F) */
+    --background: #1a242f;
+    --foreground: #ffffff;
+    --card: #222b36;
+    --card-foreground: #ffffff;
+    --popover: #222b36;
+    --popover-foreground: #ffffff;
+    --primary: var(--color-cyan-500);
+    --primary-foreground: #ffffff;
+    --secondary: #2a3542;
+    --secondary-foreground: #ffffff;
+    --muted: #2a3542;
+    --muted-foreground: #a0aec0;
+    --accent: #323d4a;
+    --accent-foreground: #ffffff;
+    --destructive: #d9465b;
+    --border: rgba(255, 255, 255, 0.08);
+    --input: rgba(255, 255, 255, 0.12);
+    --ring: var(--color-cyan-500);
+    --sidebar: #1a242f;
+    --sidebar-foreground: #ffffff;
+    --sidebar-primary: var(--color-cyan-500);
+    --sidebar-primary-foreground: #ffffff;
+    --sidebar-accent: #2a3542;
+    --sidebar-accent-foreground: #ffffff;
+    --sidebar-border: rgba(255, 255, 255, 0.08);
+    --sidebar-ring: var(--color-cyan-500);
+  }
+}
+
+/* Force Match Trader light (white) when html has light mode - overrides any cascade */
+html:not(.dark) body.theme-match-trader,
+html:not(.dark) body.theme-match-trader-scaled {
+  --background: #ffffff;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+  --primary: var(--color-cyan-600);
+  --primary-foreground: #ffffff;
+  --secondary: #f1f5f9;
+  --secondary-foreground: #0f172a;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --accent: #e2e8f0;
+  --accent-foreground: #0f172a;
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: var(--color-cyan-500);
+  --sidebar: #ffffff;
+  --sidebar-foreground: #0f172a;
+  --sidebar-primary: var(--color-cyan-600);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f1f5f9;
+  --sidebar-accent-foreground: #0f172a;
+  --sidebar-border: #e2e8f0;
+  --sidebar-ring: var(--color-cyan-500);
+}
+
 .theme-mono,
 .theme-mono-scaled {
   --font-sans: var(--font-mono);

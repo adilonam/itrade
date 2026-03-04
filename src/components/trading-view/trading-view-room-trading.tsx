@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, memo } from 'react';
 import { useTheme } from 'next-themes';
+import { useThemeConfig } from '@/components/active-theme';
 
 interface TradingViewRoomTradingProps {
   symbol?: string;
@@ -20,6 +21,7 @@ function TradingViewRoomTradingComponent({
 }: TradingViewRoomTradingProps) {
   const container = useRef<HTMLDivElement>(null);
   const { resolvedTheme } = useTheme();
+  const { activeTheme } = useThemeConfig();
 
   useEffect(() => {
     const currentContainer = container.current;
@@ -28,7 +30,11 @@ function TradingViewRoomTradingComponent({
     // Determine theme colors based on resolved theme
     const isDark = resolvedTheme === 'dark';
     const theme = isDark ? 'dark' : 'light';
-    const backgroundColor = isDark ? '#0F0F0F' : '#FFFFFF';
+    // Match-trader dark mode uses #1a242f; use it for chart so it matches app background
+    const isMatchTrader =
+      activeTheme === 'match-trader' || activeTheme === 'match-trader-scaled';
+    const backgroundColor =
+      isDark && isMatchTrader ? '#1a242f' : isDark ? '#0F0F0F' : '#FFFFFF';
     const gridColor = isDark
       ? 'rgba(242, 242, 242, 0.06)'
       : 'rgba(0, 0, 0, 0.06)';
@@ -91,7 +97,7 @@ function TradingViewRoomTradingComponent({
         currentContainer.innerHTML = '';
       }
     };
-  }, [symbol, interval, style, resolvedTheme]);
+  }, [symbol, interval, style, resolvedTheme, activeTheme]);
 
   return (
     <div

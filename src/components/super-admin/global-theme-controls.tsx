@@ -158,6 +158,7 @@ export function GlobalThemeControls() {
               'blue',
               'green',
               'amber',
+              'match-trader',
               'default-scaled',
               'blue-scaled',
               'mono-scaled'
@@ -169,7 +170,7 @@ export function GlobalThemeControls() {
                 onClick={() => handleThemeColorChange(color)}
                 className='capitalize'
               >
-                {color.replace('-', ' ')}
+                {color === 'match-trader' ? 'Match Trader' : color.replace('-', ' ')}
               </Button>
             ))}
           </div>

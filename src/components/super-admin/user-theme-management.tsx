@@ -257,6 +257,7 @@ export function UserThemeManagement() {
                       <SelectItem value='blue'>Blue</SelectItem>
                       <SelectItem value='green'>Green</SelectItem>
                       <SelectItem value='amber'>Amber</SelectItem>
+                      <SelectItem value='match-trader'>Match Trader</SelectItem>
                       <SelectItem value='default-scaled'>
                         Default Scaled
                       </SelectItem>
