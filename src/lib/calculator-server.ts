@@ -74,7 +74,7 @@ export async function calculatePositionPnL(
         const askPrice = midPrice + spread / 2;
 
         // Use ask price for BUY, bid price for SELL
-        currentPrice = position.type === 'BUY' ? askPrice : bidPrice;
+        currentPrice = position.type === 'BUY' ? bidPrice : askPrice ;
       } else {
         console.warn(
           `Unable to refresh market data for ${position.market.symbol}`

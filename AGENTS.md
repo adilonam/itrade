@@ -11,6 +11,8 @@ This project uses:
 - **swagger** for API documentation UI
 - prisma version 7 it s in src/lib/prisma.ts
 - dont creat files markdown
+- links are loacted on src/constants/data.ts
+- for auth we use next auth
 
 
 

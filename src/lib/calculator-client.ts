@@ -54,7 +54,16 @@ export function calculatePnLClient(
     return null;
   }
 
-  const currentPrice = realTimeData.price;
+  const midPrice = realTimeData.price;
+  const spread = position.market.spread ?? 0;
+  const bidPrice = midPrice - spread / 2;
+  const askPrice = midPrice + spread / 2;
+  // Use ask for BUY (exit/sell side), bid for SELL (exit/buy side), matching server
+  const currentPrice = position.type === 'BUY' ? bidPrice : askPrice ;
+
+
+
+
   const executedPrice = position.executedPrice;
   const quantity = position.quantity;
 
@@ -64,7 +73,7 @@ export function calculatePnLClient(
       ? 1
       : getLotSize(position.market.type);
 
-  // Calculate P&L based on position type
+  // Calculate P&L based on position type (with spread applied to current price)
   if (position.type === 'BUY') {
     // For BUY: P&L = (current_price - executed_price) * quantity
     return (currentPrice - executedPrice) * quantity * lotSize;

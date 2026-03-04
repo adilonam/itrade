@@ -1,31 +1,56 @@
+import { getToken } from 'next-auth/jwt';
 import { withAuth } from 'next-auth/middleware';
 import { NextResponse } from 'next/server';
 
+const isAuthPage = (pathname: string) =>
+  pathname === '/auth/sign-in' || pathname.startsWith('/auth/sign-up');
+const isPublicPath = (pathname: string) =>
+  isAuthPage(pathname) || pathname.startsWith('/api/auth');
+
 export default withAuth(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  function middleware(req) {
-    // Add any additional middleware logic here
+  async function middleware(req) {
+    const pathname = req.nextUrl.pathname;
+
+    // Allow NextAuth API through without redirect logic
+    if (pathname.startsWith('/api/auth')) {
+      return NextResponse.next();
+    }
+
+    const token = await getToken({
+      req,
+      secret: process.env.NEXTAUTH_SECRET
+    });
+    const isAuthenticated = !!token;
+
+    // Authenticated user on sign-in or sign-up → redirect to app
+    if (isAuthenticated && isAuthPage(pathname)) {
+      return NextResponse.redirect(new URL('/overview', req.url));
+    }
+
     return NextResponse.next();
   },
   {
     callbacks: {
       authorized: ({ token, req }) => {
-        // Check if user is trying to access super-admin routes
-        if (req.nextUrl.pathname.startsWith('/super-admin')) {
+        const pathname = req.nextUrl.pathname;
+
+        // Public routes: auth pages and NextAuth API
+        if (isPublicPath(pathname)) {
+          return true;
+        }
+
+        // Role-based: super-admin
+        if (pathname.startsWith('/super-admin')) {
           return token?.role === 'SUPERADMIN';
         }
 
-        // Check if user is trying to access admin routes
-        if (req.nextUrl.pathname.startsWith('/admin')) {
+        // Role-based: admin
+        if (pathname.startsWith('/admin')) {
           return token?.role === 'ADMIN' || token?.role === 'SUPERADMIN';
         }
 
-        // Check if user is trying to access protected routes
-        if (req.nextUrl.pathname.startsWith('/dashboard')) {
-          return !!token; // User must be authenticated
-        }
-
-        return true; // Allow access to public routes
+        // All other routes require authentication (/, /overview, /investments, /seller, etc.)
+        return !!token;
       }
     }
   }
@@ -33,9 +58,8 @@ export default withAuth(
 
 export const config = {
   matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
+    // Skip Next.js internals and static files
     '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
-    // Always run for API routes
     '/(api|trpc)(.*)'
   ]
 };

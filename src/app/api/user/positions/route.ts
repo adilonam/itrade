@@ -383,7 +383,7 @@ export async function POST(request: NextRequest) {
           );
         }
       } else {
-        // For PLACED orders or when no executedPrice provided, refresh market and use current price
+        // For PLACED orders or when no executedPrice provided, refresh market and use current price with spread
         const refreshedMarkets = await refreshSaveMarkets([market]);
         if (!refreshedMarkets || refreshedMarkets.length === 0) {
           return NextResponse.json(
@@ -391,7 +391,14 @@ export async function POST(request: NextRequest) {
             { status: 500 }
           );
         }
-        executedPrice = market.lastPrice; // Use the market's lastPrice since getCombinedData stores data
+        const refreshedMarket = refreshedMarkets[0];
+        const midPrice = refreshedMarket.lastPrice ?? 0;
+        const spread = refreshedMarket.spread ?? 0;
+        const bidPrice = midPrice - spread / 2;
+        const askPrice = midPrice + spread / 2;
+        // BUY fills at ask, SELL fills at bid
+        executedPrice =
+          body.type === 'BUY' ? askPrice : bidPrice;
       }
 
       // Balance validation is handled by couldOpenPosition function for both STOCK and TRADING rooms
