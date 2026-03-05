@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
 import { IconMinus, IconPlus } from '@tabler/icons-react';
 import type { Market } from '@/lib/prisma/generated/client';
+import { useMarketsWebSocket } from '@/contexts/markets-websocket-context';
 
 interface TradingRoomOrderPanelProps {
   market: Market | null;
@@ -19,8 +20,31 @@ export function TradingRoomOrderPanel({
   disabled = false
 }: TradingRoomOrderPanelProps) {
   const [lotSize, setLotSize] = useState('0.01');
-  const price = market?.lastPrice ?? 0;
-  const displayPrice = price >= 1 ? price.toFixed(5) : price.toFixed(3);
+  const { realTimePrices, isConnected, subscribe } = useMarketsWebSocket();
+
+  // Subscribe to live price for selected market
+  useEffect(() => {
+    if (market?.symbol && isConnected) {
+      subscribe([market.symbol]);
+    }
+  }, [market?.symbol, isConnected, subscribe]);
+
+  const livePrice = market?.symbol
+    ? realTimePrices.get(market.symbol)?.price
+    : undefined;
+  const midPrice = livePrice ?? market?.lastPrice ?? 0;
+  const spread = market?.spread ?? 0;
+  const bid = midPrice - spread / 2;
+  const ask = midPrice + spread / 2;
+
+  const formatFull = (p: number) => (p >= 1 ? p.toFixed(5) : p.toFixed(3));
+  const formatCompact = (p: number) => (p >= 1 ? p.toFixed(2) : p.toFixed(3));
+  const displayBidFull = formatFull(bid);
+  const displayBidCompact = formatCompact(bid);
+  const displayAskFull = formatFull(ask);
+  const displayAskCompact = formatCompact(ask);
+
+  const price = midPrice;
 
   const incrementLot = () => {
     const n = parseFloat(lotSize) || 0;
@@ -45,13 +69,16 @@ export function TradingRoomOrderPanel({
     <div className='space-y-2 rounded-xl border border-border bg-card p-3'>
       <Button
         variant='destructive'
-        className='h-12 w-full rounded-xl text-base font-semibold transition-all duration-200 ease-out hover:brightness-110 hover:shadow-md active:scale-[0.98]'
+        className='h-12 w-full min-w-0 rounded-xl text-sm font-semibold transition-all duration-200 ease-out hover:brightness-110 hover:shadow-md active:scale-[0.98] sm:text-base'
         disabled={disabled}
         onClick={() =>
           onMarketOrder?.('SELL', parseFloat(lotSize) || 0.01)
         }
+        title={`SELL at ${displayBidFull} (bid)`}
       >
-        SELL {displayPrice}
+        <span className='min-w-0 truncate'>
+          SELL {displayBidCompact}
+        </span>
       </Button>
       <div className='flex items-center gap-2'>
         <Button
@@ -88,13 +115,16 @@ export function TradingRoomOrderPanel({
         {marginEstimate.toFixed(0)} USD
       </p>
       <Button
-        className='h-12 w-full rounded-xl bg-emerald-600 text-base font-semibold transition-all duration-200 ease-out hover:bg-emerald-500 hover:shadow-md active:scale-[0.98] disabled:opacity-50'
+        className='h-12 w-full min-w-0 rounded-xl bg-emerald-600 text-sm font-semibold transition-all duration-200 ease-out hover:bg-emerald-500 hover:shadow-md active:scale-[0.98] disabled:opacity-50 sm:text-base'
         disabled={disabled}
         onClick={() =>
           onMarketOrder?.('BUY', parseFloat(lotSize) || 0.01)
         }
+        title={`BUY at ${displayAskFull} (ask)`}
       >
-        BUY {displayPrice}
+        <span className='min-w-0 truncate'>
+          BUY {displayAskCompact}
+        </span>
       </Button>
       <Link
         href='#'

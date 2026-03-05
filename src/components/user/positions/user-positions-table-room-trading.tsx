@@ -402,12 +402,20 @@ export function UserPositionsTableRoomTrading({
   );
 }
 
+/** Tab filter maps to PositionStatus: open=PLACED, pending=PENDING, closed=CLOSED+FAILED */
+export type PositionTabFilter = 'open' | 'pending' | 'closed';
+
 /**
  * Standalone card component that fetches room trading positions and renders
  * the table. Use this when you only need the "Your Room Trading Positions"
  * card (e.g. at the bottom of the trading view page).
+ * @param statusFilter - Filter by position status tab: open (PLACED), pending (PENDING), closed (CLOSED, FAILED)
  */
-export function UserPositionsTableCardRoomTrading() {
+export function UserPositionsTableCardRoomTrading({
+  statusFilter = 'open'
+}: {
+  statusFilter?: PositionTabFilter;
+}) {
   const [positions, setPositions] = useState<PositionWithMarket[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -422,6 +430,9 @@ export function UserPositionsTableCardRoomTrading() {
         limit: '10',
         room: 'TRADING'
       });
+      if (statusFilter === 'open') params.set('status', 'PLACED');
+      else if (statusFilter === 'pending') params.set('status', 'PENDING');
+      else if (statusFilter === 'closed') params.set('status', 'CLOSED,FAILED');
       const response = await fetch(`/api/user/positions?${params}`);
       if (!response.ok) throw new Error('Failed to fetch positions');
       const data = await response.json();
@@ -431,7 +442,7 @@ export function UserPositionsTableCardRoomTrading() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [statusFilter]);
 
   useEffect(() => {
     loadPositions();

@@ -225,7 +225,14 @@ export async function GET(request: NextRequest) {
     };
 
     if (type) where.type = type;
-    if (status) where.status = status;
+    if (status) {
+      const statuses = status.split(',').map((s) => s.trim()).filter(Boolean);
+      if (statuses.length === 1) {
+        where.status = statuses[0];
+      } else if (statuses.length > 1) {
+        where.status = { in: statuses };
+      }
+    }
     if (marketId) where.marketId = marketId;
     if (room) where.room = room;
     if (search) {

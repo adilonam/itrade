@@ -10,73 +10,12 @@ import {
 } from '@/components/ui/resizable';
 import { TradingRoomHeader } from './trading-room-header';
 import { TradingRoomSidebar, type SymbolItem } from './trading-room-sidebar';
+import { TradingRoomBottomPanel } from './trading-room-bottom-panel';
 import { TradingViewRoomTrading } from '@/components/trading-view/trading-view-room-trading';
-import { UserPositionsTableCardRoomTrading } from '@/components/user/positions/user-positions-table-room-trading';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { IconDownload, IconFilter } from '@tabler/icons-react';
 import { MOCK_SYMBOLS } from './mock-data';
 import type { Market } from '@/lib/prisma/generated/client';
 import { toTradingViewSymbol } from '@/lib/market-symbol';
 import { toast } from 'sonner';
-
-const GUEST_MSG =
-  "You don't have any open positions because you are in guest mode. Open a live account, start trading and you will see your open positions here.";
-
-function TradingRoomBottomPanel({ guestMode }: { guestMode: boolean }) {
-  return (
-    <div className="flex h-[240px] min-h-0 flex-col border-t border-border bg-background">
-      <Tabs defaultValue="open" className="flex h-full flex-col">
-        <div className="flex shrink-0 items-center justify-between border-b border-border px-3 py-2">
-          <TabsList className="h-8 gap-1 rounded-full bg-muted/50 p-1">
-            <TabsTrigger value="open" className="rounded-full border-0 px-3 text-sm transition-all duration-200 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm">
-              Open Positions
-            </TabsTrigger>
-            <TabsTrigger value="pending" className="rounded-full border-0 px-3 text-sm transition-all duration-200 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm">
-              Pending Orders
-            </TabsTrigger>
-            <TabsTrigger value="closed" className="rounded-full border-0 px-3 text-sm transition-all duration-200 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm">
-              Closed Positions
-            </TabsTrigger>
-            <TabsTrigger value="finance" className="rounded-full border-0 px-3 text-sm transition-all duration-200 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm">
-              Finance
-            </TabsTrigger>
-          </TabsList>
-          <div className="flex items-center gap-1">
-            <button type="button" className="rounded-lg p-1.5 text-muted-foreground transition-colors duration-200 hover:bg-muted hover:text-foreground" aria-label="Filter">
-              <IconFilter className="size-4" />
-            </button>
-            <button type="button" className="rounded-lg p-1.5 text-muted-foreground transition-colors duration-200 hover:bg-muted hover:text-foreground" aria-label="Download">
-              <IconDownload className="size-4" />
-            </button>
-          </div>
-        </div>
-        <TabsContent value="open" className="mt-0 min-h-0 flex-1 overflow-auto data-[state=inactive]:hidden">
-          {guestMode ? (
-            <div className="flex flex-col items-center justify-center gap-2 p-6 text-center">
-              <span className="rounded-full bg-emerald-500/20 px-2.5 py-0.5 text-xs font-medium text-emerald-400">
-                GUEST MODE
-              </span>
-              <p className="text-sm text-muted-foreground">{GUEST_MSG}</p>
-            </div>
-          ) : (
-            <div className="h-full overflow-auto">
-              <UserPositionsTableCardRoomTrading />
-            </div>
-          )}
-        </TabsContent>
-        <TabsContent value="pending" className="mt-0 flex flex-1 items-center justify-center data-[state=inactive]:hidden">
-          <p className="text-sm text-muted-foreground">No pending orders</p>
-        </TabsContent>
-        <TabsContent value="closed" className="mt-0 flex flex-1 items-center justify-center data-[state=inactive]:hidden">
-          <p className="text-sm text-muted-foreground">Closed positions will appear here</p>
-        </TabsContent>
-        <TabsContent value="finance" className="mt-0 flex flex-1 items-center justify-center data-[state=inactive]:hidden">
-          <p className="text-sm text-muted-foreground">Deposits and withdrawals</p>
-        </TabsContent>
-      </Tabs>
-    </div>
-  );
-}
 
 interface TradingRoomLayoutProps {
   initialMarket: Market | null;
