@@ -13,6 +13,6 @@ This project uses:
 - dont creat files markdown
 - links are loacted on src/constants/data.ts
 - for auth we use next auth
-
+- if a type or interface is in schema primsa import it from '@/lib/prisma/generated/client';
 
 
