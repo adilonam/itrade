@@ -3,7 +3,10 @@ import { withAuth } from 'next-auth/middleware';
 import { NextResponse } from 'next/server';
 
 const isAuthPage = (pathname: string) =>
-  pathname === '/auth/sign-in' || pathname.startsWith('/auth/sign-up');
+  pathname === '/auth/sign-in' ||
+  pathname.startsWith('/auth/sign-up') ||
+  pathname === '/auth/forgot-password' ||
+  pathname === '/auth/reset-password';
 const isPublicPath = (pathname: string) =>
   isAuthPage(pathname) || pathname.startsWith('/api/auth');
 

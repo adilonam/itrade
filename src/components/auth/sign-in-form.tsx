@@ -154,7 +154,15 @@ export function SignInForm() {
             />
           </div>
           <div className='space-y-2'>
-            <Label htmlFor='password'>Password</Label>
+            <div className='flex items-center justify-between'>
+              <Label htmlFor='password'>Password</Label>
+              <Link
+                href='/auth/forgot-password'
+                className='text-muted-foreground hover:text-primary text-xs underline underline-offset-4'
+              >
+                Forgot password?
+              </Link>
+            </div>
             <Input
               id='password'
               type='password'
