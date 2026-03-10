@@ -65,6 +65,23 @@ export async function PATCH(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const role = session.user.role as string;
+    const canBypass = role === 'ADMIN' || role === 'SUPERADMIN';
+    if (!canBypass) {
+      const appSettings = await prisma.appSettings.findUnique({
+        where: { id: 'default' }
+      });
+      if ((appSettings?.openMarket ?? true) === false) {
+        return NextResponse.json(
+          {
+            error:
+              'Market is currently closed. Closing positions is disabled by administrators.'
+          },
+          { status: 403 }
+        );
+      }
+    }
+
     const { id } = await params;
     const body = await request.json();
     const { status = 'CLOSED', amount } = body;

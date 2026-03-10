@@ -295,6 +295,8 @@ model AppSettings {
   id            String   @id @default("default")
   appIcon       String?  @map("app_icon") // Path to uploaded icon
   appName       String   @default("Trading Dashboard") @map("app_name")
+  // When true, users can create/update/close positions; when false, only admin/superadmin can
+  openMarket    Boolean  @default(true) @map("open_market")
   // Global theme settings
   themeMode     String   @default("system") @map("theme_mode") // "light", "dark", "system"
   themeColor    String   @default("green") @map("theme_color") // "default", "blue", "green", etc.
