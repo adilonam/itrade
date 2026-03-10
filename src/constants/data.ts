@@ -989,6 +989,208 @@ export const tenantNavItems: TenantNavItems = {
       }
     ]
   },
+  'Bot Trading': {
+    USER: [
+      {
+        title: 'Bot Marketplace',
+        url: '/bot-trading',
+        icon: 'robot',
+        isActive: false,
+        shortcut: ['b', 'm'],
+        items: []
+      },
+      {
+        title: 'My Bots',
+        url: '/bot-trading/my-bots',
+        icon: 'server',
+        isActive: false,
+        shortcut: ['m', 'b'],
+        items: []
+      },
+      {
+        title: 'Deposit',
+        url: '/deposit',
+        icon: 'add',
+        isActive: false,
+        shortcut: ['d', 'p'],
+        items: []
+      },
+      {
+        title: 'Withdraw',
+        url: '/withdraw',
+        icon: 'minus',
+        isActive: false,
+        shortcut: ['w', 'd'],
+        items: []
+      },
+      {
+        title: 'News',
+        url: '/news',
+        icon: 'news',
+        isActive: false,
+        shortcut: ['n', 'w'],
+        items: []
+      },
+      {
+        title: 'Account',
+        url: '/profile',
+        icon: 'billing',
+        isActive: false,
+        shortcut: ['p', 'r'],
+        items: []
+      }
+    ],
+    SELLER: [
+      {
+        title: 'Bot Marketplace',
+        url: '/bot-trading',
+        icon: 'robot',
+        isActive: false,
+        shortcut: ['b', 'm'],
+        items: []
+      },
+      {
+        title: 'My Bots',
+        url: '/bot-trading/my-bots',
+        icon: 'server',
+        isActive: false,
+        shortcut: ['m', 'b'],
+        items: []
+      },
+      {
+        title: 'Deposit',
+        url: '/deposit',
+        icon: 'add',
+        isActive: false,
+        shortcut: ['d', 'p'],
+        items: []
+      },
+      {
+        title: 'Withdraw',
+        url: '/withdraw',
+        icon: 'minus',
+        isActive: false,
+        shortcut: ['w', 'd'],
+        items: []
+      },
+      {
+        title: 'News',
+        url: '/news',
+        icon: 'news',
+        isActive: false,
+        shortcut: ['n', 'w'],
+        items: []
+      },
+      {
+        title: 'Account',
+        url: '/profile',
+        icon: 'billing',
+        isActive: false,
+        shortcut: ['p', 'r'],
+        items: []
+      }
+    ],
+    ADMIN: [
+      {
+        title: 'Bot Marketplace',
+        url: '/bot-trading',
+        icon: 'robot',
+        isActive: false,
+        shortcut: ['b', 'm'],
+        items: []
+      },
+      {
+        title: 'My Bots',
+        url: '/bot-trading/my-bots',
+        icon: 'server',
+        isActive: false,
+        shortcut: ['m', 'b'],
+        items: []
+      },
+      {
+        title: 'Deposit',
+        url: '/deposit',
+        icon: 'add',
+        isActive: false,
+        shortcut: ['d', 'p'],
+        items: []
+      },
+      {
+        title: 'Withdraw',
+        url: '/withdraw',
+        icon: 'minus',
+        isActive: false,
+        shortcut: ['w', 'd'],
+        items: []
+      },
+      {
+        title: 'News',
+        url: '/news',
+        icon: 'news',
+        isActive: false,
+        shortcut: ['n', 'w'],
+        items: []
+      },
+      {
+        title: 'Account',
+        url: '/profile',
+        icon: 'billing',
+        isActive: false,
+        shortcut: ['p', 'r'],
+        items: []
+      }
+    ],
+    SUPERADMIN: [
+      {
+        title: 'Bot Marketplace',
+        url: '/bot-trading',
+        icon: 'robot',
+        isActive: false,
+        shortcut: ['b', 'm'],
+        items: []
+      },
+      {
+        title: 'My Bots',
+        url: '/bot-trading/my-bots',
+        icon: 'server',
+        isActive: false,
+        shortcut: ['m', 'b'],
+        items: []
+      },
+      {
+        title: 'Deposit',
+        url: '/deposit',
+        icon: 'add',
+        isActive: false,
+        shortcut: ['d', 'p'],
+        items: []
+      },
+      {
+        title: 'Withdraw',
+        url: '/withdraw',
+        icon: 'minus',
+        isActive: false,
+        shortcut: ['w', 'd'],
+        items: []
+      },
+      {
+        title: 'News',
+        url: '/news',
+        icon: 'news',
+        isActive: false,
+        shortcut: ['n', 'w'],
+        items: []
+      },
+      {
+        title: 'Account',
+        url: '/profile',
+        icon: 'billing',
+        isActive: false,
+        shortcut: ['p', 'r'],
+        items: []
+      }
+    ]
+  },
   Administration: {
     USER: [],
     SELLER: [
