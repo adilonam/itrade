@@ -310,6 +310,23 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const role = session.user.role as string;
+    const canBypass = role === 'ADMIN' || role === 'SUPERADMIN';
+    if (!canBypass) {
+      const appSettings = await prisma.appSettings.findUnique({
+        where: { id: 'default' }
+      });
+      if ((appSettings?.openMarket ?? true) === false) {
+        return NextResponse.json(
+          {
+            error:
+              'Market is currently closed. Position creation is disabled by administrators.'
+          },
+          { status: 403 }
+        );
+      }
+    }
+
     const body: Omit<CreatePositionData, 'userId'> = await request.json();
 
     // Validate required fields

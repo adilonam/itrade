@@ -10,13 +10,17 @@ import { MarketTable } from './market-tables';
 import { columns } from './market-tables/columns';
 import { AddMarketDialog } from './add-market-dialog';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import {
   parseAsInteger,
   parseAsString,
   useQueryStates,
   parseAsStringEnum
 } from 'nuqs';
-import { IconPlus, IconExternalLink } from '@tabler/icons-react';
+import { IconPlus, IconExternalLink, IconLockOpen, IconLock } from '@tabler/icons-react';
+import { toast } from 'sonner';
 
 type MarketListingPageProps = {};
 
@@ -28,6 +32,9 @@ export default function MarketListingPage({}: MarketListingPageProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [openMarket, setOpenMarket] = useState<boolean>(true);
+  const [openMarketLoading, setOpenMarketLoading] = useState(false);
+  const [openMarketSettingLoading, setOpenMarketSettingLoading] = useState(true);
 
   // Use query states to sync with URL parameters
   const [queryParams] = useQueryStates({
@@ -73,6 +80,50 @@ export default function MarketListingPage({}: MarketListingPageProps) {
     loadMarkets();
   }, [loadMarkets]);
 
+  const loadOpenMarket = useCallback(async () => {
+    try {
+      setOpenMarketSettingLoading(true);
+      const res = await fetch('/api/admin/app-settings');
+      if (res.ok) {
+        const data = await res.json();
+        setOpenMarket(data.openMarket ?? true);
+      }
+    } catch {
+      setOpenMarket(true);
+    } finally {
+      setOpenMarketSettingLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadOpenMarket();
+  }, [loadOpenMarket]);
+
+  const handleOpenMarketChange = async (checked: boolean) => {
+    try {
+      setOpenMarketLoading(true);
+      const res = await fetch('/api/admin/app-settings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ openMarket: checked })
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || 'Failed to update');
+      }
+      setOpenMarket(checked);
+      toast.success(
+        checked
+          ? 'Market opened. Users can create and close positions.'
+          : 'Market closed. Only admins can create or close positions.'
+      );
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Failed to update setting');
+    } finally {
+      setOpenMarketLoading(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className='flex justify-center py-6'>
@@ -91,6 +142,39 @@ export default function MarketListingPage({}: MarketListingPageProps) {
 
   return (
     <>
+      <Card className='mb-6'>
+        <CardHeader className='pb-2'>
+          <CardTitle className='flex items-center gap-2 text-base'>
+            {openMarket ? (
+              <IconLockOpen className='h-5 w-5 text-green-600' />
+            ) : (
+              <IconLock className='h-5 w-5 text-amber-600' />
+            )}
+            Open market
+          </CardTitle>
+          <CardDescription>
+            When on, users can create and close positions. When off, only Admin and Superadmin can.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className='flex items-center gap-3'>
+          {openMarketSettingLoading ? (
+            <span className='text-muted-foreground text-sm'>Loading...</span>
+          ) : (
+            <>
+              <Switch
+                id='open-market'
+                checked={openMarket}
+                onCheckedChange={handleOpenMarketChange}
+                disabled={openMarketLoading}
+              />
+              <Label htmlFor='open-market' className='text-sm font-medium'>
+                {openMarket ? 'Market open' : 'Market closed'}
+              </Label>
+            </>
+          )}
+        </CardContent>
+      </Card>
+
       <div className='mb-4 flex items-center justify-end gap-2'>
         <Button
           variant='outline'

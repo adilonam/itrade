@@ -116,3 +116,45 @@ ${APP_NAME} Team`;
     html
   });
 };
+
+export const sendPasswordResetEmail = async (
+  email: string,
+  resetLink: string,
+  name?: string
+) => {
+  const subject = `Reset your password - ${APP_NAME}`;
+
+  const text = `Hello ${name || 'User'},
+
+You requested a password reset. Click the link below to set a new password:
+
+${resetLink}
+
+This link will expire in 1 hour. If you didn't request this, please ignore this email.
+
+Best regards,
+${APP_NAME} Team`;
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <h2 style="color: #333; text-align: center;">Reset your password</h2>
+      <p>Hello ${name || 'User'},</p>
+      <p>You requested a password reset. Click the button below to set a new password:</p>
+      <p style="text-align: center; margin: 24px 0;">
+        <a href="${resetLink}" style="background-color: #18181b; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Reset password</a>
+      </p>
+      <p style="color: #666; font-size: 14px;">Or copy this link: <a href="${resetLink}">${resetLink}</a></p>
+      <p style="color: #666; font-size: 14px;">This link will expire in <strong>1 hour</strong>.</p>
+      <p style="color: #666; font-size: 14px;">If you didn't request this, please ignore this email.</p>
+      <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+      <p style="color: #666; font-size: 12px; text-align: center;">Best regards,<br>${APP_NAME} Team</p>
+    </div>
+  `;
+
+  return await sendEmail({
+    to: email,
+    subject,
+    text,
+    html
+  });
+};

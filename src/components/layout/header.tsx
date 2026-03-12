@@ -37,6 +37,10 @@ export default function Header({
       if (!response.ok) {
         throw new Error('Failed to fetch financial data');
       }
+      const contentType = response.headers.get('content-type');
+      if (!contentType?.includes('application/json')) {
+        throw new Error('Invalid response type');
+      }
       const data = await response.json();
       setFinancialData(data);
     } catch (err) {

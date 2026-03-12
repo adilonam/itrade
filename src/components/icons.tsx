@@ -44,7 +44,8 @@ import {
   IconNews,
   IconLink,
   IconBriefcase,
-  IconServer
+  IconServer,
+  IconRobot
 } from '@tabler/icons-react';
 
 export type Icon = React.ComponentType<IconProps>;
@@ -94,5 +95,6 @@ export const Icons = {
   news: IconNews,
   link: IconLink,
   portfolio: IconBriefcase,
-  server: IconServer
+  server: IconServer,
+  robot: IconRobot
 };

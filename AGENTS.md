@@ -14,6 +14,4 @@ This project uses:
 - Links are maintained in `src/constants/data.ts`
 - Authentication via NextAuth
 - Refer to the Prisma schema at `prisma/schema.prisma`
-
-
-
+- If a type or interface is in the Prisma schema, import it from `@/lib/prisma/generated/client`

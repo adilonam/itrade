@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
+import { twelveDataService } from '@/lib/twelvedata';
 import { z } from 'zod';
 
 /**
@@ -78,9 +79,22 @@ import { z } from 'zod';
  */
 
 const updateMarketSchema = z.object({
+  symbol: z
+    .string()
+    .min(1, 'Symbol is required')
+    .max(12, 'Symbol too long')
+    .regex(
+      /^[A-Z0-9\-\/\.]+$/,
+      'Symbol can only contain uppercase letters, numbers, hyphens, slashes, and dots'
+    )
+    .optional(),
+  type: z
+    .enum(['FOREX', 'CRYPTO', 'STOCKS', 'COMMODITIES', 'INDICES'])
+    .optional(),
   visible: z.boolean().optional(),
   spread: z.number().min(0).optional(),
-  room: z.enum(['STOCK', 'TRADING']).optional()
+  room: z.enum(['STOCK', 'TRADING']).optional(),
+  image: z.string().nullable().optional()
 });
 
 type RouteParams = {
@@ -126,10 +140,47 @@ export async function PUT(request: NextRequest, context: RouteParams) {
       return NextResponse.json({ error: 'Market not found' }, { status: 404 });
     }
 
-    // Update the market
+    const updateData: Record<string, unknown> = {};
+
+    if (validation.data.visible !== undefined) {
+      updateData.visible = validation.data.visible;
+    }
+    if (validation.data.spread !== undefined) {
+      updateData.spread = validation.data.spread;
+    }
+    if (validation.data.room !== undefined) {
+      updateData.room = validation.data.room;
+    }
+    if (Object.hasOwn(validation.data, 'image')) {
+      updateData.image = validation.data.image;
+    }
+    if (validation.data.type !== undefined) {
+      updateData.type = validation.data.type;
+    }
+
+    // If symbol is being updated, validate with TwelveData and update name
+    if (validation.data.symbol !== undefined) {
+      const upperSymbol = validation.data.symbol.toUpperCase();
+      if (upperSymbol !== existingMarket.symbol) {
+        const marketData = await twelveDataService.getCombinedData(upperSymbol);
+        if ('error' in marketData) {
+          return NextResponse.json(
+            {
+              error: 'Market validation failed',
+              message: `Symbol "${upperSymbol}" failed TwelveData API validation`
+            },
+            { status: 400 }
+          );
+        }
+        const marketName = marketData.name || upperSymbol;
+        updateData.symbol = upperSymbol;
+        updateData.name = marketName;
+      }
+    }
+
     const updatedMarket = await prisma.market.update({
       where: { id },
-      data: validation.data
+      data: updateData
     });
 
     return NextResponse.json(updatedMarket);

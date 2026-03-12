@@ -16,7 +16,7 @@ import {
   updateMarket
 } from '../../services/markets';
 import { toast } from 'sonner';
-import { EditRoomDialog } from './edit-room-dialog';
+import { EditMarketDialog } from './edit-market-dialog';
 
 interface CellActionProps {
   data: AdminMarket;
@@ -29,7 +29,7 @@ export const CellAction: React.FC<CellActionProps> = ({
 }) => {
   const [loading, setLoading] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
-  const [editRoomOpen, setEditRoomOpen] = useState(false);
+  const [editMarketOpen, setEditMarketOpen] = useState(false);
   const [visibilityLoading, setVisibilityLoading] = useState(false);
 
   const onDeleteConfirm = async () => {
@@ -77,9 +77,9 @@ export const CellAction: React.FC<CellActionProps> = ({
         onConfirm={onDeleteConfirm}
         loading={loading}
       />
-      <EditRoomDialog
-        open={editRoomOpen}
-        onOpenChange={setEditRoomOpen}
+      <EditMarketDialog
+        open={editMarketOpen}
+        onOpenChange={setEditMarketOpen}
         data={data}
         onSuccess={onDataChange}
       />
@@ -93,9 +93,9 @@ export const CellAction: React.FC<CellActionProps> = ({
         <DropdownMenuContent align='end'>
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
 
-          <DropdownMenuItem onClick={() => setEditRoomOpen(true)}>
+          <DropdownMenuItem onClick={() => setEditMarketOpen(true)}>
             <Edit className='mr-2 h-4 w-4' />
-            Edit Room
+            Edit
           </DropdownMenuItem>
 
           <DropdownMenuItem

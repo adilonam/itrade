@@ -20,9 +20,12 @@ export interface CreateMarketParams {
 }
 
 export interface UpdateMarketParams {
+  symbol?: string;
+  type?: 'FOREX' | 'CRYPTO' | 'STOCKS' | 'COMMODITIES' | 'INDICES';
   visible?: boolean;
   spread?: number;
   room?: 'STOCK' | 'TRADING';
+  image?: string | null;
 }
 
 export interface MarketsResponse {

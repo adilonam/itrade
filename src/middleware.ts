@@ -3,7 +3,10 @@ import { withAuth } from 'next-auth/middleware';
 import { NextResponse } from 'next/server';
 
 const isAuthPage = (pathname: string) =>
-  pathname === '/auth/sign-in' || pathname.startsWith('/auth/sign-up');
+  pathname === '/auth/sign-in' ||
+  pathname.startsWith('/auth/sign-up') ||
+  pathname === '/auth/forgot-password' ||
+  pathname === '/auth/reset-password';
 const isPublicPath = (pathname: string) =>
   isAuthPage(pathname) || pathname.startsWith('/api/auth');
 
@@ -34,7 +37,13 @@ export default withAuth(
       authorized: ({ token, req }) => {
         const pathname = req.nextUrl.pathname;
 
-        // Public routes: auth pages and NextAuth API
+        // Let all API routes through – they return 401 JSON when unauthenticated.
+        // Redirecting API requests would return HTML and break fetch().json().
+        if (pathname.startsWith('/api')) {
+          return true;
+        }
+
+        // Public routes: auth pages
         if (isPublicPath(pathname)) {
           return true;
         }
@@ -49,7 +58,7 @@ export default withAuth(
           return token?.role === 'ADMIN' || token?.role === 'SUPERADMIN';
         }
 
-        // All other routes require authentication (/, /overview, /investments, /seller, etc.)
+        // All other page routes require authentication (/, /overview, /investments, etc.)
         return !!token;
       }
     }

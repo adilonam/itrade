@@ -1,0 +1,362 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import Image from 'next/image';
+
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
+} from '@/components/ui/dialog';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+
+import { AdminMarket, updateMarket } from '../../services/markets';
+import { toast } from 'sonner';
+
+const formSchema = z.object({
+  symbol: z
+    .string()
+    .min(1, 'Symbol is required')
+    .max(12, 'Symbol must be 12 characters or less')
+    .regex(
+      /^[A-Z0-9\-\/\.]+$/,
+      'Symbol can only contain uppercase letters, numbers, hyphens, slashes, and dots'
+    ),
+  type: z.enum(['FOREX', 'CRYPTO', 'STOCKS', 'COMMODITIES', 'INDICES'], {
+    required_error: 'Please select a market type'
+  }),
+  room: z.enum(['STOCK', 'TRADING'], {
+    required_error: 'Please select a market room'
+  }),
+  spread: z.coerce.number().min(0, 'Spread must be non-negative').optional(),
+  visible: z.boolean().optional(),
+  image: z.string().nullable().optional()
+});
+
+type FormData = z.infer<typeof formSchema>;
+
+interface EditMarketDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  data: AdminMarket;
+  onSuccess?: () => void;
+}
+
+export function EditMarketDialog({
+  open,
+  onOpenChange,
+  data,
+  onSuccess
+}: EditMarketDialogProps) {
+  const [loading, setLoading] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(
+    data.image ?? null
+  );
+
+  const form = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      symbol: data.symbol,
+      type: data.type,
+      room: data.room,
+      spread: data.spread ?? 0,
+      visible: data.visible ?? true,
+      image: data.image ?? undefined
+    }
+  });
+
+  useEffect(() => {
+    if (open && data) {
+      form.reset({
+        symbol: data.symbol,
+        type: data.type,
+        room: data.room,
+        spread: data.spread ?? 0,
+        visible: data.visible ?? true,
+        image: data.image ?? undefined
+      });
+      setImagePreview(data.image ?? null);
+    }
+  }, [open, data, form]);
+
+  const onSubmit = async (formData: FormData) => {
+    try {
+      setLoading(true);
+
+      await updateMarket(data.id, {
+        symbol: formData.symbol.toUpperCase(),
+        type: formData.type,
+        room: formData.room,
+        ...(formData.spread !== undefined && { spread: formData.spread }),
+        ...(formData.visible !== undefined && { visible: formData.visible }),
+        image: formData.image ?? null
+      });
+
+      toast.success('Market updated successfully');
+      onOpenChange(false);
+      onSuccess?.();
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : 'Failed to update market. Please try again.'
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleClose = () => {
+    form.reset({
+      symbol: data.symbol,
+      type: data.type,
+      room: data.room,
+      spread: data.spread ?? 0,
+      visible: data.visible ?? true,
+      image: data.image ?? undefined
+    });
+    setImagePreview(data.image ?? null);
+    onOpenChange(false);
+  };
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        toast.error('Please select a valid image file');
+        return;
+      }
+      if (file.size > 2 * 1024 * 1024) {
+        toast.error('Image size must be less than 2MB');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const base64 = e.target?.result as string;
+        setImagePreview(base64);
+        form.setValue('image', base64);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setImagePreview(null);
+    form.setValue('image', undefined);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={handleClose}>
+      <DialogContent className='sm:max-w-[425px]'>
+        <DialogHeader>
+          <DialogTitle>Edit Market</DialogTitle>
+          <DialogDescription>
+            Modify all fields for this market. Changing the symbol will be
+            validated against the TwelveData API.
+          </DialogDescription>
+        </DialogHeader>
+
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
+            <FormField
+              control={form.control}
+              name='symbol'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Symbol</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder='e.g., EURUSD, AAPL, BTCUSD'
+                      {...field}
+                      onChange={(e) =>
+                        field.onChange(e.target.value.toUpperCase())
+                      }
+                      disabled={loading}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name='type'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Market Type</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    value={field.value}
+                    disabled={loading}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder='Select market type' />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value='FOREX'>Forex</SelectItem>
+                      <SelectItem value='CRYPTO'>Cryptocurrency</SelectItem>
+                      <SelectItem value='STOCKS'>Stocks</SelectItem>
+                      <SelectItem value='COMMODITIES'>Commodities</SelectItem>
+                      <SelectItem value='INDICES'>Indices</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name='room'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Market Room</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    value={field.value}
+                    disabled={loading}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder='Select market room' />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value='TRADING'>Trading Only</SelectItem>
+                      <SelectItem value='STOCK'>Stock Only</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name='spread'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Spread (Optional)</FormLabel>
+                  <FormControl>
+                    <Input
+                      type='number'
+                      step='0.00001'
+                      min='0'
+                      placeholder='0.00002'
+                      {...field}
+                      disabled={loading}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name='visible'
+              render={({ field }) => (
+                <FormItem className='flex flex-row items-center justify-between rounded-lg border p-4'>
+                  <div className='space-y-0.5'>
+                    <FormLabel className='text-base'>
+                      Visible to Users
+                    </FormLabel>
+                    <div className='text-muted-foreground text-sm'>
+                      Make this market visible in the user dashboard
+                    </div>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      disabled={loading}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <div className='space-y-2'>
+              <Label htmlFor='edit-image'>Market Image (Optional)</Label>
+              <div className='space-y-4'>
+                <Input
+                  id='edit-image'
+                  type='file'
+                  accept='image/*'
+                  onChange={handleImageUpload}
+                  disabled={loading}
+                  className='cursor-pointer'
+                />
+                {imagePreview && (
+                  <div className='relative inline-block'>
+                    <Image
+                      src={imagePreview}
+                      alt='Market preview'
+                      width={100}
+                      height={100}
+                      className='rounded-lg border object-cover'
+                    />
+                    <Button
+                      type='button'
+                      variant='destructive'
+                      size='sm'
+                      className='absolute -top-2 -right-2 h-6 w-6 rounded-full p-0'
+                      onClick={removeImage}
+                      disabled={loading}
+                    >
+                      ×
+                    </Button>
+                  </div>
+                )}
+                <p className='text-muted-foreground text-sm'>
+                  Upload an image for this market. Max size: 2MB.
+                </p>
+              </div>
+            </div>
+
+            <DialogFooter>
+              <Button
+                type='button'
+                variant='outline'
+                onClick={handleClose}
+                disabled={loading}
+              >
+                Cancel
+              </Button>
+              <Button type='submit' disabled={loading}>
+                {loading ? 'Updating...' : 'Update Market'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
+  );
+}

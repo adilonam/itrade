@@ -10,14 +10,16 @@ export async function GET() {
     return NextResponse.json(
       settings || {
         appName: 'Trading Dashboard',
-        appIcon: null
+        appIcon: null,
+        openMarket: true
       }
     );
   } catch (error) {
     return NextResponse.json(
       {
         appName: 'Trading Dashboard',
-        appIcon: null
+        appIcon: null,
+        openMarket: true
       },
       { status: 200 }
     );

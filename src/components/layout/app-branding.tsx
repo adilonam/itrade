@@ -18,9 +18,12 @@ export function AppBranding({ className }: AppBrandingProps) {
       try {
         const response = await fetch('/api/app-settings');
         if (response.ok) {
-          const data = await response.json();
-          setAppName(data.appName || 'Trading Dashboard');
-          setAppIcon(data.appIcon);
+          const contentType = response.headers.get('content-type');
+          if (contentType?.includes('application/json')) {
+            const data = await response.json();
+            setAppName(data.appName || 'Trading Dashboard');
+            setAppIcon(data.appIcon);
+          }
         }
       } catch (error) {
         // Use defaults on error
