@@ -91,7 +91,7 @@ export function TradingRoomOrderPanel({
           type="button"
           onClick={decrementLot}
           disabled={disabled}
-          className="px-2 text-[var(--trade-text-muted)] hover:text-white disabled:opacity-50"
+          className="px-2 text-[var(--trade-text-muted)] hover:text-[var(--trade-text)] disabled:opacity-50"
         >
           −
         </button>
@@ -103,13 +103,13 @@ export function TradingRoomOrderPanel({
           type="button"
           onClick={incrementLot}
           disabled={disabled}
-          className="px-2 text-[var(--trade-text-muted)] hover:text-white disabled:opacity-50"
+          className="px-2 text-[var(--trade-text-muted)] hover:text-[var(--trade-text)] disabled:opacity-50"
         >
           +
         </button>
       </div>
       <div className="flex items-center justify-between px-1 text-[10px] text-[var(--trade-text-muted)]">
-        <Link href="#" className="flex items-center gap-1 hover:text-white">
+        <Link href="#" className="flex items-center gap-1 hover:text-[var(--trade-text)]">
           Advanced Order
         </Link>
       </div>

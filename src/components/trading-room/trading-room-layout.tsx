@@ -111,7 +111,7 @@ export function TradingRoomLayout({
   );
 
   return (
-    <div className="trade-room flex h-[calc(100dvh-52px)] flex-col overflow-hidden bg-[var(--trade-dark)] text-white">
+    <div className="trade-room flex h-[calc(100dvh-52px)] flex-col overflow-hidden bg-[var(--trade-dark)] text-[var(--trade-text)]">
       <main className="flex min-h-0 flex-1 overflow-hidden">
         <ResizablePanelGroup direction="horizontal" className="flex-1">
           {/* Left sidebar - symbols */}
@@ -159,7 +159,7 @@ export function TradingRoomLayout({
       <div className="fixed bottom-4 right-4 z-50">
         <button
           type="button"
-          className="flex items-center gap-2 rounded-lg border border-[var(--trade-border)] bg-[var(--trade-panel)] px-4 py-2 text-sm font-medium text-white shadow-xl transition-all hover:scale-105 hover:bg-[var(--trade-border)]"
+          className="flex items-center gap-2 rounded-lg border border-[var(--trade-border)] bg-[var(--trade-panel)] px-4 py-2 text-sm font-medium text-[var(--trade-text)] shadow-xl transition-all hover:scale-105 hover:bg-[var(--trade-border)]"
         >
           <span>Let&apos;s Chat</span>
           <IconMessageCircle className="size-5" />

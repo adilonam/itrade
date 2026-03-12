@@ -82,6 +82,7 @@
   --color-trade-accent-blue: var(--trade-accent-blue, #1e88e5);
   --color-trade-green: var(--trade-green, #00bfa5);
   --color-trade-red: var(--trade-red, #ff5252);
+  --color-trade-text: var(--trade-text, #ffffff);
   --color-trade-text-muted: var(--trade-text-muted, #90a4ae);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -120,7 +121,7 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-/* Stitch-inspired trade room theme (dark) */
+/* Stitch-inspired trade room theme - dark (default) and light variants */
 .trade-room {
   --trade-dark: #0b1218;
   --trade-panel: #161d26;
@@ -128,7 +129,20 @@
   --trade-accent-blue: #1e88e5;
   --trade-green: #00bfa5;
   --trade-red: #ff5252;
+  --trade-text: #ffffff;
   --trade-text-muted: #90a4ae;
+}
+
+/* Light mode - when html does not have .dark */
+html:not(.dark) .trade-room {
+  --trade-dark: #f1f5f9;
+  --trade-panel: #ffffff;
+  --trade-border: #e2e8f0;
+  --trade-accent-blue: #0ea5e9;
+  --trade-green: #10b981;
+  --trade-red: #ef4444;
+  --trade-text: #0f172a;
+  --trade-text-muted: #64748b;
 }
 
 @layer base {

@@ -16,21 +16,21 @@ export function TradingRoomNewsSidebar() {
           <TabsList className="h-full w-full justify-stretch rounded-none border-0 bg-transparent p-0">
             <TabsTrigger
               value="news"
-              className="flex flex-1 items-center justify-center gap-2 rounded-none border-b-2 border-transparent bg-transparent text-xs font-medium text-[var(--trade-text-muted)] data-[state=active]:border-[var(--trade-accent-blue)] data-[state=active]:font-bold data-[state=active]:text-white"
+              className="flex flex-1 items-center justify-center gap-2 rounded-none border-b-2 border-transparent bg-transparent text-xs font-medium text-[var(--trade-text-muted)] data-[state=active]:border-[var(--trade-accent-blue)] data-[state=active]:font-bold data-[state=active]:text-[var(--trade-text)]"
             >
               <IconNews className="size-3" />
               News
             </TabsTrigger>
             <TabsTrigger
               value="calendar"
-              className="flex flex-1 items-center justify-center gap-2 rounded-none border-b-2 border-transparent bg-transparent text-xs font-medium text-[var(--trade-text-muted)] data-[state=active]:border-[var(--trade-accent-blue)] data-[state=active]:font-bold data-[state=active]:text-white"
+              className="flex flex-1 items-center justify-center gap-2 rounded-none border-b-2 border-transparent bg-transparent text-xs font-medium text-[var(--trade-text-muted)] data-[state=active]:border-[var(--trade-accent-blue)] data-[state=active]:font-bold data-[state=active]:text-[var(--trade-text)]"
             >
               <IconCalendar className="size-3" />
               Calendar
             </TabsTrigger>
             <TabsTrigger
               value="market"
-              className="flex flex-1 items-center justify-center gap-2 rounded-none border-b-2 border-transparent bg-transparent text-xs font-medium text-[var(--trade-text-muted)] data-[state=active]:border-[var(--trade-accent-blue)] data-[state=active]:font-bold data-[state=active]:text-white"
+              className="flex flex-1 items-center justify-center gap-2 rounded-none border-b-2 border-transparent bg-transparent text-xs font-medium text-[var(--trade-text-muted)] data-[state=active]:border-[var(--trade-accent-blue)] data-[state=active]:font-bold data-[state=active]:text-[var(--trade-text)]"
             >
               <IconChartBar className="size-3" />
               Market

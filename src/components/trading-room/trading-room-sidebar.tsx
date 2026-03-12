@@ -106,8 +106,8 @@ export function TradingRoomSidebar({
               onClick={() => setListTab('favorites')}
               className={`flex items-center gap-1 border-b-2 px-0 py-1 text-xs ${
                 listTab === 'favorites'
-                  ? 'border-[var(--trade-accent-blue)] font-bold text-white'
-                  : 'border-transparent text-[var(--trade-text-muted)] hover:text-white'
+                  ? 'border-[var(--trade-accent-blue)] font-bold text-[var(--trade-text)]'
+                  : 'border-transparent text-[var(--trade-text-muted)] hover:text-[var(--trade-text)]'
               }`}
             >
               <IconStar className="size-3" />
@@ -118,15 +118,15 @@ export function TradingRoomSidebar({
               onClick={() => setListTab('movers')}
               className={`flex items-center gap-1 border-b-2 px-0 py-1 text-xs ${
                 listTab === 'movers'
-                  ? 'border-[var(--trade-accent-blue)] font-bold text-white'
-                  : 'border-transparent text-[var(--trade-text-muted)] hover:text-white'
+                  ? 'border-[var(--trade-accent-blue)] font-bold text-[var(--trade-text)]'
+                  : 'border-transparent text-[var(--trade-text-muted)] hover:text-[var(--trade-text)]'
               }`}
             >
               <IconTrendingUp className="size-3" />
               Top Movers
             </button>
           </div>
-          <button type="button" className="text-[var(--trade-text-muted)] hover:text-white" aria-label="Search">
+          <button type="button" className="text-[var(--trade-text-muted)] hover:text-[var(--trade-text)]" aria-label="Search">
             <IconSearch className="size-4" />
           </button>
         </div>
@@ -134,7 +134,7 @@ export function TradingRoomSidebar({
           <input
             type="text"
             placeholder="Search symbols"
-            className="w-full rounded border border-[var(--trade-border)] bg-[var(--trade-dark)] px-3 py-1.5 text-sm text-white placeholder:text-[var(--trade-text-muted)] focus:border-[var(--trade-accent-blue)] focus:outline-none focus:ring-1 focus:ring-[var(--trade-accent-blue)]"
+            className="w-full rounded border border-[var(--trade-border)] bg-[var(--trade-dark)] px-3 py-1.5 text-sm text-[var(--trade-text)] placeholder:text-[var(--trade-text-muted)] focus:border-[var(--trade-accent-blue)] focus:outline-none focus:ring-1 focus:ring-[var(--trade-accent-blue)]"
           />
         </div>
       </div>
@@ -171,8 +171,8 @@ export function TradingRoomSidebar({
       {/* Bottom: News/Calendar icons (minimal) */}
       <div className="flex shrink-0 justify-between border-t border-[var(--trade-border)] bg-[var(--trade-dark)]/30 p-2 text-[var(--trade-text-muted)]">
         <div className="flex gap-4">
-          <button type="button" className="hover:text-white">News</button>
-          <button type="button" className="hover:text-white">Calendar</button>
+          <button type="button" className="hover:text-[var(--trade-text)]">News</button>
+          <button type="button" className="hover:text-[var(--trade-text)]">Calendar</button>
         </div>
       </div>
     </div>

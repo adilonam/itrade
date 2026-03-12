@@ -17,14 +17,14 @@ export function TradingRoomBottomPanel({ guestMode = false }: { guestMode?: bool
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as typeof activeTab)} className="flex h-full flex-col">
         <div className="flex shrink-0 items-center justify-between border-b border-[var(--trade-border)] px-4 py-2">
           <TabsList className="h-10 gap-0 rounded-none border-0 bg-transparent p-0">
-            <TabsTrigger value="open" className="h-full rounded-none border-b-2 border-transparent bg-transparent px-4 text-xs font-medium text-[var(--trade-text-muted)] data-[state=active]:border-[var(--trade-accent-blue)] data-[state=active]:font-bold data-[state=active]:text-[var(--trade-accent-blue)]">Open Positions</TabsTrigger>
-            <TabsTrigger value="pending" className="h-full rounded-none border-b-2 border-transparent bg-transparent px-4 text-xs font-medium text-[var(--trade-text-muted)] hover:text-white data-[state=active]:border-[var(--trade-accent-blue)] data-[state=active]:font-bold data-[state=active]:text-white">Pending Orders</TabsTrigger>
-            <TabsTrigger value="closed" className="h-full rounded-none border-b-2 border-transparent bg-transparent px-4 text-xs font-medium text-[var(--trade-text-muted)] hover:text-white data-[state=active]:border-[var(--trade-accent-blue)] data-[state=active]:font-bold data-[state=active]:text-white">Closed Positions</TabsTrigger>
-            <TabsTrigger value="finance" className="h-full rounded-none border-b-2 border-transparent bg-transparent px-4 text-xs font-medium text-[var(--trade-text-muted)] hover:text-white data-[state=active]:border-[var(--trade-accent-blue)] data-[state=active]:font-bold data-[state=active]:text-white">Finance</TabsTrigger>
+            <TabsTrigger value="open" className="h-full rounded-none border-b-2 border-transparent bg-transparent px-4 text-xs font-medium text-[var(--trade-text-muted)] data-[state=active]:border-[var(--trade-accent-blue)] data-[state=active]:font-bold data-[state=active]:text-[var(--trade-accent-blue)] hover:text-[var(--trade-text)]">Open Positions</TabsTrigger>
+            <TabsTrigger value="pending" className="h-full rounded-none border-b-2 border-transparent bg-transparent px-4 text-xs font-medium text-[var(--trade-text-muted)] hover:text-[var(--trade-text)] data-[state=active]:border-[var(--trade-accent-blue)] data-[state=active]:font-bold data-[state=active]:text-[var(--trade-text)]">Pending Orders</TabsTrigger>
+            <TabsTrigger value="closed" className="h-full rounded-none border-b-2 border-transparent bg-transparent px-4 text-xs font-medium text-[var(--trade-text-muted)] hover:text-[var(--trade-text)] data-[state=active]:border-[var(--trade-accent-blue)] data-[state=active]:font-bold data-[state=active]:text-[var(--trade-text)]">Closed Positions</TabsTrigger>
+            <TabsTrigger value="finance" className="h-full rounded-none border-b-2 border-transparent bg-transparent px-4 text-xs font-medium text-[var(--trade-text-muted)] hover:text-[var(--trade-text)] data-[state=active]:border-[var(--trade-accent-blue)] data-[state=active]:font-bold data-[state=active]:text-[var(--trade-text)]">Finance</TabsTrigger>
           </TabsList>
           <div className="flex items-center gap-1 text-[var(--trade-text-muted)]">
-            <button type="button" className="rounded p-1.5 hover:text-white" aria-label="Filter"><IconFilter className="size-4" /></button>
-            <button type="button" className="rounded p-1.5 hover:text-white" aria-label="Download"><IconDownload className="size-4" /></button>
+            <button type="button" className="rounded p-1.5 hover:text-[var(--trade-text)]" aria-label="Filter"><IconFilter className="size-4" /></button>
+            <button type="button" className="rounded p-1.5 hover:text-[var(--trade-text)]" aria-label="Download"><IconDownload className="size-4" /></button>
           </div>
         </div>
         <TabsContent value="open" className="mt-0 min-h-0 flex-1 overflow-auto data-[state=inactive]:hidden">
