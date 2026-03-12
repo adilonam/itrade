@@ -40,7 +40,7 @@ next-env.d.ts
 
 
 # cursor 
-
+.cursor/
 /memory-bank
 
 # Sentry Config File

@@ -23,6 +23,8 @@ interface TradingRoomSidebarProps {
   onSelectSymbol: (id: string, market: Market | null) => void;
   onMarketOrder?: (type: 'BUY' | 'SELL', quantity: number) => void;
   guestMode?: boolean;
+  /** When true, symbol clicks update chart in-place without URL navigation */
+  noNavigation?: boolean;
 }
 
 export function TradingRoomSidebar({
@@ -31,7 +33,8 @@ export function TradingRoomSidebar({
   selectedMarket,
   onSelectSymbol,
   onMarketOrder,
-  guestMode = false
+  guestMode = false,
+  noNavigation = false
 }: TradingRoomSidebarProps) {
   const [listTab, setListTab] = useState<'favorites' | 'movers'>('favorites');
   const [newsTab, setNewsTab] = useState<'news' | 'calendar' | 'market' | 'symbol'>('news');
@@ -81,7 +84,32 @@ export function TradingRoomSidebar({
                 const symbol = getSymbol(item);
                 const isSelected = selectedSymbolId === id;
                 const market = isMarket(item) ? item : null;
-                return (
+                const rowClassName = `flex w-full items-center justify-between border-b border-border/50 px-3 py-2 text-sm transition-colors hover:bg-muted/50 text-left ${
+                  isSelected ? 'bg-muted' : ''
+                }`;
+                return noNavigation ? (
+                  <button
+                    key={id}
+                    type='button'
+                    onClick={() => onSelectSymbol(id, market)}
+                    className={rowClassName}
+                  >
+                    <span className='font-medium'>{symbol}</span>
+                    <div className='flex items-center gap-2'>
+                      <span className='text-muted-foreground'>
+                        {price >= 1 ? price.toFixed(5) : price.toFixed(3)}
+                      </span>
+                      <span
+                        className={
+                          daily >= 0 ? 'text-emerald-500' : 'text-red-500'
+                        }
+                      >
+                        {daily >= 0 ? '+' : ''}
+                        {daily.toFixed(2)}%
+                      </span>
+                    </div>
+                  </button>
+                ) : (
                   <Link
                     key={id}
                     href={`/trading-view-room-trading?pk=${encodeURIComponent(id)}`}
@@ -89,9 +117,7 @@ export function TradingRoomSidebar({
                       e.preventDefault();
                       onSelectSymbol(id, market);
                     }}
-                    className={`flex items-center justify-between border-b border-border/50 px-3 py-2 text-sm transition-colors hover:bg-muted/50 ${
-                      isSelected ? 'bg-muted' : ''
-                    }`}
+                    className={rowClassName}
                   >
                     <span className='font-medium'>{symbol}</span>
                     <div className='flex items-center gap-2'>

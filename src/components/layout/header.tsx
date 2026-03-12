@@ -20,7 +20,11 @@ interface FinancialData {
   leverage: number;
 }
 
-export default function Header() {
+export default function Header({
+  variant = 'default'
+}: {
+  variant?: 'default' | 'compact';
+}) {
   const { data: session } = useSession();
   const [financialData, setFinancialData] = useState<FinancialData | null>(
     null
@@ -57,6 +61,32 @@ export default function Header() {
     return () => clearInterval(interval);
   }, [loadFinancialData, session?.user]);
 
+  const headerActions = (
+    <div className='flex items-center gap-2 px-4'>
+      {session?.user && financialData && (
+        <Badge
+          variant='outline'
+          className={`hidden items-center gap-1 px-3 py-1 sm:flex ${
+            financialData.freeMargin >= 0
+              ? 'border-green-200 bg-green-50 text-green-700 hover:bg-green-100'
+              : 'border-red-200 bg-red-50 text-red-700 hover:bg-red-100'
+          }`}
+        >
+          <Wallet className='h-3 w-3' />
+          <span className='text-xs font-medium'>
+            ${financialData.freeMargin.toFixed(2)}
+          </span>
+        </Badge>
+      )}
+      <ModeToggle />
+      <UserNav />
+    </div>
+  );
+
+  if (variant === 'compact') {
+    return headerActions;
+  }
+
   return (
     <header className='flex h-16 shrink-0 items-center justify-between gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12'>
       <div className='flex items-center gap-2 px-4'>
@@ -64,26 +94,7 @@ export default function Header() {
         <Separator orientation='vertical' className='mr-2 h-4' />
         <Breadcrumbs />
       </div>
-
-      <div className='flex items-center gap-2 px-4'>
-        {session?.user && financialData && (
-          <Badge
-            variant='outline'
-            className={`hidden items-center gap-1 px-3 py-1 sm:flex ${
-              financialData.freeMargin >= 0
-                ? 'border-green-200 bg-green-50 text-green-700 hover:bg-green-100'
-                : 'border-red-200 bg-red-50 text-red-700 hover:bg-red-100'
-            }`}
-          >
-            <Wallet className='h-3 w-3' />
-            <span className='text-xs font-medium'>
-              ${financialData.freeMargin.toFixed(2)}
-            </span>
-          </Badge>
-        )}
-        <ModeToggle />
-        <UserNav />
-      </div>
+      {headerActions}
     </header>
   );
 }

@@ -20,14 +20,17 @@ import { toast } from 'sonner';
 interface TradingRoomLayoutProps {
   initialMarket: Market | null;
   initialSymbols?: Market[];
+  /** When true, symbol selection updates chart in-place without URL changes */
+  noNavigation?: boolean;
 }
 
 export function TradingRoomLayout({
   initialMarket,
-  initialSymbols = []
+  initialSymbols = [],
+  noNavigation = false
 }: TradingRoomLayoutProps) {
   const searchParams = useSearchParams();
-  const pk = searchParams.get('pk');
+  const pk = noNavigation ? null : searchParams.get('pk');
   const { data: session } = useSession();
   const [symbols, setSymbols] = useState<SymbolItem[]>(() =>
     initialSymbols.length > 0 ? initialSymbols : [...MOCK_SYMBOLS]
@@ -118,6 +121,7 @@ export function TradingRoomLayout({
             onSelectSymbol={handleSelectSymbol}
             onMarketOrder={handleMarketOrder}
             guestMode={isGuest}
+            noNavigation={noNavigation}
           />
         </ResizablePanel>
         <ResizableHandle withHandle className="bg-border" />
