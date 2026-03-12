@@ -8,6 +8,6 @@ export default async function Page() {
   if (!session) {
     return redirect('/auth/sign-in');
   } else {
-    redirect('/overview');
+    redirect('/trade');
   }
 }

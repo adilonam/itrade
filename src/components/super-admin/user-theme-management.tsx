@@ -42,7 +42,7 @@ export function UserThemeManagement() {
   const [users, setUsers] = useState<User[]>([]);
   const [userSettings, setUserSettings] = useState<UserThemeSettings>({
     themeMode: 'system',
-    themeColor: 'default',
+    themeColor: 'match-trader',
     reducedMotion: false,
     highContrast: false
   });
@@ -89,7 +89,7 @@ export function UserThemeManagement() {
         const data = await response.json();
         setUserSettings({
           themeMode: data.themeMode || 'system',
-          themeColor: data.themeColor || 'default',
+          themeColor: data.themeColor || 'match-trader',
           reducedMotion: data.reducedMotion || false,
           highContrast: data.highContrast || false
         });

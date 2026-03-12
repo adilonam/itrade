@@ -21,322 +21,42 @@ export type TenantNavItems = {
 };
 
 export const tenantNavItems: TenantNavItems = {
-  Dashboard: {
-    USER: [
-      {
-        title: 'Overview',
-        url: '/overview',
-        icon: 'dashboard',
-        isActive: false,
-        shortcut: ['d', 'd'],
-        items: []
-      },
-      {
-        title: 'My Transactions',
-        url: '/transactions',
-        icon: 'transaction',
-        isActive: false,
-        shortcut: ['t', 'r'],
-        items: []
-      },
-      {
-        title: 'Messages',
-        url: '/messages',
-        icon: 'message',
-        isActive: false,
-        shortcut: ['m', 's'],
-        items: []
-      },
-      {
-        title: 'Withdraw',
-        url: '/withdraw',
-        icon: 'minus',
-        isActive: false,
-        shortcut: ['w', 'd'],
-        items: []
-      },
-      {
-        title: 'Deposit',
-        url: '/deposit',
-        icon: 'add',
-        isActive: false,
-        shortcut: ['d', 'p'],
-        items: []
-      },
-      {
-        title: 'News',
-        url: '/news',
-        icon: 'news',
-        isActive: false,
-        shortcut: ['n', 'w'],
-        items: []
-      },
-      {
-        title: 'Useful Links',
-        url: '/useful-links',
-        icon: 'link',
-        isActive: false,
-        shortcut: ['l', 'u'],
-        items: []
-      },
-      {
-        title: 'Account',
-        url: '/profile',
-        icon: 'billing',
-        isActive: false,
-        shortcut: ['p', 'r'],
-        items: []
-      }
-    ],
-    SELLER: [
-      {
-        title: 'Overview',
-        url: '/overview',
-        icon: 'dashboard',
-        isActive: false,
-        shortcut: ['d', 'd'],
-        items: []
-      },
-      {
-        title: 'My Transactions',
-        url: '/transactions',
-        icon: 'transaction',
-        isActive: false,
-        shortcut: ['t', 'r'],
-        items: []
-      },
-      {
-        title: 'Messages',
-        url: '/messages',
-        icon: 'message',
-        isActive: false,
-        shortcut: ['m', 's'],
-        items: []
-      },
-      {
-        title: 'Withdraw',
-        url: '/withdraw',
-        icon: 'minus',
-        isActive: false,
-        shortcut: ['w', 'd'],
-        items: []
-      },
-      {
-        title: 'Deposit',
-        url: '/deposit',
-        icon: 'add',
-        isActive: false,
-        shortcut: ['d', 'p'],
-        items: []
-      },
-      {
-        title: 'News',
-        url: '/news',
-        icon: 'news',
-        isActive: false,
-        shortcut: ['n', 'w'],
-        items: []
-      },
-      {
-        title: 'Useful Links',
-        url: '/useful-links',
-        icon: 'link',
-        isActive: false,
-        shortcut: ['l', 'u'],
-        items: []
-      },
-      {
-        title: 'Account',
-        url: '/profile',
-        icon: 'billing',
-        isActive: false,
-        shortcut: ['p', 'r'],
-        items: []
-      }
-    ],
-    ADMIN: [
-      {
-        title: 'Overview',
-        url: '/overview',
-        icon: 'dashboard',
-        isActive: false,
-        shortcut: ['d', 'd'],
-        items: []
-      },
-      {
-        title: 'My Transactions',
-        url: '/transactions',
-        icon: 'transaction',
-        isActive: false,
-        shortcut: ['t', 'r'],
-        items: []
-      },
-      {
-        title: 'Messages',
-        url: '/messages',
-        icon: 'message',
-        isActive: false,
-        shortcut: ['m', 's'],
-        items: []
-      },
-      {
-        title: 'Withdraw',
-        url: '/withdraw',
-        icon: 'minus',
-        isActive: false,
-        shortcut: ['w', 'd'],
-        items: []
-      },
-      {
-        title: 'Deposit',
-        url: '/deposit',
-        icon: 'add',
-        isActive: false,
-        shortcut: ['d', 'p'],
-        items: []
-      },
-      {
-        title: 'News',
-        url: '/news',
-        icon: 'news',
-        isActive: false,
-        shortcut: ['n', 'w'],
-        items: []
-      },
-      {
-        title: 'Useful Links',
-        url: '/useful-links',
-        icon: 'link',
-        isActive: false,
-        shortcut: ['l', 'u'],
-        items: []
-      },
-      {
-        title: 'Account',
-        url: '/profile',
-        icon: 'billing',
-        isActive: false,
-        shortcut: ['p', 'r'],
-        items: []
-      }
-    ],
-    SUPERADMIN: [
-      {
-        title: 'Overview',
-        url: '/overview',
-        icon: 'dashboard',
-        isActive: false,
-        shortcut: ['d', 'd'],
-        items: []
-      },
-      {
-        title: 'My Transactions',
-        url: '/transactions',
-        icon: 'transaction',
-        isActive: false,
-        shortcut: ['t', 'r'],
-        items: []
-      },
-      {
-        title: 'Messages',
-        url: '/messages',
-        icon: 'message',
-        isActive: false,
-        shortcut: ['m', 's'],
-        items: []
-      },
-      {
-        title: 'Withdraw',
-        url: '/withdraw',
-        icon: 'minus',
-        isActive: false,
-        shortcut: ['w', 'd'],
-        items: []
-      },
-      {
-        title: 'Deposit',
-        url: '/deposit',
-        icon: 'add',
-        isActive: false,
-        shortcut: ['d', 'p'],
-        items: []
-      },
-      {
-        title: 'News',
-        url: '/news',
-        icon: 'news',
-        isActive: false,
-        shortcut: ['n', 'w'],
-        items: []
-      },
-      {
-        title: 'Useful Links',
-        url: '/useful-links',
-        icon: 'link',
-        isActive: false,
-        shortcut: ['l', 'u'],
-        items: []
-      },
-      {
-        title: 'Account',
-        url: '/profile',
-        icon: 'billing',
-        isActive: false,
-        shortcut: ['p', 'r'],
-        items: []
-      }
-    ]
-  },
+ 
   'Room Trading': {
     USER: [
       {
         title: 'Dashboard',
-        url: '/markets-room-trading',
+        url: '/trade',
         icon: 'dashboard',
         isActive: false,
         shortcut: ['d', 'd'],
         items: []
       },
       {
-        title: 'My Positions',
-        url: '/positions-room-trading',
-        icon: 'switchVertical',
+        title: 'Plans',
+        url: '/investments',
+        icon: 'pigMoney',
         isActive: false,
         shortcut: ['m', 'p'],
         items: []
       },
       {
-        title: 'My Transactions',
-        url: '/transactions?type=trade',
+        title: 'Props',
+        url: '/challenges',
         icon: 'transaction',
         isActive: false,
         shortcut: ['t', 'r'],
         items: []
       },
       {
-        title: 'News',
-        url: '/news',
-        icon: 'news',
+        title: 'Dashboard',
+        url: '/dashboard',
+        icon: 'dashboard',
         isActive: false,
         shortcut: ['n', 'w'],
         items: []
       },
-      {
-        title: 'Withdraw',
-        url: '/withdraw',
-        icon: 'minus',
-        isActive: false,
-        shortcut: ['w', 'd'],
-        items: []
-      },
-      {
-        title: 'Deposit',
-        url: '/deposit',
-        icon: 'add',
-        isActive: false,
-        shortcut: ['d', 'p'],
-        items: []
-      },
+    
       {
         title: 'Account',
         url: '/profile',
@@ -349,50 +69,34 @@ export const tenantNavItems: TenantNavItems = {
     SELLER: [
       {
         title: 'Dashboard',
-        url: '/markets-room-trading',
+        url: '/trade',
         icon: 'dashboard',
         isActive: false,
         shortcut: ['d', 'd'],
         items: []
       },
       {
-        title: 'My Positions',
-        url: '/positions-room-trading',
-        icon: 'switchVertical',
+        title: 'Plans',
+        url: '/investments',
+        icon: 'pigMoney',
         isActive: false,
         shortcut: ['m', 'p'],
         items: []
       },
       {
-        title: 'My Transactions',
-        url: '/transactions?type=trade',
+        title: 'Props',
+        url: '/challenges',
         icon: 'transaction',
         isActive: false,
         shortcut: ['t', 'r'],
         items: []
       },
       {
-        title: 'News',
-        url: '/news',
-        icon: 'news',
+        title: 'Dashboard',
+        url: '/dashboard',
+        icon: 'dashboard',
         isActive: false,
         shortcut: ['n', 'w'],
-        items: []
-      },
-      {
-        title: 'Withdraw',
-        url: '/withdraw',
-        icon: 'minus',
-        isActive: false,
-        shortcut: ['w', 'd'],
-        items: []
-      },
-      {
-        title: 'Deposit',
-        url: '/deposit',
-        icon: 'add',
-        isActive: false,
-        shortcut: ['d', 'p'],
         items: []
       },
       {
@@ -407,595 +111,46 @@ export const tenantNavItems: TenantNavItems = {
     ADMIN: [
       {
         title: 'Dashboard',
-        url: '/markets-room-trading',
+        url: '/trade',
         icon: 'dashboard',
         isActive: false,
         shortcut: ['d', 'd'],
         items: []
       },
       {
-        title: 'My Positions',
-        url: '/positions-room-trading',
-        icon: 'switchVertical',
+        title: 'Institutional',
+        url: '/admin/positions',
+        icon: 'market',
+        isActive: false,
+        shortcut: ['m', 'm'],
+        items: []
+      },
+      {
+        title: 'Plans',
+        url: '/investments',
+        icon: 'pigMoney',
         isActive: false,
         shortcut: ['m', 'p'],
         items: []
       },
       {
-        title: 'My Transactions',
-        url: '/transactions?type=trade',
+        title: 'Props',
+        url: '/challenges',
         icon: 'transaction',
         isActive: false,
         shortcut: ['t', 'r'],
         items: []
       },
-      {
-        title: 'News',
-        url: '/news',
-        icon: 'news',
-        isActive: false,
-        shortcut: ['n', 'w'],
-        items: []
-      },
-      {
-        title: 'Withdraw',
-        url: '/withdraw',
-        icon: 'minus',
-        isActive: false,
-        shortcut: ['w', 'd'],
-        items: []
-      },
-      {
-        title: 'Deposit',
-        url: '/deposit',
-        icon: 'add',
-        isActive: false,
-        shortcut: ['d', 'p'],
-        items: []
-      },
-      {
-        title: 'Account',
-        url: '/profile',
-        icon: 'billing',
-        isActive: false,
-        shortcut: ['p', 'r'],
-        items: []
-      }
-    ],
-    SUPERADMIN: [
       {
         title: 'Dashboard',
-        url: '/markets-room-trading',
+        url: '/dashboard',
         icon: 'dashboard',
         isActive: false,
-        shortcut: ['d', 'd'],
-        items: []
-      },
-      {
-        title: 'My Positions',
-        url: '/positions-room-trading',
-        icon: 'switchVertical',
-        isActive: false,
-        shortcut: ['m', 'p'],
-        items: []
-      },
-      {
-        title: 'My Transactions',
-        url: '/transactions?type=trade',
-        icon: 'transaction',
-        isActive: false,
-        shortcut: ['t', 'r'],
-        items: []
-      },
-      {
-        title: 'News',
-        url: '/news',
-        icon: 'news',
-        isActive: false,
         shortcut: ['n', 'w'],
         items: []
       },
       {
-        title: 'Withdraw',
-        url: '/withdraw',
-        icon: 'minus',
-        isActive: false,
-        shortcut: ['w', 'd'],
-        items: []
-      },
-      {
-        title: 'Deposit',
-        url: '/deposit',
-        icon: 'add',
-        isActive: false,
-        shortcut: ['d', 'p'],
-        items: []
-      },
-      {
-        title: 'Account',
-        url: '/profile',
-        icon: 'billing',
-        isActive: false,
-        shortcut: ['p', 'r'],
-        items: []
-      }
-    ]
-  },
-  Invest: {
-    USER: [
-      {
-        title: 'Invest Overview',
-        url: '/invest-overview',
-        icon: 'dashboard',
-        isActive: false,
-        shortcut: ['d', 'd'],
-        items: []
-      },
-      {
-        title: 'My Investments',
-        url: '/investments',
-        icon: 'pigMoney',
-        isActive: false,
-        shortcut: ['m', 'i'],
-        items: []
-      },
-      {
-        title: 'My Transactions',
-        url: '/transactions?type=invest',
-        icon: 'transaction',
-        isActive: false,
-        shortcut: ['t', 'r'],
-        items: []
-      },
-      {
-        title: 'News',
-        url: '/news',
-        icon: 'news',
-        isActive: false,
-        shortcut: ['n', 'w'],
-        items: []
-      },
-      {
-        title: 'Withdraw',
-        url: '/withdraw',
-        icon: 'minus',
-        isActive: false,
-        shortcut: ['w', 'd'],
-        items: []
-      },
-      {
-        title: 'Deposit',
-        url: '/deposit',
-        icon: 'add',
-        isActive: false,
-        shortcut: ['d', 'p'],
-        items: []
-      },
-      {
-        title: 'Account',
-        url: '/profile',
-        icon: 'billing',
-        isActive: false,
-        shortcut: ['p', 'r'],
-        items: []
-      }
-    ],
-    SELLER: [
-      {
-        title: 'Invest Overview',
-        url: '/invest-overview',
-        icon: 'dashboard',
-        isActive: false,
-        shortcut: ['d', 'd'],
-        items: []
-      },
-      {
-        title: 'My Investments',
-        url: '/investments',
-        icon: 'pigMoney',
-        isActive: false,
-        shortcut: ['m', 'i'],
-        items: []
-      },
-      {
-        title: 'My Transactions',
-        url: '/transactions?type=invest',
-        icon: 'transaction',
-        isActive: false,
-        shortcut: ['t', 'r'],
-        items: []
-      },
-      {
-        title: 'News',
-        url: '/news',
-        icon: 'news',
-        isActive: false,
-        shortcut: ['n', 'w'],
-        items: []
-      },
-      {
-        title: 'Withdraw',
-        url: '/withdraw',
-        icon: 'minus',
-        isActive: false,
-        shortcut: ['w', 'd'],
-        items: []
-      },
-      {
-        title: 'Deposit',
-        url: '/deposit',
-        icon: 'add',
-        isActive: false,
-        shortcut: ['d', 'p'],
-        items: []
-      },
-      {
-        title: 'Account',
-        url: '/profile',
-        icon: 'billing',
-        isActive: false,
-        shortcut: ['p', 'r'],
-        items: []
-      }
-    ],
-    ADMIN: [
-      {
-        title: 'Invest Overview',
-        url: '/invest-overview',
-        icon: 'dashboard',
-        isActive: false,
-        shortcut: ['d', 'd'],
-        items: []
-      },
-      {
-        title: 'My Investments',
-        url: '/investments',
-        icon: 'pigMoney',
-        isActive: false,
-        shortcut: ['m', 'i'],
-        items: []
-      },
-      {
-        title: 'My Transactions',
-        url: '/transactions?type=invest',
-        icon: 'transaction',
-        isActive: false,
-        shortcut: ['t', 'r'],
-        items: []
-      },
-      {
-        title: 'News',
-        url: '/news',
-        icon: 'news',
-        isActive: false,
-        shortcut: ['n', 'w'],
-        items: []
-      },
-      {
-        title: 'Withdraw',
-        url: '/withdraw',
-        icon: 'minus',
-        isActive: false,
-        shortcut: ['w', 'd'],
-        items: []
-      },
-      {
-        title: 'Deposit',
-        url: '/deposit',
-        icon: 'add',
-        isActive: false,
-        shortcut: ['d', 'p'],
-        items: []
-      },
-      {
-        title: 'Account',
-        url: '/profile',
-        icon: 'billing',
-        isActive: false,
-        shortcut: ['p', 'r'],
-        items: []
-      }
-    ],
-    SUPERADMIN: [
-      {
-        title: 'Invest Overview',
-        url: '/invest-overview',
-        icon: 'dashboard',
-        isActive: false,
-        shortcut: ['d', 'd'],
-        items: []
-      },
-      {
-        title: 'My Investments',
-        url: '/investments',
-        icon: 'pigMoney',
-        isActive: false,
-        shortcut: ['m', 'i'],
-        items: []
-      },
-      {
-        title: 'My Transactions',
-        url: '/transactions?type=invest',
-        icon: 'transaction',
-        isActive: false,
-        shortcut: ['t', 'r'],
-        items: []
-      },
-      {
-        title: 'News',
-        url: '/news',
-        icon: 'news',
-        isActive: false,
-        shortcut: ['n', 'w'],
-        items: []
-      },
-      {
-        title: 'Withdraw',
-        url: '/withdraw',
-        icon: 'minus',
-        isActive: false,
-        shortcut: ['w', 'd'],
-        items: []
-      },
-      {
-        title: 'Deposit',
-        url: '/deposit',
-        icon: 'add',
-        isActive: false,
-        shortcut: ['d', 'p'],
-        items: []
-      },
-      {
-        title: 'Account',
-        url: '/profile',
-        icon: 'billing',
-        isActive: false,
-        shortcut: ['p', 'r'],
-        items: []
-      }
-    ]
-  },
-  'Bot Trading': {
-    USER: [
-      {
-        title: 'Bot Marketplace',
-        url: '/bot-trading',
-        icon: 'robot',
-        isActive: false,
-        shortcut: ['b', 'm'],
-        items: []
-      },
-      {
-        title: 'My Bots',
-        url: '/bot-trading/my-bots',
-        icon: 'server',
-        isActive: false,
-        shortcut: ['m', 'b'],
-        items: []
-      },
-      {
-        title: 'Deposit',
-        url: '/deposit',
-        icon: 'add',
-        isActive: false,
-        shortcut: ['d', 'p'],
-        items: []
-      },
-      {
-        title: 'Withdraw',
-        url: '/withdraw',
-        icon: 'minus',
-        isActive: false,
-        shortcut: ['w', 'd'],
-        items: []
-      },
-      {
-        title: 'News',
-        url: '/news',
-        icon: 'news',
-        isActive: false,
-        shortcut: ['n', 'w'],
-        items: []
-      },
-      {
-        title: 'Account',
-        url: '/profile',
-        icon: 'billing',
-        isActive: false,
-        shortcut: ['p', 'r'],
-        items: []
-      }
-    ],
-    SELLER: [
-      {
-        title: 'Bot Marketplace',
-        url: '/bot-trading',
-        icon: 'robot',
-        isActive: false,
-        shortcut: ['b', 'm'],
-        items: []
-      },
-      {
-        title: 'My Bots',
-        url: '/bot-trading/my-bots',
-        icon: 'server',
-        isActive: false,
-        shortcut: ['m', 'b'],
-        items: []
-      },
-      {
-        title: 'Deposit',
-        url: '/deposit',
-        icon: 'add',
-        isActive: false,
-        shortcut: ['d', 'p'],
-        items: []
-      },
-      {
-        title: 'Withdraw',
-        url: '/withdraw',
-        icon: 'minus',
-        isActive: false,
-        shortcut: ['w', 'd'],
-        items: []
-      },
-      {
-        title: 'News',
-        url: '/news',
-        icon: 'news',
-        isActive: false,
-        shortcut: ['n', 'w'],
-        items: []
-      },
-      {
-        title: 'Account',
-        url: '/profile',
-        icon: 'billing',
-        isActive: false,
-        shortcut: ['p', 'r'],
-        items: []
-      }
-    ],
-    ADMIN: [
-      {
-        title: 'Bot Marketplace',
-        url: '/bot-trading',
-        icon: 'robot',
-        isActive: false,
-        shortcut: ['b', 'm'],
-        items: []
-      },
-      {
-        title: 'My Bots',
-        url: '/bot-trading/my-bots',
-        icon: 'server',
-        isActive: false,
-        shortcut: ['m', 'b'],
-        items: []
-      },
-      {
-        title: 'Deposit',
-        url: '/deposit',
-        icon: 'add',
-        isActive: false,
-        shortcut: ['d', 'p'],
-        items: []
-      },
-      {
-        title: 'Withdraw',
-        url: '/withdraw',
-        icon: 'minus',
-        isActive: false,
-        shortcut: ['w', 'd'],
-        items: []
-      },
-      {
-        title: 'News',
-        url: '/news',
-        icon: 'news',
-        isActive: false,
-        shortcut: ['n', 'w'],
-        items: []
-      },
-      {
-        title: 'Account',
-        url: '/profile',
-        icon: 'billing',
-        isActive: false,
-        shortcut: ['p', 'r'],
-        items: []
-      }
-    ],
-    SUPERADMIN: [
-      {
-        title: 'Bot Marketplace',
-        url: '/bot-trading',
-        icon: 'robot',
-        isActive: false,
-        shortcut: ['b', 'm'],
-        items: []
-      },
-      {
-        title: 'My Bots',
-        url: '/bot-trading/my-bots',
-        icon: 'server',
-        isActive: false,
-        shortcut: ['m', 'b'],
-        items: []
-      },
-      {
-        title: 'Deposit',
-        url: '/deposit',
-        icon: 'add',
-        isActive: false,
-        shortcut: ['d', 'p'],
-        items: []
-      },
-      {
-        title: 'Withdraw',
-        url: '/withdraw',
-        icon: 'minus',
-        isActive: false,
-        shortcut: ['w', 'd'],
-        items: []
-      },
-      {
-        title: 'News',
-        url: '/news',
-        icon: 'news',
-        isActive: false,
-        shortcut: ['n', 'w'],
-        items: []
-      },
-      {
-        title: 'Account',
-        url: '/profile',
-        icon: 'billing',
-        isActive: false,
-        shortcut: ['p', 'r'],
-        items: []
-      }
-    ]
-  },
-  Administration: {
-    USER: [],
-    SELLER: [
-      {
-        title: 'List Users (Seller)',
-        url: '/seller/users',
-        icon: 'user',
-        isActive: false,
-        shortcut: ['l', 'u'],
-        items: []
-      },
-      {
-        title: 'List Positions (Seller)',
-        url: '/seller/positions',
-        icon: 'switchVertical',
-        isActive: false,
-        shortcut: ['l', 'p'],
-        items: []
-      },
-      {
-        title: 'List Investments (Seller)',
-        url: '/seller/investments',
-        icon: 'pigMoney',
-        isActive: false,
-        shortcut: ['l', 'i'],
-        items: []
-      },
-      {
-        title: 'Messages (Seller)',
-        url: '/seller/messages',
-        icon: 'message',
-        isActive: false,
-        shortcut: ['a', 'm'],
-        items: []
-      }
-    ],
-    ADMIN: [
-      {
-        title: 'List Users (Admin)',
+        title: 'Users',
         url: '/admin/users',
         icon: 'user',
         isActive: false,
@@ -1003,15 +158,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'List Users (Seller)',
-        url: '/seller/users',
-        icon: 'user',
-        isActive: false,
-        shortcut: ['l', 's'],
-        items: []
-      },
-      {
-        title: 'List Markets',
+        title: 'Markets',
         url: '/admin/markets',
         icon: 'market',
         isActive: false,
@@ -1019,23 +166,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'List Positions (Admin)',
-        url: '/admin/positions',
-        icon: 'switchVertical',
-        isActive: false,
-        shortcut: ['l', 'p'],
-        items: []
-      },
-      {
-        title: 'List Positions (Seller)',
-        url: '/seller/positions',
-        icon: 'switchVertical',
-        isActive: false,
-        shortcut: ['l', 'p'],
-        items: []
-      },
-      {
-        title: 'List Investments (Admin)',
+        title: 'Investments',
         url: '/admin/investments',
         icon: 'pigMoney',
         isActive: false,
@@ -1043,41 +174,66 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'List Investments (Seller)',
-        url: '/seller/investments',
-        icon: 'pigMoney',
+        title: 'Account',
+        url: '/profile',
+        icon: 'billing',
         isActive: false,
-        shortcut: ['l', 'i'],
-        items: []
-      },
-      {
-        title: 'Messages (Seller)',
-        url: '/seller/messages',
-        icon: 'message',
-        isActive: false,
-        shortcut: ['a', 'm'],
-        items: []
-      },
-      {
-        title: 'List Useful Links',
-        url: '/admin/useful-links',
-        icon: 'link',
-        isActive: false,
-        shortcut: ['l', 'l'],
-        items: []
-      },
-      {
-        title: 'Withdraw Requests',
-        url: '/admin/withdraw-requests',
-        icon: 'minus',
-        isActive: false,
-        shortcut: ['w', 'r'],
+        shortcut: ['p', 'r'],
         items: []
       }
     ],
     SUPERADMIN: [
       {
-        title: 'List Users (Admin)',
+        title: 'Dashboard',
+        url: '/trade',
+        icon: 'dashboard',
+        isActive: false,
+        shortcut: ['d', 'd'],
+        items: []
+      },
+      {
+        title: 'Institutional',
+        url: '/admin/positions',
+        icon: 'market',
+        isActive: false,
+        shortcut: ['m', 'm'],
+        items: []
+      },
+      {
+        title: 'Plans',
+        url: '/investments',
+        icon: 'pigMoney',
+        isActive: false,
+        shortcut: ['m', 'p'],
+        items: []
+      },
+      {
+        title: 'Props',
+        url: '/challenges',
+        icon: 'transaction',
+        isActive: false,
+        shortcut: ['t', 'r'],
+        items: []
+      },
+      {
+        title: 'Dashboard',
+        url: '/dashboard',
+        icon: 'dashboard',
+        isActive: false,
+        shortcut: ['n', 'w'],
+        items: []
+      },
+    
+      {
+        title: 'Account',
+        url: '/profile',
+        icon: 'billing',
+        isActive: false,
+        shortcut: ['p', 'r'],
+        items: []
+      },
+      {
+        title: 'Users',
         url: '/admin/users',
         icon: 'user',
         isActive: false,
@@ -1085,15 +241,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'List Users (Seller)',
-        url: '/seller/users',
-        icon: 'user',
-        isActive: false,
-        shortcut: ['l', 's'],
-        items: []
-      },
-      {
-        title: 'List Markets',
+        title: 'Markets',
         url: '/admin/markets',
         icon: 'market',
         isActive: false,
@@ -1101,23 +249,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'List Positions (Admin)',
-        url: '/admin/positions',
-        icon: 'switchVertical',
-        isActive: false,
-        shortcut: ['l', 'p'],
-        items: []
-      },
-      {
-        title: 'List Positions (Seller)',
-        url: '/seller/positions',
-        icon: 'switchVertical',
-        isActive: false,
-        shortcut: ['l', 'p'],
-        items: []
-      },
-      {
-        title: 'List Investments (Admin)',
+        title: 'Investments',
         url: '/admin/investments',
         icon: 'pigMoney',
         isActive: false,
@@ -1125,46 +257,15 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'List Investments (Seller)',
-        url: '/seller/investments',
-        icon: 'pigMoney',
-        isActive: false,
-        shortcut: ['l', 'i'],
-        items: []
-      },
-      {
-        title: 'Messages (Seller)',
-        url: '/seller/messages',
-        icon: 'message',
-        isActive: false,
-        shortcut: ['a', 'm'],
-        items: []
-      },
-      {
-        title: 'List Useful Links',
-        url: '/admin/useful-links',
-        icon: 'link',
-        isActive: false,
-        shortcut: ['l', 'l'],
-        items: []
-      },
-      {
-        title: 'Withdraw Requests',
+        title: 'Withdrawals',
         url: '/admin/withdraw-requests',
         icon: 'minus',
         isActive: false,
         shortcut: ['w', 'r'],
         items: []
-      }
-    ]
-  },
-  Configuration: {
-    USER: [],
-    SELLER: [],
-    ADMIN: [],
-    SUPERADMIN: [
+      },
       {
-        title: 'App Settings',
+        title: 'Settings',
         url: '/super-admin/app-settings',
         icon: 'settings',
         isActive: false,
@@ -1172,7 +273,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'Theme Settings',
+        title: 'Theme',
         url: '/super-admin/theme-settings',
         icon: 'palette',
         isActive: false,
@@ -1180,17 +281,21 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       }
     ]
-  }
+  },
+
+
+ 
 };
 
 // Legacy exports for backward compatibility (if needed elsewhere)
-export const navItemsUser: NavItem[] = tenantNavItems['Dashboard'].USER || [];
+export const navItemsUser: NavItem[] =
+  tenantNavItems['Room Trading']?.USER || [];
 export const navItemsSeller: NavItem[] =
-  tenantNavItems['Administration'].SELLER || [];
+  tenantNavItems['Room Trading']?.SELLER || [];
 export const navItemsAdmin: NavItem[] =
-  tenantNavItems['Administration'].ADMIN || [];
+  tenantNavItems['Room Trading']?.ADMIN || [];
 export const navItemsSuperAdmin: NavItem[] =
-  tenantNavItems['Configuration'].SUPERADMIN || [];
+  tenantNavItems['Room Trading']?.SUPERADMIN || [];
 
 export const navItems: NavItem[] = [
   ...navItemsUser,

@@ -23,7 +23,7 @@ export async function GET() {
 
     return NextResponse.json({
       themeMode: (settings as any)?.themeMode || 'system',
-      themeColor: (settings as any)?.themeColor || 'green',
+      themeColor: (settings as any)?.themeColor || 'match-trader',
       reducedMotion: (settings as any)?.reducedMotion || false,
       highContrast: (settings as any)?.highContrast || false
     });

@@ -10,7 +10,7 @@ import {
 import { useSession } from 'next-auth/react';
 
 const COOKIE_NAME = 'active_theme';
-const DEFAULT_THEME = 'default';
+const DEFAULT_THEME = 'match-trader';
 
 function setThemeCookie(theme: string) {
   if (typeof window === 'undefined') return;

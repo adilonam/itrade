@@ -1,10 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import Link from 'next/link';
-import { IconMinus, IconPlus } from '@tabler/icons-react';
 import type { Market } from '@/lib/prisma/generated/client';
 import { useMarketsWebSocket } from '@/contexts/markets-websocket-context';
 
@@ -57,7 +54,7 @@ export function TradingRoomOrderPanel({
 
   if (!market) {
     return (
-      <div className='rounded-lg border border-border bg-muted/30 p-4 text-center text-sm text-muted-foreground'>
+      <div className="rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)]/40 p-4 text-center text-sm text-[var(--trade-text-muted)]">
         Select a symbol to trade
       </div>
     );
@@ -66,72 +63,56 @@ export function TradingRoomOrderPanel({
   const marginEstimate = (parseFloat(lotSize) || 0) * price * 100000 * 0.01; // rough forex margin
 
   return (
-    <div className='space-y-2 rounded-xl border border-border bg-card p-3'>
-      <Button
-        variant='destructive'
-        className='h-12 w-full min-w-0 rounded-xl text-sm font-semibold transition-all duration-200 ease-out hover:brightness-110 hover:shadow-md active:scale-[0.98] sm:text-base'
-        disabled={disabled}
-        onClick={() =>
-          onMarketOrder?.('SELL', parseFloat(lotSize) || 0.01)
-        }
-        title={`SELL at ${displayBidFull} (bid)`}
-      >
-        <span className='min-w-0 truncate'>
-          SELL {displayBidCompact}
-        </span>
-      </Button>
-      <div className='flex items-center gap-2'>
-        <Button
-          type='button'
-          variant='outline'
-          size='icon'
-          className='h-8 w-8 shrink-0 rounded-lg transition-all duration-200 ease-out hover:bg-muted active:scale-95'
+    <div className="space-y-4 rounded-lg border border-[var(--trade-border)]/30 bg-[var(--trade-dark)] p-3">
+      <div className="grid grid-cols-2 gap-2">
+        <button
+          type="button"
+          disabled={disabled}
+          onClick={() => onMarketOrder?.('SELL', parseFloat(lotSize) || 0.01)}
+          title={`SELL at ${displayBidFull} (bid)`}
+          className="flex flex-col items-center justify-center rounded bg-[var(--trade-red)]/90 p-2 text-white transition-colors hover:bg-[var(--trade-red)] disabled:opacity-50"
+        >
+          <span className="text-[10px] font-bold uppercase opacity-80">Sell</span>
+          <span className="text-lg font-bold">{displayBidCompact}</span>
+        </button>
+        <button
+          type="button"
+          disabled={disabled}
+          onClick={() => onMarketOrder?.('BUY', parseFloat(lotSize) || 0.01)}
+          title={`BUY at ${displayAskFull} (ask)`}
+          className="flex flex-col items-center justify-center rounded bg-[var(--trade-green)]/90 p-2 text-white transition-colors hover:bg-[var(--trade-green)] disabled:opacity-50"
+        >
+          <span className="text-[10px] font-bold uppercase opacity-80">Buy</span>
+          <span className="text-lg font-bold">{displayAskCompact}</span>
+        </button>
+      </div>
+      <div className="flex items-center justify-center gap-4 rounded border border-[var(--trade-border)]/30 bg-[var(--trade-dark)] py-1">
+        <button
+          type="button"
           onClick={decrementLot}
           disabled={disabled}
+          className="px-2 text-[var(--trade-text-muted)] hover:text-white disabled:opacity-50"
         >
-          <IconMinus className='size-4' />
-        </Button>
-        <Input
-          type='number'
-          min={0.01}
-          step={0.01}
-          value={lotSize}
-          onChange={(e) => setLotSize(e.target.value)}
-          className='h-8 flex-1 rounded-lg text-center text-sm transition-colors duration-200'
-          disabled={disabled}
-        />
-        <Button
-          type='button'
-          variant='outline'
-          size='icon'
-          className='h-8 w-8 shrink-0 rounded-lg transition-all duration-200 ease-out hover:bg-muted active:scale-95'
+          −
+        </button>
+        <div className="text-center">
+          <div className="text-xs font-bold">{lotSize}</div>
+          <div className="text-[9px] text-[var(--trade-text-muted)]">≈ {marginEstimate.toFixed(0)} USD</div>
+        </div>
+        <button
+          type="button"
           onClick={incrementLot}
           disabled={disabled}
+          className="px-2 text-[var(--trade-text-muted)] hover:text-white disabled:opacity-50"
         >
-          <IconPlus className='size-4' />
-        </Button>
+          +
+        </button>
       </div>
-      <p className='text-muted-foreground text-center text-xs'>
-        {marginEstimate.toFixed(0)} USD
-      </p>
-      <Button
-        className='h-12 w-full min-w-0 rounded-xl bg-emerald-600 text-sm font-semibold transition-all duration-200 ease-out hover:bg-emerald-500 hover:shadow-md active:scale-[0.98] disabled:opacity-50 sm:text-base'
-        disabled={disabled}
-        onClick={() =>
-          onMarketOrder?.('BUY', parseFloat(lotSize) || 0.01)
-        }
-        title={`BUY at ${displayAskFull} (ask)`}
-      >
-        <span className='min-w-0 truncate'>
-          BUY {displayAskCompact}
-        </span>
-      </Button>
-      <Link
-        href='#'
-        className='text-primary block text-center text-xs transition-opacity duration-200 hover:underline hover:opacity-90'
-      >
-        Advanced Order
-      </Link>
+      <div className="flex items-center justify-between px-1 text-[10px] text-[var(--trade-text-muted)]">
+        <Link href="#" className="flex items-center gap-1 hover:text-white">
+          Advanced Order
+        </Link>
+      </div>
     </div>
   );
 }

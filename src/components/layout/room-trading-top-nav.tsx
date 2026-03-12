@@ -2,20 +2,22 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { cn } from '@/lib/utils';
-
-const ROOM_TRADING_NAV_ITEMS = [
-  { title: 'Dashboard', url: '/markets-room-trading' },
-  { title: 'Overview Test', url: '/overview-test' },
-  { title: 'My Positions', url: '/positions-room-trading' },
-  { title: 'My Transactions', url: '/transactions?type=trade' },
-  { title: 'News', url: '/news' },
-  { title: 'Withdraw', url: '/withdraw' },
-  { title: 'Deposit', url: '/deposit' },
-  { title: 'Account', url: '/profile' }
-];
+import { tenantNavItems } from '@/constants/data';
 
 export function RoomTradingTopNav() {
+  const { data: session } = useSession();
+  const userRole = (session?.user as { role?: string } | undefined)?.role as
+    | 'USER'
+    | 'SELLER'
+    | 'ADMIN'
+    | 'SUPERADMIN'
+    | undefined;
+  const roomTradingNav =
+    tenantNavItems['Room Trading']?.[userRole ?? 'USER'] ??
+    tenantNavItems['Room Trading']?.USER ??
+    [];
   const pathname = usePathname();
 
   return (
@@ -24,13 +26,15 @@ export function RoomTradingTopNav() {
         role="tablist"
         className="inline-flex h-8 w-fit items-center justify-center gap-1 rounded-full bg-muted/50 p-1"
       >
-        {ROOM_TRADING_NAV_ITEMS.map((item) => {
+        {roomTradingNav.map((item) => {
           const isActive =
             pathname === item.url ||
             (item.url.startsWith('/transactions') &&
               pathname?.startsWith('/transactions')) ||
-            (item.url === '/markets-room-trading' &&
-              pathname?.startsWith('/trading-view-room-trading'));
+            (item.url === '/trade' && pathname?.startsWith('/trade')) ||
+            (item.url.startsWith('/admin') && pathname?.startsWith(item.url)) ||
+            (item.url.startsWith('/super-admin') &&
+              pathname?.startsWith(item.url));
 
           return (
             <Link

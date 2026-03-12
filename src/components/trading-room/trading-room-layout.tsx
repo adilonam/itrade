@@ -8,14 +8,15 @@ import {
   ResizablePanel,
   ResizableHandle
 } from '@/components/ui/resizable';
-import { TradingRoomHeader } from './trading-room-header';
 import { TradingRoomSidebar, type SymbolItem } from './trading-room-sidebar';
 import { TradingRoomBottomPanel } from './trading-room-bottom-panel';
+import { TradingRoomNewsSidebar } from './trading-room-news-sidebar';
 import { TradingViewRoomTrading } from '@/components/trading-view/trading-view-room-trading';
 import { MOCK_SYMBOLS } from './mock-data';
 import type { Market } from '@/lib/prisma/generated/client';
 import { toTradingViewSymbol } from '@/lib/market-symbol';
 import { toast } from 'sonner';
+import { IconMessageCircle } from '@tabler/icons-react';
 
 interface TradingRoomLayoutProps {
   initialMarket: Market | null;
@@ -110,33 +111,60 @@ export function TradingRoomLayout({
   );
 
   return (
-    <div className="flex h-[calc(100dvh-52px)] flex-col overflow-hidden bg-background">
-      <TradingRoomHeader isGuest={isGuest} />
-      <ResizablePanelGroup direction="horizontal" className="flex-1">
-        <ResizablePanel defaultSize={22} minSize={18} maxSize={35} className="flex flex-col">
-          <TradingRoomSidebar
-            symbols={symbols}
-            selectedSymbolId={selectedSymbolId}
-            selectedMarket={selectedMarket}
-            onSelectSymbol={handleSelectSymbol}
-            onMarketOrder={handleMarketOrder}
-            guestMode={isGuest}
-            noNavigation={noNavigation}
-          />
-        </ResizablePanel>
-        <ResizableHandle withHandle className="bg-border" />
-        <ResizablePanel defaultSize={78} minSize={50} className="flex flex-col">
-          <div className="min-h-0 flex-1">
-            <TradingViewRoomTrading
-              symbol={chartSymbol}
-              interval="60"
-              height="100%"
-              width="100%"
-            />
-          </div>
-          <TradingRoomBottomPanel guestMode={isGuest} />
-        </ResizablePanel>
-      </ResizablePanelGroup>
+    <div className="trade-room flex h-[calc(100dvh-52px)] flex-col overflow-hidden bg-[var(--trade-dark)] text-white">
+      <main className="flex min-h-0 flex-1 overflow-hidden">
+        <ResizablePanelGroup direction="horizontal" className="flex-1">
+          {/* Left sidebar - symbols */}
+          <ResizablePanel defaultSize={18} minSize={12} maxSize={35} className="flex min-w-0 flex-col overflow-hidden">
+            <aside className="flex h-full min-w-0 flex-col border-r border-[var(--trade-border)] bg-[var(--trade-panel)]">
+              <TradingRoomSidebar
+                symbols={symbols}
+                selectedSymbolId={selectedSymbolId}
+                selectedMarket={selectedMarket}
+                onSelectSymbol={handleSelectSymbol}
+                onMarketOrder={handleMarketOrder}
+                guestMode={isGuest}
+                noNavigation={noNavigation}
+              />
+            </aside>
+          </ResizablePanel>
+          <ResizableHandle withHandle className="shrink-0 bg-[var(--trade-border)]" />
+          {/* Center - chart + bottom panel */}
+          <ResizablePanel defaultSize={52} minSize={35} className="flex min-w-0 flex-col overflow-hidden">
+            <ResizablePanelGroup direction="vertical" className="min-h-0 flex-1">
+              <ResizablePanel defaultSize={70} minSize={30} className="flex min-h-0 flex-col overflow-hidden">
+                <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-[var(--trade-dark)]">
+                  <TradingViewRoomTrading
+                    symbol={chartSymbol}
+                    interval="60"
+                    height="100%"
+                    width="100%"
+                  />
+                </div>
+              </ResizablePanel>
+              <ResizableHandle withHandle className="shrink-0 bg-[var(--trade-border)]" />
+              <ResizablePanel defaultSize={30} minSize={15} maxSize={50} className="flex flex-col shrink-0 min-h-0">
+                <TradingRoomBottomPanel guestMode={isGuest} />
+              </ResizablePanel>
+            </ResizablePanelGroup>
+          </ResizablePanel>
+          <ResizableHandle withHandle className="shrink-0 bg-[var(--trade-border)]" />
+          {/* Right sidebar - news */}
+          <ResizablePanel defaultSize={30} minSize={18} maxSize={45} className="flex min-w-0 flex-col overflow-hidden">
+            <TradingRoomNewsSidebar />
+          </ResizablePanel>
+        </ResizablePanelGroup>
+      </main>
+      {/* Floating Let's Chat button */}
+      <div className="fixed bottom-4 right-4 z-50">
+        <button
+          type="button"
+          className="flex items-center gap-2 rounded-lg border border-[var(--trade-border)] bg-[var(--trade-panel)] px-4 py-2 text-sm font-medium text-white shadow-xl transition-all hover:scale-105 hover:bg-[var(--trade-border)]"
+        >
+          <span>Let&apos;s Chat</span>
+          <IconMessageCircle className="size-5" />
+        </button>
+      </div>
     </div>
   );
 }

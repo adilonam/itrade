@@ -27,7 +27,7 @@ export default withAuth(
 
     // Authenticated user on sign-in or sign-up → redirect to app
     if (isAuthenticated && isAuthPage(pathname)) {
-      return NextResponse.redirect(new URL('/overview', req.url));
+      return NextResponse.redirect(new URL('/trade', req.url));
     }
 
     return NextResponse.next();
@@ -58,7 +58,7 @@ export default withAuth(
           return token?.role === 'ADMIN' || token?.role === 'SUPERADMIN';
         }
 
-        // All other page routes require authentication (/, /overview, /investments, etc.)
+        // All other page routes require authentication (/, /trade, /investments, etc.)
         return !!token;
       }
     }

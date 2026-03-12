@@ -1,13 +1,11 @@
 import KBar from '@/components/kbar';
-import AppSidebar from '@/components/layout/app-sidebar';
 import Header from '@/components/layout/header';
+import { RoomTradingTopNav } from '@/components/layout/room-trading-top-nav';
 import ForbiddenPage from '@/components/errors/forbidden';
-import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { authOptions } from '@/lib/auth';
 import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
 import type { Metadata } from 'next';
-import { cookies } from 'next/headers';
 
 export const metadata: Metadata = {
   title: 'Super Admin Dashboard',
@@ -40,19 +38,15 @@ export default async function SuperAdminLayout({
     );
   }
 
-  // Persisting the sidebar state in the cookie.
-  const cookieStore = await cookies();
-  const defaultOpen = cookieStore.get('sidebar_state')?.value === 'true';
-
   return (
     <KBar>
-      <SidebarProvider defaultOpen={defaultOpen}>
-        <AppSidebar />
-        <SidebarInset>
-          <Header />
-          {children}
-        </SidebarInset>
-      </SidebarProvider>
+      <div className="flex min-h-screen w-full flex-col">
+        <header className="flex h-12 shrink-0 items-center justify-between gap-4 border-b border-border bg-background px-4">
+          <RoomTradingTopNav />
+          <Header variant="compact" />
+        </header>
+        <main className="flex min-h-0 flex-1 flex-col overflow-auto">{children}</main>
+      </div>
     </KBar>
   );
 }

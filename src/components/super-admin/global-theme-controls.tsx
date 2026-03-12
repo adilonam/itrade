@@ -29,7 +29,7 @@ export function GlobalThemeControls() {
   const { setActiveTheme } = useThemeConfig();
   const [settings, setSettings] = useState<GlobalThemeSettings>({
     themeMode: 'system',
-    themeColor: 'green',
+    themeColor: 'match-trader',
     reducedMotion: false,
     highContrast: false
   });
