@@ -22,7 +22,6 @@ import {
 import {
   IconRobot,
   IconTrendingUp,
-  IconTrendingDown,
   IconShield,
   IconSearch
 } from '@tabler/icons-react';

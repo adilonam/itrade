@@ -180,8 +180,7 @@ export async function GET(request: NextRequest) {
               ...position,
               calculatedPnL: pnl
             };
-          } catch (error) {
-            console.error('Error calculating PnL:', error);
+          } catch {
             return position;
           }
         }
@@ -198,8 +197,7 @@ export async function GET(request: NextRequest) {
         pages: Math.ceil(total / limit)
       }
     });
-  } catch (error) {
-    console.error('Get seller positions error:', error);
+  } catch {
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -373,8 +371,7 @@ export async function POST(request: NextRequest) {
       },
       { status: 201 }
     );
-  } catch (error) {
-    console.error('Create seller position error:', error);
+  } catch {
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

@@ -149,8 +149,6 @@ export async function POST(request: NextRequest) {
       user.name || undefined
     );
 
-    console.log('mfa code for', user.email, code);
-
     if (!emailResult.success) {
       return NextResponse.json(
         { error: 'Failed to send verification email' },

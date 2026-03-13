@@ -35,12 +35,6 @@ type PositionWithRelations = Position & {
   market: Market | null;
 };
 
-// Create position data type
-type CreatePositionData = Position;
-
-// Update position data type
-type UpdatePositionData = Partial<Position>;
-
 interface PositionFormProps {
   position?: PositionWithRelations | null;
   onClose: () => void;

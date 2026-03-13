@@ -10,8 +10,7 @@ import {
 } from '@tabler/icons-react';
 
 export function TradingRoomHeader({
-  isGuest = false,
-  profit
+  isGuest = false
 }: {
   isGuest?: boolean;
   profit?: number | null;

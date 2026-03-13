@@ -11,6 +11,10 @@ import {
 import { TradingRoomSidebar, type SymbolItem } from './trading-room-sidebar';
 import { TradingRoomBottomPanel } from './trading-room-bottom-panel';
 import { TradingRoomNewsSidebar } from './trading-room-news-sidebar';
+import {
+  TradingRoomAdvancedOrderPanel,
+  type AdvancedOrderMarket
+} from './trading-room-advanced-order-panel';
 import { TradingViewRoomTrading } from '@/components/trading-view/trading-view-room-trading';
 import { MOCK_SYMBOLS } from './mock-data';
 import type { Market } from '@/lib/prisma/generated/client';
@@ -40,7 +44,22 @@ export function TradingRoomLayout({
     initialMarket?.id ?? pk ?? (symbols[0]?.id ?? null)
   );
   const [selectedMarket, setSelectedMarket] = useState<Market | null>(initialMarket);
+  const [advancedOrderOpen, setAdvancedOrderOpen] = useState(false);
   const isGuest = !session?.user;
+
+  const selectedSymbol = symbols.find((s) => s.id === selectedSymbolId);
+  const getPrice = (item: SymbolItem) =>
+    'lastPrice' in item ? item.lastPrice : (item as { price: number }).price;
+  const getSymbol = (item: SymbolItem) => item.symbol;
+  const advancedOrderMarket: AdvancedOrderMarket = selectedMarket
+    ? selectedMarket
+    : selectedSymbol
+      ? {
+          symbol: getSymbol(selectedSymbol),
+          lastPrice: getPrice(selectedSymbol),
+          spread: 0.00002
+        }
+      : null;
 
   useEffect(() => {
     if (initialSymbols.length > 0) return;
@@ -64,9 +83,8 @@ export function TradingRoomLayout({
     if (!pk || !initialMarket) return;
     setSelectedSymbolId(pk);
     setSelectedMarket(initialMarket);
-  }, [pk, initialMarket?.id]);
+  }, [pk, initialMarket]);
 
-  const selectedSymbol = symbols.find((s) => s.id === selectedSymbolId);
   const chartSymbol = selectedMarket
     ? toTradingViewSymbol(selectedMarket)
     : selectedSymbol
@@ -79,29 +97,36 @@ export function TradingRoomLayout({
   }, []);
 
   const handleMarketOrder = useCallback(
-    async (type: 'BUY' | 'SELL', quantity: number) => {
+    async (type: 'BUY' | 'SELL', quantity: number, limitPrice?: number) => {
       if (!session?.user?.id || !selectedMarket) {
         toast.error('Sign in and select a market to trade');
         return;
       }
+      const isPending = limitPrice != null;
       try {
+        const body: Record<string, unknown> = {
+          type,
+          status: isPending ? 'PENDING' : 'PLACED',
+          room: 'TRADING',
+          marketId: selectedMarket.id,
+          quantity,
+          description: isPending
+            ? `${type} ${quantity} lots @ ${limitPrice}`
+            : `${type} ${quantity} lots`
+        };
+        if (isPending) body.executedPrice = limitPrice;
         const res = await fetch('/api/user/positions', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            type,
-            status: 'PLACED',
-            room: 'TRADING',
-            marketId: selectedMarket.id,
-            quantity,
-            description: `${type} ${quantity} lots`
-          })
+          body: JSON.stringify(body)
         });
         if (!res.ok) {
           const err = await res.json();
           throw new Error(err.message || 'Order failed');
         }
-        toast.success(`${type} order placed`);
+        toast.success(
+          isPending ? `${type} limit order placed` : `${type} order placed`
+        );
         window.dispatchEvent(new CustomEvent('room-trading-positions-refresh'));
       } catch (e) {
         toast.error(e instanceof Error ? e.message : 'Order failed');
@@ -114,39 +139,52 @@ export function TradingRoomLayout({
     <div className="trade-room flex h-[calc(100dvh-52px)] flex-col overflow-hidden bg-[var(--trade-dark)] text-[var(--trade-text)]">
       <main className="flex min-h-0 flex-1 overflow-hidden">
         <ResizablePanelGroup direction="horizontal" className="flex-1">
-          {/* Left sidebar - symbols */}
+          {/* Left panel - symbols list OR advanced order form */}
           <ResizablePanel defaultSize={18} minSize={12} maxSize={35} className="flex min-w-0 flex-col overflow-hidden">
-            <aside className="flex h-full min-w-0 flex-col border-r border-[var(--trade-border)] bg-[var(--trade-panel)]">
-              <TradingRoomSidebar
-                symbols={symbols}
-                selectedSymbolId={selectedSymbolId}
-                selectedMarket={selectedMarket}
-                onSelectSymbol={handleSelectSymbol}
+            {advancedOrderOpen && advancedOrderMarket ? (
+              <TradingRoomAdvancedOrderPanel
+                key={advancedOrderMarket.symbol}
+                market={advancedOrderMarket}
+                onClose={() => setAdvancedOrderOpen(false)}
                 onMarketOrder={handleMarketOrder}
-                guestMode={isGuest}
-                noNavigation={noNavigation}
+                disabled={isGuest}
               />
-            </aside>
+            ) : (
+              <aside className="flex h-full min-w-0 flex-col border-r border-[var(--trade-border)] bg-[var(--trade-panel)]">
+                <TradingRoomSidebar
+                  symbols={symbols}
+                  selectedSymbolId={selectedSymbolId}
+                  selectedMarket={selectedMarket}
+                  onSelectSymbol={handleSelectSymbol}
+                  onMarketOrder={handleMarketOrder}
+                  onAdvancedOrderClick={() => setAdvancedOrderOpen(true)}
+                  guestMode={isGuest}
+                  noNavigation={noNavigation}
+                />
+              </aside>
+            )}
           </ResizablePanel>
           <ResizableHandle withHandle className="shrink-0 bg-[var(--trade-border)]" />
           {/* Center - chart + bottom panel */}
           <ResizablePanel defaultSize={52} minSize={35} className="flex min-w-0 flex-col overflow-hidden">
-            <ResizablePanelGroup direction="vertical" className="min-h-0 flex-1">
-              <ResizablePanel defaultSize={70} minSize={30} className="flex min-h-0 flex-col overflow-hidden">
-                <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-[var(--trade-dark)]">
-                  <TradingViewRoomTrading
-                    symbol={chartSymbol}
-                    interval="60"
-                    height="100%"
-                    width="100%"
-                  />
-                </div>
-              </ResizablePanel>
-              <ResizableHandle withHandle className="shrink-0 bg-[var(--trade-border)]" />
-              <ResizablePanel defaultSize={30} minSize={15} maxSize={50} className="flex flex-col shrink-0 min-h-0">
-                <TradingRoomBottomPanel guestMode={isGuest} />
-              </ResizablePanel>
-            </ResizablePanelGroup>
+            <div className="flex min-h-0 flex-1 flex-col">
+              <ResizablePanelGroup direction="vertical" className="min-h-0 flex-1">
+                <ResizablePanel defaultSize={70} minSize={30} className="flex min-h-0 flex-col overflow-hidden">
+                  <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-[var(--trade-dark)]">
+                    <TradingViewRoomTrading
+                      symbol={chartSymbol}
+                      interval="60"
+                      height="100%"
+                      width="100%"
+                    />
+                  </div>
+                </ResizablePanel>
+                <ResizableHandle withHandle className="shrink-0 bg-[var(--trade-border)]" />
+                <ResizablePanel defaultSize={30} minSize={15} maxSize={50} className="flex flex-col shrink-0 min-h-0">
+                  <TradingRoomBottomPanel guestMode={isGuest} />
+                </ResizablePanel>
+              </ResizablePanelGroup>
+            </div>
           </ResizablePanel>
           <ResizableHandle withHandle className="shrink-0 bg-[var(--trade-border)]" />
           {/* Right sidebar - news */}

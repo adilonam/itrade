@@ -8,7 +8,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { MoreHorizontal, Trash, Eye, EyeOff, Edit } from 'lucide-react';
+import { MoreHorizontal, Trash, Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
 import {
   AdminInvestment,

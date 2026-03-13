@@ -6,8 +6,7 @@ import type {
   TwelveDataWebSocketPriceData,
   TwelveDataWebSocketSubscription,
   TwelveDataWebSocketSubscribeStatus,
-  TwelveDataWebSocketError,
-  TwelveDataWebSocketResetStatus
+  TwelveDataWebSocketError
 } from '@/types/twelvedata';
 
 interface UseTwelveDataWebSocketOptions {
@@ -124,7 +123,7 @@ export function useTwelveDataWebSocket({
               break;
 
             default:
-              console.log('Unknown event type:', data);
+              break;
           }
         } catch (error) {
           setState((prev) => ({
@@ -163,7 +162,7 @@ export function useTwelveDataWebSocket({
         }
       };
 
-      ws.onerror = (error) => {
+      ws.onerror = () => {
         setState((prev) => ({
           ...prev,
           isConnecting: false,

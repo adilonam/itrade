@@ -5,16 +5,21 @@ import Link from 'next/link';
 import type { Market } from '@/lib/prisma/generated/client';
 import { useMarketsWebSocket } from '@/contexts/markets-websocket-context';
 
+export type OrderPanelMarket = Market | { symbol: string; lastPrice: number; spread?: number } | null;
+
 interface TradingRoomOrderPanelProps {
-  market: Market | null;
+  market: OrderPanelMarket;
   onMarketOrder?: (type: 'BUY' | 'SELL', quantity: number) => void;
   disabled?: boolean;
+  /** When false, hides the Advanced Order link (parent renders it) */
+  showAdvancedOrder?: boolean;
 }
 
 export function TradingRoomOrderPanel({
   market,
   onMarketOrder,
-  disabled = false
+  disabled = false,
+  showAdvancedOrder = true
 }: TradingRoomOrderPanelProps) {
   const [lotSize, setLotSize] = useState('0.01');
   const { realTimePrices, isConnected, subscribe } = useMarketsWebSocket();
@@ -35,11 +40,12 @@ export function TradingRoomOrderPanel({
   const ask = midPrice + spread / 2;
 
   const formatFull = (p: number) => (p >= 1 ? p.toFixed(5) : p.toFixed(3));
-  const formatCompact = (p: number) => (p >= 1 ? p.toFixed(2) : p.toFixed(3));
+  const formatNoTrailingZeros = (p: number) =>
+    formatFull(p).replace(/\.?0+$/, '');
   const displayBidFull = formatFull(bid);
-  const displayBidCompact = formatCompact(bid);
   const displayAskFull = formatFull(ask);
-  const displayAskCompact = formatCompact(ask);
+  const displayBid = formatNoTrailingZeros(bid);
+  const displayAsk = formatNoTrailingZeros(ask);
 
   const price = midPrice;
 
@@ -52,6 +58,24 @@ export function TradingRoomOrderPanel({
     setLotSize(Math.max(0.01, n - 0.01).toFixed(2));
   };
 
+  const handleLotChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    if (val === '' || /^\d*\.?\d*$/.test(val)) {
+      setLotSize(val);
+    }
+  };
+
+  const handleLotBlur = () => {
+    const n = parseFloat(lotSize);
+    if (Number.isNaN(n) || n < 0.01) {
+      setLotSize('0.01');
+    } else if (n > 100) {
+      setLotSize('100');
+    } else {
+      setLotSize(n.toFixed(2));
+    }
+  };
+
   if (!market) {
     return (
       <div className="rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)]/40 p-4 text-center text-sm text-[var(--trade-text-muted)]">
@@ -60,32 +84,38 @@ export function TradingRoomOrderPanel({
     );
   }
 
-  const marginEstimate = (parseFloat(lotSize) || 0) * price * 100000 * 0.01; // rough forex margin
+  const notionalUsd = Math.round(
+    (parseFloat(lotSize) || 0) * 100000 * price
+  );
+  const formatUsd = (n: number) =>
+    n.toLocaleString('en-US', { maximumFractionDigits: 0 });
 
   return (
-    <div className="space-y-4 rounded-lg border border-[var(--trade-border)]/30 bg-[var(--trade-dark)] p-3">
+    <div className="space-y-3">
+      {/* Stitch layout: 2-col Buy/Sell grid */}
       <div className="grid grid-cols-2 gap-2">
         <button
           type="button"
           disabled={disabled}
           onClick={() => onMarketOrder?.('SELL', parseFloat(lotSize) || 0.01)}
           title={`SELL at ${displayBidFull} (bid)`}
-          className="flex flex-col items-center justify-center rounded bg-[var(--trade-red)]/90 p-2 text-white transition-colors hover:bg-[var(--trade-red)] disabled:opacity-50"
+          className="flex min-w-0 flex-col items-center justify-center rounded bg-[var(--trade-red)]/90 p-2 text-white transition-colors hover:bg-[var(--trade-red)] disabled:opacity-50"
         >
           <span className="text-[10px] font-bold uppercase opacity-80">Sell</span>
-          <span className="text-lg font-bold">{displayBidCompact}</span>
+          <span className="truncate w-full text-center text-sm font-bold">{displayBid}</span>
         </button>
         <button
           type="button"
           disabled={disabled}
           onClick={() => onMarketOrder?.('BUY', parseFloat(lotSize) || 0.01)}
           title={`BUY at ${displayAskFull} (ask)`}
-          className="flex flex-col items-center justify-center rounded bg-[var(--trade-green)]/90 p-2 text-white transition-colors hover:bg-[var(--trade-green)] disabled:opacity-50"
+          className="flex min-w-0 flex-col items-center justify-center rounded bg-[var(--trade-green)]/90 p-2 text-white transition-colors hover:bg-[var(--trade-green)] disabled:opacity-50"
         >
           <span className="text-[10px] font-bold uppercase opacity-80">Buy</span>
-          <span className="text-lg font-bold">{displayAskCompact}</span>
+          <span className="truncate w-full text-center text-sm font-bold">{displayAsk}</span>
         </button>
       </div>
+      {/* Quantity row */}
       <div className="flex items-center justify-center gap-4 rounded border border-[var(--trade-border)]/30 bg-[var(--trade-dark)] py-1">
         <button
           type="button"
@@ -96,8 +126,18 @@ export function TradingRoomOrderPanel({
           −
         </button>
         <div className="text-center">
-          <div className="text-xs font-bold">{lotSize}</div>
-          <div className="text-[9px] text-[var(--trade-text-muted)]">≈ {marginEstimate.toFixed(0)} USD</div>
+          <input
+            type="text"
+            inputMode="decimal"
+            value={lotSize}
+            onChange={handleLotChange}
+            onBlur={handleLotBlur}
+            disabled={disabled}
+            className="w-14 bg-transparent text-center text-xs font-bold text-[var(--trade-text)] outline-none focus:ring-0 disabled:opacity-50 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+          />
+          <div className="text-[9px] text-[var(--trade-text-muted)]">
+            ≈ {formatUsd(notionalUsd)} USD
+          </div>
         </div>
         <button
           type="button"
@@ -108,11 +148,13 @@ export function TradingRoomOrderPanel({
           +
         </button>
       </div>
-      <div className="flex items-center justify-between px-1 text-[10px] text-[var(--trade-text-muted)]">
-        <Link href="#" className="flex items-center gap-1 hover:text-[var(--trade-text)]">
-          Advanced Order
-        </Link>
-      </div>
+      {showAdvancedOrder && (
+        <div className="flex items-center justify-between px-1 text-[10px] text-[var(--trade-text-muted)]">
+          <Link href="#" className="flex items-center gap-1 hover:text-[var(--trade-text)]">
+            Advanced Order
+          </Link>
+        </div>
+      )}
     </div>
   );
 }

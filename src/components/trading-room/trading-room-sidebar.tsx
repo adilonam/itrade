@@ -1,12 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { TradingRoomOrderPanel } from './trading-room-order-panel';
 import type { Market } from '@/lib/prisma/generated/client';
 import type { MockSymbol } from './mock-data';
-import { IconSearch, IconStar, IconTrendingUp } from '@tabler/icons-react';
-import Link from 'next/link';
+import { getCurrencyFlags } from '@/lib/currency-flags';
+import { IconSearch, IconStar, IconTrendingUp, IconShield, IconInfoCircle } from '@tabler/icons-react';
 
 export type SymbolItem = Market | MockSymbol;
 
@@ -20,6 +21,7 @@ interface TradingRoomSidebarProps {
   selectedMarket: Market | null;
   onSelectSymbol: (id: string, market: Market | null) => void;
   onMarketOrder?: (type: 'BUY' | 'SELL', quantity: number) => void;
+  onAdvancedOrderClick?: () => void;
   guestMode?: boolean;
   /** When true, symbol clicks update chart in-place without URL navigation */
   noNavigation?: boolean;
@@ -28,24 +30,27 @@ interface TradingRoomSidebarProps {
 export function TradingRoomSidebar({
   symbols,
   selectedSymbolId,
-  selectedMarket,
+  selectedMarket: _selectedMarket,
   onSelectSymbol,
   onMarketOrder,
+  onAdvancedOrderClick,
   guestMode = false,
   noNavigation = false
 }: TradingRoomSidebarProps) {
+  void _selectedMarket; // Reserved for future use
   const [listTab, setListTab] = useState<'favorites' | 'movers'>('movers');
 
   const getPrice = (item: SymbolItem) =>
     isMarket(item) ? item.lastPrice : (item as MockSymbol).price;
-  const getDailyChange = (item: SymbolItem) =>
-    isMarket(item)
-      ? (item as Market & { lastChange?: number }).lastChange ?? 0
-      : (item as MockSymbol).dailyChange;
   const getSymbol = (item: SymbolItem) => item.symbol;
   const getName = (item: SymbolItem) =>
     isMarket(item) ? (item as Market).name : (item as MockSymbol).name;
   const getId = (item: SymbolItem) => item.id;
+
+  const formatPrice = (price: number) => {
+    const s = price >= 1 ? price.toFixed(5) : price.toFixed(3);
+    return s.replace(/\.?0+$/, '');
+  };
 
   const rowContent = (item: SymbolItem, isSelected: boolean) => {
     const id = getId(item);
@@ -53,29 +58,101 @@ export function TradingRoomSidebar({
     const symbol = getSymbol(item);
     const name = getName(item);
     const market = isMarket(item) ? item : null;
+    const [flagBase, flagQuote] = getCurrencyFlags(symbol);
+    const handleClick = () => onSelectSymbol(id, market);
+    const isPair = flagQuote.length > 0;
+
+    if (isSelected) {
+      return (
+        <div
+          key={id}
+          className="border-b border-[var(--trade-border)] bg-[var(--trade-dark)]/20"
+          data-purpose="asset-item-active"
+        >
+          <div className="p-3">
+            <div className="flex justify-between items-start mb-2">
+              <div className="flex items-center gap-2">
+                <div className="flex -space-x-1">
+                  <span
+                    className={`flex size-4 items-center justify-center rounded-full border border-[var(--trade-border)] bg-[var(--trade-panel)] ${isPair ? 'text-[8px]' : 'text-[10px] font-bold'}`}
+                  >
+                    {flagBase}
+                  </span>
+                  {isPair && (
+                    <span className="flex size-4 items-center justify-center rounded-full border border-[var(--trade-border)] bg-[var(--trade-panel)] text-[8px]">
+                      {flagQuote}
+                    </span>
+                  )}
+                </div>
+                <div>
+                  <div className="text-sm font-bold">{symbol}</div>
+                  <div className="text-[10px] text-[var(--trade-text-muted)]">{name}</div>
+                </div>
+              </div>
+              <div className="text-sm font-mono font-bold">{formatPrice(price)}</div>
+            </div>
+            <TradingRoomOrderPanel
+              market={market ?? { symbol, lastPrice: price, spread: 0.00002 }}
+              onMarketOrder={onMarketOrder}
+              disabled={guestMode}
+              showAdvancedOrder={false}
+            />
+            <div className="mt-3 flex items-center justify-between text-[10px] text-[var(--trade-text-muted)] px-1">
+              <button
+                type="button"
+                onClick={() => onAdvancedOrderClick?.()}
+                className="flex items-center gap-1 hover:text-[var(--trade-text)]"
+              >
+                <IconShield className="size-3" />
+                Advanced Order
+              </button>
+              <div className="flex gap-2">
+                <button type="button" className="hover:text-[var(--trade-text)]" aria-label="Info">
+                  <IconInfoCircle className="size-3" />
+                </button>
+                <button type="button" className="hover:text-[var(--trade-text)]" aria-label="Favorite">
+                  <IconStar className="size-3" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     const rowBase =
-      'flex w-full items-center justify-between border-b border-[var(--trade-border)] px-3 py-2.5 text-left text-sm transition-colors hover:bg-[var(--trade-dark)]/30 ' +
-      (isSelected
-        ? 'bg-[var(--trade-accent-blue)]/15 border-l-2 border-l-[var(--trade-accent-blue)]'
-        : 'border-l-2 border-l-transparent');
+      'flex w-full items-center justify-between border-b border-[var(--trade-border)] px-3 py-2.5 text-left text-sm transition-colors hover:bg-[var(--trade-dark)]/30 cursor-pointer border-l-2 border-l-transparent';
 
     const inner = (
       <>
-        <div>
-          <div className="font-bold">{symbol}</div>
-          <div className="text-[10px] text-[var(--trade-text-muted)]">{name}</div>
+        <div className="flex items-center gap-2">
+          <div className="flex -space-x-1">
+            <span
+              className={`flex size-4 items-center justify-center rounded-full border border-[var(--trade-border)] bg-[var(--trade-panel)] ${isPair ? 'text-[8px]' : 'text-[10px] font-bold'}`}
+            >
+              {flagBase}
+            </span>
+            {isPair && (
+              <span className="flex size-4 items-center justify-center rounded-full border border-[var(--trade-border)] bg-[var(--trade-panel)] text-[8px]">
+                {flagQuote}
+              </span>
+            )}
+          </div>
+          <div>
+            <div className="text-sm font-bold">{symbol}</div>
+            <div className="text-[10px] text-[var(--trade-text-muted)]">{name}</div>
+          </div>
         </div>
-        <div className="flex flex-col items-end">
-          <span className="font-mono text-sm">
-            {price >= 1 ? price.toFixed(5) : price.toFixed(3)}
-          </span>
+        <div className="flex flex-col items-end gap-0.5">
+          <span className="font-mono text-sm">{formatPrice(price)}</span>
+          <IconStar className="size-3 text-[var(--trade-text-muted)]" />
         </div>
       </>
     );
 
     if (noNavigation) {
       return (
-        <button key={id} type="button" onClick={() => onSelectSymbol(id, market)} className={rowBase}>
+        <button key={id} type="button" onClick={handleClick} className={rowBase}>
           {inner}
         </button>
       );
@@ -86,7 +163,7 @@ export function TradingRoomSidebar({
         href={`/trading-view-room-trading?pk=${encodeURIComponent(id)}`}
         onClick={(e) => {
           e.preventDefault();
-          onSelectSymbol(id, market);
+          handleClick();
         }}
         className={rowBase}
       >
@@ -157,15 +234,6 @@ export function TradingRoomSidebar({
             })}
           </div>
         </ScrollArea>
-      </div>
-
-      {/* Order panel - expanded for selected symbol */}
-      <div className="shrink-0 border-t border-[var(--trade-border)] p-3">
-        <TradingRoomOrderPanel
-          market={selectedMarket}
-          onMarketOrder={onMarketOrder}
-          disabled={guestMode}
-        />
       </div>
 
       {/* Bottom: News/Calendar icons (minimal) */}

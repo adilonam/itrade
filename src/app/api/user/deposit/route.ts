@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { amount, paymentMethod, paymentDetails } = body;
+    const { amount, paymentMethod } = body;
 
     // Validate input
     if (!amount || amount <= 0) {
@@ -122,8 +122,7 @@ export async function POST(request: NextRequest) {
       transaction: result.transaction,
       newBalance: result.newBalance
     });
-  } catch (error) {
-    console.error('Deposit error:', error);
+  } catch {
     return NextResponse.json(
       { error: 'Failed to process deposit' },
       { status: 500 }

@@ -379,12 +379,20 @@ export function InvestmentDetails({
                 Auto-Reinvestment Available
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className='space-y-3'>
               <p className='text-muted-foreground text-xs'>
                 This investment supports automatic reinvestment of returns. When
                 enabled, your returns will be automatically reinvested at the
                 end of each term.
               </p>
+              <div className='flex items-center justify-between'>
+                <Label htmlFor='auto-reinvest'>Enable auto-reinvestment</Label>
+                <Switch
+                  id='auto-reinvest'
+                  checked={autoReinvest}
+                  onCheckedChange={setAutoReinvest}
+                />
+              </div>
             </CardContent>
           </Card>
         )}

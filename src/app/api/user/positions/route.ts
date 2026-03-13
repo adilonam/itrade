@@ -564,7 +564,6 @@ export async function POST(request: NextRequest) {
 
         // Check if user can open this position
         const positionCheck = await couldOpenPosition(tempPosition as any);
-        console.log('positionCheck', positionCheck);
 
         if (!positionCheck || !positionCheck.canOpen) {
           // User cannot open position, create with FAILED status

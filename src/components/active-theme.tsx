@@ -9,14 +9,7 @@ import {
 } from 'react';
 import { useSession } from 'next-auth/react';
 
-const COOKIE_NAME = 'active_theme';
 const DEFAULT_THEME = 'match-trader';
-
-function setThemeCookie(theme: string) {
-  if (typeof window === 'undefined') return;
-
-  document.cookie = `${COOKIE_NAME}=${theme}; path=/; max-age=31536000; SameSite=Lax; ${window.location.protocol === 'https:' ? 'Secure;' : ''}`;
-}
 
 type ThemeContextType = {
   activeTheme: string;
@@ -33,7 +26,7 @@ export function ActiveThemeProvider({
   children: ReactNode;
   initialTheme?: string;
 }) {
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   const [activeTheme, setActiveThemeState] = useState<string>(
     () => initialTheme || DEFAULT_THEME
   );
@@ -51,8 +44,7 @@ export function ActiveThemeProvider({
           // Fallback to initial theme or default
           setActiveThemeState(initialTheme || DEFAULT_THEME);
         }
-      } catch (error) {
-        console.error('Failed to load global theme settings:', error);
+      } catch {
         // Fallback to initial theme or default
         setActiveThemeState(initialTheme || DEFAULT_THEME);
       }
@@ -60,7 +52,7 @@ export function ActiveThemeProvider({
     };
 
     loadGlobalTheme();
-  }, []); // Only run once on mount
+  }, [initialTheme]); // eslint-disable-line react-hooks/exhaustive-deps -- run once on mount
 
   const setActiveTheme = async (theme: string) => {
     setActiveThemeState(theme);
@@ -75,16 +67,11 @@ export function ActiveThemeProvider({
           },
           body: JSON.stringify({ themeColor: theme })
         });
-      } catch (error) {
-        console.error('Failed to save global theme settings:', error);
+      } catch {
+        // Failed to save - theme stays in local state
       }
-    } else {
-      // For non-super-admin users, just update local state (no persistence)
-      // The theme will revert to global setting on page refresh
-      console.log(
-        'Theme change is temporary - only super-admins can save global themes'
-      );
     }
+    // For non-super-admin users, theme change is temporary (reverts on refresh)
   };
 
   useEffect(() => {

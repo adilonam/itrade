@@ -64,7 +64,7 @@ export function TradingMarketsView({
     if (markets.length === 0) {
       loadMarkets();
     }
-  }, [markets.length]);
+  }, [markets.length, updateMarkets]);
 
   const filteredMarkets = useMemo(() => {
     let filtered = markets;

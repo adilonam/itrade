@@ -29,11 +29,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger
 } from '@/components/ui/alert-dialog';
-import { DataTable } from '@/components/ui/table/data-table';
-import { DataTableToolbar } from '@/components/ui/table/data-table-toolbar';
-import { DataTablePagination } from '@/components/ui/table/data-table-pagination';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
-import { flexRender, type Table as TanstackTable } from '@tanstack/react-table';
 import type { Market, Position } from '@/lib/prisma/generated/client';
 import { useMarketsWebSocket } from '@/contexts/markets-websocket-context';
 import { calculatePnLClient } from '@/lib/calculator-client';
@@ -60,8 +56,7 @@ export function UserPositionsTableRoomTrading({
   positions,
   loading,
   onClose,
-  onUpdateRealTimePnL,
-  realTimePnL = {}
+  onUpdateRealTimePnL
 }: UserPositionsTableRoomTradingProps) {
   const [closingPositionId, setClosingPositionId] = useState<string | null>(
     null

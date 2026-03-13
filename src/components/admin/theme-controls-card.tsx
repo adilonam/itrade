@@ -41,8 +41,8 @@ export function ThemeControlsCard() {
           setReducedMotion(data.reducedMotion || false);
           setHighContrast(data.highContrast || false);
         }
-      } catch (error) {
-        console.error('Failed to load user theme settings:', error);
+      } catch {
+        // Failed to load - use defaults
       } finally {
         setIsLoading(false);
       }
@@ -68,8 +68,7 @@ export function ThemeControlsCard() {
       }
 
       toast.success('Theme setting updated successfully');
-    } catch (error) {
-      console.error('Failed to update theme setting:', error);
+    } catch {
       toast.error('Failed to update theme setting');
 
       // Revert the state on error

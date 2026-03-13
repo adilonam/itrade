@@ -15,7 +15,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Icons } from '@/components/icons';
 import { toast } from 'sonner';
 import {
   IconBrandPaypal,
@@ -114,8 +113,8 @@ export default function WithdrawPage() {
           // Use freeMargin as the available balance for withdrawal
           setUserBalance(data.freeMargin);
         }
-      } catch (error) {
-        console.error('Error fetching financial data:', error);
+      } catch {
+        // Failed to fetch financial data
       }
     };
 
@@ -210,8 +209,7 @@ export default function WithdrawPage() {
           data.error || 'Failed to process withdrawal. Please try again.'
         );
       }
-    } catch (error) {
-      console.error('Withdrawal error:', error);
+    } catch {
       toast.error('An unexpected error occurred. Please try again.');
     } finally {
       setIsLoading(false);

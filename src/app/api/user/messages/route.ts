@@ -123,8 +123,7 @@ export async function GET(request: NextRequest) {
         pages: Math.ceil(total / limit)
       }
     });
-  } catch (error) {
-    console.error('Error fetching user messages:', error);
+  } catch {
     return NextResponse.json(
       { error: 'Failed to fetch messages' },
       { status: 500 }
@@ -194,8 +193,7 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json({ message: newMessage }, { status: 201 });
-  } catch (error) {
-    console.error('Error creating message:', error);
+  } catch {
     return NextResponse.json(
       { error: 'Failed to create message' },
       { status: 500 }

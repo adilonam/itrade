@@ -7,8 +7,7 @@ import type { TwelveDataWebSocketPriceData } from '@/types/twelvedata';
 import {
   IconTrendingUp,
   IconTrendingDown,
-  IconWifi,
-  IconWifiOff
+  IconWifi
 } from '@tabler/icons-react';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';

@@ -3,15 +3,10 @@
 import PageContainer from '@/components/layout/page-container';
 import { Heading } from '@/components/ui/heading';
 import { Separator } from '@/components/ui/separator';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-  MOCK_MY_BOTS,
-  MOCK_BOT_POSITIONS,
-  type MyBotItem,
-  type BotPositionItem
-} from '@/constants/bot-trading-mock';
+import { MOCK_MY_BOTS, MOCK_BOT_POSITIONS } from '@/constants/bot-trading-mock';
 import {
   IconRobot,
   IconPlayerPlay,
@@ -54,15 +49,6 @@ const STRATEGY_ICON: Record<string, React.ReactNode> = {
 };
 
 export default function MyBotsPage() {
-  const positionsByBot = MOCK_BOT_POSITIONS.reduce(
-    (acc, pos) => {
-      if (!acc[pos.myBotId]) acc[pos.myBotId] = [];
-      acc[pos.myBotId].push(pos);
-      return acc;
-    },
-    {} as Record<string, BotPositionItem[]>
-  );
-
   return (
     <PageContainer scrollable={true}>
       <div className='flex flex-1 flex-col space-y-8'>

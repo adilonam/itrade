@@ -96,13 +96,11 @@ export async function calculateRequiredMargin(
   try {
     // Validate inputs
     if (!position || !position.user) {
-      console.warn('Position or user is missing for margin calculation');
       return null;
     }
 
     // Always use executedPrice as the position price
     if (!position.executedPrice || position.executedPrice <= 0) {
-      console.warn(`No valid executed price for position ${position.id}`);
       return null;
     }
 
@@ -123,18 +121,8 @@ export async function calculateRequiredMargin(
       position.market.room === 'STOCK' ? 1 : position.user.leverage || 1;
     const requiredMargin = positionValue / leverage;
 
-    console.log(`Calculated required margin for position ${position.id}:`, {
-      positionValue,
-      leverage,
-      requiredMargin,
-      positionPrice,
-      quantity: position.quantity,
-      lotSize
-    });
-
     return requiredMargin;
-  } catch (error) {
-    console.error('Error calculating required margin:', error);
+  } catch {
     return null;
   }
 }
@@ -157,18 +145,15 @@ export function calculateLotSizeFromMargin(
   try {
     // Validate inputs
     if (!market || !user) {
-      console.warn('Market or user is missing for lot size calculation');
       return null;
     }
 
     if (!requiredMargin || requiredMargin <= 0) {
-      console.warn('Required margin must be greater than 0');
       return null;
     }
 
     // Use lastPrice from market as the position price
     if (!market.lastPrice || market.lastPrice <= 0) {
-      console.warn(`No valid price for market ${market.symbol}`);
       return null;
     }
 
@@ -186,20 +171,8 @@ export function calculateLotSizeFromMargin(
     // Formula: quantity = (requiredMargin * leverage) / (price * lotSize)
     const quantity = (requiredMargin * leverage) / (price * lotSize);
 
-    console.log(
-      `Calculated lot size from margin for market ${market.symbol}:`,
-      {
-        requiredMargin,
-        leverage,
-        price,
-        lotSize,
-        quantity
-      }
-    );
-
     return quantity;
-  } catch (error) {
-    console.error('Error calculating lot size from margin:', error);
+  } catch {
     return null;
   }
 }

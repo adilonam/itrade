@@ -1,12 +1,6 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  IconTrendingUp,
-  IconTrendingDown,
-  IconChartBar,
-  IconArrowsExchange
-} from '@tabler/icons-react';
 
 interface Position {
   id: string;

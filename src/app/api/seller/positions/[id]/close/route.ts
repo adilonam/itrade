@@ -221,8 +221,7 @@ export async function PATCH(
       position: closedPosition,
       message: 'Position closed successfully'
     });
-  } catch (error) {
-    console.error('Close seller position error:', error);
+  } catch {
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

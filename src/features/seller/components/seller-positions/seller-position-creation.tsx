@@ -229,8 +229,7 @@ export function SellerPositionCreation({
           );
           setCalculatedLotSize(lotSize);
         }
-      } catch (error) {
-        console.error('Error calculating:', error);
+      } catch {
         setCalculatedLotSize(null);
         setRequiredMargin(null);
       }

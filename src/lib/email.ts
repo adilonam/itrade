@@ -35,14 +35,8 @@ export const sendEmail = async (options: EmailOptions) => {
     };
 
     const info = await transporter.sendMail(mailOptions);
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Email sent successfully:', info.messageId);
-    }
     return { success: true, messageId: info.messageId };
   } catch (error) {
-    if (process.env.NODE_ENV === 'development') {
-      console.error('Error sending email:', error);
-    }
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error'
@@ -57,10 +51,8 @@ export const cleanupExpiredMfaChallenges = async () => {
         expiresAt: { lt: new Date() }
       }
     });
-  } catch (error) {
-    if (process.env.NODE_ENV === 'development') {
-      console.error('Error cleaning up expired MFA challenges:', error);
-    }
+  } catch {
+    // Silently ignore cleanup errors
   }
 };
 

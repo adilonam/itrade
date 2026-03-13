@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { SellerMessagesTable } from './seller-messages/seller-messages-table';
 import { SellerMessageCreation } from './seller-messages/seller-message-creation';
-import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { IconRefresh, IconPlus } from '@tabler/icons-react';
 import { useSession } from 'next-auth/react';
@@ -61,11 +60,11 @@ export default function SellerMessagesListing() {
 
       const data = await response.json();
       setMessages(data.messages || []);
-      setPagination({
-        ...pagination,
+      setPagination((p) => ({
+        ...p,
         total: data.pagination?.total || 0,
         pages: data.pagination?.pages || 0
-      });
+      }));
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : 'Failed to load messages'

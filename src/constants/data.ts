@@ -25,7 +25,7 @@ export const tenantNavItems: TenantNavItems = {
   'Room Trading': {
     USER: [
       {
-        title: 'Dashboard',
+        title: 'Trade',
         url: '/trade',
         icon: 'dashboard',
         isActive: false,
@@ -50,7 +50,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Dashboard',
-        url: '/dashboard',
+        url: '/overview',
         icon: 'dashboard',
         isActive: false,
         shortcut: ['n', 'w'],
@@ -68,7 +68,7 @@ export const tenantNavItems: TenantNavItems = {
     ],
     SELLER: [
       {
-        title: 'Dashboard',
+        title: 'Trade',
         url: '/trade',
         icon: 'dashboard',
         isActive: false,
@@ -92,7 +92,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'Dashboard',
+        title: 'Overview',
         url: '/dashboard',
         icon: 'dashboard',
         isActive: false,
@@ -110,7 +110,7 @@ export const tenantNavItems: TenantNavItems = {
     ],
     ADMIN: [
       {
-        title: 'Dashboard',
+          title: 'Trade',
         url: '/trade',
         icon: 'dashboard',
         isActive: false,
@@ -142,7 +142,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'Dashboard',
+        title: 'Trade',
         url: '/dashboard',
         icon: 'dashboard',
         isActive: false,
@@ -184,7 +184,7 @@ export const tenantNavItems: TenantNavItems = {
     ],
     SUPERADMIN: [
       {
-        title: 'Dashboard',
+        title: 'Trade',
         url: '/trade',
         icon: 'dashboard',
         isActive: false,
@@ -217,7 +217,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Dashboard',
-        url: '/dashboard',
+        url: '/overview',
         icon: 'dashboard',
         isActive: false,
         shortcut: ['n', 'w'],

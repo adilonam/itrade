@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { amount, withdrawMethod, withdrawDetails } = body;
+    const { amount, withdrawMethod } = body;
 
     // Validate input
     if (!amount || amount <= 0) {

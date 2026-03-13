@@ -80,9 +80,10 @@ const CustomTooltip = ({ active, payload }: any) => {
 
 export function PortfolioBarChart({
   positions,
-  realTimePrices,
+  realTimePrices: _realTimePrices,
   loading = false
 }: PortfolioBarChartProps) {
+  void _realTimePrices; // Reserved for real-time price integration
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -159,7 +160,7 @@ export function PortfolioBarChart({
       .sort((a, b) => b.value - a.value); // Sort by value descending
 
     return chartData;
-  }, [positions, realTimePrices]);
+  }, [positions]);
 
   if (loading) {
     return (
@@ -246,7 +247,7 @@ export function PortfolioBarChart({
                   paddingTop: '12px',
                   fontSize: isMobile ? '11px' : '12px'
                 }}
-                formatter={(value) => 'Portfolio Value'}
+                formatter={() => 'Portfolio Value'}
               />
               <Bar dataKey='value' name='Value ($)' radius={[8, 8, 0, 0]}>
                 {portfolioData.map((entry, index) => (

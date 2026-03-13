@@ -129,8 +129,7 @@ export async function GET(request: NextRequest) {
         pages: Math.ceil(total / limit)
       }
     });
-  } catch (error) {
-    console.error('Error fetching transactions:', error);
+  } catch {
     return NextResponse.json(
       { error: 'Failed to fetch transactions' },
       { status: 500 }

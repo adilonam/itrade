@@ -3,12 +3,10 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { SidebarTrigger } from '../ui/sidebar';
 import { Separator } from '../ui/separator';
 import { Breadcrumbs } from '../breadcrumbs';
-import SearchInput from '../search-input';
 import { UserNav } from './user-nav';
 import { ModeToggle } from './ThemeToggle/theme-toggle';
 import { useSession } from 'next-auth/react';
-import { Badge } from '../ui/badge';
-import { Wallet } from 'lucide-react';
+import { IconWallet } from '@tabler/icons-react';
 
 interface FinancialData {
   balance: number;
@@ -66,24 +64,34 @@ export default function Header({
   }, [loadFinancialData, session?.user]);
 
   const headerActions = (
-    <div className='flex items-center gap-2 px-4'>
+    <div className='flex items-center gap-0 rounded-lg border border-border bg-muted/50 px-1 py-0.5 dark:bg-muted/30'>
       {session?.user && financialData && (
-        <Badge
-          variant='outline'
-          className={`hidden items-center gap-1 px-3 py-1 sm:flex ${
-            financialData.freeMargin >= 0
-              ? 'border-green-200 bg-green-50 text-green-700 hover:bg-green-100'
-              : 'border-red-200 bg-red-50 text-red-700 hover:bg-red-100'
-          }`}
-        >
-          <Wallet className='h-3 w-3' />
-          <span className='text-xs font-medium'>
-            ${financialData.freeMargin.toFixed(2)}
-          </span>
-        </Badge>
+        <>
+          <div
+            className='hidden select-text items-center gap-1.5 px-3 py-1.5 sm:flex'
+            title='Free margin'
+          >
+            <IconWallet className='text-muted-foreground size-3.5 shrink-0' />
+            <span
+              className={`font-mono text-sm font-bold tabular-nums ${
+                financialData.freeMargin >= 0
+                  ? 'text-emerald-600 dark:text-emerald-400'
+                  : 'text-destructive'
+              }`}
+            >
+              ${financialData.freeMargin.toFixed(2)}
+            </span>
+          </div>
+          <Separator orientation='vertical' className='mx-0.5 h-5' />
+        </>
       )}
-      <ModeToggle />
-      <UserNav />
+      <div className='flex items-center'>
+        <ModeToggle />
+      </div>
+      <Separator orientation='vertical' className='mx-0.5 h-5' />
+      <div className='flex items-center pr-0.5'>
+        <UserNav />
+      </div>
     </div>
   );
 

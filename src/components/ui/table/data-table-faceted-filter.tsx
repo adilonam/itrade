@@ -48,15 +48,14 @@ export function DataTableFacetedFilter<TData, TValue>({
   const isDeferred =
     pendingValues !== undefined && setPendingValues !== undefined;
   const columnFilterValue = column?.getFilterValue();
-  const sourceValues = isDeferred
-    ? pendingValues
-    : Array.isArray(columnFilterValue)
-      ? columnFilterValue
-      : [];
-  const selectedValues = React.useMemo(
-    () => new Set(sourceValues),
-    [sourceValues]
-  );
+  const selectedValues = React.useMemo(() => {
+    const sourceValues = isDeferred
+      ? pendingValues ?? []
+      : Array.isArray(columnFilterValue)
+        ? columnFilterValue
+        : [];
+    return new Set(sourceValues);
+  }, [isDeferred, pendingValues, columnFilterValue]);
 
   const onItemSelect = React.useCallback(
     (option: Option, isSelected: boolean) => {

@@ -115,8 +115,7 @@ export async function GET(
     }
 
     return NextResponse.json(position);
-  } catch (error) {
-    console.error('Error fetching position:', error);
+  } catch {
     return NextResponse.json(
       { error: 'Failed to fetch position' },
       { status: 500 }
@@ -241,8 +240,7 @@ export async function PUT(
     });
 
     return NextResponse.json(result);
-  } catch (error) {
-    console.error('Error updating position:', error);
+  } catch {
     return NextResponse.json(
       { error: 'Failed to update position' },
       { status: 500 }
@@ -273,8 +271,7 @@ export async function DELETE(
     });
 
     return NextResponse.json({ message: 'Position deleted successfully' });
-  } catch (error) {
-    console.error('Error deleting position:', error);
+  } catch {
     return NextResponse.json(
       { error: 'Failed to delete position' },
       { status: 500 }

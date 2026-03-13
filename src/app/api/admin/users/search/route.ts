@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const { email, excludeSellerId } = validation.data;
+    const { email } = validation.data;
 
     // Build where clause - only show users not linked to any seller
     const where: any = {

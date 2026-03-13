@@ -311,8 +311,7 @@ export async function GET(request: NextRequest) {
         pages: Math.ceil(total / limit)
       }
     });
-  } catch (error) {
-    console.error('Error fetching positions:', error);
+  } catch {
     return NextResponse.json(
       { error: 'Failed to fetch positions' },
       { status: 500 }
@@ -413,8 +412,7 @@ export async function POST(request: NextRequest) {
     };
 
     return NextResponse.json(response, { status: 201 });
-  } catch (error) {
-    console.error('Error creating position:', error);
+  } catch {
     return NextResponse.json(
       { error: 'Failed to create position' },
       { status: 500 }

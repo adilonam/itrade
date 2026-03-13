@@ -46,7 +46,6 @@ type PositionWithRelations = Position & {
 import {
   IconEdit,
   IconTrash,
-  IconEye,
   IconTrendingUp,
   IconTrendingDown
 } from '@tabler/icons-react';
@@ -123,8 +122,8 @@ export function PositionsTable({
       }
 
       onDelete();
-    } catch (error) {
-      console.error('Error deleting position:', error);
+    } catch {
+      // Error handled via onDelete callback
     } finally {
       setDeletingId(null);
     }

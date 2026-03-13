@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
   Card,
   CardContent,
@@ -70,8 +70,7 @@ export function UserThemeManagement() {
       } else {
         toast.error('Failed to search users');
       }
-    } catch (error) {
-      console.error('Failed to search users:', error);
+    } catch {
       toast.error('Failed to search users');
     } finally {
       setIsLoadingUsers(false);
@@ -96,8 +95,7 @@ export function UserThemeManagement() {
       } else {
         toast.error('Failed to load user settings');
       }
-    } catch (error) {
-      console.error('Failed to load user settings:', error);
+    } catch {
       toast.error('Failed to load user settings');
     } finally {
       setIsLoading(false);
@@ -126,8 +124,7 @@ export function UserThemeManagement() {
       } else {
         toast.error('Failed to update user settings');
       }
-    } catch (error) {
-      console.error('Failed to update user settings:', error);
+    } catch {
       toast.error('Failed to update user settings');
     }
   };

@@ -39,8 +39,7 @@ export async function GET() {
       reducedMotion: user.reducedMotion || false,
       highContrast: user.highContrast || false
     });
-  } catch (error) {
-    console.error('Error fetching user theme settings:', error);
+  } catch {
     return NextResponse.json(
       { error: 'Failed to fetch theme settings' },
       { status: 500 }
@@ -84,7 +83,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.error('Error updating user theme settings:', error);
     return NextResponse.json(
       { error: 'Failed to update theme settings' },
       { status: 500 }

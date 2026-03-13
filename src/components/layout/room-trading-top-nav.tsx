@@ -24,7 +24,7 @@ export function RoomTradingTopNav() {
     <nav className="flex items-center gap-1">
       <div
         role="tablist"
-        className="inline-flex h-8 w-fit items-center justify-center gap-1 rounded-full bg-muted/50 p-1"
+        className="inline-flex h-9 w-fit items-center justify-center gap-0.5 rounded-lg border border-border bg-muted/60 p-1 dark:bg-muted/40"
       >
         {roomTradingNav.map((item) => {
           const isActive =
@@ -41,11 +41,10 @@ export function RoomTradingTopNav() {
               key={item.url}
               href={item.url}
               className={cn(
-                'rounded-full border-0 px-3 py-1.5 text-sm font-medium transition-all duration-200',
-                'hover:bg-muted/70',
+                'rounded-md border-0 px-3 py-1.5 text-sm font-medium transition-all duration-200',
                 isActive
                   ? 'bg-primary text-primary-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
+                  : 'text-muted-foreground hover:bg-accent/80 hover:text-foreground dark:hover:bg-accent dark:hover:text-accent-foreground'
               )}
             >
               {item.title}

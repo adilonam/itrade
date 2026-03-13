@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { UserTransactionsTable } from './user-transactions/user-transactions-table';
-import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -74,11 +73,11 @@ function UserTransactionsListingContent() {
 
       const data = await response.json();
       setTransactions(data.transactions || []);
-      setPagination({
-        ...pagination,
+      setPagination((p) => ({
+        ...p,
         total: data.pagination?.total || 0,
         pages: data.pagination?.pages || 0
-      });
+      }));
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : 'Failed to load transactions'

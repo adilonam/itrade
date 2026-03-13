@@ -53,8 +53,7 @@ export function SellerInvestmentCreation({
   const [userEmailFilter, setUserEmailFilter] = useState('');
   const [investmentFilter, setInvestmentFilter] = useState('');
   const [debouncedUserFilter, setDebouncedUserFilter] = useState('');
-  const [debouncedInvestmentFilter, setDebouncedInvestmentFilter] =
-    useState('');
+  const [, setDebouncedInvestmentFilter] = useState('');
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [loadingInvestments, setLoadingInvestments] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState('');

@@ -60,6 +60,7 @@ export async function POST(request: NextRequest) {
       }
     });
 
+    // eslint-disable-next-line no-console -- intentional logging for cron job monitoring
     console.log(
       `Found ${maturedInvestments.length} matured investments to process`
     );
@@ -126,8 +127,9 @@ export async function POST(request: NextRequest) {
                   userInvestment.amount
               )
             }
-          });
+          }          );
 
+          // eslint-disable-next-line no-console -- intentional logging for cron job monitoring
           console.log(
             `Completed investment ${userInvestment.id} for user ${userInvestment.userId}: ` +
               `Principal: ${userInvestment.amount}, Return: ${userInvestment.expectedReturn}, Total: ${totalReturn}`
@@ -141,10 +143,12 @@ export async function POST(request: NextRequest) {
           error instanceof Error ? error.message : 'Unknown error'
         }`;
         errors.push(errorMessage);
+        // eslint-disable-next-line no-console -- intentional error logging for cron job
         console.error(errorMessage);
       }
     }
 
+    // eslint-disable-next-line no-console -- intentional logging for cron job monitoring
     console.log(
       `Investment maturity processing completed: ${completedCount} completed, ${failedCount} failed`
     );
@@ -157,6 +161,7 @@ export async function POST(request: NextRequest) {
       errors: errors.length > 0 ? errors : undefined
     });
   } catch (error) {
+    // eslint-disable-next-line no-console -- intentional error logging in API route
     console.error('Error in mature-investments schedule:', error);
     return NextResponse.json(
       {

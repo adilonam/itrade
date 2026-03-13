@@ -12,6 +12,7 @@ export async function GET() {
       highContrast: (settings as any)?.highContrast || false
     });
   } catch (error) {
+    // eslint-disable-next-line no-console -- intentional error logging in API route
     console.error('Failed to fetch global theme settings:', error);
     return NextResponse.json(
       { error: 'Failed to fetch theme settings' },

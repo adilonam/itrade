@@ -81,11 +81,11 @@ export default function SellerPositionsListing() {
 
       const data = await response.json();
       setPositions(data.positions || []);
-      setPagination({
-        ...pagination,
+      setPagination((p) => ({
+        ...p,
         total: data.pagination?.total || 0,
         pages: data.pagination?.pages || 0
-      });
+      }));
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : 'Failed to load positions'

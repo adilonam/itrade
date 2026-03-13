@@ -15,7 +15,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Icons } from '@/components/icons';
 import { toast } from 'sonner';
 import {
   IconCreditCard,
@@ -38,7 +37,7 @@ interface PaypalDetails {
 
 export default function DepositPage() {
   const router = useRouter();
-  const { data: session } = useSession();
+  useSession();
   const [amount, setAmount] = useState('');
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('card');
   const [isLoading, setIsLoading] = useState(false);
@@ -119,8 +118,7 @@ export default function DepositPage() {
           data.error || 'Failed to process deposit. Please try again.'
         );
       }
-    } catch (error) {
-      console.error('Deposit error:', error);
+    } catch {
       toast.error('An unexpected error occurred. Please try again.');
     } finally {
       setIsLoading(false);

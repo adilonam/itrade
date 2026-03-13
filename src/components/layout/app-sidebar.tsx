@@ -34,10 +34,8 @@ import { useMediaQuery } from '@/hooks/use-media-query';
 import { NavItem } from '@/types';
 import { useSession, signOut } from 'next-auth/react';
 import {
-  IconBell,
   IconChevronRight,
   IconChevronsDown,
-  IconCreditCard,
   IconLogout,
   IconPhotoUp,
   IconUserCircle

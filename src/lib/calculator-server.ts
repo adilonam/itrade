@@ -48,9 +48,6 @@ export async function calculatePositionPnL(
     // Use executed price from position (don't change it)
     const executedPrice = position.executedPrice;
     if (!executedPrice || executedPrice <= 0) {
-      console.warn(
-        `No valid executed price for position ${position.market.symbol}`
-      );
       return null;
     }
 
@@ -76,18 +73,12 @@ export async function calculatePositionPnL(
         // Use ask price for BUY, bid price for SELL
         currentPrice = position.type === 'BUY' ? bidPrice : askPrice ;
       } else {
-        console.warn(
-          `Unable to refresh market data for ${position.market.symbol}`
-        );
         return null;
       }
     }
 
     // If we can't get current price, return null
     if (currentPrice === null) {
-      console.warn(
-        `Unable to calculate PnL for ${position.market.symbol}: missing current price`
-      );
       return null;
     }
 
@@ -109,12 +100,8 @@ export async function calculatePositionPnL(
       return null;
     }
 
-    console.log(
-      `Calculated PnL for ${position.type} ${position.market.symbol}: ${pnl.toFixed(2)} (Exec: ${executedPrice}, Current: ${currentPrice}, Qty: ${quantity})`
-    );
     return pnl;
-  } catch (error) {
-    console.error('Error calculating PnL:', error);
+  } catch {
     return null;
   }
 }
@@ -185,12 +172,10 @@ export async function refreshSaveMarkets(
       // Use provided markets directly
       marketsToRefresh = markets;
     } else {
-      console.warn('No markets provided and refreshAll is false');
       return null;
     }
 
     if (marketsToRefresh.length === 0) {
-      console.warn('No markets found to refresh');
       return [];
     }
 
@@ -204,10 +189,6 @@ export async function refreshSaveMarkets(
           );
 
           if ('error' in marketData) {
-            console.warn(
-              `Failed to refresh market ${market.symbol}:`,
-              marketData.error
-            );
             return market; // Return original market if API fails
           }
 
@@ -224,16 +205,14 @@ export async function refreshSaveMarkets(
           });
 
           return updatedMarket;
-        } catch (error) {
-          console.error(`Error refreshing market ${market.symbol}:`, error);
+        } catch {
           return market; // Return original market if refresh fails
         }
       })
     );
 
     return refreshedMarkets;
-  } catch (error) {
-    console.error('Error refreshing markets:', error);
+  } catch {
     return null;
   }
 }
@@ -249,13 +228,11 @@ export async function calculateRequiredMargin(
   try {
     // Validate inputs
     if (!position || !position.user) {
-      console.warn('Position or user is missing for margin calculation');
       return null;
     }
 
     // Always use executedPrice as the position price
     if (!position.executedPrice || position.executedPrice <= 0) {
-      console.warn(`No valid executed price for position ${position.id}`);
       return null;
     }
 
@@ -276,18 +253,8 @@ export async function calculateRequiredMargin(
       position.market.room === 'STOCK' ? 1 : position.user.leverage || 1;
     const requiredMargin = positionValue / leverage;
 
-    console.log(`Calculated required margin for position ${position.id}:`, {
-      positionValue,
-      leverage,
-      requiredMargin,
-      positionPrice,
-      quantity: position.quantity,
-      lotSize
-    });
-
     return requiredMargin;
-  } catch (error) {
-    console.error('Error calculating required margin:', error);
+  } catch {
     return null;
   }
 }
@@ -312,8 +279,6 @@ export async function calculateUserFinancialInfo(
 } | null> {
   try {
     if (!user) {
-      // eslint-disable-next-line no-console
-      console.warn('User object is null or undefined');
       return null;
     }
 
@@ -411,9 +376,7 @@ export async function calculateUserFinancialInfo(
       totalPnL: Number(totalPnL.toFixed(2)),
       leverage: user.leverage
     };
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('Error calculating user financial info:', error);
+  } catch {
     return null;
   }
 }
@@ -463,7 +426,6 @@ export async function couldOpenPosition(
     // Refresh market data for all positions
     const refreshedMarkets = await refreshSaveMarkets(markets);
     if (!refreshedMarkets) {
-      console.warn('Failed to refresh market data for position calculation');
       return null;
     }
 
@@ -512,17 +474,10 @@ export async function couldOpenPosition(
 
     // Calculate free margin: balance + total PnL - total required margin
     const freeMargin = user.balance + totalPnL - totalRequiredMargin;
-    console.log('freeMargin', freeMargin);
-    console.log('user.balance', user.balance);
-    console.log('totalPnL', totalPnL);
-    console.log('totalRequiredMargin', totalRequiredMargin);
 
     // Calculate required margin for the new position
     const newPositionRequiredMargin = await calculateRequiredMargin(position);
     if (newPositionRequiredMargin === null) {
-      console.warn(
-        `Could not calculate required margin for new position ${position.id}`
-      );
       return null;
     }
 
@@ -535,17 +490,6 @@ export async function couldOpenPosition(
     const effectiveLeverage =
       position.market.room === 'STOCK' ? 1 : user.leverage || 1;
 
-    console.log(`Position opening check for user ${user.id}:`, {
-      canOpen,
-      freeMargin,
-      totalPnL,
-      totalRequiredMargin,
-      newPositionRequiredMargin,
-      leverage: effectiveLeverage,
-      marketRoom: position.market.room,
-      userBalance: user.balance
-    });
-
     return {
       canOpen,
       freeMargin,
@@ -554,8 +498,7 @@ export async function couldOpenPosition(
       newPositionRequiredMargin,
       leverage: effectiveLeverage
     };
-  } catch (error) {
-    console.error('Error checking if position can be opened:', error);
+  } catch {
     return null;
   }
 }

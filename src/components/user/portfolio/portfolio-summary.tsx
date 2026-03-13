@@ -122,12 +122,6 @@ export function PortfolioSummary({
       }
 
       const quantity = Number(position.quantity) || 0;
-      const realTimeData = realTimePrices.get(marketSymbol);
-      const currentPrice =
-        realTimeData?.price ||
-        position.market?.lastPrice ||
-        position.executedPrice ||
-        0;
       const value = position.requiredMargin || 0;
       const pnl =
         realTimePnL[position.id] !== undefined
@@ -141,7 +135,7 @@ export function PortfolioSummary({
     });
 
     return Object.values(groups);
-  }, [placedPositions, realTimePrices, realTimePnL]);
+  }, [placedPositions, realTimePnL]);
 
   const toggleGroup = (symbol: string) => {
     setExpandedGroups((prev) => {

@@ -194,17 +194,9 @@ export async function PATCH(
           positionWithClosedPrice as Position & { market: Market }
         );
 
-        if (calculatedPnL !== null) {
-          console.log(
-            `Calculated P&L for position ${id}: ${calculatedPnL.toFixed(2)}`
-          );
-        } else {
-          console.warn(`Unable to calculate P&L for position ${id}`);
-        }
+        // calculatedPnL set above when refresh succeeded
       } else {
-        console.warn(
-          `Unable to refresh market data for ${existingPosition.market.symbol}`
-        );
+        // Unable to refresh market data - calculatedPnL remains null
       }
     }
 
@@ -341,8 +333,7 @@ export async function PATCH(
     });
 
     return NextResponse.json(result);
-  } catch (error) {
-    console.error('Error closing position:', error);
+  } catch {
     return NextResponse.json(
       { error: 'Failed to close position' },
       { status: 500 }

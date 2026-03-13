@@ -132,8 +132,7 @@ export function TradingActionsRoomTrading({
           );
           setCalculatedLotSize(lotSize);
         }
-      } catch (error) {
-        console.error('Error calculating lot size and margin:', error);
+      } catch {
         setCalculatedLotSize(null);
         setRequiredMargin(null);
       }

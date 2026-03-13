@@ -8,7 +8,6 @@ import {
   XAxis,
   YAxis,
   Tooltip,
-  Legend,
   Pie,
   PieChart,
   Cell
@@ -89,7 +88,7 @@ export function DashboardCharts({
   };
 
   const positionTypeData = Object.entries(positionsByType)
-    .filter(([_, count]) => count > 0)
+    .filter(([, count]) => count > 0)
     .map(([type, count]) => ({
       name: type,
       value: count

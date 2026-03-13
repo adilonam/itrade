@@ -26,8 +26,8 @@ export function ModeToggle() {
             },
             body: JSON.stringify({ themeMode: newMode })
           });
-        } catch (error) {
-          console.error('Failed to save theme mode:', error);
+        } catch {
+          // Best-effort; theme still toggles locally
         }
       }
 

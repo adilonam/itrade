@@ -67,7 +67,7 @@ export function StockMarketsView({
     if (markets.length === 0) {
       loadMarkets();
     }
-  }, [markets.length]); // Include dependencies to satisfy linter
+  }, [markets.length, updateMarkets]);
 
   const filteredMarkets = useMemo(() => {
     let filtered = markets;

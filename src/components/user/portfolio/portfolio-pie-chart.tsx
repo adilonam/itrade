@@ -95,9 +95,10 @@ const CustomLegend = ({ payload }: any) => {
 
 export function PortfolioPieChart({
   positions,
-  realTimePrices,
+  realTimePrices: _rtPrices,
   loading = false
 }: PortfolioPieChartProps) {
+  void _rtPrices; // Reserved for real-time price integration
   const [outerRadius, setOuterRadius] = useState(120);
 
   useEffect(() => {
@@ -175,7 +176,7 @@ export function PortfolioPieChart({
       .sort((a, b) => b.value - a.value); // Sort by value descending
 
     return chartData;
-  }, [positions, realTimePrices]);
+  }, [positions]);
 
   if (loading) {
     return (

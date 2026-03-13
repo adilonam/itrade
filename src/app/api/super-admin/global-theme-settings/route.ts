@@ -27,8 +27,7 @@ export async function GET() {
       reducedMotion: (settings as any)?.reducedMotion || false,
       highContrast: (settings as any)?.highContrast || false
     });
-  } catch (error) {
-    console.error('Failed to fetch global theme settings:', error);
+  } catch {
     return NextResponse.json(
       { error: 'Failed to fetch theme settings' },
       { status: 500 }
@@ -90,7 +89,6 @@ export async function POST(request: Request) {
       );
     }
 
-    console.error('Failed to update global theme settings:', error);
     return NextResponse.json(
       { error: 'Failed to update theme settings' },
       { status: 500 }

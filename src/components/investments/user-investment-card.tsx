@@ -9,8 +9,7 @@ import {
   IconMapPin,
   IconTrendingUp,
   IconClock,
-  IconShield,
-  IconRefresh
+  IconShield
 } from '@tabler/icons-react';
 
 interface UserInvestmentData {

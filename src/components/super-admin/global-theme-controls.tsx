@@ -45,8 +45,7 @@ export function GlobalThemeControls() {
           const data = await response.json();
           setSettings(data);
         }
-      } catch (error) {
-        console.error('Failed to load global theme settings:', error);
+      } catch {
         toast.error('Failed to load theme settings');
       } finally {
         setIsLoading(false);
@@ -86,8 +85,7 @@ export function GlobalThemeControls() {
       } else {
         toast.error('Failed to save theme settings');
       }
-    } catch (error) {
-      console.error('Failed to save global theme settings:', error);
+    } catch {
       toast.error('Failed to save theme settings');
     } finally {
       setIsSaving(false);

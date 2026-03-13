@@ -2,7 +2,7 @@
 
 import NextError from 'next/error';
 
-export default function GlobalError(_props: {
+export default function GlobalError(_: {
   error: Error & { digest?: string };
 }) {
   return (
