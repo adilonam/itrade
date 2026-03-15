@@ -189,6 +189,7 @@ model Position {
 
   // Reference and metadata
   description String? // Position description
+  bot        Bot?    @map("bot") // Bot that created the position, if any
 
   // Timestamps
   executedAt DateTime? @map("executed_at") // When position was executed
@@ -386,6 +387,7 @@ model BotUser {
   dateStop    DateTime @map("date_stop")
   quantityLot Float    @map("quantity_lot")
   marketId    String   @map("market_id")
+  interval    String   @default("1h") @map("interval") // 1min, 5min, 15min, 30min, 45min, 1h, 2h, 4h, 5h, 1day, 1week, 1month
   botParams   Json     @map("bot_params")
   active      Boolean  @default(true) @map("active")
 

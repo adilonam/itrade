@@ -76,10 +76,14 @@ interface MarketOption {
 
 function BotCard({
   bot,
-  onUseBot
+  onUseBot,
+  isBlocked,
+  blockedUntil
 }: {
   bot: BotMarketplaceItem;
   onUseBot: (bot: BotMarketplaceItem) => void;
+  isBlocked?: boolean;
+  blockedUntil?: string;
 }) {
   const isComingSoon = bot.status === 'COMING_SOON';
 
@@ -147,6 +151,17 @@ function BotCard({
           <Button className='w-full' variant='outline' disabled>
             Coming soon
           </Button>
+        ) : isBlocked ? (
+          <div className='space-y-2 pt-2'>
+            <Button className='w-full' variant='outline' disabled>
+              In use until period ends
+            </Button>
+            {blockedUntil && (
+              <p className='text-muted-foreground text-center text-xs'>
+                End date: {new Date(blockedUntil).toLocaleDateString(undefined, { dateStyle: 'short', timeStyle: 'short' })}
+              </p>
+            )}
+          </div>
         ) : (
           <div className='grid grid-cols-2 gap-2 pt-2'>
             <Button className='w-full' onClick={() => onUseBot(bot)}>
@@ -162,11 +177,31 @@ function BotCard({
   );
 }
 
+const BOT_INTERVALS = [
+  '1min',
+  '5min',
+  '15min',
+  '30min',
+  '45min',
+  '1h',
+  '2h',
+  '4h',
+  '5h',
+  '1day',
+  '1week',
+  '1month'
+] as const;
+
 const FILTER_TABS = [
   { id: 'all', label: 'All Bots' },
   { id: 'low', label: 'Low Risk' },
   { id: 'high', label: 'High Risk' }
 ] as const;
+
+interface UserBotRecord {
+  bot: Bot;
+  dateStop: string;
+}
 
 export default function BotMarketplacePage() {
   const router = useRouter();
@@ -177,11 +212,13 @@ export default function BotMarketplacePage() {
   const [markets, setMarkets] = useState<MarketOption[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [blockedBots, setBlockedBots] = useState<Record<string, string>>({});
 
   const [dateStart, setDateStart] = useState('');
   const [dateStop, setDateStop] = useState('');
   const [quantityLot, setQuantityLot] = useState(0.01);
   const [marketId, setMarketId] = useState('');
+  const [interval, setInterval] = useState<string>('1h');
   const [botParams, setBotParams] = useState<BotParamsMap[Bot]>(DEFAULT_BOT_PARAMS.RSI);
 
   const openModal = useCallback((bot: BotMarketplaceItem) => {
@@ -191,8 +228,30 @@ export default function BotMarketplacePage() {
     setDateStop(de);
     setQuantityLot(0.01);
     setMarketId('');
+    setInterval('1h');
     setBotParams({ ...DEFAULT_BOT_PARAMS[bot.bot] });
     setError(null);
+  }, []);
+
+  useEffect(() => {
+    fetch('/api/user/bot-trading')
+      .then((res) => res.json())
+      .then((data) => {
+        if (!data.bots?.length) {
+          setBlockedBots({});
+          return;
+        }
+        const now = Date.now();
+        const blocked: Record<string, string> = {};
+        for (const b of data.bots as UserBotRecord[]) {
+          const end = new Date(b.dateStop).getTime();
+          if (end > now && (!blocked[b.bot] || end > new Date(blocked[b.bot]).getTime())) {
+            blocked[b.bot] = b.dateStop;
+          }
+        }
+        setBlockedBots(blocked);
+      })
+      .catch(() => setBlockedBots({}));
   }, []);
 
   useEffect(() => {
@@ -232,6 +291,7 @@ export default function BotMarketplacePage() {
           dateStop: new Date(dateStop).toISOString(),
           quantityLot,
           marketId,
+          interval,
           botParams
         })
       });
@@ -319,7 +379,13 @@ export default function BotMarketplacePage() {
 
         <div className='grid gap-6 sm:grid-cols-2 lg:grid-cols-3'>
           {sorted.map((bot) => (
-            <BotCard key={bot.id} bot={bot} onUseBot={openModal} />
+            <BotCard
+              key={bot.id}
+              bot={bot}
+              onUseBot={openModal}
+              isBlocked={!!blockedBots[bot.bot]}
+              blockedUntil={blockedBots[bot.bot]}
+            />
           ))}
         </div>
 
@@ -373,20 +439,35 @@ export default function BotMarketplacePage() {
                   />
                 </div>
                 <div className='space-y-2'>
-                  <Label>Market</Label>
-                  <Select value={marketId} onValueChange={setMarketId}>
+                  <Label>Interval</Label>
+                  <Select value={interval} onValueChange={setInterval}>
                     <SelectTrigger>
-                      <SelectValue placeholder='Select market' />
+                      <SelectValue placeholder='Interval' />
                     </SelectTrigger>
                     <SelectContent>
-                      {markets.map((m) => (
-                        <SelectItem key={m.id} value={m.id}>
-                          {m.symbol} – {m.name}
+                      {BOT_INTERVALS.map((v) => (
+                        <SelectItem key={v} value={v}>
+                          {v}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
+              </div>
+              <div className='space-y-2'>
+                <Label>Market</Label>
+                <Select value={marketId} onValueChange={setMarketId}>
+                  <SelectTrigger>
+                    <SelectValue placeholder='Select market' />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {markets.map((m) => (
+                      <SelectItem key={m.id} value={m.id}>
+                        {m.symbol} – {m.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <Separator />
