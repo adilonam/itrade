@@ -54,6 +54,16 @@ export interface TwelveDataRsiResponse {
   status: string;
 }
 
+export interface TwelveDataEmaResponse {
+  meta: {
+    symbol: string;
+    interval: string;
+    indicator: { name: string; series_type: string; time_period: number };
+  };
+  values: Array<{ datetime: string; ema: string }>;
+  status: string;
+}
+
 export interface TwelveDataCombinedResponse extends TwelveDataQuoteResponse {
   // This extends the quote response and adds current live price
   current_price: string; // Current live price from the price endpoint

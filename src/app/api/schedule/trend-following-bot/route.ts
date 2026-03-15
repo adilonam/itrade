@@ -12,18 +12,18 @@ import {
   TransactionType
 } from '@/lib/prisma/generated/client';
 
-const DEFAULT_RSI_OVERSOLD = 30;
-const DEFAULT_RSI_OVERBOUGHT = 70;
+const DEFAULT_EMA_FAST_PERIOD = 9;
+const DEFAULT_EMA_SLOW_PERIOD = 21;
 
 export async function GET() {
   try {
-    console.log('Starting RSI bot scheduled run...');
+    console.log('Starting Trend Following bot scheduled run...');
 
     const now = new Date();
 
     const botUsers = await prisma.botUser.findMany({
       where: {
-        bot: 'RSI',
+        bot: 'TREND_FOLLOWING',
         active: true,
         dateStart: { lte: now },
         dateStop: { gte: now }
@@ -34,11 +34,11 @@ export async function GET() {
       }
     });
 
-    console.log(`Found ${botUsers.length} active RSI bot users for current date`);
+    console.log(`Found ${botUsers.length} active Trend Following bot users for current date`);
 
     if (botUsers.length === 0) {
       return NextResponse.json({
-        message: 'No active RSI bots to process',
+        message: 'No active Trend Following bots to process',
         processed: 0,
         closed: 0,
         opened: 0,
@@ -49,7 +49,8 @@ export async function GET() {
     const results: Array<{
       botUserId: string;
       symbol: string;
-      rsi: number;
+      emaFast: number;
+      emaSlow: number;
       signal: 'BUY' | 'SELL' | null;
       closedPositionId?: string;
       openedPositionId?: string;
@@ -65,40 +66,62 @@ export async function GET() {
           results.push({
             botUserId: botUser.id,
             symbol: 'Unknown',
-            rsi: 0,
+            emaFast: 0,
+            emaSlow: 0,
             signal: null,
             error: 'Market not found'
           });
           continue;
         }
 
-        const rsiResult = await twelveDataService.getRsi(
-          botUser.market.symbol,
-          botUser.interval
-        );
+        const botParams = (botUser.botParams ?? {}) as Record<string, unknown>;
+        const emaFastPeriod = Number(botParams.emaFastPeriod) || DEFAULT_EMA_FAST_PERIOD;
+        const emaSlowPeriod = Number(botParams.emaSlowPeriod) || DEFAULT_EMA_SLOW_PERIOD;
 
-       
+        const [emaFastResult, emaSlowResult] = await Promise.all([
+          twelveDataService.getEma(
+            botUser.market.symbol,
+            botUser.interval,
+            emaFastPeriod
+          ),
+          twelveDataService.getEma(
+            botUser.market.symbol,
+            botUser.interval,
+            emaSlowPeriod
+          )
+        ]);
 
-        if ('error' in rsiResult) {
+        if ('error' in emaFastResult) {
           results.push({
             botUserId: botUser.id,
             symbol: botUser.market.symbol,
-            rsi: 0,
+            emaFast: 0,
+            emaSlow: 0,
             signal: null,
-            error: rsiResult.message ?? rsiResult.error
+            error: emaFastResult.message ?? emaFastResult.error
           });
           continue;
         }
 
-        const rsi = rsiResult.rsi;
-        const botParams = (botUser.botParams ?? {}) as Record<string, unknown>;
-        const rsiOversold = Number(botParams.rsiOversold) || DEFAULT_RSI_OVERSOLD;
-        const rsiOverbought = Number(botParams.rsiOverbought) || DEFAULT_RSI_OVERBOUGHT;
+        if ('error' in emaSlowResult) {
+          results.push({
+            botUserId: botUser.id,
+            symbol: botUser.market.symbol,
+            emaFast: emaFastResult.ema,
+            emaSlow: 0,
+            signal: null,
+            error: emaSlowResult.message ?? emaSlowResult.error
+          });
+          continue;
+        }
+
+        const emaFast = emaFastResult.ema;
+        const emaSlow = emaSlowResult.ema;
 
         let signal: 'BUY' | 'SELL' | null = null;
-        if (rsi <= rsiOversold) {
+        if (emaFast > emaSlow) {
           signal = 'BUY';
-        } else if (rsi >= rsiOverbought) {
+        } else if (emaFast < emaSlow) {
           signal = 'SELL';
         }
 
@@ -106,7 +129,8 @@ export async function GET() {
           results.push({
             botUserId: botUser.id,
             symbol: botUser.market.symbol,
-            rsi,
+            emaFast,
+            emaSlow,
             signal: null
           });
           continue;
@@ -117,7 +141,7 @@ export async function GET() {
             userId: botUser.userId,
             marketId: botUser.marketId,
             status: 'PLACED',
-            bot: 'RSI'
+            bot: 'TREND_FOLLOWING'
           },
           include: { market: true, user: true }
         });
@@ -132,7 +156,8 @@ export async function GET() {
             results.push({
               botUserId: botUser.id,
               symbol: botUser.market.symbol,
-              rsi,
+              emaFast,
+              emaSlow,
               signal,
               error: 'Failed to refresh market for close'
             });
@@ -180,7 +205,7 @@ export async function GET() {
                   userId: existingPosition.userId,
                   type: transactionType,
                   absoluteAmount: Math.abs(calculatedPnL),
-                  description: `Position ${existingPosition.type} closed by RSI bot - ${existingPosition.market?.symbol ?? 'Unknown'}`
+                  description: `Position ${existingPosition.type} closed by Trend Following bot - ${existingPosition.market?.symbol ?? 'Unknown'}`
                 }
               });
             }
@@ -197,7 +222,8 @@ export async function GET() {
           results.push({
             botUserId: botUser.id,
             symbol: botUser.market.symbol,
-            rsi,
+            emaFast,
+            emaSlow,
             signal,
             closedPositionId,
             error: 'Failed to refresh market for open'
@@ -222,7 +248,7 @@ export async function GET() {
           closedPrice: null,
           takeProfit: null,
           stopLoss: null,
-          description: `RSI bot ${signal} - ${botUser.market.symbol}`,
+          description: `Trend Following bot ${signal} - ${botUser.market.symbol}`,
           executedAt: new Date(),
           closedAt: null,
           pnl: null,
@@ -238,7 +264,8 @@ export async function GET() {
           results.push({
             botUserId: botUser.id,
             symbol: botUser.market.symbol,
-            rsi,
+            emaFast,
+            emaSlow,
             signal,
             closedPositionId,
             error: 'Insufficient margin to open position'
@@ -256,8 +283,8 @@ export async function GET() {
             quantity: botUser.quantityLot,
             executedPrice,
             requiredMargin: positionCheck.newPositionRequiredMargin,
-            description: `RSI bot ${signal} - ${botUser.market.symbol}`,
-            bot: 'RSI',
+            description: `Trend Following bot ${signal} - ${botUser.market.symbol}`,
+            bot: 'TREND_FOLLOWING',
             executedAt: new Date()
           }
         });
@@ -266,17 +293,19 @@ export async function GET() {
         results.push({
           botUserId: botUser.id,
           symbol: botUser.market.symbol,
-          rsi,
+          emaFast,
+          emaSlow,
           signal,
           closedPositionId,
           openedPositionId: newPosition.id
         });
       } catch (err) {
-        console.error(`Error processing RSI bot ${botUser.id}:`, err);
+        console.error(`Error processing Trend Following bot ${botUser.id}:`, err);
         results.push({
           botUserId: botUser.id,
           symbol: botUser.market?.symbol ?? 'Unknown',
-          rsi: 0,
+          emaFast: 0,
+          emaSlow: 0,
           signal: null,
           error: err instanceof Error ? err.message : 'Unknown error'
         });
@@ -284,21 +313,21 @@ export async function GET() {
     }
 
     console.log(
-      `RSI bot run completed: ${closedCount} closed, ${openedCount} opened`
+      `Trend Following bot run completed: ${closedCount} closed, ${openedCount} opened`
     );
 
     return NextResponse.json({
-      message: 'RSI bot run completed',
+      message: 'Trend Following bot run completed',
       processed: botUsers.length,
       closed: closedCount,
       opened: openedCount,
       results
     });
   } catch (error) {
-    console.error('Error in RSI bot scheduled run:', error);
+    console.error('Error in Trend Following bot scheduled run:', error);
     return NextResponse.json(
       {
-        error: 'Failed to run RSI bot',
+        error: 'Failed to run Trend Following bot',
         details: error instanceof Error ? error.message : 'Unknown error'
       },
       { status: 500 }

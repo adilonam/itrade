@@ -179,29 +179,35 @@ export default function MyBotsPage() {
 
   return (
     <PageContainer scrollable={true}>
-      <div className='flex flex-1 flex-col space-y-8'>
-        <div className='flex flex-col gap-4 md:flex-row md:items-end md:justify-between'>
-          <div className='space-y-1'>
+      <div className='flex min-w-0 flex-1 flex-col space-y-8'>
+        <div className='flex min-w-0 flex-col gap-4 md:flex-row md:items-end md:justify-between'>
+          <div className='min-w-0 flex-1 space-y-1'>
             <Heading
               title='Bot Management'
               description='Monitor your active automated strategies.'
             />
           </div>
-          <div className='flex items-center gap-3'>
-            <div className='bg-muted flex items-center gap-2 rounded-lg px-4 py-2'>
-              <span className='bg-primary size-2 animate-pulse rounded-full' />
-              <span className='text-muted-foreground text-xs font-bold uppercase tracking-wider'>
+          <div className='flex min-w-0 flex-shrink-0 flex-wrap items-center gap-2 sm:flex-nowrap sm:gap-3'>
+            <div className='bg-muted flex w-full min-w-0 items-center justify-center gap-2 rounded-lg px-4 py-2 sm:w-auto'>
+              <span className='bg-primary size-2 shrink-0 animate-pulse rounded-full' />
+              <span className='text-muted-foreground truncate text-xs font-bold uppercase tracking-wider'>
                 Live System Status
               </span>
             </div>
-            <Button variant='outline' size='sm' onClick={fetchBots} disabled={loading}>
+            <Button
+              variant='outline'
+              size='sm'
+              className='w-full sm:w-auto'
+              onClick={fetchBots}
+              disabled={loading}
+            >
               <IconRefresh className={cn('mr-2 h-4 w-4', loading && 'animate-spin')} />
               Refresh
             </Button>
-            <Button asChild>
-              <Link href='/bot-trading'>
-                <IconRobot className='mr-2 h-4 w-4' />
-                Browse marketplace
+            <Button asChild className='w-full sm:w-auto'>
+              <Link href='/bot-trading' className='flex items-center justify-center'>
+                <IconRobot className='mr-2 h-4 w-4 shrink-0' />
+                <span className='truncate'>Browse marketplace</span>
               </Link>
             </Button>
           </div>
@@ -247,9 +253,9 @@ export default function MyBotsPage() {
                   });
                 return (
                   <>
-                    <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
-                      <h3 className='text-xl font-bold'>Trading Bots</h3>
-                      <div className='flex gap-1 rounded-lg bg-muted/50 p-1'>
+                    <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
+                      <h3 className='min-w-0 truncate text-xl font-bold'>Trading Bots</h3>
+                      <div className='flex min-w-0 overflow-x-auto rounded-lg bg-muted/50 p-1'>
                         {BOT_STATUS_TABS.map((tab) => {
                           const Icon = tab.icon;
                           return (
@@ -257,12 +263,12 @@ export default function MyBotsPage() {
                               key={tab.id}
                               variant={botStatusFilter === tab.id ? 'default' : 'ghost'}
                               size='sm'
-                              className='rounded-md'
+                              className='shrink-0 rounded-md'
                               onClick={() =>
                                 setBotStatusFilter(tab.id as 'active' | 'paused' | 'ended')
                               }
                             >
-                              <Icon className='mr-1.5 h-4 w-4' />
+                              <Icon className='mr-1.5 h-4 w-4 shrink-0' />
                               {tab.label}
                             </Button>
                           );
@@ -290,18 +296,18 @@ export default function MyBotsPage() {
                               key={bot.id}
                               className='border-border/50 transition-all hover:border-primary/30'
                             >
-                              <CardHeader className='flex flex-row items-start justify-between space-y-0 pb-2'>
-                                <div className='flex items-center gap-2'>
-                                  <span className='text-primary'>
+                              <CardHeader className='flex min-w-0 flex-row items-start justify-between gap-2 space-y-0 pb-2'>
+                                <div className='flex min-w-0 shrink items-center gap-2'>
+                                  <span className='text-primary shrink-0'>
                                     {STRATEGY_ICON[strategy] ?? <IconRobot className='h-5 w-5' />}
                                   </span>
-                                  <span className='text-muted-foreground text-xs font-bold uppercase tracking-widest'>
+                                  <span className='text-muted-foreground truncate text-xs font-bold uppercase tracking-widest'>
                                     {strategy}
                                   </span>
                                 </div>
                                 <Badge
                                   className={cn(
-                                    'text-[10px] font-bold uppercase',
+                                    'shrink-0 text-[10px] font-bold uppercase',
                                     status === 'RUNNING' && 'bg-primary/10 text-primary',
                                     status === 'STOPPED' && 'bg-muted text-muted-foreground',
                                     status === 'SCHEDULED' && 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
@@ -313,18 +319,18 @@ export default function MyBotsPage() {
                               </CardHeader>
                               <CardContent className='space-y-4'>
                                 <h4 className='text-xl font-bold'>{getBotDisplayName(bot.bot)}</h4>
-                                <p className='text-muted-foreground text-sm'>
+                                <p className='text-muted-foreground min-w-0 break-words text-sm'>
                                   {bot.market.symbol} – {bot.market.name}
                                 </p>
                                 <div className='space-y-4'>
-                                  <div className='grid grid-cols-2 gap-2'>
-                                    <div className='flex flex-col'>
+                                  <div className='grid grid-cols-1 gap-3 min-[380px]:grid-cols-2'>
+                                    <div className='flex flex-col min-w-0'>
                                       <span className='text-muted-foreground text-[10px] font-bold uppercase'>
                                         Lot size
                                       </span>
                                       <span className='text-sm font-medium'>{bot.quantityLot}</span>
                                     </div>
-                                    <div className='flex flex-col'>
+                                    <div className='flex flex-col min-w-0'>
                                       <span className='text-muted-foreground text-[10px] font-bold uppercase'>
                                         Duration
                                       </span>
@@ -333,22 +339,22 @@ export default function MyBotsPage() {
                                       </span>
                                     </div>
                                   </div>
-                                  <div className='grid grid-cols-2 gap-2 border-t border-border/50 pt-4'>
-                                    <div className='flex flex-col'>
+                                  <div className='grid grid-cols-1 gap-3 border-t border-border/50 pt-4 min-[380px]:grid-cols-2'>
+                                    <div className='flex flex-col min-w-0'>
                                       <span className='text-muted-foreground text-[10px] font-bold uppercase'>
                                         Start
                                       </span>
-                                      <span className='text-xs'>{formatDate(bot.dateStart)}</span>
+                                      <span className='break-words text-xs'>{formatDate(bot.dateStart)}</span>
                                     </div>
-                                    <div className='flex flex-col'>
+                                    <div className='flex flex-col min-w-0'>
                                       <span className='text-muted-foreground text-[10px] font-bold uppercase'>
                                         Stop
                                       </span>
-                                      <span className='text-xs'>{formatDate(bot.dateStop)}</span>
+                                      <span className='break-words text-xs'>{formatDate(bot.dateStop)}</span>
                                     </div>
                                   </div>
                                 </div>
-                                <div className='mt-6 flex gap-3'>
+                                <div className='mt-6 flex flex-col gap-2 sm:flex-row sm:gap-3'>
                                   {status === 'RUNNING' && (
                                     <Button
                                       variant='secondary'

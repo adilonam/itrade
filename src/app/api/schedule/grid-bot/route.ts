@@ -5,25 +5,21 @@ import {
   calculatePositionPnL,
   couldOpenPosition
 } from '@/lib/calculator-server';
-import { twelveDataService } from '@/lib/twelvedata';
 import {
   Market,
   Position,
   TransactionType
 } from '@/lib/prisma/generated/client';
 
-const DEFAULT_RSI_OVERSOLD = 30;
-const DEFAULT_RSI_OVERBOUGHT = 70;
-
 export async function GET() {
   try {
-    console.log('Starting RSI bot scheduled run...');
+    console.log('Starting Grid Trading bot scheduled run...');
 
     const now = new Date();
 
     const botUsers = await prisma.botUser.findMany({
       where: {
-        bot: 'RSI',
+        bot: 'GRID_TRADING',
         active: true,
         dateStart: { lte: now },
         dateStop: { gte: now }
@@ -34,11 +30,11 @@ export async function GET() {
       }
     });
 
-    console.log(`Found ${botUsers.length} active RSI bot users for current date`);
+    console.log(`Found ${botUsers.length} active Grid Trading bot users for current date`);
 
     if (botUsers.length === 0) {
       return NextResponse.json({
-        message: 'No active RSI bots to process',
+        message: 'No active Grid Trading bots to process',
         processed: 0,
         closed: 0,
         opened: 0,
@@ -49,7 +45,7 @@ export async function GET() {
     const results: Array<{
       botUserId: string;
       symbol: string;
-      rsi: number;
+      price: number;
       signal: 'BUY' | 'SELL' | null;
       closedPositionId?: string;
       openedPositionId?: string;
@@ -65,40 +61,47 @@ export async function GET() {
           results.push({
             botUserId: botUser.id,
             symbol: 'Unknown',
-            rsi: 0,
+            price: 0,
             signal: null,
             error: 'Market not found'
           });
           continue;
         }
 
-        const rsiResult = await twelveDataService.getRsi(
-          botUser.market.symbol,
-          botUser.interval
-        );
-
-       
-
-        if ('error' in rsiResult) {
+        const refreshedMarkets = await refreshSaveMarkets([botUser.market]);
+        if (!refreshedMarkets?.length) {
           results.push({
             botUserId: botUser.id,
             symbol: botUser.market.symbol,
-            rsi: 0,
+            price: 0,
             signal: null,
-            error: rsiResult.message ?? rsiResult.error
+            error: 'Failed to refresh market'
           });
           continue;
         }
 
-        const rsi = rsiResult.rsi;
+        const market = refreshedMarkets[0];
+        const currentPrice = market.lastPrice ?? 0;
+
         const botParams = (botUser.botParams ?? {}) as Record<string, unknown>;
-        const rsiOversold = Number(botParams.rsiOversold) || DEFAULT_RSI_OVERSOLD;
-        const rsiOverbought = Number(botParams.rsiOverbought) || DEFAULT_RSI_OVERBOUGHT;
+        const gridBuyLevel = Number(botParams.gridBuyLevel);
+        const gridSellLevel = Number(botParams.gridSellLevel);
+
+        if (Number.isNaN(gridBuyLevel) || Number.isNaN(gridSellLevel)) {
+          results.push({
+            botUserId: botUser.id,
+            symbol: botUser.market.symbol,
+            price: currentPrice,
+            signal: null,
+            error: 'Invalid grid levels (gridBuyLevel, gridSellLevel required in botParams)'
+          });
+          continue;
+        }
 
         let signal: 'BUY' | 'SELL' | null = null;
-        if (rsi <= rsiOversold) {
+        if (currentPrice <= gridBuyLevel) {
           signal = 'BUY';
-        } else if (rsi >= rsiOverbought) {
+        } else if (currentPrice >= gridSellLevel) {
           signal = 'SELL';
         }
 
@@ -106,7 +109,7 @@ export async function GET() {
           results.push({
             botUserId: botUser.id,
             symbol: botUser.market.symbol,
-            rsi,
+            price: currentPrice,
             signal: null
           });
           continue;
@@ -117,7 +120,7 @@ export async function GET() {
             userId: botUser.userId,
             marketId: botUser.marketId,
             status: 'PLACED',
-            bot: 'RSI'
+            bot: 'GRID_TRADING'
           },
           include: { market: true, user: true }
         });
@@ -125,31 +128,31 @@ export async function GET() {
         let closedPositionId: string | undefined;
 
         if (existingPosition && existingPosition.market) {
-          const refreshedMarkets = await refreshSaveMarkets([
+          const refreshedMarketsForClose = await refreshSaveMarkets([
             existingPosition.market
           ]);
-          if (!refreshedMarkets?.length) {
+          if (!refreshedMarketsForClose?.length) {
             results.push({
               botUserId: botUser.id,
               symbol: botUser.market.symbol,
-              rsi,
+              price: currentPrice,
               signal,
               error: 'Failed to refresh market for close'
             });
             continue;
           }
 
-          const refreshedMarket = refreshedMarkets[0];
+          const refreshedMarket = refreshedMarketsForClose[0];
           const midPrice = refreshedMarket.lastPrice ?? 0;
           const spread = refreshedMarket.spread ?? 0;
           const bidPrice = midPrice - spread / 2;
           const askPrice = midPrice + spread / 2;
-          const currentPrice =
+          const closePrice =
             existingPosition.type === 'BUY' ? askPrice : bidPrice;
 
           const positionWithClosedPrice = {
             ...existingPosition,
-            closedPrice: currentPrice,
+            closedPrice: closePrice,
             status: 'CLOSED' as const
           };
 
@@ -162,7 +165,7 @@ export async function GET() {
               where: { id: existingPosition.id },
               data: {
                 status: 'CLOSED',
-                closedPrice: currentPrice,
+                closedPrice: closePrice,
                 closedAt: new Date(),
                 pnl: calculatedPnL ?? 0
               }
@@ -180,7 +183,7 @@ export async function GET() {
                   userId: existingPosition.userId,
                   type: transactionType,
                   absoluteAmount: Math.abs(calculatedPnL),
-                  description: `Position ${existingPosition.type} closed by RSI bot - ${existingPosition.market?.symbol ?? 'Unknown'}`
+                  description: `Position ${existingPosition.type} closed by Grid Trading bot - ${existingPosition.market?.symbol ?? 'Unknown'}`
                 }
               });
             }
@@ -197,7 +200,7 @@ export async function GET() {
           results.push({
             botUserId: botUser.id,
             symbol: botUser.market.symbol,
-            rsi,
+            price: currentPrice,
             signal,
             closedPositionId,
             error: 'Failed to refresh market for open'
@@ -222,7 +225,7 @@ export async function GET() {
           closedPrice: null,
           takeProfit: null,
           stopLoss: null,
-          description: `RSI bot ${signal} - ${botUser.market.symbol}`,
+          description: `Grid Trading bot ${signal} - ${botUser.market.symbol}`,
           executedAt: new Date(),
           closedAt: null,
           pnl: null,
@@ -238,7 +241,7 @@ export async function GET() {
           results.push({
             botUserId: botUser.id,
             symbol: botUser.market.symbol,
-            rsi,
+            price: currentPrice,
             signal,
             closedPositionId,
             error: 'Insufficient margin to open position'
@@ -256,8 +259,8 @@ export async function GET() {
             quantity: botUser.quantityLot,
             executedPrice,
             requiredMargin: positionCheck.newPositionRequiredMargin,
-            description: `RSI bot ${signal} - ${botUser.market.symbol}`,
-            bot: 'RSI',
+            description: `Grid Trading bot ${signal} - ${botUser.market.symbol}`,
+            bot: 'GRID_TRADING',
             executedAt: new Date()
           }
         });
@@ -266,17 +269,17 @@ export async function GET() {
         results.push({
           botUserId: botUser.id,
           symbol: botUser.market.symbol,
-          rsi,
+          price: currentPrice,
           signal,
           closedPositionId,
           openedPositionId: newPosition.id
         });
       } catch (err) {
-        console.error(`Error processing RSI bot ${botUser.id}:`, err);
+        console.error(`Error processing Grid Trading bot ${botUser.id}:`, err);
         results.push({
           botUserId: botUser.id,
           symbol: botUser.market?.symbol ?? 'Unknown',
-          rsi: 0,
+          price: 0,
           signal: null,
           error: err instanceof Error ? err.message : 'Unknown error'
         });
@@ -284,21 +287,21 @@ export async function GET() {
     }
 
     console.log(
-      `RSI bot run completed: ${closedCount} closed, ${openedCount} opened`
+      `Grid Trading bot run completed: ${closedCount} closed, ${openedCount} opened`
     );
 
     return NextResponse.json({
-      message: 'RSI bot run completed',
+      message: 'Grid Trading bot run completed',
       processed: botUsers.length,
       closed: closedCount,
       opened: openedCount,
       results
     });
   } catch (error) {
-    console.error('Error in RSI bot scheduled run:', error);
+    console.error('Error in Grid Trading bot scheduled run:', error);
     return NextResponse.json(
       {
-        error: 'Failed to run RSI bot',
+        error: 'Failed to run Grid Trading bot',
         details: error instanceof Error ? error.message : 'Unknown error'
       },
       { status: 500 }
