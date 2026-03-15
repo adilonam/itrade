@@ -14,10 +14,10 @@ import {
 } from 'lightweight-charts';
 const BINARY_TRADE_COLORS = {
   background: '#26261c',
-  line: '#c8c81e',
-  grid: 'rgba(200, 200, 30, 0.1)',
+  line: '#e2e8f0',
+  grid: 'rgba(226, 232, 240, 0.1)',
   text: '#e2e8f0',
-  upColor: '#0bda24',
+  upColor: '#22c55e',
   downColor: '#ef4444'
 };
 

@@ -5,7 +5,6 @@ import Link from 'next/link';
 import {
   IconWallet,
   IconTrendingUp,
-  IconChevronDown,
   IconCash,
   IconChartBar,
   IconList,
@@ -53,6 +52,7 @@ export function BinaryOptionsTradingScreen() {
   const [livePrice, setLivePrice] = useState(1.0842);
   const [openPositions, setOpenPositions] = useState<OpenPosition[]>([]);
   const [lastResult, setLastResult] = useState<TradeResult | null>(null);
+  const [lastResultProfit, setLastResultProfit] = useState<number | null>(null);
   const [, setTick] = useState(0);
   const livePriceRef = useRef(livePrice);
 
@@ -71,6 +71,7 @@ export function BinaryOptionsTradingScreen() {
   const placeTrade = useCallback(
     (direction: PositionDirection) => {
       setLastResult(null);
+      setLastResultProfit(null);
       const expiresAt = Date.now() + expirationSeconds * 1000;
       const profitAmount = Math.round(investment * PROFIT_PERCENTAGE * 100) / 100;
       const placedAt = Math.floor(Date.now() / 1000);
@@ -101,6 +102,7 @@ export function BinaryOptionsTradingScreen() {
         } else {
           setLastResult(isWin ? 'WIN' : 'HIGH');
         }
+        setLastResultProfit(resultProfit);
 
         setOpenPositions((prev) =>
           prev.map((p) =>
@@ -117,34 +119,33 @@ export function BinaryOptionsTradingScreen() {
       {/* Top bar */}
       <header className='flex items-center justify-between rounded-t-xl border-b border-[#383829] px-6 py-3 bg-[#171711] sticky top-0 z-50'>
         <div className='flex items-center gap-8'>
-          <div className='flex items-center gap-2 text-[#c8c81e]'>
+          <div className='flex items-center gap-2 text-primary'>
             <IconWallet className='h-8 w-8' />
             <h1 className='text-xl font-bold tracking-tight'>BinaryTrade</h1>
           </div>
           <nav className='hidden md:flex items-center gap-6'>
             <button
               type='button'
-              className='flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#c8c81e]/10 border border-[#c8c81e]/40 text-[#c8c81e] hover:bg-[#c8c81e]/20 transition-colors'
+              className='flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary/10 border border-primary/40 text-primary hover:bg-primary/20 transition-colors'
             >
               <span className='text-sm font-semibold'>EUR/USD</span>
-              <IconChevronDown className='h-4 w-4' />
             </button>
             <div className='flex gap-2'>
               <Link
                 href='#'
-                className='px-3 py-1.5 rounded-lg text-sm font-medium text-slate-500 hover:text-[#c8c81e] hover:bg-[#c8c81e]/10 transition-colors'
+                className='px-3 py-1.5 rounded-lg text-sm font-medium text-slate-500 hover:text-primary hover:bg-primary/10 transition-colors'
               >
                 GBP/JPY
               </Link>
               <Link
                 href='#'
-                className='px-3 py-1.5 rounded-lg text-sm font-medium text-slate-500 hover:text-[#c8c81e] hover:bg-[#c8c81e]/10 transition-colors'
+                className='px-3 py-1.5 rounded-lg text-sm font-medium text-slate-500 hover:text-primary hover:bg-primary/10 transition-colors'
               >
                 BTC/USDT
               </Link>
               <Link
                 href='#'
-                className='px-3 py-1.5 rounded-lg text-sm font-medium text-slate-500 hover:text-[#c8c81e] hover:bg-[#c8c81e]/10 transition-colors'
+                className='px-3 py-1.5 rounded-lg text-sm font-medium text-slate-500 hover:text-primary hover:bg-primary/10 transition-colors'
               >
                 ETH/USD
               </Link>
@@ -154,11 +155,11 @@ export function BinaryOptionsTradingScreen() {
         <div className='flex items-center gap-6'>
           <Link
             href='/deposit'
-            className='bg-[#c8c81e] text-[#171711] px-4 py-2 rounded-lg font-bold text-sm hover:bg-[#d4d42a] hover:shadow-lg hover:shadow-[#c8c81e]/30 transition-all'
+            className='bg-primary text-primary-foreground px-4 py-2 rounded-lg font-bold text-sm hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/30 transition-all'
           >
             DEPOSIT
           </Link>
-          <div className='h-10 w-10 rounded-full border-2 border-[#c8c81e]/20 bg-[#26261c] overflow-hidden'>
+          <div className='h-10 w-10 rounded-full border-2 border-primary/20 bg-[#26261c] overflow-hidden'>
             <div className='w-full h-full bg-[#383829] flex items-center justify-center text-slate-500'>
               <IconWallet className='h-5 w-5' />
             </div>
@@ -173,7 +174,7 @@ export function BinaryOptionsTradingScreen() {
           <div className='flex items-center justify-between px-2'>
             <div className='flex items-center gap-4'>
               <h2 className='text-2xl font-bold'>EUR/USD</h2>
-              <div className='flex items-center gap-2 px-2 py-0.5 rounded bg-[#0bda24]/10 text-[#0bda24]'>
+              <div className='flex items-center gap-2 px-2 py-0.5 rounded bg-primary/10 text-primary'>
                 <IconTrendingUp className='h-4 w-4' />
                 <span className='text-sm font-bold'>{livePrice.toFixed(5)}</span>
                 <span className='text-xs font-medium'>+0.02%</span>
@@ -182,33 +183,33 @@ export function BinaryOptionsTradingScreen() {
             <div className='flex items-center gap-2 bg-[#26261c] p-1 rounded-lg border border-[#383829]'>
               <button
                 type='button'
-                className='px-3 py-1 rounded bg-[#c8c81e]/20 text-[#c8c81e] text-xs font-bold border border-[#c8c81e]/40'
+                className='px-3 py-1 rounded bg-primary/20 text-primary text-xs font-bold border border-primary/40'
               >
                 1M
               </button>
               <button
                 type='button'
-                className='px-3 py-1 rounded text-xs font-bold text-slate-500 hover:text-[#c8c81e] hover:bg-[#c8c81e]/10 transition-colors'
+                className='px-3 py-1 rounded text-xs font-bold text-slate-500 hover:text-primary hover:bg-primary/10 transition-colors'
               >
                 5M
               </button>
               <button
                 type='button'
-                className='px-3 py-1 rounded text-xs font-bold text-slate-500 hover:text-[#c8c81e] hover:bg-[#c8c81e]/10 transition-colors'
+                className='px-3 py-1 rounded text-xs font-bold text-slate-500 hover:text-primary hover:bg-primary/10 transition-colors'
               >
                 15M
               </button>
               <button
                 type='button'
-                className='px-3 py-1 rounded text-xs font-bold text-slate-500 hover:text-[#c8c81e] hover:bg-[#c8c81e]/10 transition-colors'
+                className='px-3 py-1 rounded text-xs font-bold text-slate-500 hover:text-primary hover:bg-primary/10 transition-colors'
               >
                 1H
               </button>
               <div className='w-px h-4 bg-[#383829] mx-1' />
-              <button type='button' className='text-slate-500 hover:text-[#c8c81e] p-1 rounded transition-colors'>
+              <button type='button' className='text-slate-500 hover:text-primary p-1 rounded transition-colors'>
                 <IconAdjustments className='h-5 w-5' />
               </button>
-              <button type='button' className='text-slate-500 hover:text-[#c8c81e] p-1 rounded transition-colors'>
+              <button type='button' className='text-slate-500 hover:text-primary p-1 rounded transition-colors'>
                 <IconPencil className='h-5 w-5' />
               </button>
             </div>
@@ -235,10 +236,10 @@ export function BinaryOptionsTradingScreen() {
                 </span>
               </div>
               <div className='flex items-baseline gap-2 flex-wrap'>
-                <span className='text-2xl font-bold text-[#0bda24]'>
+                <span className='text-2xl font-bold text-primary'>
                   +$2,481.50
                 </span>
-                <span className='text-sm font-medium text-[#0bda24]'>
+                <span className='text-sm font-medium text-primary'>
                   +12%
                 </span>
               </div>
@@ -254,7 +255,7 @@ export function BinaryOptionsTradingScreen() {
                 <span className='text-2xl font-bold shrink-0'>68.4%</span>
                 <div className='flex-1 h-1.5 bg-[#171711] rounded-full overflow-hidden min-w-[60px]'>
                   <div
-                    className='bg-[#c8c81e] h-full rounded-full'
+                    className='bg-primary h-full rounded-full'
                     style={{ width: '68.4%' }}
                   />
                 </div>
@@ -296,25 +297,31 @@ export function BinaryOptionsTradingScreen() {
                     max={10000}
                     value={investment}
                     onChange={(e) => setInvestment(Math.max(1, Number(e.target.value) || 1))}
-                    className='w-full bg-[#26261c] border border-[#383829] focus:border-[#c8c81e] focus:ring-1 focus:ring-[#c8c81e] rounded-xl h-14 pl-10 pr-24 font-bold text-lg'
+                    className='w-full bg-[#26261c] border border-[#383829] focus:border-primary focus:ring-1 focus:ring-primary rounded-xl h-14 pl-10 pr-24 font-bold text-lg'
                   />
                   <div className='absolute right-2 top-1/2 -translate-y-1/2 flex gap-1'>
                     <button
                       type='button'
                       onClick={() => setInvestment(1)}
-                      className='bg-[#171711] hover:bg-[#c8c81e]/20 hover:text-[#c8c81e] hover:border-[#c8c81e]/40 border border-transparent p-1.5 rounded-lg transition-colors text-xs font-bold w-10'
+                      className='bg-[#171711] hover:bg-primary/20 hover:text-primary hover:border-primary/40 border border-transparent p-1.5 rounded-lg transition-colors text-xs font-bold w-10'
                     >
                       MIN
                     </button>
                     <button
                       type='button'
                       onClick={() => setInvestment(1000)}
-                      className='bg-[#171711] hover:bg-[#c8c81e]/20 hover:text-[#c8c81e] hover:border-[#c8c81e]/40 border border-transparent p-1.5 rounded-lg transition-colors text-xs font-bold w-10'
+                      className='bg-[#171711] hover:bg-primary/20 hover:text-primary hover:border-primary/40 border border-transparent p-1.5 rounded-lg transition-colors text-xs font-bold w-10'
                     >
                       MAX
                     </button>
                   </div>
                 </div>
+              </div>
+              <div className='bg-primary/10 border border-primary/20 rounded-xl p-4 flex justify-between items-center'>
+                <span className='text-sm font-medium text-primary'>
+                  Potential Profit ({Math.round(PROFIT_PERCENTAGE * 100)}%)
+                </span>
+                <span className='text-xl font-bold text-primary'>+${potentialProfit.toFixed(2)}</span>
               </div>
               <div className='flex flex-col gap-2'>
                 <label className='text-sm font-medium text-slate-400'>
@@ -324,7 +331,7 @@ export function BinaryOptionsTradingScreen() {
                   <select
                     value={expirationSeconds}
                     onChange={(e) => setExpirationSeconds(Number(e.target.value))}
-                    className='w-full bg-[#26261c] border border-[#383829] focus:border-[#c8c81e] focus:ring-1 focus:ring-[#c8c81e] rounded-xl h-14 px-4 pr-10 font-bold text-lg appearance-none cursor-pointer'
+                    className='w-full bg-[#26261c] border border-[#383829] focus:border-primary focus:ring-1 focus:ring-primary rounded-xl h-14 px-4 pr-10 font-bold text-lg appearance-none cursor-pointer'
                   >
                     {EXPIRATION_OPTIONS.map((opt) => (
                       <option key={opt.value} value={opt.value}>
@@ -343,29 +350,26 @@ export function BinaryOptionsTradingScreen() {
                     <label className='text-sm font-medium text-slate-400'>
                       Time left
                     </label>
-                    <div className='w-full bg-[#c8c81e]/10 border border-[#c8c81e]/40 rounded-xl h-14 px-4 flex items-center justify-center font-bold text-xl text-[#c8c81e] tabular-nums'>
+                    <div className='w-full bg-primary/10 border border-primary/40 rounded-xl h-14 px-4 flex items-center justify-center font-bold text-xl text-primary tabular-nums'>
                       {formatTimeLeft(activePos.expiresAt)}
                     </div>
                   </div>
                 );
               })()}
             </div>
-            <div className='bg-[#c8c81e]/10 border border-[#c8c81e]/20 rounded-xl p-4 flex justify-between items-center'>
-              <span className='text-sm font-medium text-[#c8c81e]'>
-                Potential Profit ({Math.round(PROFIT_PERCENTAGE * 100)}%)
-              </span>
-              <span className='text-xl font-bold text-[#c8c81e]'>+${potentialProfit.toFixed(2)}</span>
-            </div>
             <div className='flex flex-col gap-4'>
-              {lastResult !== null && (
+              {lastResult !== null && lastResultProfit !== null && (
                 <div
                   className={`rounded-xl border-2 px-4 py-3 text-center text-xl font-black uppercase tracking-widest ${
                     lastResult === 'WIN'
-                      ? 'border-[#0bda24] bg-[#0bda24]/20 text-[#0bda24]'
-                      : 'border-[#ef4444] bg-[#ef4444]/20 text-[#ef4444]'
+                      ? 'border-primary bg-primary/20 text-primary'
+                      : 'border-destructive bg-destructive/20 text-destructive'
                   }`}
                 >
-                  {lastResult}
+                  <span>{lastResult}</span>
+                  <span className='ml-2 tabular-nums'>
+                    {lastResultProfit >= 0 ? '+' : ''}${lastResultProfit.toFixed(2)}
+                  </span>
                 </div>
               )}
               <button
@@ -399,26 +403,26 @@ export function BinaryOptionsTradingScreen() {
               <h4 className='text-sm font-bold uppercase text-slate-500 tracking-wider'>
                 Live Feed
               </h4>
-              <span className='h-2 w-2 rounded-full bg-[#0bda24] animate-pulse' />
+              <span className='h-2 w-2 rounded-full bg-primary animate-pulse' />
             </div>
             <div className='space-y-3'>
-              <div className='flex items-center justify-between p-3 rounded-lg bg-[#26261c] border-l-4 border-[#0bda24]'>
+              <div className='flex items-center justify-between p-3 rounded-lg bg-[#26261c] border-l-4 border-primary'>
                 <div>
                   <p className='text-xs font-bold'>User #8421</p>
                   <p className='text-[10px] text-slate-500'>
                     EUR/USD • 1m
                   </p>
                 </div>
-                <p className='text-[#0bda24] font-bold text-sm'>+$185.00</p>
+                <p className='text-primary font-bold text-sm'>+$185.00</p>
               </div>
-              <div className='flex items-center justify-between p-3 rounded-lg bg-[#26261c] border-l-4 border-[#ef4444]'>
+              <div className='flex items-center justify-between p-3 rounded-lg bg-[#26261c] border-l-4 border-destructive'>
                 <div>
                   <p className='text-xs font-bold'>User #3391</p>
                   <p className='text-[10px] text-slate-500'>
                     BTC/USDT • 5m
                   </p>
                 </div>
-                <p className='text-[#ef4444] font-bold text-sm'>-$50.00</p>
+                <p className='text-destructive font-bold text-sm'>-$50.00</p>
               </div>
             </div>
           </div>
@@ -430,19 +434,19 @@ export function BinaryOptionsTradingScreen() {
         <div className='flex border-b border-[#383829] px-6'>
           <button
             type='button'
-            className='px-6 py-4 text-sm font-bold border-b-2 border-[#c8c81e] text-[#c8c81e] bg-[#c8c81e]/5'
+            className='px-6 py-4 text-sm font-bold border-b-2 border-primary text-primary bg-primary/5'
           >
             Open Positions ({openPositions.length})
           </button>
           <button
             type='button'
-            className='px-6 py-4 text-sm font-bold text-slate-500 hover:text-[#c8c81e] hover:bg-[#c8c81e]/5 transition-colors'
+            className='px-6 py-4 text-sm font-bold text-slate-500 hover:text-primary hover:bg-primary/5 transition-colors'
           >
             Closed Trades
           </button>
           <button
             type='button'
-            className='px-6 py-4 text-sm font-bold text-slate-500 hover:text-[#c8c81e] hover:bg-[#c8c81e]/5 transition-colors'
+            className='px-6 py-4 text-sm font-bold text-slate-500 hover:text-primary hover:bg-primary/5 transition-colors'
           >
             Pending Orders
           </button>
@@ -476,11 +480,11 @@ export function BinaryOptionsTradingScreen() {
                       <div className='flex items-center gap-2'>
                         <div
                           className={`w-6 h-6 rounded-full flex items-center justify-center ${
-                            pos.direction === 'call' ? 'bg-[#0bda24]' : 'bg-[#ef4444]'
+                            pos.direction === 'call' ? 'bg-primary' : 'bg-destructive'
                           }`}
                         >
                           {pos.direction === 'call' ? (
-                            <IconArrowUp className='h-3.5 w-3.5 text-[#171711] font-bold' />
+                            <IconArrowUp className='h-3.5 w-3.5 text-primary-foreground font-bold' />
                           ) : (
                             <IconArrowDown className='h-3.5 w-3.5 text-white font-bold' />
                           )}
@@ -492,7 +496,7 @@ export function BinaryOptionsTradingScreen() {
                       {pos.profit !== null ? 'Expired' : formatTimeLeft(pos.expiresAt)}
                     </td>
                     <td className='py-4 font-mono'>{pos.strikePrice.toFixed(5)}</td>
-                    <td className='py-4 font-mono text-[#0bda24]'>
+                    <td className='py-4 font-mono text-primary'>
                       {pos.currentPrice.toFixed(5)}
                     </td>
                     <td className='py-4 font-bold text-slate-300'>
@@ -502,7 +506,7 @@ export function BinaryOptionsTradingScreen() {
                       {pos.profit !== null ? (
                         <span
                           className={`font-bold ${
-                            pos.profit >= 0 ? 'text-[#0bda24]' : 'text-[#ef4444]'
+                            pos.profit >= 0 ? 'text-primary' : 'text-destructive'
                           }`}
                         >
                           {pos.profit >= 0 ? '+' : ''}${pos.profit.toFixed(2)}
