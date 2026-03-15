@@ -4,26 +4,6 @@ import { prisma } from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
 import { z } from 'zod';
 
-/**
- * @swagger
- * /api/admin/users/{id}/seller-users:
- *   get:
- *     tags:
- *       - Admin - Users
- *     summary: Get seller's linked users
- *     description: Retrieve all users linked to a seller (via sellerUsers relation). Requires ADMIN or SUPERADMIN role.
- *   post:
- *     tags:
- *       - Admin - Users
- *     summary: Add user to seller
- *     description: Link a user to a seller by email. Requires ADMIN or SUPERADMIN role.
- *   delete:
- *     tags:
- *       - Admin - Users
- *     summary: Remove user from seller
- *     description: Unlink a user from a seller. Requires ADMIN or SUPERADMIN role.
- */
-
 const addUserSchema = z.object({
   email: z.string().email('Invalid email address')
 });

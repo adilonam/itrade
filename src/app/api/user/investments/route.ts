@@ -10,24 +10,6 @@ const EnrollmentSchema = z.object({
   autoReinvest: z.boolean().default(false)
 });
 
-/**
- * @swagger
- * /api/user/investments:
- *   get:
- *     tags:
- *       - User - Investments
- *     summary: Get user investments
- *     description: Retrieve all investments for the authenticated user
- *     security:
- *       - ApiKeyAuth: []
- *     responses:
- *       200:
- *         description: User investments retrieved successfully
- *       401:
- *         description: Unauthorized
- *       500:
- *         description: Internal server error
- */
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
@@ -63,46 +45,6 @@ export async function GET() {
   }
 }
 
-/**
- * @swagger
- * /api/user/investments:
- *   post:
- *     tags:
- *       - User - Investments
- *     summary: Enroll in investment
- *     description: Enroll the authenticated user in an investment
- *     security:
- *       - ApiKeyAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - investmentId
- *               - amount
- *             properties:
- *               investmentId:
- *                 type: string
- *               amount:
- *                 type: number
- *                 minimum: 0
- *               autoReinvest:
- *                 type: boolean
- *                 default: false
- *     responses:
- *       201:
- *         description: Successfully enrolled in investment
- *       400:
- *         description: Bad request - validation error or insufficient funds
- *       401:
- *         description: Unauthorized
- *       404:
- *         description: Investment not found
- *       500:
- *         description: Internal server error
- */
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);

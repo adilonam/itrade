@@ -4,53 +4,6 @@ import { prisma } from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
 import { z } from 'zod';
 
-/**
- * @swagger
- * /api/user/transactions:
- *   get:
- *     tags:
- *       - User - Transactions
- *     summary: Get user transactions
- *     description: Retrieve all transactions for the authenticated user with optional filtering
- *     security:
- *       - ApiKeyAuth: []
- *     parameters:
- *       - in: query
- *         name: page
- *         schema:
- *           type: integer
- *           minimum: 1
- *           default: 1
- *         description: Page number for pagination
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *           minimum: 1
- *           maximum: 100
- *           default: 20
- *         description: Number of transactions per page
- *       - in: query
- *         name: type
- *         schema:
- *           type: string
- *           enum: [GAIN, LOSS, DEPOSIT, WITHDRAW]
- *         description: Filter by transaction type
- *       - in: query
- *         name: transactionType
- *         schema:
- *           type: string
- *           enum: [trade, stock, invest]
- *         description: Filter by transaction category (trade, stock, invest)
- *     responses:
- *       200:
- *         description: Transactions retrieved successfully
- *       401:
- *         description: Unauthorized
- *       500:
- *         description: Internal server error
- */
-
 // Validation schema
 const getTransactionsSchema = z.object({
   page: z.coerce.number().int().min(1).optional().default(1),

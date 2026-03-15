@@ -4,44 +4,6 @@ import { put } from '@vercel/blob';
 import { prisma } from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
 
-/**
- * @swagger
- * /api/user/profile:
- *   get:
- *     tags:
- *       - User - Profile
- *     summary: Get user profile
- *     description: Retrieve the authenticated user's profile information including balance
- *     security:
- *       - ApiKeyAuth: []
- *     responses:
- *       200:
- *         description: User profile retrieved successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: string
- *                 name:
- *                   type: string
- *                 email:
- *                   type: string
- *                 balance:
- *                   type: number
- *                 role:
- *                   type: string
- *                 createdAt:
- *                   type: string
- *                   format: date-time
- *       401:
- *         description: Unauthorized
- *       404:
- *         description: User not found
- *       500:
- *         description: Internal server error
- */
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);

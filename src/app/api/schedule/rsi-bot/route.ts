@@ -15,18 +15,6 @@ import {
 const DEFAULT_RSI_OVERSOLD = 30;
 const DEFAULT_RSI_OVERBOUGHT = 70;
 
-/**
- * @swagger
- * /api/schedule/rsi-bot:
- *   get:
- *     summary: Scheduled endpoint to run RSI bot - close previous bot position and open new BUY/SELL based on RSI
- *     tags: [Schedule, Bot, RSI]
- *     responses:
- *       200:
- *         description: RSI bot run completed
- *       500:
- *         description: Internal server error
- */
 export async function GET() {
   try {
     console.log('Starting RSI bot scheduled run...');
@@ -88,6 +76,8 @@ export async function GET() {
           botUser.market.symbol,
           botUser.interval
         );
+
+        console.log('rsiResult', rsiResult);
 
         if ('error' in rsiResult) {
           results.push({

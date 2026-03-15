@@ -3,34 +3,6 @@ import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
 
-/**
- * @swagger
- * /api/seller/messages/{id}:
- *   delete:
- *     tags:
- *       - Seller - Messages
- *     summary: Delete a message
- *     description: Delete a message where seller is sender or receiver. Requires SELLER, ADMIN, or SUPERADMIN role.
- *     security:
- *       - ApiKeyAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: Message ID
- *     responses:
- *       200:
- *         description: Message deleted successfully
- *       401:
- *         description: Unauthorized
- *       403:
- *         description: Forbidden - insufficient permissions
- *       404:
- *         description: Message not found
- */
-
 // Helper function to check seller permissions
 async function checkSellerPermission(session: any) {
   if (!session?.user?.id) {

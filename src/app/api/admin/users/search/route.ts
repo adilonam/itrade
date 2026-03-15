@@ -4,16 +4,6 @@ import { prisma } from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
 import { z } from 'zod';
 
-/**
- * @swagger
- * /api/admin/users/search:
- *   get:
- *     tags:
- *       - Admin - Users
- *     summary: Search users by email
- *     description: Search for users by email address. Requires ADMIN or SUPERADMIN role.
- */
-
 const searchSchema = z.object({
   email: z.string().email('Invalid email address'),
   excludeSellerId: z.string().optional() // Exclude users already linked to this seller

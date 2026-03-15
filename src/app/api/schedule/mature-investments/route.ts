@@ -1,24 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-/**
- * @swagger
- * /api/schedule/mature-investments:
- *   post:
- *     tags:
- *       - Schedule
- *     summary: Process matured investments
- *     description: Check for investments that have reached their end date and complete them
- *     security:
- *       - ApiKeyAuth: []
- *     responses:
- *       200:
- *         description: Investments processed successfully
- *       401:
- *         description: Unauthorized
- *       500:
- *         description: Internal server error
- */
 export async function POST(request: NextRequest) {
   try {
     // Verify the request is from an authorized source (e.g., cron job or Vercel)

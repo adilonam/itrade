@@ -4,48 +4,6 @@ import { prisma } from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
 import { z } from 'zod';
 
-/**
- * @swagger
- * /api/seller/investments:
- *   get:
- *     tags:
- *       - Seller - Investments
- *     summary: Get user investments of seller's linked users
- *     description: Retrieve user investments (enrollments) for all users linked to the authenticated seller. Requires SELLER, ADMIN, or SUPERADMIN role.
- *     security:
- *       - ApiKeyAuth: []
- *     parameters:
- *       - in: query
- *         name: page
- *         schema:
- *           type: integer
- *           minimum: 1
- *           default: 1
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *           minimum: 1
- *           maximum: 100
- *           default: 20
- *       - in: query
- *         name: status
- *         schema:
- *           type: string
- *           enum: [ACTIVE, COMPLETED, CANCELLED]
- *       - in: query
- *         name: userId
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: User investments retrieved successfully
- *       401:
- *         description: Unauthorized
- *       403:
- *         description: Forbidden
- */
-
 async function checkSellerPermission(
   session: { user?: { id?: string } } | null
 ) {
@@ -176,36 +134,6 @@ const createSchema = z.object({
   autoReinvest: z.boolean().optional().default(false)
 });
 
-/**
- * @swagger
- * /api/seller/investments:
- *   post:
- *     tags:
- *       - Seller - Investments
- *     summary: Create user investment for a linked user
- *     description: Enroll a user linked to the seller in an investment. Deducts from user balance. Requires SELLER, ADMIN, or SUPERADMIN.
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required: [userId, investmentId, amount]
- *             properties:
- *               userId: { type: string }
- *               investmentId: { type: string }
- *               amount: { type: number, minimum: 0 }
- *               autoReinvest: { type: boolean, default: false }
- *     responses:
- *       201:
- *         description: User investment created
- *       400:
- *         description: Validation or business rule error
- *       401:
- *         description: Unauthorized
- *       403:
- *         description: Forbidden - user not linked to seller
- */
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);

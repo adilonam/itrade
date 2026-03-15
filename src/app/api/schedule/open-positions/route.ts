@@ -2,48 +2,6 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { refreshSaveMarkets, couldOpenPosition } from '@/lib/calculator-server';
 
-/**
- * @swagger
- * /api/schedule/open-positions:
- *   get:
- *     summary: Scheduled endpoint to automatically process pending positions and convert them to PLACED when conditions are met
- *     tags: [Schedule, Positions]
- *     responses:
- *       200:
- *         description: Positions processed successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                 processed:
- *                   type: number
- *                 placed:
- *                   type: number
- *                 failed:
- *                   type: number
- *                 skipped:
- *                   type: number
- *                 results:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: string
- *                       symbol:
- *                         type: string
- *                       type:
- *                         type: string
- *                       status:
- *                         type: string
- *                       reason:
- *                         type: string
- *       500:
- *         description: Internal server error
- */
 export async function GET() {
   try {
     console.log('Starting scheduled position opening process...');

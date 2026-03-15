@@ -11,18 +11,6 @@ import {
   TransactionType
 } from '@/lib/prisma/generated/client';
 
-/**
- * @swagger
- * /api/schedule/close-positions:
- *   get:
- *     summary: Scheduled endpoint to automatically close positions based on take profit/stop loss
- *     tags: [Schedule, Positions]
- *     responses:
- *       200:
- *         description: Positions processed successfully
- *       500:
- *         description: Internal server error
- */
 export async function GET() {
   try {
     // eslint-disable-next-line no-console

@@ -8,7 +8,6 @@ This project uses:
 - **Tailwind v4** for styling
 - **tabler-icons-react** for icons
 - **shadcn/ui** for pre-built components (optional, use sparingly)
-- **swagger** for API documentation UI
 - prisma version 7 it s in src/lib/prisma.ts
 - dont creat files markdown
 - links are loacted on src/constants/data.ts

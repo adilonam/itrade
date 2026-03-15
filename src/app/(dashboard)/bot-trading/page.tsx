@@ -158,7 +158,7 @@ function BotCard({
             </Button>
             {blockedUntil && (
               <p className='text-muted-foreground text-center text-xs'>
-                End date: {new Date(blockedUntil).toLocaleDateString(undefined, { dateStyle: 'short', timeStyle: 'short' })}
+                End date: {new Date(blockedUntil).toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short' })}
               </p>
             )}
           </div>

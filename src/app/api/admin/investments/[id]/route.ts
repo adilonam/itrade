@@ -19,33 +19,6 @@ const UpdateInvestmentSchema = z.object({
   imageUrl: z.string().url().optional()
 });
 
-/**
- * @swagger
- * /api/admin/investments/{id}:
- *   get:
- *     tags:
- *       - Admin - Investments
- *     summary: Get investment by ID
- *     description: Retrieve a specific investment by ID. Requires ADMIN or SUPERADMIN role.
- *     security:
- *       - ApiKeyAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: Investment ID
- *     responses:
- *       200:
- *         description: Investment retrieved successfully
- *       401:
- *         description: Unauthorized
- *       403:
- *         description: Forbidden - Admin role required
- *       404:
- *         description: Investment not found
- */
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -101,67 +74,6 @@ export async function GET(
   }
 }
 
-/**
- * @swagger
- * /api/admin/investments/{id}:
- *   put:
- *     tags:
- *       - Admin - Investments
- *     summary: Update investment
- *     description: Update an existing investment. Requires ADMIN or SUPERADMIN role.
- *     security:
- *       - ApiKeyAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: Investment ID
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               title:
- *                 type: string
- *               description:
- *                 type: string
- *               country:
- *                 type: string
- *               duration:
- *                 type: integer
- *               rentability:
- *                 type: number
- *               minInvestment:
- *                 type: number
- *               maxInvestment:
- *                 type: number
- *               autoReinvestment:
- *                 type: boolean
- *               totalCapacity:
- *                 type: number
- *               riskLevel:
- *                 type: string
- *                 enum: [LOW, MEDIUM, HIGH]
- *               isActive:
- *                 type: boolean
- *               imageUrl:
- *                 type: string
- *     responses:
- *       200:
- *         description: Investment updated successfully
- *       400:
- *         description: Bad request
- *       401:
- *         description: Unauthorized
- *       403:
- *         description: Forbidden - Admin role required
- *       404:
- *         description: Investment not found
- */
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -230,35 +142,6 @@ export async function PUT(
   }
 }
 
-/**
- * @swagger
- * /api/admin/investments/{id}:
- *   delete:
- *     tags:
- *       - Admin - Investments
- *     summary: Delete investment
- *     description: Delete an investment. Only allowed if no active user investments exist. Requires ADMIN or SUPERADMIN role.
- *     security:
- *       - ApiKeyAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: Investment ID
- *     responses:
- *       200:
- *         description: Investment deleted successfully
- *       400:
- *         description: Cannot delete investment with active enrollments
- *       401:
- *         description: Unauthorized
- *       403:
- *         description: Forbidden - Admin role required
- *       404:
- *         description: Investment not found
- */
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }

@@ -9,37 +9,6 @@ interface RouteParams {
   }>;
 }
 
-/**
- * @swagger
- * /api/user/investments/{id}:
- *   delete:
- *     tags:
- *       - User - Investments
- *     summary: Cancel an investment
- *     description: Cancel an active investment and return funds to user balance (may include penalties)
- *     security:
- *       - ApiKeyAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: The user investment ID
- *     responses:
- *       200:
- *         description: Investment cancelled successfully
- *       400:
- *         description: Bad request - investment cannot be cancelled
- *       401:
- *         description: Unauthorized
- *       403:
- *         description: Forbidden - not the owner of this investment
- *       404:
- *         description: Investment not found
- *       500:
- *         description: Internal server error
- */
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
     const session = await getServerSession(authOptions);

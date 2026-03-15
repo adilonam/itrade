@@ -4,60 +4,6 @@ import { prisma } from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
 import { TransactionType } from '@/lib/prisma/generated/client';
 
-/**
- * @swagger
- * /api/user/deposit:
- *   post:
- *     tags:
- *       - User - Financial
- *     summary: Process user deposit
- *     description: Process a deposit transaction and update user balance
- *     security:
- *       - ApiKeyAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - amount
- *               - paymentMethod
- *             properties:
- *               amount:
- *                 type: number
- *                 minimum: 0.01
- *                 description: Deposit amount
- *               paymentMethod:
- *                 type: string
- *                 enum: [card, paypal]
- *                 description: Payment method used
- *               paymentDetails:
- *                 type: object
- *                 description: Payment method specific details
- *     responses:
- *       200:
- *         description: Deposit processed successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                 message:
- *                   type: string
- *                 transaction:
- *                   type: object
- *                 newBalance:
- *                   type: number
- *       400:
- *         description: Invalid request data
- *       401:
- *         description: Unauthorized
- *       500:
- *         description: Internal server error
- */
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);

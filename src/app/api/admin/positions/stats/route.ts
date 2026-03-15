@@ -11,67 +11,6 @@ type PositionStats = {
   failedPositions: number;
 };
 
-/**
- * @swagger
- * /api/admin/positions/stats:
- *   get:
- *     summary: Get position statistics
- *     tags: [Admin, Positions]
- *     parameters:
- *       - in: query
- *         name: userId
- *         schema:
- *           type: string
- *         description: Filter by user ID
- *       - in: query
- *         name: dateFrom
- *         schema:
- *           type: string
- *           format: date
- *         description: Start date for statistics
- *       - in: query
- *         name: dateTo
- *         schema:
- *           type: string
- *           format: date
- *         description: End date for statistics
- *     responses:
- *       200:
- *         description: Position statistics with enums
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 stats:
- *                   type: object
- *                   properties:
- *                     totalPositions:
- *                       type: number
- *                     totalVolume:
- *                       type: number
- *                     totalPnL:
- *                       type: number
- *                     completedPositions:
- *                       type: number
- *                     pendingPositions:
- *                       type: number
- *                     failedPositions:
- *                       type: number
- *                 enums:
- *                   type: object
- *                   properties:
- *                     positionTypes:
- *                       type: array
- *                       items:
- *                         type: string
- *                         enum: [BUY, SELL, DEPOSIT, WITHDRAWAL, TRANSFER_IN, TRANSFER_OUT, FEE, BONUS, REFUND]
- *                     positionStatuses:
- *                       type: array
- *                       items:
- *                         type: string
- *                         enum: [PLACED, CLOSED, FAILED, PENDING]
- */
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
