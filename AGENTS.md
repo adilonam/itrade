@@ -14,6 +14,5 @@ This project uses:
 - links are loacted on src/constants/data.ts
 - for auth we use next auth
 - if a type or interface is in schema primsa import it from '@/lib/prisma/generated/client';
-- use a good architecture like using componenets and functions 
-
+- always decompose code for good architecture like using componenets and using functions
 
