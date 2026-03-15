@@ -755,6 +755,176 @@ export const tenantNavItems: TenantNavItems = {
       }
     ]
   },
+  'Room Binary Option': {
+    USER: [
+      {
+        title: 'Binary Option Trade',
+        url: '/binary-option-trade',
+        icon: 'chart',
+        isActive: false,
+        shortcut: ['b', 't'],
+        items: []
+      },
+      {
+        title: 'Deposit',
+        url: '/deposit',
+        icon: 'add',
+        isActive: false,
+        shortcut: ['d', 'p'],
+        items: []
+      },
+      {
+        title: 'Withdraw',
+        url: '/withdraw',
+        icon: 'minus',
+        isActive: false,
+        shortcut: ['w', 'd'],
+        items: []
+      },
+      {
+        title: 'Transaction',
+        url: '/transactions?type=binary',
+        icon: 'transaction',
+        isActive: false,
+        shortcut: ['t', 'r'],
+        items: []
+      },
+      {
+        title: 'Account',
+        url: '/profile',
+        icon: 'billing',
+        isActive: false,
+        shortcut: ['p', 'r'],
+        items: []
+      }
+    ],
+    SELLER: [
+      {
+        title: 'Binary Option Trade',
+        url: '/binary-option-trade',
+        icon: 'chart',
+        isActive: false,
+        shortcut: ['b', 't'],
+        items: []
+      },
+      {
+        title: 'Deposit',
+        url: '/deposit',
+        icon: 'add',
+        isActive: false,
+        shortcut: ['d', 'p'],
+        items: []
+      },
+      {
+        title: 'Withdraw',
+        url: '/withdraw',
+        icon: 'minus',
+        isActive: false,
+        shortcut: ['w', 'd'],
+        items: []
+      },
+      {
+        title: 'Transaction',
+        url: '/transactions?type=binary',
+        icon: 'transaction',
+        isActive: false,
+        shortcut: ['t', 'r'],
+        items: []
+      },
+      {
+        title: 'Account',
+        url: '/profile',
+        icon: 'billing',
+        isActive: false,
+        shortcut: ['p', 'r'],
+        items: []
+      }
+    ],
+    ADMIN: [
+      {
+        title: 'Binary Option Trade',
+        url: '/binary-option-trade',
+        icon: 'chart',
+        isActive: false,
+        shortcut: ['b', 't'],
+        items: []
+      },
+      {
+        title: 'Deposit',
+        url: '/deposit',
+        icon: 'add',
+        isActive: false,
+        shortcut: ['d', 'p'],
+        items: []
+      },
+      {
+        title: 'Withdraw',
+        url: '/withdraw',
+        icon: 'minus',
+        isActive: false,
+        shortcut: ['w', 'd'],
+        items: []
+      },
+      {
+        title: 'Transaction',
+        url: '/transactions?type=binary',
+        icon: 'transaction',
+        isActive: false,
+        shortcut: ['t', 'r'],
+        items: []
+      },
+      {
+        title: 'Account',
+        url: '/profile',
+        icon: 'billing',
+        isActive: false,
+        shortcut: ['p', 'r'],
+        items: []
+      }
+    ],
+    SUPERADMIN: [
+      {
+        title: 'Binary Option Trade',
+        url: '/binary-option-trade',
+        icon: 'chart',
+        isActive: false,
+        shortcut: ['b', 't'],
+        items: []
+      },
+      {
+        title: 'Deposit',
+        url: '/deposit',
+        icon: 'add',
+        isActive: false,
+        shortcut: ['d', 'p'],
+        items: []
+      },
+      {
+        title: 'Withdraw',
+        url: '/withdraw',
+        icon: 'minus',
+        isActive: false,
+        shortcut: ['w', 'd'],
+        items: []
+      },
+      {
+        title: 'Transaction',
+        url: '/transactions?type=binary',
+        icon: 'transaction',
+        isActive: false,
+        shortcut: ['t', 'r'],
+        items: []
+      },
+      {
+        title: 'Account',
+        url: '/profile',
+        icon: 'billing',
+        isActive: false,
+        shortcut: ['p', 'r'],
+        items: []
+      }
+    ]
+  },
   Invest: {
     USER: [
       {

@@ -161,6 +161,13 @@ export default function AppSidebar() {
       if (roomStockTenant) {
         setSelectedTenant(roomStockTenant);
       }
+    } else if (pathname.includes('/binary-option-trade')) {
+      const roomBinaryTenant = tenants.find(
+        (t) => t.name === 'Room Binary Option'
+      );
+      if (roomBinaryTenant) {
+        setSelectedTenant(roomBinaryTenant);
+      }
     } else if (pathname.includes('/investments')) {
       const investTenant = tenants.find((t) => t.name === 'Invest');
       if (investTenant) {
