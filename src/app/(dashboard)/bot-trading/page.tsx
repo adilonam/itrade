@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import PageContainer from '@/components/layout/page-container';
 import { Heading } from '@/components/ui/heading';
 import { Separator } from '@/components/ui/separator';
@@ -8,6 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { DateTimePicker } from '@/components/ui/date-time-picker';
 import {
   Select,
   SelectContent,
@@ -16,18 +19,28 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
+} from '@/components/ui/dialog';
+import {
   MOCK_BOT_MARKETPLACE,
-  type BotMarketplaceItem
+  DEFAULT_BOT_PARAMS,
+  type BotMarketplaceItem,
+  type BotParamsMap
 } from '@/constants/bot-trading-mock';
+import { BotTradingStatsCards } from '@/components/bot-trading/bot-trading-stats-cards';
 import {
   IconRobot,
   IconTrendingUp,
-  IconTrendingDown,
   IconShield,
   IconSearch
 } from '@tabler/icons-react';
 import { cn } from '@/lib/utils';
-import Link from 'next/link';
+import type { Bot } from '@/lib/prisma/generated/client';
 
 const getRiskColor = (riskLevel: string) => {
   switch (riskLevel) {
@@ -45,7 +58,29 @@ const formatCurrency = (amount: number) =>
     amount
   );
 
-function BotCard({ bot }: { bot: BotMarketplaceItem }) {
+function getDefaultDates() {
+  const start = new Date();
+  const stop = new Date();
+  stop.setDate(stop.getDate() + 30);
+  return {
+    dateStart: start.toISOString(),
+    dateStop: stop.toISOString()
+  };
+}
+
+interface MarketOption {
+  id: string;
+  symbol: string;
+  name: string;
+}
+
+function BotCard({
+  bot,
+  onUseBot
+}: {
+  bot: BotMarketplaceItem;
+  onUseBot: (bot: BotMarketplaceItem) => void;
+}) {
   const isComingSoon = bot.status === 'COMING_SOON';
 
   return (
@@ -114,8 +149,8 @@ function BotCard({ bot }: { bot: BotMarketplaceItem }) {
           </Button>
         ) : (
           <div className='grid grid-cols-2 gap-2 pt-2'>
-            <Button className='w-full' asChild>
-              <Link href='/bot-trading/my-bots'>Use bot</Link>
+            <Button className='w-full' onClick={() => onUseBot(bot)}>
+              Use bot
             </Button>
             <Button variant='secondary' className='w-full' disabled>
               Stop
@@ -129,15 +164,91 @@ function BotCard({ bot }: { bot: BotMarketplaceItem }) {
 
 const FILTER_TABS = [
   { id: 'all', label: 'All Bots' },
-  { id: 'favorites', label: 'Favorites' },
-  { id: 'high', label: 'High Frequency' },
-  { id: 'low', label: 'Low Risk' }
+  { id: 'low', label: 'Low Risk' },
+  { id: 'high', label: 'High Risk' }
 ] as const;
 
 export default function BotMarketplacePage() {
+  const router = useRouter();
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<string>('all');
   const [sort, setSort] = useState<string>('performance');
+  const [selectedBot, setSelectedBot] = useState<BotMarketplaceItem | null>(null);
+  const [markets, setMarkets] = useState<MarketOption[]>([]);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const [dateStart, setDateStart] = useState('');
+  const [dateStop, setDateStop] = useState('');
+  const [quantityLot, setQuantityLot] = useState(0.01);
+  const [marketId, setMarketId] = useState('');
+  const [botParams, setBotParams] = useState<BotParamsMap[Bot]>(DEFAULT_BOT_PARAMS.RSI);
+
+  const openModal = useCallback((bot: BotMarketplaceItem) => {
+    setSelectedBot(bot);
+    const { dateStart: ds, dateStop: de } = getDefaultDates();
+    setDateStart(ds);
+    setDateStop(de);
+    setQuantityLot(0.01);
+    setMarketId('');
+    setBotParams({ ...DEFAULT_BOT_PARAMS[bot.bot] });
+    setError(null);
+  }, []);
+
+  useEffect(() => {
+    if (!selectedBot) return;
+    fetch('/api/markets?room=TRADING')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.markets?.length) {
+          setMarkets(
+            data.markets.map((m: { id: string; symbol: string; name: string }) => ({
+              id: m.id,
+              symbol: m.symbol,
+              name: m.name
+            }))
+          );
+          setMarketId((prev) => prev || data.markets[0]?.id || '');
+        }
+      })
+      .catch(() => setMarkets([]));
+  }, [selectedBot]);
+
+  const handleConfirm = async () => {
+    if (!selectedBot) return;
+    setError(null);
+    if (!marketId) {
+      setError('Please select a market.');
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const res = await fetch('/api/user/bot-trading/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          bot: selectedBot.bot,
+          dateStart: new Date(dateStart).toISOString(),
+          dateStop: new Date(dateStop).toISOString(),
+          quantityLot,
+          marketId,
+          botParams
+        })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(data.error || 'Failed to start bot.');
+        setSubmitting(false);
+        return;
+      }
+      setSelectedBot(null);
+      router.push('/bot-trading/my-bots');
+    } catch {
+      setError('Failed to start bot.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   const filtered = MOCK_BOT_MARKETPLACE.filter((bot) => {
     const matchSearch =
@@ -161,7 +272,7 @@ export default function BotMarketplacePage() {
         <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
           <Heading
             title='Bot Marketplace'
-            description='Browse and connect trading bots. Stitch-inspired layout with mock data.'
+            description='RSI, Grid Trading, and Trend Following bots. Configure and start from here.'
           />
           <div className='relative w-full max-w-xs'>
             <IconSearch className='text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2' />
@@ -175,45 +286,8 @@ export default function BotMarketplacePage() {
         </div>
         <Separator />
 
-        {/* Stats bar - Stitch style */}
-        <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
-          <Card className='border-border/50'>
-            <CardContent className='p-5'>
-              <p className='text-muted-foreground mb-1 text-[10px] font-bold uppercase tracking-wider'>
-                Active Bots
-              </p>
-              <p className='text-2xl font-bold'>
-                2 <span className='text-muted-foreground ml-1 text-sm font-normal'>/ 20</span>
-              </p>
-            </CardContent>
-          </Card>
-          <Card className='border-border/50'>
-            <CardContent className='p-5'>
-              <p className='text-muted-foreground mb-1 text-[10px] font-bold uppercase tracking-wider'>
-                24h Profit
-              </p>
-              <p className='text-2xl font-bold text-primary'>+$50.70</p>
-            </CardContent>
-          </Card>
-          <Card className='border-border/50'>
-            <CardContent className='p-5'>
-              <p className='text-muted-foreground mb-1 text-[10px] font-bold uppercase tracking-wider'>
-                Total Equity
-              </p>
-              <p className='text-2xl font-bold'>$1,500.00</p>
-            </CardContent>
-          </Card>
-          <Card className='border-border/50'>
-            <CardContent className='p-5'>
-              <p className='text-muted-foreground mb-1 text-[10px] font-bold uppercase tracking-wider'>
-                Success Rate
-              </p>
-              <p className='text-2xl font-bold text-primary'>78.4%</p>
-            </CardContent>
-          </Card>
-        </div>
+        <BotTradingStatsCards />
 
-        {/* Filter tabs + sort - Stitch style */}
         <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
           <div className='flex gap-1 rounded-lg bg-muted/50 p-1'>
             {FILTER_TABS.map((tab) => (
@@ -245,7 +319,7 @@ export default function BotMarketplacePage() {
 
         <div className='grid gap-6 sm:grid-cols-2 lg:grid-cols-3'>
           {sorted.map((bot) => (
-            <BotCard key={bot.id} bot={bot} />
+            <BotCard key={bot.id} bot={bot} onUseBot={openModal} />
           ))}
         </div>
 
@@ -260,6 +334,223 @@ export default function BotMarketplacePage() {
           </Card>
         )}
       </div>
+
+      <Dialog open={!!selectedBot} onOpenChange={(open) => !open && setSelectedBot(null)}>
+        <DialogContent className='max-w-md sm:max-w-lg'>
+          <DialogHeader>
+            <DialogTitle>Start bot: {selectedBot?.name}</DialogTitle>
+            <DialogDescription>
+              Set schedule, market, lot size, and bot parameters. The bot will run between the
+              start and stop dates.
+            </DialogDescription>
+          </DialogHeader>
+          {selectedBot && (
+            <div className='grid gap-4 py-4'>
+              <div className='grid grid-cols-2 gap-4'>
+                <DateTimePicker
+                  id='dateStart'
+                  label='Start date & time'
+                  value={dateStart}
+                  onChange={setDateStart}
+                />
+                <DateTimePicker
+                  id='dateStop'
+                  label='Stop date & time'
+                  value={dateStop}
+                  onChange={setDateStop}
+                />
+              </div>
+              <div className='grid grid-cols-2 gap-4'>
+                <div className='space-y-2'>
+                  <Label htmlFor='quantityLot'>Quantity (lots)</Label>
+                  <Input
+                    id='quantityLot'
+                    type='number'
+                    min={0.01}
+                    step={0.01}
+                    value={quantityLot}
+                    onChange={(e) => setQuantityLot(Number(e.target.value) || 0.01)}
+                  />
+                </div>
+                <div className='space-y-2'>
+                  <Label>Market</Label>
+                  <Select value={marketId} onValueChange={setMarketId}>
+                    <SelectTrigger>
+                      <SelectValue placeholder='Select market' />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {markets.map((m) => (
+                        <SelectItem key={m.id} value={m.id}>
+                          {m.symbol} – {m.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <Separator />
+
+              <div className='space-y-2'>
+                <Label className='text-xs font-bold uppercase tracking-wider text-muted-foreground'>
+                  Bot parameters
+                </Label>
+                {selectedBot.bot === 'RSI' && (
+                  <div className='grid grid-cols-3 gap-3'>
+                    <div className='space-y-1'>
+                      <Label htmlFor='rsi-period' className='text-xs'>
+                        Period
+                      </Label>
+                      <Input
+                        id='rsi-period'
+                        type='number'
+                        min={2}
+                        max={50}
+                        value={(botParams as BotParamsMap['RSI']).period}
+                        onChange={(e) =>
+                          setBotParams((p) => ({
+                            ...p,
+                            period: Number(e.target.value) || 14
+                          }))
+                        }
+                      />
+                    </div>
+                    <div className='space-y-1'>
+                      <Label htmlFor='rsi-overbought' className='text-xs'>
+                        Overbought
+                      </Label>
+                      <Input
+                        id='rsi-overbought'
+                        type='number'
+                        min={50}
+                        max={100}
+                        value={(botParams as BotParamsMap['RSI']).overbought}
+                        onChange={(e) =>
+                          setBotParams((p) => ({
+                            ...p,
+                            overbought: Number(e.target.value) || 70
+                          }))
+                        }
+                      />
+                    </div>
+                    <div className='space-y-1'>
+                      <Label htmlFor='rsi-oversold' className='text-xs'>
+                        Oversold
+                      </Label>
+                      <Input
+                        id='rsi-oversold'
+                        type='number'
+                        min={0}
+                        max={50}
+                        value={(botParams as BotParamsMap['RSI']).oversold}
+                        onChange={(e) =>
+                          setBotParams((p) => ({
+                            ...p,
+                            oversold: Number(e.target.value) || 30
+                          }))
+                        }
+                      />
+                    </div>
+                  </div>
+                )}
+                {selectedBot.bot === 'GRID_TRADING' && (
+                  <div className='grid grid-cols-2 gap-3'>
+                    <div className='space-y-1'>
+                      <Label htmlFor='grid-levels' className='text-xs'>
+                        Grid levels
+                      </Label>
+                      <Input
+                        id='grid-levels'
+                        type='number'
+                        min={2}
+                        max={50}
+                        value={(botParams as BotParamsMap['GRID_TRADING']).gridLevels}
+                        onChange={(e) =>
+                          setBotParams((p) => ({
+                            ...p,
+                            gridLevels: Number(e.target.value) || 10
+                          }))
+                        }
+                      />
+                    </div>
+                    <div className='space-y-1'>
+                      <Label htmlFor='grid-step' className='text-xs'>
+                        Step (%)
+                      </Label>
+                      <Input
+                        id='grid-step'
+                        type='number'
+                        min={0.1}
+                        step={0.1}
+                        value={(botParams as BotParamsMap['GRID_TRADING']).stepPercent}
+                        onChange={(e) =>
+                          setBotParams((p) => ({
+                            ...p,
+                            stepPercent: Number(e.target.value) || 0.5
+                          }))
+                        }
+                      />
+                    </div>
+                  </div>
+                )}
+                {selectedBot.bot === 'TREND_FOLLOWING' && (
+                  <div className='grid grid-cols-2 gap-3'>
+                    <div className='space-y-1'>
+                      <Label htmlFor='trend-ema' className='text-xs'>
+                        EMA period
+                      </Label>
+                      <Input
+                        id='trend-ema'
+                        type='number'
+                        min={5}
+                        max={200}
+                        value={(botParams as BotParamsMap['TREND_FOLLOWING']).emaPeriod}
+                        onChange={(e) =>
+                          setBotParams((p) => ({
+                            ...p,
+                            emaPeriod: Number(e.target.value) || 20
+                          }))
+                        }
+                      />
+                    </div>
+                    <div className='space-y-1'>
+                      <Label htmlFor='trend-strength' className='text-xs'>
+                        Trend strength
+                      </Label>
+                      <Input
+                        id='trend-strength'
+                        type='number'
+                        min={0.5}
+                        step={0.5}
+                        value={(botParams as BotParamsMap['TREND_FOLLOWING']).trendStrength}
+                        onChange={(e) =>
+                          setBotParams((p) => ({
+                            ...p,
+                            trendStrength: Number(e.target.value) || 2
+                          }))
+                        }
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+          {error && (
+            <p className='text-destructive text-sm' role='alert'>
+              {error}
+            </p>
+          )}
+          <DialogFooter>
+            <Button variant='outline' onClick={() => setSelectedBot(null)} disabled={submitting}>
+              Cancel
+            </Button>
+            <Button onClick={handleConfirm} disabled={submitting}>
+              {submitting ? 'Starting…' : 'Confirm & start bot'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </PageContainer>
   );
 }

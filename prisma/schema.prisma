@@ -52,40 +52,41 @@ model Session {
 }
 
 model User {
-  id               String           @id @default(cuid())
-  name             String?
-  email            String           @unique
-  emailVerified    DateTime?        @map("email_verified")
-  image            String? // profile image URL (e.g. Vercel Blob URL)
-  password         String? // For credentials provider
-  balance          Float            @default(0) @map("balance")
-  role             Role             @default(USER)
-  createdAt        DateTime         @default(now()) @map("created_at")
-  updatedAt        DateTime         @updatedAt @map("updated_at")
-  leverage         Int              @default(1000) @map("leverage")
+  id                  String               @id @default(cuid())
+  name                String?
+  email               String               @unique
+  emailVerified       DateTime?            @map("email_verified")
+  image               String? // profile image URL (e.g. Vercel Blob URL)
+  password            String? // For credentials provider
+  balance             Float                @default(0) @map("balance")
+  role                Role                 @default(USER)
+  createdAt           DateTime             @default(now()) @map("created_at")
+  updatedAt           DateTime             @updatedAt @map("updated_at")
+  leverage            Int                  @default(1000) @map("leverage")
   // Theme preferences
-  themeMode        String?          @default("system") @map("theme_mode") // "light", "dark", "system"
-  themeColor       String?          @default("default") @map("theme_color") // "default", "blue", "green", etc.
-  reducedMotion    Boolean          @default(false) @map("reduced_motion")
-  highContrast     Boolean          @default(false) @map("high_contrast")
-  phone            String?          @map("phone")
-  dateOfBirth      DateTime?        @map("date_of_birth")
-  address          String?          @map("address")
-  postalCode       String?          @map("postal_code")
-  city             String?          @map("city")
-  accounts         Account[]
-  sessions         Session[]
-  mfaChallenges        MfaChallenge[]
-  passwordResetTokens  PasswordResetToken[]
-  positions            Position[]
-  userInvestments  UserInvestment[]
-  transactions     Transaction[]
-  withdrawRequests WithdrawRequest[]
-  seller           User?            @relation("SellerUsers", fields: [sellerId], references: [id], onDelete: SetNull)
-  sellerId         String?          @map("seller_id")
-  sellerUsers      User[]           @relation("SellerUsers")
-  sentMessages     Message[]        @relation("MessageSender")
-  receivedMessages Message[]        @relation("MessageReceiver")
+  themeMode           String?              @default("system") @map("theme_mode") // "light", "dark", "system"
+  themeColor          String?              @default("default") @map("theme_color") // "default", "blue", "green", etc.
+  reducedMotion       Boolean              @default(false) @map("reduced_motion")
+  highContrast        Boolean              @default(false) @map("high_contrast")
+  phone               String?              @map("phone")
+  dateOfBirth         DateTime?            @map("date_of_birth")
+  address             String?              @map("address")
+  postalCode          String?              @map("postal_code")
+  city                String?              @map("city")
+  accounts            Account[]
+  sessions            Session[]
+  mfaChallenges       MfaChallenge[]
+  passwordResetTokens PasswordResetToken[]
+  positions           Position[]
+  userInvestments     UserInvestment[]
+  transactions        Transaction[]
+  withdrawRequests    WithdrawRequest[]
+  seller              User?                @relation("SellerUsers", fields: [sellerId], references: [id], onDelete: SetNull)
+  sellerId            String?              @map("seller_id")
+  sellerUsers         User[]               @relation("SellerUsers")
+  sentMessages        Message[]            @relation("MessageSender")
+  receivedMessages    Message[]            @relation("MessageReceiver")
+  botUsers            BotUser[]
 
   @@map("users")
 }
@@ -146,6 +147,7 @@ model Market {
   createdAt         DateTime   @default(now()) @map("created_at")
   updatedAt         DateTime   @updatedAt @map("updated_at")
   positions         Position[]
+  botUsers          BotUser[]
 
   @@map("markets")
 }
@@ -353,19 +355,47 @@ enum WithdrawRequestStatus {
 }
 
 model WithdrawRequest {
-  id         String               @id @default(cuid())
-  userId     String               @map("user_id")
-  amount     Float                @map("amount")
-  method     WithdrawMethod       @map("method")
+  id         String                @id @default(cuid())
+  userId     String                @map("user_id")
+  amount     Float                 @map("amount")
+  method     WithdrawMethod        @map("method")
   status     WithdrawRequestStatus @default(PENDING) @map("status")
-  details    Json?                @map("details") // paypal: { email }, bank: { accountHolderName, bankName, accountNumber, routingNumber }
-  adminNotes String?              @map("admin_notes") @db.Text
-  createdAt  DateTime             @default(now()) @map("created_at")
-  updatedAt  DateTime             @updatedAt @map("updated_at")
+  details    Json?                 @map("details") // paypal: { email }, bank: { accountHolderName, bankName, accountNumber, routingNumber }
+  adminNotes String?               @map("admin_notes") @db.Text
+  createdAt  DateTime              @default(now()) @map("created_at")
+  updatedAt  DateTime              @updatedAt @map("updated_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([status])
   @@map("withdraw_requests")
+}
+
+enum Bot {
+  RSI
+  GRID_TRADING
+  TREND_FOLLOWING
+}
+
+model BotUser {
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  bot         Bot
+  dateStart   DateTime @map("date_start")
+  dateStop    DateTime @map("date_stop")
+  quantityLot Float    @map("quantity_lot")
+  marketId    String   @map("market_id")
+  botParams   Json     @map("bot_params")
+  active      Boolean  @default(true) @map("active")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  market Market @relation(fields: [marketId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([marketId])
+  @@map("bot_users")
 }

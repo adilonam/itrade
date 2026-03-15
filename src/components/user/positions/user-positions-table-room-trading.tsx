@@ -159,9 +159,11 @@ export function UserPositionsTableRoomTrading({
   if (loading) {
     return (
       <Card>
-        <CardContent className='flex items-center justify-center py-8'>
-          <IconLoader2 className='h-6 w-6 animate-spin' />
-          <span className='ml-2'>Loading room trading positions...</span>
+        <CardContent className='flex flex-col items-center justify-center py-12'>
+          <IconLoader2 className='text-muted-foreground mb-4 h-6 w-6 animate-spin' />
+          <p className='text-muted-foreground text-center'>
+            Loading room trading positions...
+          </p>
         </CardContent>
       </Card>
     );
@@ -170,16 +172,10 @@ export function UserPositionsTableRoomTrading({
   if (positions.length === 0) {
     return (
       <Card>
-        <CardContent className='flex items-center justify-center py-8'>
-          <div className='text-center'>
-            <p className='text-muted-foreground'>
-              No room trading positions found
-            </p>
-            <p className='text-muted-foreground mt-1 text-sm'>
-              Your room trading positions will appear here once you start
-              trading
-            </p>
-          </div>
+        <CardContent className='flex flex-col items-center justify-center py-12'>
+          <p className='text-muted-foreground text-center'>
+            No room trading positions found. Positions will appear here once you start trading.
+          </p>
         </CardContent>
       </Card>
     );

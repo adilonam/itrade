@@ -1,0 +1,56 @@
+import { NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
+import { calculateUserFinancialInfo } from '@/lib/calculator-server';
+
+const MAX_BOTS = 20;
+
+/**
+ * GET /api/user/bot-trading/stats
+ * Returns live stats for the bot trading dashboard: active bots count, 24h profit, total equity, success rate.
+ * profit24h and successRate are placeholders (0 / null) until trade history is available.
+ */
+export async function GET() {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const userId = session.user.id;
+
+    const [activeBotsCount, user] = await Promise.all([
+      prisma.botUser.count({
+        where: { userId, active: true }
+      }),
+      prisma.user.findUnique({
+        where: { id: userId }
+      })
+    ]);
+
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    const financialInfo = await calculateUserFinancialInfo(user, 'TRADING');
+    const totalEquity =
+      financialInfo != null ? financialInfo.equity : Number(user.balance.toFixed(2));
+
+    const stats = {
+      activeBots: activeBotsCount,
+      maxBots: MAX_BOTS,
+      profit24h: 0,
+      totalEquity,
+      successRate: null as number | null
+    };
+
+    return NextResponse.json(stats);
+  } catch (e) {
+    console.error('GET /api/user/bot-trading/stats', e);
+    return NextResponse.json(
+      { error: 'Failed to fetch bot trading stats.' },
+      { status: 500 }
+    );
+  }
+}

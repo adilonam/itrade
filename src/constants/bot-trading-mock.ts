@@ -1,3 +1,5 @@
+import type { Bot } from '@/lib/prisma/generated/client';
+
 export interface BotMarketplaceItem {
   id: string;
   name: string;
@@ -9,7 +11,31 @@ export interface BotMarketplaceItem {
   subscribers: number;
   riskLevel: 'LOW' | 'MEDIUM' | 'HIGH';
   status: 'ACTIVE' | 'COMING_SOON';
+  /** Maps to Prisma Bot enum */
+  bot: Bot;
 }
+
+export interface RsiBotParams {
+  period: number;
+  overbought: number;
+  oversold: number;
+}
+
+export interface GridTradingBotParams {
+  gridLevels: number;
+  stepPercent: number;
+}
+
+export interface TrendFollowingBotParams {
+  emaPeriod: number;
+  trendStrength: number;
+}
+
+export type BotParamsMap = {
+  RSI: RsiBotParams;
+  GRID_TRADING: GridTradingBotParams;
+  TREND_FOLLOWING: TrendFollowingBotParams;
+};
 
 export interface MyBotItem {
   id: string;
@@ -35,87 +61,61 @@ export interface BotPositionItem {
   openedAt: string;
 }
 
+/** Only RSI, Grid Trading, Trend Following */
 export const MOCK_BOT_MARKETPLACE: BotMarketplaceItem[] = [
   {
-    id: 'bot-1',
-    name: 'Trend Scout',
-    description: 'Follows momentum and trend-following signals on major forex pairs.',
-    strategy: 'Momentum',
-    performance30d: 4.2,
-    performance90d: 12.8,
-    minCapital: 500,
-    subscribers: 1240,
+    id: 'bot-rsi',
+    name: 'RSI Bot',
+    description: 'Relative Strength Index signals for overbought/oversold entries.',
+    strategy: 'RSI',
+    performance30d: 3.2,
+    performance90d: 9.6,
+    minCapital: 10,
+    subscribers: 1520,
     riskLevel: 'MEDIUM',
-    status: 'ACTIVE'
+    status: 'ACTIVE',
+    bot: 'RSI'
   },
   {
-    id: 'bot-2',
-    name: 'Scalper Pro',
-    description: 'High-frequency scalping on indices with tight stop-loss.',
-    strategy: 'Scalping',
-    performance30d: 2.1,
-    performance90d: 8.4,
-    minCapital: 1000,
-    subscribers: 892,
-    riskLevel: 'HIGH',
-    status: 'ACTIVE'
-  },
-  {
-    id: 'bot-3',
-    name: 'Safe Yield',
-    description: 'Conservative grid strategy on EUR/USD and GBP/USD.',
+    id: 'bot-grid',
+    name: 'Grid Trading',
+    description: 'Conservative grid strategy on forex and crypto pairs.',
     strategy: 'Grid',
     performance30d: 1.8,
     performance90d: 5.2,
-    minCapital: 200,
+    minCapital: 10,
     subscribers: 2103,
     riskLevel: 'LOW',
-    status: 'ACTIVE'
+    status: 'ACTIVE',
+    bot: 'GRID_TRADING'
   },
   {
-    id: 'bot-4',
-    name: 'Breakout King',
-    description: 'Detects breakouts and enters with trailing stop.',
-    strategy: 'Breakout',
-    performance30d: 5.6,
-    performance90d: 18.3,
-    minCapital: 750,
-    subscribers: 567,
+    id: 'bot-trend',
+    name: 'Trend Following',
+    description: 'Follows momentum and trend-following signals on major pairs.',
+    strategy: 'Trend',
+    performance30d: 4.2,
+    performance90d: 12.8,
+    minCapital: 10,
+    subscribers: 1240,
     riskLevel: 'MEDIUM',
-    status: 'ACTIVE'
-  },
-  {
-    id: 'bot-5',
-    name: 'DCA Master',
-    description: 'Dollar-cost averaging across selected crypto and forex.',
-    strategy: 'DCA',
-    performance30d: 0.9,
-    performance90d: 4.1,
-    minCapital: 100,
-    subscribers: 3421,
-    riskLevel: 'LOW',
-    status: 'ACTIVE'
-  },
-  {
-    id: 'bot-6',
-    name: 'Volatility Hunter',
-    description: 'Options-style volatility plays (coming soon).',
-    strategy: 'Volatility',
-    performance30d: 0,
-    performance90d: 0,
-    minCapital: 2000,
-    subscribers: 0,
-    riskLevel: 'HIGH',
-    status: 'COMING_SOON'
+    status: 'ACTIVE',
+    bot: 'TREND_FOLLOWING'
   }
 ];
+
+export const DEFAULT_BOT_PARAMS: BotParamsMap = {
+  RSI: { period: 14, overbought: 70, oversold: 30 },
+  GRID_TRADING: { gridLevels: 10, stepPercent: 0.5 },
+  TREND_FOLLOWING: { emaPeriod: 20, trendStrength: 2 }
+};
 
 export const MOCK_MY_BOTS: MyBotItem[] = [
   {
     id: 'my-bot-1',
-    botId: 'bot-1',
-    botName: 'Trend Scout',
-    strategy: 'Momentum',
+    botId: 'bot-rsi',
+    botName: 'RSI Bot',
+    strategy: 'RSI',
     allocatedCapital: 1000,
     pnl: 42.5,
     pnlPercent: 4.25,
@@ -124,8 +124,8 @@ export const MOCK_MY_BOTS: MyBotItem[] = [
   },
   {
     id: 'my-bot-2',
-    botId: 'bot-3',
-    botName: 'Safe Yield',
+    botId: 'bot-grid',
+    botName: 'Grid Trading',
     strategy: 'Grid',
     allocatedCapital: 500,
     pnl: 8.2,
