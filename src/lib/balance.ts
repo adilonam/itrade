@@ -9,12 +9,6 @@ export function parseBalanceType(input: unknown): BalanceType {
   return DEFAULT_BALANCE_TYPE;
 }
 
-export function getSessionBalanceType(session: {
-  user?: { currentBalanceType?: BalanceType | null };
-} | null): BalanceType {
-  return parseBalanceType(session?.user?.currentBalanceType);
-}
-
 export async function getUserBalanceAmount(
   tx: Prisma.TransactionClient,
   userId: string,

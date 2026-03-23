@@ -94,7 +94,7 @@ export default function InvestmentsPage() {
         await Promise.all([
           fetch('/api/investments'),
           fetch('/api/user/investments'),
-          fetch('/api/user/financial')
+          fetch('/api/user/financial?balanceType=REAL')
         ]);
 
       if (!investmentsRes.ok) throw new Error('Failed to fetch investments');

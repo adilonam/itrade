@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
 import { z } from 'zod';
-import { getSessionBalanceType } from '@/lib/balance';
+import { parseBalanceType } from '@/lib/balance';
 
 // Validation schema
 const getTransactionsSchema = z.object({
@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
     }
 
     const { page, limit, type, transactionType } = validation.data;
-    const balanceType = getSessionBalanceType(session);
+    const balanceType = parseBalanceType(searchParams.get('balanceType'));
     const skip = (page - 1) * limit;
 
     // Build where clause

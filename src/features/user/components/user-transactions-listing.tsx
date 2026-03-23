@@ -54,7 +54,8 @@ function UserTransactionsListingContent() {
       setLoading(true);
       const params = new URLSearchParams({
         page: pagination.page.toString(),
-        limit: pagination.limit.toString()
+        limit: pagination.limit.toString(),
+        balanceType: 'REAL'
       });
 
       if (typeFilter && typeFilter !== 'all') {

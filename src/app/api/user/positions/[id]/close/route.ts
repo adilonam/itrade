@@ -11,7 +11,7 @@ import {
   Position,
   TransactionType
 } from '@/lib/prisma/generated/client';
-import { getSessionBalanceType } from '@/lib/balance';
+import { parseBalanceType } from '@/lib/balance';
 
 export async function PATCH(
   request: NextRequest,
@@ -43,8 +43,8 @@ export async function PATCH(
 
     const { id } = await params;
     const body = await request.json();
-    const { status = 'CLOSED', amount } = body;
-    const balanceType = getSessionBalanceType(session);
+    const { status = 'CLOSED', amount, balanceType: rawBalanceType } = body;
+    const balanceType = parseBalanceType(rawBalanceType);
 
     // Validate status
     if (status !== 'CLOSED') {

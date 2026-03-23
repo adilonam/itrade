@@ -91,11 +91,11 @@ export function DashboardOverview() {
         investmentsRes,
         userRes
       ] = await Promise.all([
-        fetch('/api/user/financial'),
-        fetch('/api/user/positions?room=TRADING&limit=1000'),
-        fetch('/api/user/positions?room=STOCK&limit=1000'),
+        fetch('/api/user/financial?balanceType=REAL'),
+        fetch('/api/user/positions?room=TRADING&limit=1000&balanceType=REAL'),
+        fetch('/api/user/positions?room=STOCK&limit=1000&balanceType=REAL'),
         fetch('/api/user/investments'),
-        fetch('/api/user/profile')
+        fetch('/api/user/profile?balanceType=REAL')
       ]);
 
       if (

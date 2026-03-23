@@ -6,7 +6,7 @@ import {
   WithdrawMethod,
   WithdrawRequestStatus
 } from '@/lib/prisma/generated/client';
-import { ensureUserBalance, getSessionBalanceType } from '@/lib/balance';
+import { ensureUserBalance, parseBalanceType } from '@/lib/balance';
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,8 +17,8 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { amount, withdrawMethod } = body;
-    const balanceType = getSessionBalanceType(session);
+    const { amount, withdrawMethod, balanceType: rawBalanceType } = body;
+    const balanceType = parseBalanceType(rawBalanceType);
 
     // Validate input
     if (!amount || amount <= 0) {

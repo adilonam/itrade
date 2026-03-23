@@ -57,6 +57,7 @@ export function TradingActionsRoomTrading({
   room = 'TRADING',
   refreshEventName = 'room-trading-positions-refresh'
 }: TradingActionsRoomTradingProps) {
+  const balanceType = room === 'INSTITUTIONAL' ? 'INSTITUTIONAL' : 'REAL';
   const { data: session } = useSession();
   const [inputMode, setInputMode] = useState<'LOT' | 'AMOUNT'>('LOT');
   const [inputValue, setInputValue] = useState<string>('');
@@ -195,6 +196,7 @@ export function TradingActionsRoomTrading({
         body: JSON.stringify({
           type,
           status: orderType === 'LIMIT' ? 'PENDING' : 'PLACED',
+          balanceType,
           room,
           executedPrice:
             orderType === 'LIMIT' ? parseFloat(limitPrice) : undefined,

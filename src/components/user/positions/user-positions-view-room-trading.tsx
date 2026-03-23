@@ -99,7 +99,8 @@ export function UserPositionsViewRoomTrading() {
         const params = new URLSearchParams({
           page: page.toString(),
           limit: pagination.limit.toString(),
-          room: 'TRADING'
+          room: 'TRADING',
+          balanceType: 'REAL'
         });
 
         // Add filter values, handling Date objects and undefined values
@@ -135,7 +136,7 @@ export function UserPositionsViewRoomTrading() {
   // Load financial data from API
   const loadFinancialData = useCallback(async () => {
     try {
-      const response = await fetch('/api/user/financial?room=TRADING');
+      const response = await fetch('/api/user/financial?room=TRADING&balanceType=REAL');
       if (!response.ok) {
         throw new Error('Failed to fetch financial data');
       }
@@ -197,7 +198,7 @@ export function UserPositionsViewRoomTrading() {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ status: 'CLOSED' })
+        body: JSON.stringify({ status: 'CLOSED', balanceType: 'REAL' })
       });
 
       if (!response.ok) {

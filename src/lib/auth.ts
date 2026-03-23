@@ -3,7 +3,6 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import { prisma } from './prisma';
-import { parseBalanceType } from './balance';
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -92,7 +91,6 @@ export const authOptions: NextAuthOptions = {
             role: true,
             leverage: true,
             image: true,
-            currentBalanceType: true,
             balances: {
               select: { type: true, amount: true }
             }
@@ -100,15 +98,13 @@ export const authOptions: NextAuthOptions = {
         });
 
         if (dbUser) {
-          const selectedBalanceType = parseBalanceType(dbUser.currentBalanceType);
           const selectedBalance = dbUser.balances.find(
-            (balance) => balance.type === selectedBalanceType
+            (balance) => balance.type === 'REAL'
           );
           token.role = dbUser.role;
           token.balance = selectedBalance?.amount ?? 0;
           token.leverage = dbUser.leverage;
           token.image = dbUser.image ?? token.image;
-          token.currentBalanceType = selectedBalanceType;
         }
       }
 
@@ -120,9 +116,6 @@ export const authOptions: NextAuthOptions = {
         session.user.role = (token.role as string) || 'USER';
         session.user.balance = (token.balance as number) || 0;
         session.user.leverage = (token.leverage as number) || 1;
-        session.user.currentBalanceType = parseBalanceType(
-          token.currentBalanceType
-        );
         session.user.image = (token.image as string) ?? session.user.image;
       }
       return session;

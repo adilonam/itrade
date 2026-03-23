@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { calculateUserFinancialInfo } from '@/lib/calculator-server';
-import { getSessionBalanceType } from '@/lib/balance';
+import { parseBalanceType } from '@/lib/balance';
 
 export async function GET(request: NextRequest) {
   try {
@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
       roomParam && ['STOCK', 'TRADING', 'INSTITUTIONAL', 'ALL'].includes(roomParam)
         ? (roomParam as 'STOCK' | 'TRADING' | 'INSTITUTIONAL' | 'ALL')
         : 'ALL';
-    const balanceType = getSessionBalanceType(session);
+    const balanceType = parseBalanceType(searchParams.get('balanceType'));
 
     // Get user with required fields
     const { prisma } = await import('@/lib/prisma');

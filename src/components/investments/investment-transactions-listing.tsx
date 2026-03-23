@@ -38,6 +38,7 @@ export default function InvestmentTransactionsListing() {
       const params = new URLSearchParams();
       params.append('page', queryParams.page.toString());
       params.append('limit', queryParams.perPage.toString());
+      params.append('balanceType', 'REAL');
       if (queryParams.type) params.append('type', queryParams.type);
 
       const response = await fetch(

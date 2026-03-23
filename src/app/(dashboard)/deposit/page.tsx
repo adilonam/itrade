@@ -92,6 +92,7 @@ export default function DepositPage() {
         body: JSON.stringify({
           amount: parseFloat(amount),
           paymentMethod,
+          balanceType: 'REAL',
           paymentDetails: paymentMethod === 'card' ? cardDetails : paypalDetails
         })
       });

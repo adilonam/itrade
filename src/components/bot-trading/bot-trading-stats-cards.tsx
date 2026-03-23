@@ -36,7 +36,7 @@ export function BotTradingStatsCards() {
     let cancelled = false;
     setLoading(true);
     setError(null);
-    fetch('/api/user/bot-trading/stats')
+    fetch('/api/user/bot-trading/stats?balanceType=REAL')
       .then((res) => {
         if (!res.ok) throw new Error('Failed to load stats');
         return res.json();

@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
 import { z } from 'zod';
-import { ensureUserBalance, getSessionBalanceType } from '@/lib/balance';
+import { ensureUserBalance, parseBalanceType } from '@/lib/balance';
 
 const EnrollmentSchema = z.object({
   investmentId: z.string(),
@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const { investmentId, amount, autoReinvest } = EnrollmentSchema.parse(body);
-    const balanceType = getSessionBalanceType(session);
+    const balanceType = parseBalanceType(body.balanceType);
 
     // Start a position to ensure data consistency
     const result = await prisma.$transaction(async (tx) => {

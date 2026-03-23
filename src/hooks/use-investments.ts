@@ -135,7 +135,7 @@ export const useUserInvestments = (): UseUserInvestmentsResult => {
       setLoading(true);
       setError(null);
 
-      const response = await fetch('/api/user/investments');
+      const response = await fetch('/api/user/investments?balanceType=REAL');
 
       if (!response.ok) {
         throw new Error('Failed to fetch user investments');
@@ -180,7 +180,8 @@ export const useInvestmentEnrollment = (): UseInvestmentEnrollmentResult => {
           body: JSON.stringify({
             investmentId,
             amount: data.amount,
-            autoReinvest: data.autoReinvest
+            autoReinvest: data.autoReinvest,
+            balanceType: 'REAL'
           })
         });
 

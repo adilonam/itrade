@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
-import { ensureUserBalance, getSessionBalanceType } from '@/lib/balance';
+import { ensureUserBalance, parseBalanceType } from '@/lib/balance';
 
 interface RouteParams {
   params: Promise<{
@@ -19,7 +19,9 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     }
 
     const { id } = await params;
-    const balanceType = getSessionBalanceType(session);
+    const balanceType = parseBalanceType(
+      request.nextUrl.searchParams.get('balanceType')
+    );
 
     // Start a transaction to ensure data consistency
     const result = await prisma.$transaction(async (tx) => {

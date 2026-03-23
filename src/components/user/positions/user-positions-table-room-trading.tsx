@@ -413,6 +413,7 @@ export function UserPositionsTableCardRoomTrading({
   room = 'TRADING',
   refreshEventName = 'room-trading-positions-refresh'
 }: UserPositionsTableCardRoomTradingProps) {
+  const balanceType = room === 'INSTITUTIONAL' ? 'INSTITUTIONAL' : 'REAL';
   const [positions, setPositions] = useState<PositionWithMarket[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -425,7 +426,8 @@ export function UserPositionsTableCardRoomTrading({
       const params = new URLSearchParams({
         page: '1',
         limit: '10',
-        room
+        room,
+        balanceType
       });
       const response = await fetch(`/api/user/positions?${params}`);
       if (!response.ok) throw new Error('Failed to fetch positions');
@@ -436,7 +438,7 @@ export function UserPositionsTableCardRoomTrading({
     } finally {
       setLoading(false);
     }
-  }, [room]);
+  }, [room, balanceType]);
 
   useEffect(() => {
     loadPositions();
@@ -458,7 +460,7 @@ export function UserPositionsTableCardRoomTrading({
           {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ status: 'CLOSED' })
+            body: JSON.stringify({ status: 'CLOSED', balanceType })
           }
         );
         if (!response.ok) {
@@ -473,7 +475,7 @@ export function UserPositionsTableCardRoomTrading({
         );
       }
     },
-    [loadPositions]
+    [loadPositions, balanceType]
   );
 
   const updateRealTimePnL = useCallback((positionId: string, pnl: number) => {

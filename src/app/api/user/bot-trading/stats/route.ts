@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { calculateUserFinancialInfo } from '@/lib/calculator-server';
-import { getSessionBalanceType } from '@/lib/balance';
+import { parseBalanceType } from '@/lib/balance';
 
 const MAX_BOTS = 20;
 
@@ -35,7 +35,8 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    const balanceType = getSessionBalanceType(session);
+    const { searchParams } = new URL(request.url);
+    const balanceType = parseBalanceType(searchParams.get('balanceType'));
     const financialInfo = await calculateUserFinancialInfo(
       user,
       'TRADING',

@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth';
 import { put } from '@vercel/blob';
 import { prisma } from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
-import { getSessionBalanceType, parseBalanceType } from '@/lib/balance';
+import { parseBalanceType } from '@/lib/balance';
 
 export async function GET(request: NextRequest) {
   try {
@@ -13,7 +13,9 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const balanceType = getSessionBalanceType(session);
+    const balanceType = parseBalanceType(
+      request.nextUrl.searchParams.get('balanceType')
+    );
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
       include: {
@@ -35,7 +37,6 @@ export async function GET(request: NextRequest) {
       email: user.email,
       image: user.image,
       balance: user.balances[0]?.amount ?? 0,
-      currentBalanceType: balanceType,
       role: user.role,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
@@ -66,26 +67,9 @@ export async function PATCH(request: NextRequest) {
 
     const contentType = request.headers.get('content-type') || '';
     if (contentType.includes('application/json')) {
-      const body = await request.json();
-      const nextBalanceType = parseBalanceType(body.currentBalanceType);
-      const user = await prisma.user.update({
-        where: { id: session.user.id },
-        data: { currentBalanceType: nextBalanceType },
-        include: {
-          balances: {
-            where: { type: nextBalanceType },
-            select: { amount: true }
-          }
-        }
-      });
-
       return NextResponse.json({
-        user: {
-          id: user.id,
-          currentBalanceType: user.currentBalanceType,
-          balance: user.balances[0]?.amount ?? 0
-        }
-      });
+        error: 'JSON profile updates are not supported'
+      }, { status: 400 });
     }
 
     const formData = await request.formData();

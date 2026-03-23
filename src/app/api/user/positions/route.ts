@@ -7,7 +7,7 @@ import {
   calculatePositionPnL,
   couldOpenPosition
 } from '@/lib/calculator-server';
-import { getSessionBalanceType, getUserBalanceAmount } from '@/lib/balance';
+import { getUserBalanceAmount, parseBalanceType } from '@/lib/balance';
 // Create position data type
 type CreatePositionData = Position;
 import { Market, Position } from '@/lib/prisma/generated/client';
@@ -132,8 +132,9 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const body: Omit<CreatePositionData, 'userId'> = await request.json();
-    const balanceType = getSessionBalanceType(session);
+    const body: Omit<CreatePositionData, 'userId'> & { balanceType?: unknown } =
+      await request.json();
+    const balanceType = parseBalanceType(body.balanceType);
 
     // Validate required fields
     if (!body.type || body.quantity === undefined) {
