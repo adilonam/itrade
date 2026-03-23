@@ -9,6 +9,7 @@ import {
   IconScale,
   IconWallet
 } from '@tabler/icons-react';
+import { TRADE_ROOM_CARD_CLASS } from '@/constants/trade-room-ui';
 
 type FinancialData = {
   balance: number;
@@ -60,13 +61,25 @@ export function InstitutionalAccountInfoCard() {
     loadFinancial();
   }, [loadFinancial]);
 
+  useEffect(() => {
+    const refreshHandler = () => {
+      loadFinancial();
+    };
+    window.addEventListener('room-institutional-balances-refresh', refreshHandler);
+    return () =>
+      window.removeEventListener(
+        'room-institutional-balances-refresh',
+        refreshHandler
+      );
+  }, [loadFinancial]);
+
   if (loading) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Account Information</CardTitle>
+      <Card className={TRADE_ROOM_CARD_CLASS}>
+        <CardHeader className='px-4 pb-0 pt-0'>
+          <CardTitle className='text-sm font-semibold'>Account Information</CardTitle>
         </CardHeader>
-        <CardContent className='text-muted-foreground'>
+        <CardContent className='px-4 text-xs text-[var(--trade-text-muted)]'>
           Loading balance information...
         </CardContent>
       </Card>
@@ -75,7 +88,10 @@ export function InstitutionalAccountInfoCard() {
 
   if (error) {
     return (
-      <Alert variant='destructive'>
+      <Alert
+        variant='destructive'
+        className='border-[var(--trade-border)] bg-[var(--trade-panel)] text-sm'
+      >
         <AlertDescription>{error}</AlertDescription>
       </Alert>
     );
@@ -86,79 +102,79 @@ export function InstitutionalAccountInfoCard() {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Account Information</CardTitle>
+    <Card className={TRADE_ROOM_CARD_CLASS}>
+      <CardHeader className='px-4 pb-0 pt-0'>
+        <CardTitle className='text-sm font-semibold'>Account Information</CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-4'>
+      <CardContent className='px-4'>
+        <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
           <div className='flex items-start space-x-3'>
-            <div className='rounded-lg bg-blue-100 p-2 dark:bg-blue-900'>
-              <IconWallet className='h-5 w-5 text-blue-600 dark:text-blue-400' />
+            <div className='rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)]/40 p-2'>
+              <IconWallet className='h-4 w-4 text-[var(--trade-accent-blue)]' />
             </div>
             <div>
-              <p className='text-muted-foreground text-sm'>Balance</p>
-              <p className='text-xl font-bold'>
+              <p className='text-xs text-[var(--trade-text-muted)]'>Balance</p>
+              <p className='font-mono text-sm font-bold'>
                 {currencyFormatter.format(financial.balance)}
               </p>
             </div>
           </div>
 
           <div className='flex items-start space-x-3'>
-            <div className='rounded-lg bg-green-100 p-2 dark:bg-green-900'>
-              <IconChartLine className='h-5 w-5 text-green-600 dark:text-green-400' />
+            <div className='rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)]/40 p-2'>
+              <IconChartLine className='h-4 w-4 text-[var(--trade-green)]' />
             </div>
             <div>
-              <p className='text-muted-foreground text-sm'>Equity</p>
-              <p className='text-xl font-bold'>
+              <p className='text-xs text-[var(--trade-text-muted)]'>Equity</p>
+              <p className='font-mono text-sm font-bold'>
                 {currencyFormatter.format(financial.equity)}
               </p>
             </div>
           </div>
 
           <div className='flex items-start space-x-3'>
-            <div className='rounded-lg bg-purple-100 p-2 dark:bg-purple-900'>
-              <IconCash className='h-5 w-5 text-purple-600 dark:text-purple-400' />
+            <div className='rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)]/40 p-2'>
+              <IconCash className='h-4 w-4 text-[var(--trade-accent-blue)]' />
             </div>
             <div>
-              <p className='text-muted-foreground text-sm'>Free Margin</p>
-              <p className='text-xl font-bold'>
+              <p className='text-xs text-[var(--trade-text-muted)]'>Free Margin</p>
+              <p className='font-mono text-sm font-bold'>
                 {currencyFormatter.format(financial.freeMargin)}
               </p>
             </div>
           </div>
 
           <div className='flex items-start space-x-3'>
-            <div className='rounded-lg bg-orange-100 p-2 dark:bg-orange-900'>
-              <IconScale className='h-5 w-5 text-orange-600 dark:text-orange-400' />
+            <div className='rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)]/40 p-2'>
+              <IconScale className='h-4 w-4 text-[var(--trade-text-muted)]' />
             </div>
             <div>
-              <p className='text-muted-foreground text-sm'>Leverage</p>
-              <p className='text-xl font-bold'>1:{financial.leverage}</p>
+              <p className='text-xs text-[var(--trade-text-muted)]'>Leverage</p>
+              <p className='font-mono text-sm font-bold'>1:{financial.leverage}</p>
             </div>
           </div>
         </div>
 
-        <div className='mt-6 grid gap-4 border-t pt-4 md:grid-cols-3'>
+        <div className='mt-4 grid gap-3 border-t border-[var(--trade-border)] pt-4 md:grid-cols-3'>
           <div>
-            <p className='text-muted-foreground text-sm'>Used Margin</p>
-            <p className='text-lg font-semibold'>
+            <p className='text-xs text-[var(--trade-text-muted)]'>Used Margin</p>
+            <p className='font-mono text-sm font-semibold'>
               {currencyFormatter.format(financial.usedMargin)}
             </p>
           </div>
           <div>
-            <p className='text-muted-foreground text-sm'>Margin Level</p>
-            <p className='text-lg font-semibold'>
+            <p className='text-xs text-[var(--trade-text-muted)]'>Margin Level</p>
+            <p className='font-mono text-sm font-semibold'>
               {financial.marginLevel !== null
                 ? `${financial.marginLevel.toFixed(2)}%`
                 : 'N/A'}
             </p>
           </div>
           <div>
-            <p className='text-muted-foreground text-sm'>Unrealized P&L</p>
+            <p className='text-xs text-[var(--trade-text-muted)]'>Unrealized P&L</p>
             <p
-              className={`text-lg font-semibold ${
-                financial.totalPnL >= 0 ? 'text-green-600' : 'text-red-600'
+              className={`font-mono text-sm font-semibold ${
+                financial.totalPnL >= 0 ? 'text-[var(--trade-green)]' : 'text-[var(--trade-red)]'
               }`}
             >
               {financial.totalPnL >= 0 ? '+' : ''}

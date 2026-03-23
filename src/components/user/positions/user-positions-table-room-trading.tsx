@@ -42,23 +42,32 @@ import {
 } from '@tabler/icons-react';
 import { toast } from 'sonner';
 import type { Room } from '@/lib/prisma/generated/client';
+import { cn } from '@/lib/utils';
 
 type PositionWithMarket = Position & {
   market: Market | null;
 };
+
+const tradeRoomPositionsCardClass =
+  'border border-[var(--trade-border)] bg-[var(--trade-panel)] text-[var(--trade-text)] shadow-none py-4 gap-4';
+
 interface UserPositionsTableRoomTradingProps {
   positions: PositionWithMarket[];
   loading: boolean;
   onClose: (positionId: string) => void;
   onUpdateRealTimePnL?: (positionId: string, pnl: number) => void;
   realTimePnL?: Record<string, number>;
+  /** Match `/trade` trade-room panel typography and colors */
+  panelVariant?: 'default' | 'trade';
 }
 export function UserPositionsTableRoomTrading({
   positions,
   loading,
   onClose,
-  onUpdateRealTimePnL
+  onUpdateRealTimePnL,
+  panelVariant = 'default'
 }: UserPositionsTableRoomTradingProps) {
+  const isTradePanel = panelVariant === 'trade';
   const [closingPositionId, setClosingPositionId] = useState<string | null>(
     null
   );
@@ -154,10 +163,22 @@ export function UserPositionsTableRoomTrading({
 
   if (loading) {
     return (
-      <Card>
-        <CardContent className='flex flex-col items-center justify-center py-12'>
-          <IconLoader2 className='text-muted-foreground mb-4 h-6 w-6 animate-spin' />
-          <p className='text-muted-foreground text-center'>
+      <Card
+        className={cn(isTradePanel && tradeRoomPositionsCardClass)}
+      >
+        <CardContent
+          className={cn(
+            'flex flex-col items-center justify-center py-12',
+            isTradePanel && 'text-xs text-[var(--trade-text-muted)]'
+          )}
+        >
+          <IconLoader2
+            className={cn(
+              'mb-4 h-6 w-6 animate-spin',
+              isTradePanel ? 'text-[var(--trade-text-muted)]' : 'text-muted-foreground'
+            )}
+          />
+          <p className='text-center'>
             Loading room trading positions...
           </p>
         </CardContent>
@@ -167,9 +188,16 @@ export function UserPositionsTableRoomTrading({
 
   if (positions.length === 0) {
     return (
-      <Card>
-        <CardContent className='flex flex-col items-center justify-center py-12'>
-          <p className='text-muted-foreground text-center'>
+      <Card
+        className={cn(isTradePanel && tradeRoomPositionsCardClass)}
+      >
+        <CardContent
+          className={cn(
+            'flex flex-col items-center justify-center py-12',
+            isTradePanel && 'text-xs text-[var(--trade-text-muted)]'
+          )}
+        >
+          <p className='text-center'>
             No room trading positions found. Positions will appear here once you start trading.
           </p>
         </CardContent>
@@ -178,20 +206,52 @@ export function UserPositionsTableRoomTrading({
   }
 
   return (
-    <Card className='flex max-h-[min(70vh,520px)] flex-col overflow-hidden'>
-      <CardHeader className='shrink-0'>
-        <CardTitle>Your Room Trading Positions</CardTitle>
-        <CardDescription>
+    <Card
+      className={cn(
+        'flex max-h-[min(70vh,520px)] flex-col overflow-hidden',
+        isTradePanel && tradeRoomPositionsCardClass
+      )}
+    >
+      <CardHeader
+        className={cn('shrink-0', isTradePanel && 'px-4 pb-0 pt-0')}
+      >
+        <CardTitle
+          className={cn(isTradePanel && 'text-sm font-semibold')}
+        >
+          Your Room Trading Positions
+        </CardTitle>
+        <CardDescription
+          className={cn(
+            isTradePanel && 'text-xs text-[var(--trade-text-muted)]'
+          )}
+        >
           View and manage your room trading positions
         </CardDescription>
       </CardHeader>
-      <CardContent className='min-h-[240px] min-w-0 flex-1 overflow-hidden'>
+      <CardContent
+        className={cn(
+          'min-h-[240px] min-w-0 flex-1 overflow-hidden',
+          isTradePanel && 'px-4'
+        )}
+      >
         <div className='relative flex h-full min-h-[200px] flex-col'>
           <div className='relative flex min-h-0 flex-1'>
-            <div className='absolute inset-0 flex overflow-auto rounded-lg border'>
+            <div
+              className={cn(
+                'absolute inset-0 flex overflow-auto rounded-lg border',
+                isTradePanel && 'border-[var(--trade-border)]'
+              )}
+            >
               <ScrollArea className='h-full w-full'>
-                <Table>
-                  <TableHeader className='bg-muted sticky top-0 z-10'>
+                <Table className={cn(isTradePanel && 'text-xs')}>
+                  <TableHeader
+                    className={cn(
+                      'sticky top-0 z-10',
+                      isTradePanel
+                        ? 'bg-[var(--trade-dark)]/50 [&_th]:h-9 [&_th]:px-2 [&_th]:text-xs'
+                        : 'bg-muted'
+                    )}
+                  >
                     <TableRow>
                       <TableHead>Type</TableHead>
                       <TableHead>Market</TableHead>
@@ -407,12 +467,14 @@ interface UserPositionsTableCardRoomTradingProps {
   statusFilter?: PositionTabFilter;
   room?: Room;
   refreshEventName?: string;
+  panelVariant?: 'default' | 'trade';
 }
 
 export function UserPositionsTableCardRoomTrading({
   statusFilter = 'open',
   room = 'TRADING',
-  refreshEventName = 'room-trading-positions-refresh'
+  refreshEventName = 'room-trading-positions-refresh',
+  panelVariant = 'default'
 }: UserPositionsTableCardRoomTradingProps) {
   const balanceType = room === 'INSTITUTIONAL' ? 'INSTITUTIONAL' : 'REAL';
   const [positions, setPositions] = useState<PositionWithMarket[]>([]);
@@ -488,9 +550,27 @@ export function UserPositionsTableCardRoomTrading({
 
   if (error) {
     return (
-      <Card>
-        <CardContent className='flex items-center justify-center py-8'>
-          <p className='text-destructive text-sm'>{error}</p>
+      <Card
+        className={cn(
+          panelVariant === 'trade' && tradeRoomPositionsCardClass
+        )}
+      >
+        <CardContent
+          className={cn(
+            'flex items-center justify-center py-8',
+            panelVariant === 'trade' && 'px-4 text-xs'
+          )}
+        >
+          <p
+            className={cn(
+              'text-sm',
+              panelVariant === 'trade'
+                ? 'text-[var(--trade-red)]'
+                : 'text-destructive'
+            )}
+          >
+            {error}
+          </p>
         </CardContent>
       </Card>
     );
@@ -503,6 +583,7 @@ export function UserPositionsTableCardRoomTrading({
       onClose={handleClosePosition}
       onUpdateRealTimePnL={updateRealTimePnL}
       realTimePnL={realTimePnL}
+      panelVariant={panelVariant}
     />
   );
 }

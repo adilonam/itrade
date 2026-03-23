@@ -65,8 +65,8 @@ export async function GET(
         name: true,
         email: true,
         balances: {
-          where: { type: 'REAL' },
-          select: { amount: true }
+          where: { type: { in: ['REAL', 'INSTITUTIONAL'] } },
+          select: { amount: true, type: true }
         },
         leverage: true,
         role: true,
@@ -86,8 +86,18 @@ export async function GET(
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
+    const realAmount =
+      user.balances.find((b) => b.type === 'REAL')?.amount ?? 0;
+    const institutionalAmount =
+      user.balances.find((b) => b.type === 'INSTITUTIONAL')?.amount ?? 0;
+
     return NextResponse.json({
-      user: { ...user, balance: user.balances[0]?.amount ?? 0 }
+      user: {
+        ...user,
+        balance: realAmount,
+        realBalance: realAmount,
+        institutionalBalance: institutionalAmount
+      }
     });
   } catch (error) {
     // eslint-disable-next-line no-console

@@ -1,4 +1,7 @@
 export { TradingRoomLayout } from './trading-room-layout';
+export { TradingRoomShell } from './trading-room-shell';
+export { TradingRoomTradeMain } from './trading-room-trade-main';
+export { useTradingRoomShell } from './trading-room-shell-context';
 export { TradingRoomChart } from './trading-room-chart';
 export { TradingRoomMarketsPanel, type SymbolItem } from './trading-room-markets-panel';
 export { TradingRoomPositionsPanel } from './trading-room-positions-panel';

@@ -21,7 +21,16 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { PositionsTable } from './positions-table';
 import { PositionForm } from './positions-form';
 import { PositionStats, PositionEnums } from './positions-stats';
+import { TRADE_ROOM_CARD_CLASS } from '@/constants/trade-room-ui';
 import type { Position, Market, User } from '@/lib/prisma/generated/client';
+import {
+  IconPlus,
+  IconSearch,
+  IconFilter,
+  IconChevronLeft,
+  IconChevronRight,
+  IconRefresh
+} from '@tabler/icons-react';
 
 // Extended position type with relations
 type PositionWithRelations = Position & {
@@ -50,14 +59,6 @@ type PositionStats = {
   pendingPositions: number;
   failedPositions: number;
 };
-import {
-  IconPlus,
-  IconSearch,
-  IconFilter,
-  IconChevronLeft,
-  IconChevronRight,
-  IconRefresh
-} from '@tabler/icons-react';
 
 interface PaginationInfo {
   page: number;
@@ -250,38 +251,38 @@ export function PositionsView() {
       {enums && <PositionEnums enums={enums} />}
 
       {/* Filters */}
-      <Card>
-        <CardHeader>
-          <CardTitle className='flex items-center gap-2'>
-            <IconFilter className='h-5 w-5' />
+      <Card className={TRADE_ROOM_CARD_CLASS}>
+        <CardHeader className='px-4 pb-0 pt-0'>
+          <CardTitle className='flex items-center gap-2 text-sm font-semibold'>
+            <IconFilter className='h-4 w-4 text-[var(--trade-accent-blue)]' />
             Filters
           </CardTitle>
-          <CardDescription>
+          <CardDescription className='text-xs text-[var(--trade-text-muted)]'>
             Filter positions by various criteria
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className='px-4'>
           <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4'>
             <div className='space-y-2'>
-              <label className='text-sm font-medium'>Search</label>
+              <label className='text-xs text-[var(--trade-text-muted)]'>Search</label>
               <div className='relative'>
-                <IconSearch className='text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform' />
+                <IconSearch className='absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-[var(--trade-text-muted)]' />
                 <Input
                   placeholder='Search descriptions...'
                   value={filters.search || ''}
                   onChange={(e) => handleFilterChange('search', e.target.value)}
-                  className='pl-10'
+                  className='border-[var(--trade-border)] bg-[var(--trade-dark)] pl-10 text-sm text-[var(--trade-text)] placeholder:text-[var(--trade-text-muted)]'
                 />
               </div>
             </div>
 
             <div className='space-y-2'>
-              <label className='text-sm font-medium'>Type</label>
+              <label className='text-xs text-[var(--trade-text-muted)]'>Type</label>
               <Select
                 value={filters.type || 'all'}
                 onValueChange={(value) => handleFilterChange('type', value)}
               >
-                <SelectTrigger>
+                <SelectTrigger className='border-[var(--trade-border)] bg-[var(--trade-dark)] text-sm text-[var(--trade-text)]'>
                   <SelectValue placeholder='All types' />
                 </SelectTrigger>
                 <SelectContent>
@@ -296,12 +297,12 @@ export function PositionsView() {
             </div>
 
             <div className='space-y-2'>
-              <label className='text-sm font-medium'>Status</label>
+              <label className='text-xs text-[var(--trade-text-muted)]'>Status</label>
               <Select
                 value={filters.status || 'all'}
                 onValueChange={(value) => handleFilterChange('status', value)}
               >
-                <SelectTrigger>
+                <SelectTrigger className='border-[var(--trade-border)] bg-[var(--trade-dark)] text-sm text-[var(--trade-text)]'>
                   <SelectValue placeholder='All statuses' />
                 </SelectTrigger>
                 <SelectContent>
@@ -316,29 +317,30 @@ export function PositionsView() {
             </div>
 
             <div className='space-y-2'>
-              <label className='text-sm font-medium'>Room</label>
+              <label className='text-xs text-[var(--trade-text-muted)]'>Room</label>
               <Select
                 value={filters.room || 'all'}
                 onValueChange={(value) => handleFilterChange('room', value)}
               >
-                <SelectTrigger>
+                <SelectTrigger className='border-[var(--trade-border)] bg-[var(--trade-dark)] text-sm text-[var(--trade-text)]'>
                   <SelectValue placeholder='All rooms' />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value='all'>All rooms</SelectItem>
                   <SelectItem value='STOCK'>STOCK</SelectItem>
                   <SelectItem value='TRADING'>TRADING</SelectItem>
+                  <SelectItem value='INSTITUTIONAL'>INSTITUTIONAL</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className='space-y-2'>
-              <label className='text-sm font-medium'>Market</label>
+              <label className='text-xs text-[var(--trade-text-muted)]'>Market</label>
               <Select
                 value={filters.marketId || 'all'}
                 onValueChange={(value) => handleFilterChange('marketId', value)}
               >
-                <SelectTrigger>
+                <SelectTrigger className='border-[var(--trade-border)] bg-[var(--trade-dark)] text-sm text-[var(--trade-text)]'>
                   <SelectValue placeholder='All markets' />
                 </SelectTrigger>
                 <SelectContent>
@@ -379,14 +381,17 @@ export function PositionsView() {
           </Button>
         </div>
 
-        <div className='text-muted-foreground text-sm'>
+        <div className='font-mono text-sm text-[var(--trade-text-muted)]'>
           Showing {positions.length} of {pagination.total} positions
         </div>
       </div>
 
       {/* Error Alert */}
       {error && (
-        <Alert variant='destructive'>
+        <Alert
+          variant='destructive'
+          className='border-[var(--trade-border)] bg-[var(--trade-panel)] text-sm text-[var(--trade-text)]'
+        >
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}

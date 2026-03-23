@@ -132,13 +132,13 @@
 
 
 - [no] switch to resend
-- [ ] admin change leverage and market 
-- [ ] instituianal for user 
-- [ ] pay gateway : btc , usdc , usdt
-- [ ] make two ways for deposit
-- [ ] challenges : props basic page 
-- [ ] trading view chart 
-- [ ] dashboard as match trader 
+- [?] admin change leverage and market 
+- [x] instituianal for user 
+- [?] pay gateway : btc , usdc , usdt
+- [?] make two ways for deposit
+- [?] challenges : props basic page 
+- [x] trading view chart 
+- [x] dashboard as match trader 
 - [ ] change format of plans to feet document 
 - [ ] account part , respect the format but with match trader color
 - [ ] kyc part of user 

@@ -49,6 +49,7 @@ import {
   IconTrendingUp,
   IconTrendingDown
 } from '@tabler/icons-react';
+import { TRADE_ROOM_CARD_CLASS } from '@/constants/trade-room-ui';
 
 interface PositionsTableProps {
   positions: PositionWithRelations[];
@@ -87,26 +88,26 @@ export function PositionsTable({
   const getTypeColor = (type: PositionType) => {
     switch (type) {
       case 'BUY':
-        return 'bg-green-100 text-green-800';
+        return 'border-[var(--trade-green)]/40 bg-[var(--trade-green)]/15 text-[var(--trade-green)]';
       case 'SELL':
-        return 'bg-red-100 text-red-800';
+        return 'border-[var(--trade-red)]/40 bg-[var(--trade-red)]/15 text-[var(--trade-red)]';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'border-[var(--trade-border)] bg-[var(--trade-dark)] text-[var(--trade-text-muted)]';
     }
   };
 
   const getStatusColor = (status: PositionStatus) => {
     switch (status) {
       case 'CLOSED':
-        return 'bg-green-100 text-green-800';
+        return 'border-[var(--trade-green)]/40 bg-[var(--trade-green)]/15 text-[var(--trade-green)]';
       case 'PLACED':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'border-amber-400/40 bg-amber-400/15 text-amber-400';
       case 'FAILED':
-        return 'bg-red-100 text-red-800';
+        return 'border-[var(--trade-red)]/40 bg-[var(--trade-red)]/15 text-[var(--trade-red)]';
       case 'PENDING':
-        return 'bg-blue-100 text-blue-800';
+        return 'border-[var(--trade-accent-blue)]/40 bg-[var(--trade-accent-blue)]/15 text-[var(--trade-accent-blue)]';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'border-[var(--trade-border)] bg-[var(--trade-dark)] text-[var(--trade-text-muted)]';
     }
   };
 
@@ -131,14 +132,16 @@ export function PositionsTable({
 
   if (loading) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Positions</CardTitle>
-          <CardDescription>Loading positions...</CardDescription>
+      <Card className={TRADE_ROOM_CARD_CLASS}>
+        <CardHeader className='px-4 pb-0 pt-0'>
+          <CardTitle className='text-sm font-semibold'>Positions</CardTitle>
+          <CardDescription className='text-xs text-[var(--trade-text-muted)]'>
+            Loading positions...
+          </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className='px-4'>
           <div className='flex items-center justify-center py-8'>
-            <div className='border-primary h-8 w-8 animate-spin rounded-full border-b-2'></div>
+            <div className='h-8 w-8 animate-spin rounded-full border-2 border-[var(--trade-border)] border-b-[var(--trade-accent-blue)]'></div>
           </div>
         </CardContent>
       </Card>
@@ -147,13 +150,15 @@ export function PositionsTable({
 
   if (positions.length === 0) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Positions</CardTitle>
-          <CardDescription>No positions found</CardDescription>
+      <Card className={TRADE_ROOM_CARD_CLASS}>
+        <CardHeader className='px-4 pb-0 pt-0'>
+          <CardTitle className='text-sm font-semibold'>Positions</CardTitle>
+          <CardDescription className='text-xs text-[var(--trade-text-muted)]'>
+            No positions found
+          </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className='text-muted-foreground py-8 text-center'>
+        <CardContent className='px-4'>
+          <div className='py-8 text-center text-xs text-[var(--trade-text-muted)]'>
             No positions match your current filters.
           </div>
         </CardContent>
@@ -162,47 +167,78 @@ export function PositionsTable({
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Positions</CardTitle>
-        <CardDescription>Manage and monitor all user positions</CardDescription>
+    <Card className={TRADE_ROOM_CARD_CLASS}>
+      <CardHeader className='px-4 pb-0 pt-0'>
+        <CardTitle className='text-sm font-semibold'>Positions</CardTitle>
+        <CardDescription className='text-xs text-[var(--trade-text-muted)]'>
+          Manage and monitor all user positions
+        </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className='px-4'>
         <div className='relative flex min-h-[600px] flex-col'>
           <div className='flex flex-1 flex-col space-y-4'>
             <div className='relative flex flex-1'>
-              <div className='absolute inset-0 flex overflow-hidden rounded-lg border'>
+              <div className='absolute inset-0 flex overflow-hidden rounded-lg border border-[var(--trade-border)]'>
                 <ScrollArea className='h-full w-full'>
                   <Table>
-                    <TableHeader className='bg-muted sticky top-0 z-10'>
-                      <TableRow>
-                        <TableHead>ID</TableHead>
-                        <TableHead>User</TableHead>
-                        <TableHead>Type</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Room</TableHead>
-                        <TableHead>Market</TableHead>
-                        <TableHead>Quantity</TableHead>
-                        <TableHead>Exec Price</TableHead>
-                        <TableHead>Closed Price</TableHead>
-                        <TableHead>P&L</TableHead>
-                        <TableHead>Created</TableHead>
-                        <TableHead>Closed</TableHead>
-                        <TableHead>Actions</TableHead>
+                    <TableHeader className='sticky top-0 z-10 border-b border-[var(--trade-border)] bg-[var(--trade-dark)]/80'>
+                      <TableRow className='border-[var(--trade-border)] hover:bg-transparent'>
+                        <TableHead className='text-xs font-medium text-[var(--trade-text-muted)]'>
+                          ID
+                        </TableHead>
+                        <TableHead className='text-xs font-medium text-[var(--trade-text-muted)]'>
+                          User
+                        </TableHead>
+                        <TableHead className='text-xs font-medium text-[var(--trade-text-muted)]'>
+                          Type
+                        </TableHead>
+                        <TableHead className='text-xs font-medium text-[var(--trade-text-muted)]'>
+                          Status
+                        </TableHead>
+                        <TableHead className='text-xs font-medium text-[var(--trade-text-muted)]'>
+                          Room
+                        </TableHead>
+                        <TableHead className='text-xs font-medium text-[var(--trade-text-muted)]'>
+                          Market
+                        </TableHead>
+                        <TableHead className='text-xs font-medium text-[var(--trade-text-muted)]'>
+                          Quantity
+                        </TableHead>
+                        <TableHead className='text-xs font-medium text-[var(--trade-text-muted)]'>
+                          Exec Price
+                        </TableHead>
+                        <TableHead className='text-xs font-medium text-[var(--trade-text-muted)]'>
+                          Closed Price
+                        </TableHead>
+                        <TableHead className='text-xs font-medium text-[var(--trade-text-muted)]'>
+                          P&L
+                        </TableHead>
+                        <TableHead className='text-xs font-medium text-[var(--trade-text-muted)]'>
+                          Created
+                        </TableHead>
+                        <TableHead className='text-xs font-medium text-[var(--trade-text-muted)]'>
+                          Closed
+                        </TableHead>
+                        <TableHead className='text-xs font-medium text-[var(--trade-text-muted)]'>
+                          Actions
+                        </TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {positions.map((position) => (
-                        <TableRow key={position.id}>
-                          <TableCell className='font-mono text-xs'>
+                        <TableRow
+                          key={position.id}
+                          className='border-[var(--trade-border)] hover:bg-[var(--trade-dark)]/30'
+                        >
+                          <TableCell className='font-mono text-xs text-[var(--trade-text)]'>
                             {position.id.slice(0, 8)}...
                           </TableCell>
-                          <TableCell>
+                          <TableCell className='text-[var(--trade-text)]'>
                             <div>
-                              <div className='font-medium'>
+                              <div className='text-sm font-medium'>
                                 {position.user?.name || 'N/A'}
                               </div>
-                              <div className='text-muted-foreground text-sm'>
+                              <div className='text-xs text-[var(--trade-text-muted)]'>
                                 {position.user?.email}
                               </div>
                             </div>
@@ -220,31 +256,31 @@ export function PositionsTable({
                           <TableCell>
                             <Badge variant='outline'>{position.room}</Badge>
                           </TableCell>
-                          <TableCell>
+                          <TableCell className='text-[var(--trade-text)]'>
                             {position.market ? (
                               <div>
-                                <div className='font-medium'>
+                                <div className='text-sm font-medium'>
                                   {position.market.symbol}
                                 </div>
-                                <div className='text-muted-foreground text-sm'>
+                                <div className='text-xs text-[var(--trade-text-muted)]'>
                                   {position.market.name}
                                 </div>
                               </div>
                             ) : (
-                              <span className='text-muted-foreground'>N/A</span>
+                              <span className='text-[var(--trade-text-muted)]'>N/A</span>
                             )}
                           </TableCell>
-                          <TableCell className='font-mono text-xs'>
+                          <TableCell className='font-mono text-xs text-[var(--trade-text)]'>
                             {position.quantity
                               ? position.quantity.toFixed(4)
                               : 'N/A'}
                           </TableCell>
-                          <TableCell className='text-xs'>
+                          <TableCell className='font-mono text-xs text-[var(--trade-text)]'>
                             {position.executedPrice
                               ? `$${position.executedPrice.toFixed(2)}`
                               : 'N/A'}
                           </TableCell>
-                          <TableCell className='text-xs'>
+                          <TableCell className='font-mono text-xs text-[var(--trade-text)]'>
                             {position.closedPrice
                               ? `$${position.closedPrice.toFixed(2)}`
                               : 'N/A'}
@@ -254,10 +290,10 @@ export function PositionsTable({
                               <div
                                 className={`flex items-center gap-1 font-mono text-xs ${
                                   position.pnl > 0
-                                    ? 'text-green-600'
+                                    ? 'text-[var(--trade-green)]'
                                     : position.pnl < 0
-                                      ? 'text-red-600'
-                                      : 'text-gray-600'
+                                      ? 'text-[var(--trade-red)]'
+                                      : 'text-[var(--trade-text-muted)]'
                                 }`}
                               >
                                 {position.pnl > 0 ? (
@@ -268,15 +304,15 @@ export function PositionsTable({
                                 {formatCurrency(position.pnl)}
                               </div>
                             ) : (
-                              <span className='text-muted-foreground text-xs'>
+                              <span className='text-xs text-[var(--trade-text-muted)]'>
                                 N/A
                               </span>
                             )}
                           </TableCell>
-                          <TableCell className='text-xs'>
+                          <TableCell className='text-xs text-[var(--trade-text-muted)]'>
                             {formatDate(position.executedAt || new Date())}
                           </TableCell>
-                          <TableCell className='text-xs'>
+                          <TableCell className='text-xs text-[var(--trade-text-muted)]'>
                             {position.closedAt
                               ? formatDate(position.closedAt)
                               : 'N/A'}

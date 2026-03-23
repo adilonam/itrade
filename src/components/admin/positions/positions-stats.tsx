@@ -8,15 +8,6 @@ import {
   CardTitle
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-// Position stats type
-type PositionStats = {
-  totalPositions: number;
-  totalVolume: number;
-  totalPnL: number;
-  completedPositions: number;
-  pendingPositions: number;
-  failedPositions: number;
-};
 import {
   IconTrendingUp,
   IconTrendingDown,
@@ -25,6 +16,16 @@ import {
   IconClock,
   IconX
 } from '@tabler/icons-react';
+import { TRADE_ROOM_CARD_CLASS } from '@/constants/trade-room-ui';
+
+type PositionStats = {
+  totalPositions: number;
+  totalVolume: number;
+  totalPnL: number;
+  completedPositions: number;
+  pendingPositions: number;
+  failedPositions: number;
+};
 
 interface PositionStatsProps {
   stats: PositionStats;
@@ -49,109 +50,138 @@ export function PositionStats({ stats }: PositionStatsProps) {
   };
 
   const getPnLColor = (pnl: number) => {
-    if (pnl > 0) return 'text-green-600';
-    if (pnl < 0) return 'text-red-600';
-    return 'text-gray-600';
+    if (pnl > 0) return 'text-[var(--trade-green)]';
+    if (pnl < 0) return 'text-[var(--trade-red)]';
+    return 'text-[var(--trade-text-muted)]';
   };
 
   const getPnLIcon = (pnl: number) => {
-    if (pnl > 0) return <IconTrendingUp className='h-4 w-4' />;
-    if (pnl < 0) return <IconTrendingDown className='h-4 w-4' />;
+    if (pnl > 0) {
+      return (
+        <IconTrendingUp className='h-4 w-4 text-[var(--trade-green)]' />
+      );
+    }
+    if (pnl < 0) {
+      return <IconTrendingDown className='h-4 w-4 text-[var(--trade-red)]' />;
+    }
     return null;
   };
 
   return (
     <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6'>
-      {/* Total Positions */}
-      <Card>
-        <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-          <CardTitle className='text-sm font-medium'>Total Positions</CardTitle>
-          <IconCurrencyDollar className='text-muted-foreground h-4 w-4' />
+      <Card className={TRADE_ROOM_CARD_CLASS}>
+        <CardHeader className='flex flex-row items-center justify-between space-y-0 px-4 pb-0 pt-0'>
+          <CardTitle className='text-xs font-medium text-[var(--trade-text-muted)]'>
+            Total Positions
+          </CardTitle>
+          <div className='rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)]/40 p-2'>
+            <IconCurrencyDollar className='h-4 w-4 text-[var(--trade-accent-blue)]' />
+          </div>
         </CardHeader>
-        <CardContent>
-          <div className='text-2xl font-bold'>
+        <CardContent className='px-4 pt-2'>
+          <div className='font-mono text-lg font-bold tabular-nums'>
             {formatNumber(stats.totalPositions)}
           </div>
-          <p className='text-muted-foreground text-xs'>All time positions</p>
+          <p className='text-xs text-[var(--trade-text-muted)]'>All time positions</p>
         </CardContent>
       </Card>
 
-      {/* Total Volume */}
-      <Card>
-        <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-          <CardTitle className='text-sm font-medium'>Total Volume</CardTitle>
-          <IconCurrencyDollar className='text-muted-foreground h-4 w-4' />
+      <Card className={TRADE_ROOM_CARD_CLASS}>
+        <CardHeader className='flex flex-row items-center justify-between space-y-0 px-4 pb-0 pt-0'>
+          <CardTitle className='text-xs font-medium text-[var(--trade-text-muted)]'>
+            Total Volume
+          </CardTitle>
+          <div className='rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)]/40 p-2'>
+            <IconCurrencyDollar className='h-4 w-4 text-[var(--trade-accent-blue)]' />
+          </div>
         </CardHeader>
-        <CardContent>
-          <div className='text-2xl font-bold'>
+        <CardContent className='px-4 pt-2'>
+          <div className='font-mono text-lg font-bold tabular-nums'>
             {formatCurrency(stats.totalVolume)}
           </div>
-          <p className='text-muted-foreground text-xs'>Total position volume</p>
+          <p className='text-xs text-[var(--trade-text-muted)]'>
+            Total position volume
+          </p>
         </CardContent>
       </Card>
 
-      {/* Total P&L */}
-      <Card>
-        <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-          <CardTitle className='text-sm font-medium'>Total P&L</CardTitle>
-          {getPnLIcon(stats.totalPnL)}
+      <Card className={TRADE_ROOM_CARD_CLASS}>
+        <CardHeader className='flex flex-row items-center justify-between space-y-0 px-4 pb-0 pt-0'>
+          <CardTitle className='text-xs font-medium text-[var(--trade-text-muted)]'>
+            Total P&L
+          </CardTitle>
+          <div className='rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)]/40 p-2'>
+            {getPnLIcon(stats.totalPnL) ?? (
+              <IconCurrencyDollar className='h-4 w-4 text-[var(--trade-text-muted)]' />
+            )}
+          </div>
         </CardHeader>
-        <CardContent>
-          <div className={`text-2xl font-bold ${getPnLColor(stats.totalPnL)}`}>
+        <CardContent className='px-4 pt-2'>
+          <div
+            className={`font-mono text-lg font-bold tabular-nums ${getPnLColor(stats.totalPnL)}`}
+          >
             {formatCurrency(stats.totalPnL)}
           </div>
-          <p className='text-muted-foreground text-xs'>Profit & Loss</p>
+          <p className='text-xs text-[var(--trade-text-muted)]'>Profit & Loss</p>
         </CardContent>
       </Card>
 
-      {/* Completed Positions */}
-      <Card>
-        <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-          <CardTitle className='text-sm font-medium'>Completed</CardTitle>
-          <IconCheck className='h-4 w-4 text-green-600' />
+      <Card className={TRADE_ROOM_CARD_CLASS}>
+        <CardHeader className='flex flex-row items-center justify-between space-y-0 px-4 pb-0 pt-0'>
+          <CardTitle className='text-xs font-medium text-[var(--trade-text-muted)]'>
+            Completed
+          </CardTitle>
+          <div className='rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)]/40 p-2'>
+            <IconCheck className='h-4 w-4 text-[var(--trade-green)]' />
+          </div>
         </CardHeader>
-        <CardContent>
-          <div className='text-2xl font-bold text-green-600'>
+        <CardContent className='px-4 pt-2'>
+          <div className='font-mono text-lg font-bold tabular-nums text-[var(--trade-green)]'>
             {formatNumber(stats.completedPositions)}
           </div>
-          <p className='text-muted-foreground text-xs'>
+          <p className='text-xs text-[var(--trade-text-muted)]'>
             Successfully completed
           </p>
         </CardContent>
       </Card>
 
-      {/* Pending Positions */}
-      <Card>
-        <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-          <CardTitle className='text-sm font-medium'>Pending</CardTitle>
-          <IconClock className='h-4 w-4 text-yellow-600' />
+      <Card className={TRADE_ROOM_CARD_CLASS}>
+        <CardHeader className='flex flex-row items-center justify-between space-y-0 px-4 pb-0 pt-0'>
+          <CardTitle className='text-xs font-medium text-[var(--trade-text-muted)]'>
+            Pending
+          </CardTitle>
+          <div className='rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)]/40 p-2'>
+            <IconClock className='h-4 w-4 text-amber-400' />
+          </div>
         </CardHeader>
-        <CardContent>
-          <div className='text-2xl font-bold text-yellow-600'>
+        <CardContent className='px-4 pt-2'>
+          <div className='font-mono text-lg font-bold tabular-nums text-amber-400'>
             {formatNumber(stats.pendingPositions)}
           </div>
-          <p className='text-muted-foreground text-xs'>Awaiting processing</p>
+          <p className='text-xs text-[var(--trade-text-muted)]'>Awaiting processing</p>
         </CardContent>
       </Card>
 
-      {/* Failed Positions */}
-      <Card>
-        <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-          <CardTitle className='text-sm font-medium'>Failed</CardTitle>
-          <IconX className='h-4 w-4 text-red-600' />
+      <Card className={TRADE_ROOM_CARD_CLASS}>
+        <CardHeader className='flex flex-row items-center justify-between space-y-0 px-4 pb-0 pt-0'>
+          <CardTitle className='text-xs font-medium text-[var(--trade-text-muted)]'>
+            Failed
+          </CardTitle>
+          <div className='rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)]/40 p-2'>
+            <IconX className='h-4 w-4 text-[var(--trade-red)]' />
+          </div>
         </CardHeader>
-        <CardContent>
-          <div className='text-2xl font-bold text-red-600'>
+        <CardContent className='px-4 pt-2'>
+          <div className='font-mono text-lg font-bold tabular-nums text-[var(--trade-red)]'>
             {formatNumber(stats.failedPositions)}
           </div>
-          <p className='text-muted-foreground text-xs'>Failed positions</p>
+          <p className='text-xs text-[var(--trade-text-muted)]'>Failed positions</p>
         </CardContent>
       </Card>
     </div>
   );
 }
 
-// Additional component to display enums (optional)
 export function PositionEnums({
   enums
 }: {
@@ -161,18 +191,21 @@ export function PositionEnums({
 
   return (
     <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
-      {/* Position Types */}
-      <Card>
-        <CardHeader>
-          <CardTitle className='text-sm font-medium'>Position Types</CardTitle>
-          <CardDescription>
+      <Card className={TRADE_ROOM_CARD_CLASS}>
+        <CardHeader className='px-4 pb-0 pt-0'>
+          <CardTitle className='text-sm font-semibold'>Position Types</CardTitle>
+          <CardDescription className='text-xs text-[var(--trade-text-muted)]'>
             Available position types in the system
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className='px-4'>
           <div className='flex flex-wrap gap-2'>
             {enums.positionTypes.map((type) => (
-              <Badge key={type} variant='outline' className='text-xs'>
+              <Badge
+                key={type}
+                variant='outline'
+                className='border-[var(--trade-border)] text-xs text-[var(--trade-text)]'
+              >
                 {type}
               </Badge>
             ))}
@@ -180,32 +213,29 @@ export function PositionEnums({
         </CardContent>
       </Card>
 
-      {/* Position Statuses */}
-      <Card>
-        <CardHeader>
-          <CardTitle className='text-sm font-medium'>
-            Position Statuses
-          </CardTitle>
-          <CardDescription>
+      <Card className={TRADE_ROOM_CARD_CLASS}>
+        <CardHeader className='px-4 pb-0 pt-0'>
+          <CardTitle className='text-sm font-semibold'>Position Statuses</CardTitle>
+          <CardDescription className='text-xs text-[var(--trade-text-muted)]'>
             Available position statuses in the system
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className='px-4'>
           <div className='flex flex-wrap gap-2'>
             {enums.positionStatuses.map((status) => (
               <Badge
                 key={status}
                 variant='outline'
-                className={`text-xs ${
+                className={`border-[var(--trade-border)] text-xs ${
                   status === 'CLOSED'
-                    ? 'border-green-500 text-green-700'
+                    ? 'border-[var(--trade-green)]/50 text-[var(--trade-green)]'
                     : status === 'PLACED'
-                      ? 'border-blue-500 text-blue-700'
+                      ? 'text-[var(--trade-accent-blue)] border-[var(--trade-accent-blue)]/50'
                       : status === 'PENDING'
-                        ? 'border-yellow-500 text-yellow-700'
+                        ? 'border-amber-400/50 text-amber-400'
                         : status === 'FAILED'
-                          ? 'border-red-500 text-red-700'
-                          : ''
+                          ? 'border-[var(--trade-red)]/50 text-[var(--trade-red)]'
+                          : 'text-[var(--trade-text)]'
                 }`}
               >
                 {status}

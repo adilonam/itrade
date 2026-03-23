@@ -1,10 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { calculatePositionPnL } from '@/lib/calculator-server';
-import { Market, Position } from '@/lib/prisma/generated/client';
+import type { Market, Position, PositionType, PositionStatus, Room } from '@/lib/prisma/generated/client';
 
-// Create position data type
-type CreatePositionData = Position;
+type CreatePositionBody = {
+  userId: string;
+  type: PositionType;
+  status?: PositionStatus;
+  room: Room;
+  marketId: string;
+  quantity: number;
+  executedPrice: number;
+  closedPrice?: number | null;
+  description?: string | null;
+  executedAt?: string | Date | null;
+  pnl?: number | null;
+};
 
 export async function GET(request: NextRequest) {
   try {
@@ -140,12 +151,21 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const body: CreatePositionData = await request.json();
+    const body = (await request.json()) as CreatePositionBody;
 
     // Validate required fields
-    if (!body.userId || !body.type || body.quantity === undefined) {
+    if (
+      !body.userId ||
+      !body.type ||
+      body.quantity === undefined ||
+      !body.marketId ||
+      !body.room
+    ) {
       return NextResponse.json(
-        { error: 'Missing required fields: userId, type, quantity' },
+        {
+          error:
+            'Missing required fields: userId, type, quantity, marketId, room'
+        },
         { status: 400 }
       );
     }
@@ -167,27 +187,29 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // Check if market exists and fetch executed price for BUY/SELL positions
-    let executedPrice = body.executedPrice;
-    if (!executedPrice) {
+    const executedPrice = body.executedPrice;
+    if (executedPrice === undefined || executedPrice === null) {
       return NextResponse.json(
         { error: 'Executed price is required' },
         { status: 400 }
       );
     }
-    let market = null;
 
-    if (body.marketId) {
-      market = await prisma.market.findUnique({
-        where: { id: body.marketId }
-      });
+    const market = await prisma.market.findUnique({
+      where: { id: body.marketId }
+    });
 
-      if (!market) {
-        return NextResponse.json(
-          { error: 'Market not found' },
-          { status: 404 }
-        );
-      }
+    if (!market) {
+      return NextResponse.json({ error: 'Market not found' }, { status: 404 });
+    }
+
+    if (market.room !== body.room) {
+      return NextResponse.json(
+        {
+          error: `Selected market belongs to room ${market.room}, but position room is ${body.room}`
+        },
+        { status: 400 }
+      );
     }
 
     const position = await prisma.position.create({
@@ -195,12 +217,15 @@ export async function POST(request: NextRequest) {
         userId: body.userId,
         type: body.type,
         status: body.status || 'PLACED',
+        room: body.room,
         marketId: body.marketId,
         quantity: body.quantity,
-        executedPrice: executedPrice ?? undefined,
+        executedPrice,
         closedPrice: body.closedPrice,
         description: body.description,
-        executedAt: body.executedAt,
+        executedAt: body.executedAt
+          ? new Date(body.executedAt)
+          : undefined,
         pnl: body.pnl
       },
       include: {

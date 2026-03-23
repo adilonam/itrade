@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -26,10 +26,10 @@ import type {
   PositionStatus,
   Position,
   Market,
-  User
+  User,
+  Room
 } from '@/lib/prisma/generated/client';
 
-// Extended position type with relations
 type PositionWithRelations = Position & {
   user: User | null;
   market: Market | null;
@@ -41,6 +41,12 @@ interface PositionFormProps {
   onSuccess: () => void;
 }
 
+type AdminUserRow = {
+  id: string;
+  name: string | null;
+  email: string;
+};
+
 export function PositionForm({
   position,
   onClose,
@@ -50,8 +56,10 @@ export function PositionForm({
     userId: '',
     type: '' as PositionType | '',
     status: 'PLACED' as PositionStatus,
+    room: 'TRADING' as Room,
     marketId: '',
     quantity: '',
+    executedPrice: '',
     description: '',
     executedAt: '',
     pnl: ''
@@ -59,23 +67,136 @@ export function PositionForm({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Initialize form data
+  const [userEmailQuery, setUserEmailQuery] = useState('');
+  const [debouncedUserQuery, setDebouncedUserQuery] = useState('');
+  const [userCandidates, setUserCandidates] = useState<AdminUserRow[]>([]);
+  const [loadingUsers, setLoadingUsers] = useState(false);
+  const [realBalance, setRealBalance] = useState<number | null>(null);
+  const [institutionalBalance, setInstitutionalBalance] = useState<
+    number | null
+  >(null);
+  const [loadingBalances, setLoadingBalances] = useState(false);
+
+  const [marketSymbolQuery, setMarketSymbolQuery] = useState('');
+  const [debouncedMarketSymbol, setDebouncedMarketSymbol] = useState('');
+  const [markets, setMarkets] = useState<Market[]>([]);
+  const [loadingMarkets, setLoadingMarkets] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedUserQuery(userEmailQuery), 400);
+    return () => clearTimeout(t);
+  }, [userEmailQuery]);
+
+  useEffect(() => {
+    const t = setTimeout(
+      () => setDebouncedMarketSymbol(marketSymbolQuery),
+      400
+    );
+    return () => clearTimeout(t);
+  }, [marketSymbolQuery]);
+
+  const loadUserBalances = useCallback(async (userId: string) => {
+    setLoadingBalances(true);
+    setRealBalance(null);
+    setInstitutionalBalance(null);
+    try {
+      const res = await fetch(`/api/admin/users/${userId}`);
+      if (!res.ok) return;
+      const data = await res.json();
+      const u = data.user as {
+        realBalance?: number;
+        institutionalBalance?: number;
+      };
+      setRealBalance(u.realBalance ?? 0);
+      setInstitutionalBalance(u.institutionalBalance ?? 0);
+    } finally {
+      setLoadingBalances(false);
+    }
+  }, []);
+
   useEffect(() => {
     if (position) {
       setFormData({
         userId: position.userId,
         type: position.type,
         status: position.status,
+        room: position.room,
         marketId: position.marketId || '',
         quantity: position.quantity?.toString() || '',
+        executedPrice:
+          position.executedPrice != null
+            ? String(position.executedPrice)
+            : '',
         description: position.description || '',
         executedAt: position.executedAt
           ? new Date(position.executedAt).toISOString().slice(0, 16)
           : '',
         pnl: position.pnl?.toString() || ''
       });
+      setUserEmailQuery(position.user?.email ?? '');
+      void loadUserBalances(position.userId);
     }
-  }, [position]);
+  }, [position, loadUserBalances]);
+
+  useEffect(() => {
+    if (position) return;
+    if (debouncedUserQuery.trim().length < 2) {
+      setUserCandidates([]);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      setLoadingUsers(true);
+      try {
+        const params = new URLSearchParams({
+          limit: '30',
+          page: '1',
+          search: debouncedUserQuery.trim()
+        });
+        const res = await fetch(`/api/admin/users?${params}`);
+        if (!res.ok || cancelled) return;
+        const data = await res.json();
+        setUserCandidates((data.users ?? []) as AdminUserRow[]);
+      } finally {
+        if (!cancelled) setLoadingUsers(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [debouncedUserQuery, position]);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setLoadingMarkets(true);
+      try {
+        const params = new URLSearchParams({
+          limit: '100',
+          page: '1',
+          room: formData.room
+        });
+        const sym = debouncedMarketSymbol.trim();
+        if (sym) params.set('symbol', sym);
+        const res = await fetch(`/api/admin/markets?${params}`);
+        if (!res.ok || cancelled) return;
+        const data = await res.json();
+        let list = (data.markets ?? []) as Market[];
+        if (
+          position?.market &&
+          !list.some((m) => m.id === position.market!.id)
+        ) {
+          list = [position.market, ...list];
+        }
+        setMarkets(list);
+      } finally {
+        if (!cancelled) setLoadingMarkets(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [formData.room, debouncedMarketSymbol, position]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,9 +204,8 @@ export function PositionForm({
     setError(null);
 
     try {
-      // Validate required fields
       if (!formData.userId || !formData.type || !formData.quantity) {
-        throw new Error('User ID, type, and quantity are required');
+        throw new Error('User, type, and quantity are required');
       }
 
       const quantity = parseFloat(formData.quantity);
@@ -93,18 +213,29 @@ export function PositionForm({
         throw new Error('Quantity must be a positive number');
       }
 
-      const data = {
+      if (!formData.marketId) {
+        throw new Error('Market is required');
+      }
+
+      const executedPrice = parseFloat(formData.executedPrice);
+      if (isNaN(executedPrice)) {
+        throw new Error('Executed price is required');
+      }
+
+      const data: Record<string, unknown> = {
         userId: formData.userId,
         type: formData.type as PositionType,
         status: formData.status as PositionStatus,
-        marketId: formData.marketId || undefined,
-        quantity: quantity,
+        room: formData.room as Room,
+        marketId: formData.marketId,
+        quantity,
+        executedPrice,
         description: formData.description || undefined,
-        executedAt: formData.executedAt
-          ? new Date(formData.executedAt)
-          : undefined,
         pnl: formData.pnl ? parseFloat(formData.pnl) : undefined
       };
+      if (formData.executedAt) {
+        data.executedAt = new Date(formData.executedAt);
+      }
 
       const url = position
         ? `/api/admin/positions/${position.id}`
@@ -137,9 +268,16 @@ export function PositionForm({
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
+  const selectUser = (u: AdminUserRow) => {
+    setFormData((prev) => ({ ...prev, userId: u.id }));
+    setUserEmailQuery(u.email);
+    setUserCandidates([]);
+    void loadUserBalances(u.id);
+  };
+
   return (
     <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className='max-h-[90vh] max-w-2xl overflow-y-auto'>
+      <DialogContent className='max-h-[90vh] max-w-2xl overflow-y-auto text-sm text-[var(--trade-text)]'>
         <DialogHeader>
           <DialogTitle>
             {position ? 'Edit Position' : 'Create New Position'}
@@ -159,17 +297,106 @@ export function PositionForm({
           )}
 
           <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
-            {/* User ID */}
-            <div className='space-y-2'>
-              <Label htmlFor='userId'>User ID *</Label>
-              <Input
-                id='userId'
-                value={formData.userId}
-                onChange={(e) => handleInputChange('userId', e.target.value)}
-                placeholder='Enter user ID'
-                required
-              />
+            {/* Room — drives which markets are listed */}
+            <div className='space-y-2 md:col-span-2'>
+              <Label htmlFor='room'>Position room *</Label>
+              <Select
+                value={formData.room}
+                onValueChange={(value) => {
+                  handleInputChange('room', value);
+                  handleInputChange('marketId', '');
+                }}
+              >
+                <SelectTrigger id='room'>
+                  <SelectValue placeholder='Select room' />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value='STOCK'>Stock</SelectItem>
+                  <SelectItem value='TRADING'>Trading</SelectItem>
+                  <SelectItem value='INSTITUTIONAL'>Institutional</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
+
+            {/* User by email */}
+            <div className='space-y-2 md:col-span-2'>
+              <Label htmlFor='userEmail'>User (filter by email) *</Label>
+              <Input
+                id='userEmail'
+                value={userEmailQuery}
+                onChange={(e) => {
+                  setUserEmailQuery(e.target.value);
+                  if (position) return;
+                  setFormData((prev) => ({ ...prev, userId: '' }));
+                  setRealBalance(null);
+                  setInstitutionalBalance(null);
+                }}
+                placeholder='Type email to search'
+                autoComplete='off'
+                required={!position}
+                disabled={!!position}
+              />
+              {!position && userCandidates.length > 0 && (
+                <ul
+                  className='bg-popover text-popover-foreground max-h-40 overflow-auto rounded-md border p-1 text-sm shadow-md'
+                  role='listbox'
+                >
+                  {userCandidates.map((u) => (
+                    <li key={u.id}>
+                      <button
+                        type='button'
+                        className='hover:bg-accent focus:bg-accent w-full rounded px-2 py-1.5 text-left'
+                        onClick={() => selectUser(u)}
+                      >
+                        <span className='font-medium'>{u.email}</span>
+                        {u.name ? (
+                          <span className='text-muted-foreground ml-2'>
+                            {u.name}
+                          </span>
+                        ) : null}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {loadingUsers && (
+                <p className='text-muted-foreground text-xs'>Searching…</p>
+              )}
+              {formData.userId && (
+                <p className='text-muted-foreground text-xs'>
+                  Selected user ID: {formData.userId}
+                </p>
+              )}
+            </div>
+
+            {(realBalance !== null || institutionalBalance !== null) && (
+              <div className='bg-muted/40 md:col-span-2 grid grid-cols-1 gap-3 rounded-lg border p-3 sm:grid-cols-2'>
+                <div>
+                  <p className='text-muted-foreground text-xs'>
+                    REAL balance (margin)
+                  </p>
+                  <p className='text-lg font-semibold tabular-nums'>
+                    {loadingBalances
+                      ? '…'
+                      : (realBalance ?? 0).toLocaleString(undefined, {
+                          maximumFractionDigits: 2
+                        })}
+                  </p>
+                </div>
+                <div>
+                  <p className='text-muted-foreground text-xs'>
+                    INSTITUTIONAL balance (margin)
+                  </p>
+                  <p className='text-lg font-semibold tabular-nums'>
+                    {loadingBalances
+                      ? '…'
+                      : (institutionalBalance ?? 0).toLocaleString(undefined, {
+                          maximumFractionDigits: 2
+                        })}
+                  </p>
+                </div>
+              </div>
+            )}
 
             {/* Type */}
             <div className='space-y-2'>
@@ -184,13 +411,6 @@ export function PositionForm({
                 <SelectContent>
                   <SelectItem value='BUY'>Buy</SelectItem>
                   <SelectItem value='SELL'>Sell</SelectItem>
-                  <SelectItem value='DEPOSIT'>Deposit</SelectItem>
-                  <SelectItem value='WITHDRAWAL'>Withdrawal</SelectItem>
-                  <SelectItem value='TRANSFER_IN'>Transfer In</SelectItem>
-                  <SelectItem value='TRANSFER_OUT'>Transfer Out</SelectItem>
-                  <SelectItem value='FEE'>Fee</SelectItem>
-                  <SelectItem value='BONUS'>Bonus</SelectItem>
-                  <SelectItem value='REFUND'>Refund</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -210,19 +430,54 @@ export function PositionForm({
                   <SelectItem value='CLOSED'>Closed</SelectItem>
                   <SelectItem value='FAILED'>Failed</SelectItem>
                   <SelectItem value='PENDING'>Processing</SelectItem>
+                  <SelectItem value='SPLITTED'>Splitted</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
-            {/* Market ID */}
-            <div className='space-y-2'>
-              <Label htmlFor='marketId'>Market ID</Label>
+            {/* Market — filtered by room + symbol */}
+            <div className='space-y-2 md:col-span-2'>
+              <Label htmlFor='marketSymbol'>Market symbol filter</Label>
               <Input
-                id='marketId'
-                value={formData.marketId}
-                onChange={(e) => handleInputChange('marketId', e.target.value)}
-                placeholder='Enter market ID (optional)'
+                id='marketSymbol'
+                value={marketSymbolQuery}
+                onChange={(e) => setMarketSymbolQuery(e.target.value)}
+                placeholder='Filter markets by symbol (optional)'
+                autoComplete='off'
               />
+              <Label htmlFor='marketId' className='pt-1'>
+                Market * ({formData.room})
+              </Label>
+              <Select
+                value={formData.marketId}
+                onValueChange={(value) => handleInputChange('marketId', value)}
+              >
+                <SelectTrigger id='marketId'>
+                  <SelectValue
+                    placeholder={
+                      loadingMarkets
+                        ? 'Loading markets…'
+                        : 'Select a market for this room'
+                    }
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {markets.map((m) => (
+                    <SelectItem key={m.id} value={m.id}>
+                      {m.symbol} — {m.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {markets.length === 0 && !loadingMarkets && (
+                <p className='text-muted-foreground text-xs'>
+                  No markets for this room
+                  {debouncedMarketSymbol.trim()
+                    ? ` matching “${debouncedMarketSymbol.trim()}”`
+                    : ''}
+                  . Try another symbol or add markets in admin.
+                </p>
+              )}
             </div>
 
             {/* Quantity */}
@@ -234,6 +489,22 @@ export function PositionForm({
                 step='0.0001'
                 value={formData.quantity}
                 onChange={(e) => handleInputChange('quantity', e.target.value)}
+                placeholder='0.0000'
+                required
+              />
+            </div>
+
+            {/* Executed price */}
+            <div className='space-y-2'>
+              <Label htmlFor='executedPrice'>Executed price *</Label>
+              <Input
+                id='executedPrice'
+                type='number'
+                step='0.0001'
+                value={formData.executedPrice}
+                onChange={(e) =>
+                  handleInputChange('executedPrice', e.target.value)
+                }
                 placeholder='0.0000'
                 required
               />

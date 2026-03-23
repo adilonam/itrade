@@ -40,7 +40,7 @@ export default async function Page(props: PageProps) {
   }
 
   return (
-    <div className='h-[calc(100dvh-52px)] overflow-y-auto'>
+    <div className='min-h-full min-w-0 bg-[var(--trade-dark)] text-[var(--trade-text)]'>
       <div className='flex min-h-full flex-col space-y-6 p-4 md:px-6'>
         <div className='flex items-start justify-between'>
           <Heading

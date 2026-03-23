@@ -8,8 +8,7 @@ import {
   useState
 } from 'react';
 import { useSession } from 'next-auth/react';
-
-const DEFAULT_THEME = 'match-trader';
+import { DEFAULT_ACTIVE_THEME } from '@/constants/theme';
 
 type ThemeContextType = {
   activeTheme: string;
@@ -28,7 +27,7 @@ export function ActiveThemeProvider({
 }) {
   const { data: session } = useSession();
   const [activeTheme, setActiveThemeState] = useState<string>(
-    () => initialTheme || DEFAULT_THEME
+    () => initialTheme || DEFAULT_ACTIVE_THEME
   );
   const [isLoading, setIsLoading] = useState(true);
 
@@ -39,14 +38,14 @@ export function ActiveThemeProvider({
         const response = await fetch('/api/global-theme-settings');
         if (response.ok) {
           const data = await response.json();
-          setActiveThemeState(data.themeColor || DEFAULT_THEME);
+          setActiveThemeState(data.themeColor || DEFAULT_ACTIVE_THEME);
         } else {
           // Fallback to initial theme or default
-          setActiveThemeState(initialTheme || DEFAULT_THEME);
+          setActiveThemeState(initialTheme || DEFAULT_ACTIVE_THEME);
         }
       } catch {
         // Fallback to initial theme or default
-        setActiveThemeState(initialTheme || DEFAULT_THEME);
+        setActiveThemeState(initialTheme || DEFAULT_ACTIVE_THEME);
       }
       setIsLoading(false);
     };

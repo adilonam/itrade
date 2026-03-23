@@ -79,18 +79,24 @@ export async function PUT(
       );
     }
 
-    // Check if market exists (if provided)
-    if (body.marketId) {
-      const market = await prisma.market.findUnique({
-        where: { id: body.marketId }
-      });
+    const nextMarketId = body.marketId ?? existingPosition.marketId;
+    const nextRoom = body.room ?? existingPosition.room;
 
-      if (!market) {
-        return NextResponse.json(
-          { error: 'Market not found' },
-          { status: 404 }
-        );
-      }
+    const marketForPosition = await prisma.market.findUnique({
+      where: { id: nextMarketId }
+    });
+
+    if (!marketForPosition) {
+      return NextResponse.json({ error: 'Market not found' }, { status: 404 });
+    }
+
+    if (marketForPosition.room !== nextRoom) {
+      return NextResponse.json(
+        {
+          error: `Market ${marketForPosition.symbol} is in room ${marketForPosition.room}, but position room is ${nextRoom}`
+        },
+        { status: 400 }
+      );
     }
 
     // Handle P&L changes with balance updates and transaction history
@@ -112,10 +118,14 @@ export async function PUT(
         data: {
           type: body.type,
           status: body.status,
+          room: body.room,
           marketId: body.marketId,
           quantity: body.quantity,
+          executedPrice: body.executedPrice,
           description: body.description,
-          executedAt: body.executedAt,
+          executedAt: body.executedAt
+            ? new Date(body.executedAt as string | Date)
+            : body.executedAt,
           pnl: body.pnl
         },
         include: {

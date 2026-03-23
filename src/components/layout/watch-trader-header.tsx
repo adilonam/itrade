@@ -8,11 +8,7 @@ import { cn } from '@/lib/utils';
 import { tenantNavItems } from '@/constants/data';
 import { ModeToggle } from '@/components/layout/ThemeToggle/theme-toggle';
 import { UserNav } from './user-nav';
-import {
-  IconWifi,
-  IconBell,
-  IconTrendingUp
-} from '@tabler/icons-react';
+import { IconWifi, IconBell, IconWallet } from '@tabler/icons-react';
 
 /** Active state for Room Trading nav items (aligned with room-trading-top-nav + TradingView embed route). */
 function isRoomTradingNavActive(pathname: string | null, url: string): boolean {
@@ -36,22 +32,31 @@ export function WatchTraderHeader() {
   const pathname = usePathname() ?? '';
   const { data: session } = useSession();
   const [time, setTime] = useState(utcClockString);
-  const [profitDisplay, setProfitDisplay] = useState<string>('+$0.00');
+  const [marginDisplay, setMarginDisplay] = useState<{
+    text: string;
+    nonNegative: boolean;
+  } | null>(null);
 
-  const loadProfit = useCallback(async () => {
+  const loadFinancialMargin = useCallback(async () => {
     if (!session?.user) {
-      setProfitDisplay('—');
+      setMarginDisplay(null);
       return;
     }
     try {
-      const res = await fetch('/api/user/financial?room=TRADING');
+      const res = await fetch(
+        '/api/user/financial?room=TRADING&balanceType=REAL'
+      );
       if (!res.ok) throw new Error('fail');
       const json = await res.json();
-      const pnl = typeof json.totalPnL === 'number' ? json.totalPnL : 0;
-      const sign = pnl >= 0 ? '+' : '';
-      setProfitDisplay(`${sign}$${pnl.toFixed(2)}`);
+      const free =
+        typeof json.freeMargin === 'number' ? json.freeMargin : 0;
+      const sign = free >= 0 ? '+' : '-';
+      setMarginDisplay({
+        text: `${sign}$${Math.abs(free).toFixed(2)}`,
+        nonNegative: free >= 0
+      });
     } catch {
-      setProfitDisplay('+$1,240.00');
+      setMarginDisplay(null);
     }
   }, [session?.user]);
 
@@ -61,10 +66,10 @@ export function WatchTraderHeader() {
   }, []);
 
   useEffect(() => {
-    loadProfit();
-    const i = setInterval(loadProfit, 30000);
+    loadFinancialMargin();
+    const i = setInterval(loadFinancialMargin, 60_000);
     return () => clearInterval(i);
-  }, [loadProfit]);
+  }, [loadFinancialMargin]);
 
   const userRole = (session?.user as { role?: string } | undefined)?.role as
     | 'USER'
@@ -78,18 +83,20 @@ export function WatchTraderHeader() {
     [];
 
   return (
-    <header className="flex h-11 shrink-0 items-center justify-between gap-3 border-b border-[var(--trade-border)] bg-[var(--trade-panel)] px-3 text-[var(--trade-text)]">
-      <div className="flex min-w-0 items-center gap-3">
+    <header className="grid h-11 shrink-0 w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-2 border-b border-[var(--trade-border)] bg-[var(--trade-panel)] px-3 text-[var(--trade-text)]">
+      <div className="shrink-0 justify-self-start">
         <Link
           href="/trade"
-          className="shrink-0 font-bold tracking-tight text-[var(--trade-accent-blue)]"
+          className="font-bold tracking-tight text-[var(--trade-accent-blue)]"
         >
           Watch-Trader
         </Link>
-        <nav
-          className="ml-2 hidden min-w-0 items-center gap-1 overflow-x-auto lg:flex"
-          aria-label="Trade room"
-        >
+      </div>
+      <nav
+        className="w-full min-w-0 overflow-x-auto overflow-y-hidden overscroll-x-contain scroll-smooth touch-pan-x py-0.5 text-[var(--trade-text-muted)] [scrollbar-width:thin] [scrollbar-color:var(--trade-border)_transparent] [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[var(--trade-border)]"
+        aria-label="Trade room"
+      >
+        <div className="flex w-max min-w-full flex-nowrap items-center justify-center gap-1">
           {roomNav.map((item) => {
             const active = isRoomTradingNavActive(pathname, item.url);
             return (
@@ -97,44 +104,38 @@ export function WatchTraderHeader() {
                 key={`${item.url}-${item.title}`}
                 href={item.url}
                 className={cn(
-                  'whitespace-nowrap border-b-2 px-2.5 py-2 text-xs font-medium transition-colors',
+                  'shrink-0 rounded px-2 py-1 text-[10px] font-medium transition-colors',
                   active
-                    ? 'border-[var(--trade-accent-blue)] text-[var(--trade-text)]'
-                    : 'border-transparent text-[var(--trade-text-muted)] hover:text-[var(--trade-text)]'
+                    ? 'bg-[var(--trade-dark)] text-[var(--trade-accent-blue)]'
+                    : 'hover:text-[var(--trade-text)]'
                 )}
               >
                 {item.title}
               </Link>
             );
           })}
-        </nav>
-      </div>
-
-      <nav className="flex items-center gap-1 text-[var(--trade-text-muted)] lg:hidden" aria-label="Mobile trade nav">
-        {roomNav.slice(0, 4).map((item) => {
-          const active = isRoomTradingNavActive(pathname, item.url);
-          return (
-            <Link
-              key={`${item.url}-${item.title}`}
-              href={item.url}
-              className={cn(
-                'rounded px-2 py-1 text-[10px] font-medium',
-                active ? 'bg-[var(--trade-dark)] text-[var(--trade-accent-blue)]' : ''
-              )}
-            >
-              {item.title}
-            </Link>
-          );
-        })}
+        </div>
       </nav>
 
-      <div className="flex shrink-0 items-center gap-2">
+      <div className="flex shrink-0 items-center justify-self-end gap-2">
         <div
-          className="hidden items-center gap-1 rounded border border-[var(--trade-border)] bg-[var(--trade-dark)] px-2 py-1 font-mono text-[11px] text-[var(--trade-green)] sm:flex"
-          title="Session P&amp;L (mock if API unavailable)"
+          className="hidden items-center gap-1 rounded border border-[var(--trade-border)] bg-[var(--trade-dark)] px-2 py-1 font-mono text-[11px] sm:flex"
+          title="Free margin (TRADING · REAL)"
         >
-          <IconTrendingUp className="size-3.5 shrink-0 opacity-80" />
-          {profitDisplay}
+          <IconWallet className="size-3.5 shrink-0 text-[var(--trade-text-muted)] opacity-80" />
+          {marginDisplay ? (
+            <span
+              className={
+                marginDisplay.nonNegative
+                  ? 'text-[var(--trade-green)]'
+                  : 'text-red-400'
+              }
+            >
+              {marginDisplay.text}
+            </span>
+          ) : (
+            <span className="text-[var(--trade-text-muted)]">—</span>
+          )}
         </div>
         <span className="flex items-center text-[var(--trade-green)]" title="Connected">
           <IconWifi className="size-4" />

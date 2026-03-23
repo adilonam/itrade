@@ -26,17 +26,26 @@ export function TradingRoomPositionsPanel() {
         </div>
         <TabsContent value="open" className="mt-0 min-h-0 flex-1 overflow-auto data-[state=inactive]:hidden">
           <div className="h-full overflow-auto">
-            <UserPositionsTableCardRoomTrading statusFilter="open" />
+            <UserPositionsTableCardRoomTrading
+              statusFilter="open"
+              panelVariant="trade"
+            />
           </div>
         </TabsContent>
         <TabsContent value="pending" className="mt-0 min-h-0 flex-1 overflow-auto data-[state=inactive]:hidden">
           <div className="h-full overflow-auto">
-            <UserPositionsTableCardRoomTrading statusFilter="pending" />
+            <UserPositionsTableCardRoomTrading
+              statusFilter="pending"
+              panelVariant="trade"
+            />
           </div>
         </TabsContent>
         <TabsContent value="closed" className="mt-0 min-h-0 flex-1 overflow-auto data-[state=inactive]:hidden">
           <div className="h-full overflow-auto">
-            <UserPositionsTableCardRoomTrading statusFilter="closed" />
+            <UserPositionsTableCardRoomTrading
+              statusFilter="closed"
+              panelVariant="trade"
+            />
           </div>
         </TabsContent>
         <TabsContent value="finance" className="mt-0 min-h-0 flex-1 overflow-auto data-[state=inactive]:hidden">

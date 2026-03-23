@@ -32,6 +32,8 @@ interface TradingRoomMarketsPanelProps {
   tradingDisabled?: boolean;
   /** When true, symbol clicks update chart in-place without URL navigation */
   noNavigation?: boolean;
+  /** Base path for symbol deep links (e.g. `/trading-view-room-trading`). */
+  symbolLinkBasePath?: string;
 }
 
 /** Symbol list + buy/sell (order) for the selected instrument */
@@ -43,7 +45,8 @@ export function TradingRoomMarketsPanel({
   onMarketOrder,
   onAdvancedOrderClick,
   tradingDisabled = false,
-  noNavigation = false
+  noNavigation = false,
+  symbolLinkBasePath = '/trading-view-room-trading'
 }: TradingRoomMarketsPanelProps) {
   void _selectedMarket; // Reserved for future use
   const [listTab, setListTab] = useState<'favorites' | 'movers'>('movers');
@@ -168,7 +171,7 @@ export function TradingRoomMarketsPanel({
     return (
       <Link
         key={id}
-        href={`/trading-view-room-trading?pk=${encodeURIComponent(id)}`}
+        href={`${symbolLinkBasePath}?pk=${encodeURIComponent(id)}`}
         onClick={(e) => {
           e.preventDefault();
           handleClick();

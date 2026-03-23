@@ -128,7 +128,8 @@ export const authOptions: NextAuthOptions = {
       await prisma.userBalance.createMany({
         data: [
           { userId: user.id, type: 'REAL', amount: 0 },
-          { userId: user.id, type: 'DEMO', amount: 10000 }
+          { userId: user.id, type: 'DEMO', amount: 10000 },
+          { userId: user.id, type: 'INSTITUTIONAL', amount: 0 },
         ],
         skipDuplicates: true
       });

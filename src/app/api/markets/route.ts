@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
     const room = searchParams.get('room')?.toUpperCase() || 'ALL';
 
     // Validate room parameter
-    const validRooms = ['STOCK', 'TRADING'];
+    const validRooms = ['STOCK', 'TRADING', 'INSTITUTIONAL'];
     if (!validRooms.includes(room)) {
       return NextResponse.json(
         {
@@ -28,6 +28,8 @@ export async function GET(request: NextRequest) {
       whereClause.room = 'STOCK';
     } else if (room === 'TRADING') {
       whereClause.room = 'TRADING';
+    } else if (room === 'INSTITUTIONAL') {
+      whereClause.room = 'INSTITUTIONAL';
     }
     // For 'ALL', we just use visible: true
 

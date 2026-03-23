@@ -33,6 +33,14 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
+        title: 'Institutional',
+        url: '/trading-view-room-institutional',
+        icon: 'market',
+        isActive: false,
+        shortcut: ['d', 'd'],
+        items: []
+      },
+      {
         title: 'Plans',
         url: '/investments',
         icon: 'pigMoney',
@@ -118,6 +126,14 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
+        title: 'Institutional-User',
+        url: '/trading-view-room-institutional',
+        icon: 'market',
+        isActive: false,
+        shortcut: ['d', 'd'],
+        items: []
+      },
+      {
         title: 'Institutional',
         url: '/admin/positions',
         icon: 'market',
@@ -187,6 +203,14 @@ export const tenantNavItems: TenantNavItems = {
         title: 'Trade',
         url: '/trade',
         icon: 'dashboard',
+        isActive: false,
+        shortcut: ['d', 'd'],
+        items: []
+      },
+      {
+        title: 'Institutional-User',
+        url: '/trading-view-room-institutional',
+        icon: 'market',
         isActive: false,
         shortcut: ['d', 'd'],
         items: []

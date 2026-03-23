@@ -31,13 +31,15 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1');
     const limit = Math.min(parseInt(searchParams.get('limit') || '10'), 100);
     const search = searchParams.get('search');
+    const symbol = searchParams.get('symbol');
     const type = searchParams.get('type');
+    const room = searchParams.get('room');
     const visibleParam = searchParams.get('visible');
 
     const skip = (page - 1) * limit;
 
     // Build where clause
-    const where: any = {};
+    const where: Record<string, unknown> = {};
 
     if (search) {
       where.OR = [
@@ -46,11 +48,19 @@ export async function GET(request: NextRequest) {
       ];
     }
 
+    if (symbol) {
+      where.symbol = { contains: symbol, mode: 'insensitive' };
+    }
+
     if (
       type &&
       ['FOREX', 'CRYPTO', 'STOCKS', 'COMMODITIES', 'INDICES'].includes(type)
     ) {
       where.type = type;
+    }
+
+    if (room && ['STOCK', 'TRADING', 'INSTITUTIONAL'].includes(room)) {
+      where.room = room;
     }
 
     if (visibleParam !== null) {

@@ -53,11 +53,19 @@ interface FinancialInfo {
   balance?: number;
 }
 
+const tradeRoomCardClass =
+  'border border-[var(--trade-border)] bg-[var(--trade-panel)] text-[var(--trade-text)] shadow-none py-4 gap-4';
+
+const currencyFormatter = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD'
+});
+
 function InvestmentsSkeleton() {
   return (
     <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-3'>
       {Array.from({ length: 6 }).map((_, i) => (
-        <Card key={i} className='overflow-hidden'>
+        <Card key={i} className={`overflow-hidden ${tradeRoomCardClass}`}>
           <div className='bg-muted h-48 animate-pulse' />
           <CardHeader>
             <div className='bg-muted h-6 animate-pulse rounded' />
@@ -157,9 +165,9 @@ export default function InvestmentsPage() {
   if (error) {
     return (
       <PageContainer>
-        <Card>
+        <Card className={tradeRoomCardClass}>
           <CardContent className='flex flex-col items-center justify-center py-12 text-center'>
-            <p className='text-destructive font-medium'>{error}</p>
+            <p className='text-destructive text-sm font-medium'>{error}</p>
             <Button className='mt-4' onClick={() => loadData()}>
               Try again
             </Button>
@@ -171,94 +179,95 @@ export default function InvestmentsPage() {
 
   return (
     <PageContainer>
-      <div className='space-y-6'>
+      <div className='space-y-6 text-sm text-[var(--trade-text)]'>
         {/* Header */}
-        <div className='flex items-start justify-between'>
+        <div className='flex items-start justify-between gap-4'>
           <div>
-            <h1 className='text-2xl font-bold tracking-tight'>Investments</h1>
-            <p className='text-muted-foreground'>
+            <h1 className='text-2xl font-bold tracking-tight text-[var(--trade-text)]'>
+              Investments
+            </h1>
+            <p className='text-xs text-[var(--trade-text-muted)]'>
               Discover and manage your investment opportunities
             </p>
           </div>
-          <div className='flex items-center space-x-2'>
+          <div className='flex items-start space-x-3'>
             <div className='text-right'>
-              <p className='text-sm font-medium'>
+              <p className='text-xs text-[var(--trade-text-muted)]'>
                 Available Balance (Free Margin)
               </p>
-              <p className='text-xl font-bold text-green-600'>
-                {new Intl.NumberFormat('en-US', {
-                  style: 'currency',
-                  currency: 'USD'
-                }).format(userBalance)}
+              <p className='font-mono text-sm font-bold text-[var(--trade-green)]'>
+                {currencyFormatter.format(userBalance)}
               </p>
             </div>
-            <IconWallet className='text-muted-foreground h-6 w-6' />
+            <div className='rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)]/40 p-2'>
+              <IconWallet className='h-4 w-4 text-[var(--trade-accent-blue)]' />
+            </div>
           </div>
         </div>
 
         {/* Stats Cards */}
         <div className='grid gap-4 md:grid-cols-3'>
-          <Card>
-            <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-              <CardTitle className='text-sm font-medium'>
+          <Card className={tradeRoomCardClass}>
+            <CardHeader className='flex flex-row items-center justify-between space-y-0 px-4 pb-2 pt-0'>
+              <CardTitle className='text-sm font-semibold'>
                 Total Invested
               </CardTitle>
-              <IconPigMoney className='text-muted-foreground h-4 w-4' />
-            </CardHeader>
-            <CardContent>
-              <div className='text-2xl font-bold'>
-                {new Intl.NumberFormat('en-US', {
-                  style: 'currency',
-                  currency: 'USD'
-                }).format(userStats.totalInvested)}
+              <div className='rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)]/40 p-2'>
+                <IconPigMoney className='h-4 w-4 text-[var(--trade-accent-blue)]' />
               </div>
-              <p className='text-muted-foreground text-xs'>
+            </CardHeader>
+            <CardContent className='px-4 pt-0'>
+              <p className='font-mono text-sm font-bold'>
+                {currencyFormatter.format(userStats.totalInvested)}
+              </p>
+              <p className='text-xs text-[var(--trade-text-muted)]'>
                 {userStats.activeInvestments > 0
                   ? `Across ${userStats.activeInvestments} investment${userStats.activeInvestments > 1 ? 's' : ''}`
                   : 'No active investments'}
               </p>
             </CardContent>
           </Card>
-          <Card>
-            <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-              <CardTitle className='text-sm font-medium'>
+          <Card className={tradeRoomCardClass}>
+            <CardHeader className='flex flex-row items-center justify-between space-y-0 px-4 pb-2 pt-0'>
+              <CardTitle className='text-sm font-semibold'>
                 Expected Returns
               </CardTitle>
-              <IconTrendingUp className='text-muted-foreground h-4 w-4' />
+              <div className='rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)]/40 p-2'>
+                <IconTrendingUp className='h-4 w-4 text-[var(--trade-green)]' />
+              </div>
             </CardHeader>
-            <CardContent>
-              <div className='text-2xl font-bold'>
+            <CardContent className='px-4 pt-0'>
+              <p className='font-mono text-sm font-bold'>
                 {userStats.totalExpectedReturns > 0 ? (
-                  <span className='text-green-600'>
+                  <span className='text-[var(--trade-green)]'>
                     +
-                    {new Intl.NumberFormat('en-US', {
-                      style: 'currency',
-                      currency: 'USD'
-                    }).format(userStats.totalExpectedReturns)}
+                    {currencyFormatter.format(userStats.totalExpectedReturns)}
                   </span>
                 ) : (
-                  '$0'
+                  <span>{currencyFormatter.format(0)}</span>
                 )}
-              </div>
-              <p className='text-muted-foreground text-xs'>
+              </p>
+              <p className='text-xs text-[var(--trade-text-muted)]'>
                 {userStats.totalInvested > 0
                   ? 'Projected at maturity'
                   : 'Projected earnings'}
               </p>
             </CardContent>
           </Card>
-          <Card>
-            <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-              <CardTitle className='text-sm font-medium'>
+          <Card className={tradeRoomCardClass}>
+            <CardHeader className='flex flex-row items-center justify-between space-y-0 px-4 pb-2 pt-0'>
+              <CardTitle className='text-sm font-semibold'>
                 Active Investments
               </CardTitle>
-              <IconCalendar className='text-muted-foreground h-4 w-4' />
-            </CardHeader>
-            <CardContent>
-              <div className='text-2xl font-bold'>
-                {userStats.activeInvestments}
+              <div className='rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)]/40 p-2'>
+                <IconCalendar className='h-4 w-4 text-[var(--trade-text-muted)]' />
               </div>
-              <p className='text-muted-foreground text-xs'>
+            </CardHeader>
+            <CardContent className='px-4 pt-0'>
+              <p className='font-mono text-sm font-bold'>
+                {userStats.activeInvestments}
+              </p>
+              <p className='text-xs text-[var(--trade-text-muted)]'>
                 {userStats.activeInvestments === 1
                   ? 'Currently running'
                   : userStats.activeInvestments > 1
@@ -270,29 +279,44 @@ export default function InvestmentsPage() {
         </div>
 
         <Tabs defaultValue='available' className='space-y-4'>
-          <TabsList>
-            <TabsTrigger value='available'>Available Investments</TabsTrigger>
-            <TabsTrigger value='my-investments'>My Investments</TabsTrigger>
-            <TabsTrigger value='transactions'>Transactions</TabsTrigger>
+          <TabsList className='border border-[var(--trade-border)] bg-[var(--trade-panel)] text-[var(--trade-text-muted)]'>
+            <TabsTrigger
+              value='available'
+              className='data-[state=active]:bg-[var(--trade-dark)]/40 data-[state=active]:text-[var(--trade-text)]'
+            >
+              Available Investments
+            </TabsTrigger>
+            <TabsTrigger
+              value='my-investments'
+              className='data-[state=active]:bg-[var(--trade-dark)]/40 data-[state=active]:text-[var(--trade-text)]'
+            >
+              My Investments
+            </TabsTrigger>
+            <TabsTrigger
+              value='transactions'
+              className='data-[state=active]:bg-[var(--trade-dark)]/40 data-[state=active]:text-[var(--trade-text)]'
+            >
+              Transactions
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value='available' className='space-y-4'>
             {/* Filters */}
-            <Card>
-              <CardContent className='pt-6'>
+            <Card className={tradeRoomCardClass}>
+              <CardContent className='px-4 pt-6'>
                 <div className='flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4'>
                   <div className='flex-1'>
                     <div className='relative'>
-                      <IconSearch className='text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2' />
+                      <IconSearch className='absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-[var(--trade-text-muted)]' />
                       <Input
                         placeholder='Search investments...'
-                        className='pl-10'
+                        className='border-[var(--trade-border)] bg-[var(--trade-dark)]/40 pl-10 text-sm text-[var(--trade-text)] placeholder:text-[var(--trade-text-muted)]'
                       />
                     </div>
                   </div>
                   <Select>
-                    <SelectTrigger className='w-full md:w-[180px]'>
-                      <IconFilter className='mr-2 h-4 w-4' />
+                    <SelectTrigger className='w-full border-[var(--trade-border)] bg-[var(--trade-dark)]/40 text-sm text-[var(--trade-text)] md:w-[180px]'>
+                      <IconFilter className='mr-2 h-4 w-4 text-[var(--trade-text-muted)]' />
                       <SelectValue placeholder='Risk Level' />
                     </SelectTrigger>
                     <SelectContent>
@@ -303,7 +327,7 @@ export default function InvestmentsPage() {
                     </SelectContent>
                   </Select>
                   <Select>
-                    <SelectTrigger className='w-full md:w-[180px]'>
+                    <SelectTrigger className='w-full border-[var(--trade-border)] bg-[var(--trade-dark)]/40 text-sm text-[var(--trade-text)] md:w-[180px]'>
                       <SelectValue placeholder='Country' />
                     </SelectTrigger>
                     <SelectContent>
@@ -330,13 +354,13 @@ export default function InvestmentsPage() {
                 ))}
               </div>
             ) : (
-              <Card className='py-12'>
-                <CardContent className='text-center'>
-                  <IconPigMoney className='text-muted-foreground/50 mx-auto mb-4 h-12 w-12' />
-                  <h3 className='mb-2 text-lg font-semibold'>
+              <Card className={`${tradeRoomCardClass} py-12`}>
+                <CardContent className='px-4 text-center'>
+                  <IconPigMoney className='mx-auto mb-4 h-12 w-12 text-[var(--trade-text-muted)]/50' />
+                  <h3 className='mb-2 text-sm font-semibold text-[var(--trade-text)]'>
                     No investments available
                   </h3>
-                  <p className='text-muted-foreground'>
+                  <p className='text-xs text-[var(--trade-text-muted)]'>
                     Check back later for new investment opportunities.
                   </p>
                 </CardContent>
@@ -357,13 +381,13 @@ export default function InvestmentsPage() {
                 ))}
               </div>
             ) : (
-              <Card className='py-12'>
-                <CardContent className='text-center'>
-                  <IconCalendar className='text-muted-foreground/50 mx-auto mb-4 h-12 w-12' />
-                  <h3 className='mb-2 text-lg font-semibold'>
+              <Card className={`${tradeRoomCardClass} py-12`}>
+                <CardContent className='px-4 text-center'>
+                  <IconCalendar className='mx-auto mb-4 h-12 w-12 text-[var(--trade-text-muted)]/50' />
+                  <h3 className='mb-2 text-sm font-semibold text-[var(--trade-text)]'>
                     No investments yet
                   </h3>
-                  <p className='text-muted-foreground mb-4'>
+                  <p className='mb-4 text-xs text-[var(--trade-text-muted)]'>
                     Start investing to see your portfolio here.
                   </p>
                   <Button onClick={() => router.push('/investments')}>

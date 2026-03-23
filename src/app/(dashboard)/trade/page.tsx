@@ -1,28 +1,9 @@
-import { TradingRoomLayout } from '@/components/trading-room';
-import { prisma } from '@/lib/prisma';
+import { TradingRoomTradeMain } from '@/components/trading-room/trading-room-trade-main';
 
 export const metadata = {
   title: 'Trade'
 };
 
-export default async function Page() {
-  let initialSymbols: Awaited<ReturnType<typeof prisma.market.findMany>> = [];
-
-  try {
-    initialSymbols = await prisma.market.findMany({
-      where: { room: 'TRADING', visible: true },
-      orderBy: { symbol: 'asc' },
-      take: 50
-    });
-  } catch {
-    // use mock data when API unavailable
-  }
-
-  return (
-    <TradingRoomLayout
-      initialMarket={null}
-      initialSymbols={initialSymbols}
-      noNavigation
-    />
-  );
+export default function Page() {
+  return <TradingRoomTradeMain />;
 }

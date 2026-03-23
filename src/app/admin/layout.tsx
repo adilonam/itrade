@@ -1,6 +1,4 @@
-import KBar from '@/components/kbar';
-import Header from '@/components/layout/header';
-import { RoomTradingTopNav } from '@/components/layout/room-trading-top-nav';
+import { DashboardLayoutClient } from '@/components/layout/dashboard-layout-client';
 import ForbiddenPage from '@/components/errors/forbidden';
 import { authOptions } from '@/lib/auth';
 import { getServerSession } from 'next-auth';
@@ -39,14 +37,6 @@ export default async function AdminLayout({
   }
 
   return (
-    <KBar>
-      <div className="flex min-h-screen w-full flex-col">
-        <header className="flex h-12 shrink-0 items-center justify-between gap-4 border-b border-border bg-background px-4">
-          <RoomTradingTopNav />
-          <Header variant="compact" />
-        </header>
-        <main className="flex min-h-0 flex-1 flex-col overflow-auto">{children}</main>
-      </div>
-    </KBar>
+    <DashboardLayoutClient>{children}</DashboardLayoutClient>
   );
 }
