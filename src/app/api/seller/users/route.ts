@@ -85,7 +85,10 @@ export async function GET(request: NextRequest) {
           id: true,
           name: true,
           email: true,
-          balance: true,
+          balances: {
+            where: { type: 'REAL' },
+            select: { amount: true }
+          },
           leverage: true,
           role: true,
           emailVerified: true,
@@ -106,7 +109,10 @@ export async function GET(request: NextRequest) {
     ]);
 
     return NextResponse.json({
-      users,
+      users: users.map((user) => ({
+        ...user,
+        balance: user.balances[0]?.amount ?? 0
+      })),
       pagination: {
         page,
         limit,

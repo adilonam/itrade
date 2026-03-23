@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
 import bcrypt from 'bcryptjs';
 import { z } from 'zod';
+import { ensureUserBalance } from '@/lib/balance';
 
 // Validation schemas
 const updateUserSchema = z
@@ -63,7 +64,10 @@ export async function GET(
         id: true,
         name: true,
         email: true,
-        balance: true,
+        balances: {
+          where: { type: 'REAL' },
+          select: { amount: true }
+        },
         leverage: true,
         role: true,
         emailVerified: true,
@@ -82,7 +86,9 @@ export async function GET(
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    return NextResponse.json({ user });
+    return NextResponse.json({
+      user: { ...user, balance: user.balances[0]?.amount ?? 0 }
+    });
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('Get user error:', error);
@@ -132,6 +138,8 @@ export async function PUT(
     // Allow users to modify themselves through admin interface
 
     const updateData = { ...validation.data };
+    const nextRealBalance = updateData.balance;
+    delete (updateData as { balance?: number }).balance;
 
     // Check email uniqueness if email is being updated
     if (updateData.email && updateData.email !== existingUser.email) {
@@ -174,25 +182,40 @@ export async function PUT(
     }
 
     // Update user
-    const updatedUser = await prisma.user.update({
-      where: { id },
-      data: updateData,
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        balance: true,
-        leverage: true,
-        role: true,
-        emailVerified: true,
-        createdAt: true,
-        updatedAt: true
+    const updatedUser = await prisma.$transaction(async (tx) => {
+      if (nextRealBalance != null) {
+        await ensureUserBalance(tx, id, 'REAL');
+        await tx.userBalance.update({
+          where: { userId_type: { userId: id, type: 'REAL' } },
+          data: { amount: nextRealBalance }
+        });
       }
+      return tx.user.update({
+        where: { id },
+        data: updateData,
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          balances: {
+            where: { type: 'REAL' },
+            select: { amount: true }
+          },
+          leverage: true,
+          role: true,
+          emailVerified: true,
+          createdAt: true,
+          updatedAt: true
+        }
+      });
     });
 
     return NextResponse.json({
       message: 'User updated successfully',
-      user: updatedUser
+      user: {
+        ...updatedUser,
+        balance: updatedUser.balances[0]?.amount ?? 0
+      }
     });
   } catch (error) {
     // eslint-disable-next-line no-console

@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
 import { z } from 'zod';
+import { ensureUserBalance } from '@/lib/balance';
 
 async function checkSellerPermission(
   session: { user?: { id?: string } } | null
@@ -165,7 +166,7 @@ export async function POST(request: NextRequest) {
     const result = await prisma.$transaction(async (tx) => {
       const user = await tx.user.findUnique({
         where: { id: userId },
-        select: { id: true, balance: true, sellerId: true }
+        select: { id: true, sellerId: true }
       });
 
       if (!user || user.sellerId !== sellerId) {
@@ -192,7 +193,8 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      if (user.balance < amount) {
+      const userBalance = await ensureUserBalance(tx, user.id, 'REAL');
+      if (userBalance.amount < amount) {
         throw new Error('Insufficient user balance');
       }
 
@@ -236,14 +238,15 @@ export async function POST(request: NextRequest) {
         }
       });
 
-      await tx.user.update({
-        where: { id: user.id },
-        data: { balance: user.balance - amount }
+      await tx.userBalance.update({
+        where: { userId_type: { userId: user.id, type: 'REAL' } },
+        data: { amount: userBalance.amount - amount }
       });
 
       await tx.transaction.create({
         data: {
           userId: user.id,
+          balanceType: 'REAL',
           type: 'WITHDRAW',
           absoluteAmount: amount,
           description: `Investment in ${investment.title} - ${investment.country}`

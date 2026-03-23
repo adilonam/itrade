@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
 import { TransactionType } from '@/lib/prisma/generated/client';
+import { ensureUserBalance, getSessionBalanceType } from '@/lib/balance';
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,7 +14,8 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { amount, paymentMethod, paymentDetails } = body;
+    const { amount, paymentMethod } = body;
+    const balanceType = getSessionBalanceType(session);
 
     // Validate input
     if (!amount || amount <= 0) {
@@ -35,24 +37,29 @@ export async function POST(request: NextRequest) {
       // Get current user
       const user = await tx.user.findUnique({
         where: { id: session.user.id },
-        select: { balance: true }
+        select: { id: true }
       });
 
       if (!user) {
         throw new Error('User not found');
       }
 
-      // Update user balance
-      const newBalance = user.balance + amount;
-      await tx.user.update({
-        where: { id: session.user.id },
-        data: { balance: newBalance }
+      const currentBalance = await ensureUserBalance(
+        tx,
+        session.user.id,
+        balanceType
+      );
+      const newBalance = currentBalance.amount + amount;
+      await tx.userBalance.update({
+        where: { userId_type: { userId: session.user.id, type: balanceType } },
+        data: { amount: newBalance }
       });
 
       // Create deposit transaction
       const transaction = await tx.transaction.create({
         data: {
           userId: session.user.id,
+          balanceType,
           type: TransactionType.DEPOSIT,
           absoluteAmount: amount,
           description: `Deposit via ${paymentMethod === 'card' ? 'Credit/Debit Card' : 'PayPal'}`
@@ -66,6 +73,7 @@ export async function POST(request: NextRequest) {
       success: true,
       message: 'Deposit processed successfully',
       transaction: result.transaction,
+      balanceType,
       newBalance: result.newBalance
     });
   } catch (error) {

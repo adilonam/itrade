@@ -45,6 +45,8 @@ import {
   calculateLotSizeFromMargin
 } from '@/lib/calculator-client';
 
+type UserWithBalance = User & { balance?: number };
+
 interface SellerPositionCreationProps {
   initialRoom?: 'TRADING' | 'STOCK';
   onPositionCreated: () => void;
@@ -59,9 +61,9 @@ export function SellerPositionCreation({
   const [room, setRoom] = useState<'TRADING' | 'STOCK'>(initialRoom);
   const [selectedMarket, setSelectedMarket] = useState<Market | null>(null);
   const [selectedUserId, setSelectedUserId] = useState<string>('');
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [selectedUser, setSelectedUser] = useState<UserWithBalance | null>(null);
   const [markets, setMarkets] = useState<Market[]>([]);
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<UserWithBalance[]>([]);
   const [loadingMarkets, setLoadingMarkets] = useState(false);
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [marketSymbolFilter, setMarketSymbolFilter] = useState('');
@@ -395,7 +397,7 @@ export function SellerPositionCreation({
           </div>
           {selectedUser && (
             <p className='text-muted-foreground text-xs'>
-              Balance: ${selectedUser.balance.toFixed(2)} | Leverage:{' '}
+              Balance: ${(selectedUser.balance ?? 0).toFixed(2)} | Leverage:{' '}
               {selectedUser.leverage}x
             </p>
           )}

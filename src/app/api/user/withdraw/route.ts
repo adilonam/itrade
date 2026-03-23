@@ -6,6 +6,7 @@ import {
   WithdrawMethod,
   WithdrawRequestStatus
 } from '@/lib/prisma/generated/client';
+import { ensureUserBalance, getSessionBalanceType } from '@/lib/balance';
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,7 +17,8 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { amount, withdrawMethod, withdrawDetails } = body;
+    const { amount, withdrawMethod } = body;
+    const balanceType = getSessionBalanceType(session);
 
     // Validate input
     if (!amount || amount <= 0) {
@@ -37,14 +39,26 @@ export async function POST(request: NextRequest) {
       withdrawMethod === 'paypal'
         ? WithdrawMethod.PAYPAL
         : WithdrawMethod.BANK_TRANSFER;
-    const details = body.withdrawDetails ?? {};
+    const details = { ...(body.withdrawDetails ?? {}), balanceType };
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { balance: true }
+      select: { id: true }
     });
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    const balance = await prisma.$transaction(async (tx) => {
+      const account = await ensureUserBalance(tx, session.user.id, balanceType);
+      return account.amount;
+    });
+
+    if (balance < amount) {
+      return NextResponse.json(
+        { error: 'Insufficient funds for this withdrawal' },
+        { status: 400 }
+      );
     }
 
     const withdrawRequest = await prisma.withdrawRequest.create({
@@ -62,7 +76,8 @@ export async function POST(request: NextRequest) {
       message:
         'Withdrawal request submitted. You will be notified when it is processed.',
       withdrawRequest,
-      newBalance: user.balance
+      balanceType,
+      newBalance: balance
     });
   } catch (error) {
     if (error instanceof Error && error.message === 'Insufficient funds') {

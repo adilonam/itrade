@@ -33,7 +33,14 @@ export async function POST(request: NextRequest) {
       data: {
         name,
         email,
-        password: hashedPassword
+        password: hashedPassword,
+        balances: {
+          create: [
+            { type: 'REAL', amount: 0 },
+            { type: 'DEMO', amount: 10000 },
+            { type: 'INSTITUTIONAL', amount: 0 }
+          ]
+        }
       }
     });
 

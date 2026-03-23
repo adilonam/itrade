@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "Room" ADD VALUE 'INSTITUTIONAL';

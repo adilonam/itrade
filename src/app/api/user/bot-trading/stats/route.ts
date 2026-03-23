@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { calculateUserFinancialInfo } from '@/lib/calculator-server';
+import { getSessionBalanceType } from '@/lib/balance';
 
 const MAX_BOTS = 20;
 
@@ -11,7 +12,7 @@ const MAX_BOTS = 20;
  * Returns live stats for the bot trading dashboard: active bots count, 24h profit, total equity, success rate.
  * profit24h and successRate are placeholders (0 / null) until trade history is available.
  */
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
@@ -25,7 +26,8 @@ export async function GET() {
         where: { userId, active: true }
       }),
       prisma.user.findUnique({
-        where: { id: userId }
+        where: { id: userId },
+        select: { id: true, leverage: true }
       })
     ]);
 
@@ -33,9 +35,14 @@ export async function GET() {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    const financialInfo = await calculateUserFinancialInfo(user, 'TRADING');
+    const balanceType = getSessionBalanceType(session);
+    const financialInfo = await calculateUserFinancialInfo(
+      user,
+      'TRADING',
+      balanceType
+    );
     const totalEquity =
-      financialInfo != null ? financialInfo.equity : Number(user.balance.toFixed(2));
+      financialInfo != null ? financialInfo.equity : 0;
 
     const stats = {
       activeBots: activeBotsCount,

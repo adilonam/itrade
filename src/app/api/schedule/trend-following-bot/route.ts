@@ -11,6 +11,7 @@ import {
   Position,
   TransactionType
 } from '@/lib/prisma/generated/client';
+import { getUserBalanceAmount } from '@/lib/balance';
 
 const DEFAULT_EMA_FAST_PERIOD = 9;
 const DEFAULT_EMA_SLOW_PERIOD = 21;
@@ -29,7 +30,7 @@ export async function GET() {
         dateStop: { gte: now }
       },
       include: {
-        user: true,
+        user: { select: { id: true, leverage: true } },
         market: true
       }
     });
@@ -196,13 +197,21 @@ export async function GET() {
             if (calculatedPnL !== null && calculatedPnL !== 0) {
               const transactionType: TransactionType =
                 calculatedPnL > 0 ? 'GAIN' : 'LOSS';
-              await tx.user.update({
-                where: { id: existingPosition.userId },
-                data: { balance: { increment: calculatedPnL } }
+              await tx.userBalance.upsert({
+                where: {
+                  userId_type: { userId: existingPosition.userId, type: 'REAL' }
+                },
+                update: { amount: { increment: calculatedPnL } },
+                create: {
+                  userId: existingPosition.userId,
+                  type: 'REAL',
+                  amount: calculatedPnL
+                }
               });
               await tx.transaction.create({
                 data: {
                   userId: existingPosition.userId,
+                  balanceType: 'REAL',
                   type: transactionType,
                   absoluteAmount: Math.abs(calculatedPnL),
                   description: `Position ${existingPosition.type} closed by Trend Following bot - ${existingPosition.market?.symbol ?? 'Unknown'}`
@@ -236,6 +245,9 @@ export async function GET() {
         const sp = marketForOpen.spread ?? 0;
         const executedPrice = signal === 'BUY' ? mid + sp / 2 : mid - sp / 2;
 
+        const realBalance = await prisma.$transaction((tx) =>
+          getUserBalanceAmount(tx, botUser.userId, 'REAL')
+        );
         const tempPosition = {
           id: 'temp',
           userId: botUser.userId,
@@ -252,13 +264,11 @@ export async function GET() {
           executedAt: new Date(),
           closedAt: null,
           pnl: null,
-          user: botUser.user,
+          user: { ...botUser.user, balance: realBalance },
           market: marketForOpen
         };
 
-        const positionCheck = await couldOpenPosition(
-          tempPosition as Position & { user: NonNullable<typeof botUser.user>; market: Market }
-        );
+        const positionCheck = await couldOpenPosition(tempPosition as any);
 
         if (!positionCheck?.canOpen) {
           results.push({

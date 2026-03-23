@@ -147,7 +147,8 @@ export default function AppSidebar() {
       }
     } else if (
       pathname.includes('/markets-room-trading') ||
-      pathname.includes('/positions-room-trading')
+      pathname.includes('/positions-room-trading') ||
+      pathname.includes('/trading-view-room-institutional')
     ) {
       const roomTradingTenant = tenants.find((t) => t.name === 'Room Trading');
       if (roomTradingTenant) {
@@ -325,6 +326,10 @@ export default function AppSidebar() {
                   <DropdownMenuItem onClick={() => router.push('/profile')}>
                     <IconUserCircle className='mr-2 h-4 w-4' />
                     Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => router.push('/balance-type')}>
+                    <IconCreditCard className='mr-2 h-4 w-4' />
+                    Balance Type
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />

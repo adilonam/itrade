@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
 import { z } from 'zod';
+import { ensureUserBalance, getSessionBalanceType } from '@/lib/balance';
 
 const EnrollmentSchema = z.object({
   investmentId: z.string(),
@@ -55,13 +56,14 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const { investmentId, amount, autoReinvest } = EnrollmentSchema.parse(body);
+    const balanceType = getSessionBalanceType(session);
 
     // Start a position to ensure data consistency
     const result = await prisma.$transaction(async (tx) => {
       // Get user with current balance
       const user = await tx.user.findUnique({
         where: { id: session.user.id },
-        select: { id: true, balance: true }
+        select: { id: true }
       });
 
       if (!user) {
@@ -91,7 +93,8 @@ export async function POST(request: NextRequest) {
       }
 
       // Check user balance
-      if (user.balance < amount) {
+      const userBalance = await ensureUserBalance(tx, user.id, balanceType);
+      if (userBalance.amount < amount) {
         throw new Error('Insufficient balance');
       }
 
@@ -139,15 +142,16 @@ export async function POST(request: NextRequest) {
       });
 
       // Update user balance
-      await tx.user.update({
-        where: { id: user.id },
-        data: { balance: user.balance - amount }
+      await tx.userBalance.update({
+        where: { userId_type: { userId: user.id, type: balanceType } },
+        data: { amount: userBalance.amount - amount }
       });
 
       // Create transaction record for investment
       await tx.transaction.create({
         data: {
           userId: user.id,
+          balanceType,
           type: 'WITHDRAW',
           absoluteAmount: amount,
           description: `Investment in ${investment.title} - ${investment.country}`

@@ -19,6 +19,7 @@ import { Suspense } from 'react';
 type Transaction = {
   id: string;
   type: 'GAIN' | 'LOSS' | 'DEPOSIT' | 'WITHDRAW';
+  balanceType: 'REAL' | 'DEMO' | 'INSTITUTIONAL';
   absoluteAmount: number;
   description: string | null;
   createdAt: string;
@@ -86,7 +87,12 @@ function UserTransactionsListingContent() {
     } finally {
       setLoading(false);
     }
-  }, [pagination.page, pagination.limit, typeFilter, categoryFilter]);
+  }, [
+    pagination.page,
+    pagination.limit,
+    typeFilter,
+    categoryFilter
+  ]);
 
   useEffect(() => {
     loadTransactions();

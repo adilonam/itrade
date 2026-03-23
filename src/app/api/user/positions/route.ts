@@ -7,6 +7,7 @@ import {
   calculatePositionPnL,
   couldOpenPosition
 } from '@/lib/calculator-server';
+import { getSessionBalanceType, getUserBalanceAmount } from '@/lib/balance';
 // Create position data type
 type CreatePositionData = Position;
 import { Market, Position } from '@/lib/prisma/generated/client';
@@ -132,6 +133,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body: Omit<CreatePositionData, 'userId'> = await request.json();
+    const balanceType = getSessionBalanceType(session);
 
     // Validate required fields
     if (!body.type || body.quantity === undefined) {
@@ -152,7 +154,7 @@ export async function POST(request: NextRequest) {
     // Get user data including balance
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { balance: true }
+      select: { id: true }
     });
 
     if (!user) {
@@ -339,12 +341,14 @@ export async function POST(request: NextRequest) {
         where: { id: session.user.id },
         select: {
           id: true,
-          balance: true,
           leverage: true
         }
       });
 
       if (userWithLeverage) {
+        const balance = await prisma.$transaction((tx) =>
+          getUserBalanceAmount(tx, session.user.id, balanceType)
+        );
         // Create a temporary position object for margin calculation and position check
         const tempPosition = {
           id: 'temp',
@@ -362,7 +366,10 @@ export async function POST(request: NextRequest) {
           executedAt: body.executedAt || new Date(),
           closedAt: null,
           pnl: null,
-          user: userWithLeverage,
+          user: {
+            ...userWithLeverage,
+            balance
+          },
           market: market
         };
 

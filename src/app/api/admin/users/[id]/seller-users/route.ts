@@ -87,7 +87,10 @@ export async function GET(
           id: true,
           name: true,
           email: true,
-          balance: true,
+          balances: {
+            where: { type: 'REAL' },
+            select: { amount: true }
+          },
           role: true,
           createdAt: true
         },
@@ -103,7 +106,10 @@ export async function GET(
     ]);
 
     return NextResponse.json({
-      users: linkedUsers,
+      users: linkedUsers.map((u) => ({
+        ...u,
+        balance: u.balances[0]?.amount ?? 0
+      })),
       pagination: {
         page,
         limit,
@@ -205,14 +211,23 @@ export async function POST(
         id: true,
         name: true,
         email: true,
-        balance: true,
+        balances: {
+          where: { type: 'REAL' },
+          select: { amount: true }
+        },
         role: true,
         createdAt: true
       }
     });
 
     return NextResponse.json(
-      { message: 'User added to seller successfully', user: updatedUser },
+      {
+        message: 'User added to seller successfully',
+        user: {
+          ...updatedUser,
+          balance: updatedUser.balances[0]?.amount ?? 0
+        }
+      },
       { status: 200 }
     );
   } catch (error) {

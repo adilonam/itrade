@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
 import { TransactionType } from '@/lib/prisma/generated/client';
 import { z } from 'zod';
+import { ensureUserBalance } from '@/lib/balance';
 
 function isAdmin(session: { user?: { role?: string } } | null) {
   return (
@@ -40,14 +41,15 @@ export async function PATCH(
     }
 
     if (data.status === 'APPROVED' && existing.status !== 'APPROVED') {
-      const user = await prisma.user.findUnique({
-        where: { id: existing.userId },
-        select: { balance: true }
+      const balanceType = 'REAL' as const;
+      const currentBalance = await prisma.$transaction(async (tx) => {
+        const balance = await ensureUserBalance(tx, existing.userId, balanceType);
+        return balance.amount;
       });
-      if (!user || user.balance < existing.amount) {
+      if (currentBalance < existing.amount) {
         return NextResponse.json(
           {
-            error: `Cannot approve: user balance (${user?.balance ?? 0}) is less than withdrawal amount (${existing.amount})`
+            error: `Cannot approve: user balance (${currentBalance}) is less than withdrawal amount (${existing.amount})`
           },
           { status: 400 }
         );
@@ -60,13 +62,16 @@ export async function PATCH(
             ...(data.adminNotes != null && { adminNotes: data.adminNotes })
           }
         });
-        await tx.user.update({
-          where: { id: existing.userId },
-          data: { balance: { decrement: existing.amount } }
+        await tx.userBalance.update({
+          where: {
+            userId_type: { userId: existing.userId, type: balanceType }
+          },
+          data: { amount: { decrement: existing.amount } }
         });
         await tx.transaction.create({
           data: {
             userId: existing.userId,
+            balanceType,
             type: TransactionType.WITHDRAW,
             absoluteAmount: existing.amount,
             description: 'Withdrawal approved'

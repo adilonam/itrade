@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { calculateUserFinancialInfo } from '@/lib/calculator-server';
+import { getSessionBalanceType } from '@/lib/balance';
 
 export async function GET(request: NextRequest) {
   try {
@@ -14,15 +15,17 @@ export async function GET(request: NextRequest) {
     // Get room query parameter
     const searchParams = request.nextUrl.searchParams;
     const roomParam = searchParams.get('room');
-    const room: 'STOCK' | 'TRADING' | 'ALL' =
-      roomParam && ['STOCK', 'TRADING', 'ALL'].includes(roomParam)
-        ? (roomParam as 'STOCK' | 'TRADING' | 'ALL')
+    const room: 'STOCK' | 'TRADING' | 'INSTITUTIONAL' | 'ALL' =
+      roomParam && ['STOCK', 'TRADING', 'INSTITUTIONAL', 'ALL'].includes(roomParam)
+        ? (roomParam as 'STOCK' | 'TRADING' | 'INSTITUTIONAL' | 'ALL')
         : 'ALL';
+    const balanceType = getSessionBalanceType(session);
 
     // Get user with required fields
     const { prisma } = await import('@/lib/prisma');
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id }
+      where: { id: session.user.id },
+      select: { id: true, leverage: true }
     });
 
     if (!user) {
@@ -30,7 +33,11 @@ export async function GET(request: NextRequest) {
     }
 
     // Use the centralized financial calculation function
-    const financialInfo = await calculateUserFinancialInfo(user, room);
+    const financialInfo = await calculateUserFinancialInfo(
+      user,
+      room,
+      balanceType
+    );
 
     if (!financialInfo) {
       return NextResponse.json(

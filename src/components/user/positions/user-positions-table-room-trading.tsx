@@ -45,6 +45,7 @@ import {
   IconMinus
 } from '@tabler/icons-react';
 import { toast } from 'sonner';
+import type { Room } from '@/lib/prisma/generated/client';
 
 type PositionWithMarket = Position & {
   market: Market | null;
@@ -403,7 +404,15 @@ export function UserPositionsTableRoomTrading({
  * the table. Use this when you only need the "Your Room Trading Positions"
  * card (e.g. at the bottom of the trading view page).
  */
-export function UserPositionsTableCardRoomTrading() {
+interface UserPositionsTableCardRoomTradingProps {
+  room?: Room;
+  refreshEventName?: string;
+}
+
+export function UserPositionsTableCardRoomTrading({
+  room = 'TRADING',
+  refreshEventName = 'room-trading-positions-refresh'
+}: UserPositionsTableCardRoomTradingProps) {
   const [positions, setPositions] = useState<PositionWithMarket[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -416,7 +425,7 @@ export function UserPositionsTableCardRoomTrading() {
       const params = new URLSearchParams({
         page: '1',
         limit: '10',
-        room: 'TRADING'
+        room
       });
       const response = await fetch(`/api/user/positions?${params}`);
       if (!response.ok) throw new Error('Failed to fetch positions');
@@ -427,7 +436,7 @@ export function UserPositionsTableCardRoomTrading() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [room]);
 
   useEffect(() => {
     loadPositions();
@@ -436,10 +445,10 @@ export function UserPositionsTableCardRoomTrading() {
   // Refresh positions when buy/sell is completed (e.g. from trading actions on this page)
   useEffect(() => {
     const handler = () => loadPositions();
-    window.addEventListener('room-trading-positions-refresh', handler);
+    window.addEventListener(refreshEventName, handler);
     return () =>
-      window.removeEventListener('room-trading-positions-refresh', handler);
-  }, [loadPositions]);
+      window.removeEventListener(refreshEventName, handler);
+  }, [loadPositions, refreshEventName]);
 
   const handleClosePosition = useCallback(
     async (positionId: string) => {

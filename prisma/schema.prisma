@@ -20,6 +20,13 @@ enum Role {
   SUPERADMIN
 }
 
+// Demo-friendly multi-account balances for a single user.
+enum BalanceType {
+  REAL
+  DEMO
+  INSTITUTIONAL
+}
+
 // NextAuth.js required models
 model Account {
   id                String  @id @default(cuid())
@@ -58,7 +65,6 @@ model User {
   emailVerified       DateTime?            @map("email_verified")
   image               String? // profile image URL (e.g. Vercel Blob URL)
   password            String? // For credentials provider
-  balance             Float                @default(0) @map("balance")
   role                Role                 @default(USER)
   createdAt           DateTime             @default(now()) @map("created_at")
   updatedAt           DateTime             @updatedAt @map("updated_at")
@@ -87,8 +93,23 @@ model User {
   sentMessages        Message[]            @relation("MessageSender")
   receivedMessages    Message[]            @relation("MessageReceiver")
   botUsers            BotUser[]
+  balances            UserBalance[]
 
   @@map("users")
+}
+
+model UserBalance {
+  id        String       @id @default(cuid())
+  userId    String       @map("user_id")
+  type      BalanceType
+  amount    Float        @default(0) @map("amount")
+  createdAt DateTime     @default(now()) @map("created_at")
+  updatedAt DateTime     @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, type])
+  @@map("user_balances")
 }
 
 model MfaChallenge {
@@ -129,6 +150,7 @@ enum MarketType {
 enum Room {
   STOCK
   TRADING
+  INSTITUTIONAL
 }
 
 model Market {
@@ -271,6 +293,7 @@ model UserInvestment {
 model Transaction {
   id             String          @id @default(cuid())
   userId         String          @map("user_id")
+  balanceType    BalanceType     @default(REAL)
   type           TransactionType
   absoluteAmount Float           @default(0) // absolute amount of the transaction
   description    String?

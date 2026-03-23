@@ -11,6 +11,7 @@ import {
   Position,
   TransactionType
 } from '@/lib/prisma/generated/client';
+import { getSessionBalanceType } from '@/lib/balance';
 
 export async function PATCH(
   request: NextRequest,
@@ -43,6 +44,7 @@ export async function PATCH(
     const { id } = await params;
     const body = await request.json();
     const { status = 'CLOSED', amount } = body;
+    const balanceType = getSessionBalanceType(session);
 
     // Validate status
     if (status !== 'CLOSED') {
@@ -234,19 +236,17 @@ export async function PATCH(
           const absoluteAmount = Math.abs(calculatedPnL);
 
           // Update user balance
-          await tx.user.update({
-            where: { id: session.user.id },
-            data: {
-              balance: {
-                increment: calculatedPnL
-              }
-            }
+          await tx.userBalance.upsert({
+            where: { userId_type: { userId: session.user.id, type: balanceType } },
+            update: { amount: { increment: calculatedPnL } },
+            create: { userId: session.user.id, type: balanceType, amount: calculatedPnL }
           });
 
           // Create transaction record
           await tx.transaction.create({
             data: {
               userId: session.user.id,
+              balanceType,
               type: transactionType,
               absoluteAmount: absoluteAmount,
               description: `Partial position ${existingPosition.type} closed - ${existingPosition.market?.symbol || 'Unknown'} (${amount} shares)`
@@ -274,19 +274,17 @@ export async function PATCH(
           const absoluteAmount = Math.abs(calculatedPnL);
 
           // Update user balance
-          await tx.user.update({
-            where: { id: session.user.id },
-            data: {
-              balance: {
-                increment: calculatedPnL
-              }
-            }
+          await tx.userBalance.upsert({
+            where: { userId_type: { userId: session.user.id, type: balanceType } },
+            update: { amount: { increment: calculatedPnL } },
+            create: { userId: session.user.id, type: balanceType, amount: calculatedPnL }
           });
 
           // Create transaction record
           await tx.transaction.create({
             data: {
               userId: session.user.id,
+              balanceType,
               type: transactionType,
               absoluteAmount: absoluteAmount,
               description: `Position ${existingPosition.type} closed - ${existingPosition.market?.symbol || 'Unknown'}`

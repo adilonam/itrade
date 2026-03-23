@@ -5,9 +5,12 @@ import { prisma } from '@/lib/prisma';
 import {
   Market,
   Position,
-  User,
   MarketType
 } from '@/lib/prisma/generated/client';
+import type { BalanceType, User } from '@/lib/prisma/generated/client';
+import { getUserBalanceAmount } from '@/lib/balance';
+
+type UserWithBalance = Pick<User, 'id' | 'leverage'> & { balance: number };
 
 /**
  * Get lot size based on market type
@@ -244,7 +247,7 @@ export async function refreshSaveMarkets(
  * @returns Required margin amount or null if calculation fails
  */
 export async function calculateRequiredMargin(
-  position: Position & { user: User; market: Market }
+  position: Position & { user: UserWithBalance; market: Market }
 ): Promise<number | null> {
   try {
     // Validate inputs
@@ -295,12 +298,13 @@ export async function calculateRequiredMargin(
 /**
  * Calculate comprehensive financial information for a user
  * @param user - User object from Prisma with id, balance, and leverage
- * @param room - Room filter (STOCK, TRADING, or ALL). Defaults to ALL (calculates for both rooms).
+ * @param room - Room filter (STOCK, TRADING, INSTITUTIONAL, or ALL). Defaults to ALL.
  * @returns Object containing balance, margins, equity, PnL, and leverage
  */
 export async function calculateUserFinancialInfo(
-  user: User,
-  room: 'STOCK' | 'TRADING' | 'ALL' = 'ALL'
+  user: Pick<User, 'id' | 'leverage'>,
+  room: 'STOCK' | 'TRADING' | 'INSTITUTIONAL' | 'ALL' = 'ALL',
+  balanceType: BalanceType = 'REAL'
 ): Promise<{
   balance: number;
   usedMargin: number;
@@ -397,7 +401,9 @@ export async function calculateUserFinancialInfo(
     }
 
     // Calculate financial metrics
-    const balance = user.balance;
+    const balance = await prisma.$transaction((tx) =>
+      getUserBalanceAmount(tx, user.id, balanceType)
+    );
     const equity = balance + totalPnL;
     const freeMargin = equity - usedMargin;
     const marginLevel = usedMargin > 0 ? (equity / usedMargin) * 100 : null;
@@ -424,7 +430,7 @@ export async function calculateUserFinancialInfo(
  * @returns Object containing whether position can be opened and relevant calculations
  */
 export async function couldOpenPosition(
-  position: Position & { user: User; market: Market }
+  position: Position & { user: UserWithBalance; market: Market }
 ): Promise<{
   canOpen: boolean;
   freeMargin: number;

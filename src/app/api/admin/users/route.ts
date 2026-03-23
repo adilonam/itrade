@@ -101,7 +101,10 @@ export async function GET(request: NextRequest) {
           id: true,
           name: true,
           email: true,
-          balance: true,
+          balances: {
+            where: { type: 'REAL' },
+            select: { amount: true }
+          },
           leverage: true,
           role: true,
           emailVerified: true,
@@ -121,8 +124,13 @@ export async function GET(request: NextRequest) {
       prisma.user.count({ where })
     ]);
 
+    const normalizedUsers = users.map((user) => ({
+      ...user,
+      balance: user.balances[0]?.amount ?? 0
+    }));
+
     return NextResponse.json({
-      users,
+      users: normalizedUsers,
       pagination: {
         page,
         limit,
@@ -195,14 +203,22 @@ export async function POST(request: NextRequest) {
         email,
         password: hashedPassword,
         role,
-        balance: balance || 0,
+        balances: {
+          create: [
+            { type: 'REAL', amount: balance || 0 },
+            { type: 'DEMO', amount: 10000 }
+          ]
+        },
         leverage: leverage || 1
       },
       select: {
         id: true,
         name: true,
         email: true,
-        balance: true,
+        balances: {
+          where: { type: 'REAL' },
+          select: { amount: true }
+        },
         leverage: true,
         role: true,
         emailVerified: true,
@@ -212,7 +228,13 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json(
-      { message: 'User created successfully', user },
+      {
+        message: 'User created successfully',
+        user: {
+          ...user,
+          balance: user.balances[0]?.amount ?? 0
+        }
+      },
       { status: 201 }
     );
   } catch (error) {

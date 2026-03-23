@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
+import { ensureUserBalance, getSessionBalanceType } from '@/lib/balance';
 
 interface RouteParams {
   params: Promise<{
@@ -18,6 +19,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     }
 
     const { id } = await params;
+    const balanceType = getSessionBalanceType(session);
 
     // Start a transaction to ensure data consistency
     const result = await prisma.$transaction(async (tx) => {
@@ -27,8 +29,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
         include: {
           user: {
             select: {
-              id: true,
-              balance: true
+              id: true
             }
           },
           investment: {
@@ -70,10 +71,17 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       });
 
       // Return funds to user balance
-      await tx.user.update({
-        where: { id: userInvestment.userId },
+      const userBalance = await ensureUserBalance(
+        tx,
+        userInvestment.userId,
+        balanceType
+      );
+      await tx.userBalance.update({
+        where: {
+          userId_type: { userId: userInvestment.userId, type: balanceType }
+        },
         data: {
-          balance: userInvestment.user.balance + refundAmount
+          amount: userBalance.amount + refundAmount
         }
       });
 
@@ -81,6 +89,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       await tx.transaction.create({
         data: {
           userId: userInvestment.userId,
+          balanceType,
           type: 'DEPOSIT',
           absoluteAmount: refundAmount,
           description: `Investment cancelled: ${userInvestment.investment.title} - ${userInvestment.investment.country}`
@@ -92,6 +101,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
         await tx.transaction.create({
           data: {
             userId: userInvestment.userId,
+            balanceType,
             type: 'LOSS',
             absoluteAmount: penalty,
             description: `Early cancellation penalty: ${userInvestment.investment.title}`

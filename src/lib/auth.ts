@@ -3,6 +3,7 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import { prisma } from './prisma';
+import { parseBalanceType } from './balance';
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -87,14 +88,27 @@ export const authOptions: NextAuthOptions = {
       if (token.id) {
         const dbUser = await prisma.user.findUnique({
           where: { id: token.id as string },
-          select: { role: true, balance: true, leverage: true, image: true }
+          select: {
+            role: true,
+            leverage: true,
+            image: true,
+            currentBalanceType: true,
+            balances: {
+              select: { type: true, amount: true }
+            }
+          }
         });
 
         if (dbUser) {
+          const selectedBalanceType = parseBalanceType(dbUser.currentBalanceType);
+          const selectedBalance = dbUser.balances.find(
+            (balance) => balance.type === selectedBalanceType
+          );
           token.role = dbUser.role;
-          token.balance = dbUser.balance;
+          token.balance = selectedBalance?.amount ?? 0;
           token.leverage = dbUser.leverage;
           token.image = dbUser.image ?? token.image;
+          token.currentBalanceType = selectedBalanceType;
         }
       }
 
@@ -106,9 +120,25 @@ export const authOptions: NextAuthOptions = {
         session.user.role = (token.role as string) || 'USER';
         session.user.balance = (token.balance as number) || 0;
         session.user.leverage = (token.leverage as number) || 1;
+        session.user.currentBalanceType = parseBalanceType(
+          token.currentBalanceType
+        );
         session.user.image = (token.image as string) ?? session.user.image;
       }
       return session;
+    }
+  },
+  events: {
+    async createUser({ user }) {
+      if (!user?.id) return;
+
+      await prisma.userBalance.createMany({
+        data: [
+          { userId: user.id, type: 'REAL', amount: 0 },
+          { userId: user.id, type: 'DEMO', amount: 10000 }
+        ],
+        skipDuplicates: true
+      });
     }
   },
   secret: process.env.NEXTAUTH_SECRET

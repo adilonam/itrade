@@ -124,8 +124,7 @@ export async function PUT(
             select: {
               id: true,
               name: true,
-              email: true,
-              balance: true
+              email: true
             }
           },
           market: {
@@ -142,19 +141,17 @@ export async function PUT(
       // Update user balance and create transaction if P&L changed
       if (shouldCreateTransaction && balanceChange !== 0) {
         // Update user balance
-        await tx.user.update({
-          where: { id: existingPosition.userId },
-          data: {
-            balance: {
-              increment: balanceChange
-            }
-          }
+        await tx.userBalance.upsert({
+          where: { userId_type: { userId: existingPosition.userId, type: 'REAL' } },
+          update: { amount: { increment: balanceChange } },
+          create: { userId: existingPosition.userId, type: 'REAL', amount: balanceChange }
         });
 
         // Create transaction record for history
         await tx.transaction.create({
           data: {
             userId: existingPosition.userId,
+            balanceType: 'REAL',
             type: balanceChange > 0 ? 'GAIN' : 'LOSS',
             absoluteAmount: Math.abs(balanceChange),
             description: `Admin P&L adjustment for position ${id.slice(0, 8)}... - Balance ${balanceChange > 0 ? '+' : ''}${balanceChange.toFixed(2)}`
