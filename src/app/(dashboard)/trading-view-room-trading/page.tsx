@@ -1,4 +1,4 @@
-import { TradingRoomLayout } from '@/components/trading-room/trading-room-layout';
+import { TradingRoomLayout } from '@/components/trading-room';
 import { prisma } from '@/lib/prisma';
 
 export const metadata = {

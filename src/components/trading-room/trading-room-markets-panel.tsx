@@ -7,7 +7,13 @@ import { TradingRoomOrderPanel } from './trading-room-order-panel';
 import type { Market } from '@/lib/prisma/generated/client';
 import type { MockSymbol } from './mock-data';
 import { getCurrencyFlags } from '@/lib/currency-flags';
-import { IconSearch, IconStar, IconTrendingUp, IconShield, IconInfoCircle } from '@tabler/icons-react';
+import {
+  IconSearch,
+  IconStar,
+  IconTrendingUp,
+  IconInfoCircle,
+  IconSettings
+} from '@tabler/icons-react';
 
 export type SymbolItem = Market | MockSymbol;
 
@@ -15,28 +21,30 @@ function isMarket(item: SymbolItem): item is Market {
   return 'room' in item && typeof (item as Market).room === 'string';
 }
 
-interface TradingRoomSidebarProps {
+interface TradingRoomMarketsPanelProps {
   symbols: SymbolItem[];
   selectedSymbolId: string | null;
   selectedMarket: Market | null;
   onSelectSymbol: (id: string, market: Market | null) => void;
   onMarketOrder?: (type: 'BUY' | 'SELL', quantity: number) => void;
   onAdvancedOrderClick?: () => void;
-  guestMode?: boolean;
+  /** When true, buy/sell controls are inactive (e.g. user not signed in). */
+  tradingDisabled?: boolean;
   /** When true, symbol clicks update chart in-place without URL navigation */
   noNavigation?: boolean;
 }
 
-export function TradingRoomSidebar({
+/** Symbol list + buy/sell (order) for the selected instrument */
+export function TradingRoomMarketsPanel({
   symbols,
   selectedSymbolId,
   selectedMarket: _selectedMarket,
   onSelectSymbol,
   onMarketOrder,
   onAdvancedOrderClick,
-  guestMode = false,
+  tradingDisabled = false,
   noNavigation = false
-}: TradingRoomSidebarProps) {
+}: TradingRoomMarketsPanelProps) {
   void _selectedMarket; // Reserved for future use
   const [listTab, setListTab] = useState<'favorites' | 'movers'>('movers');
 
@@ -94,7 +102,7 @@ export function TradingRoomSidebar({
             <TradingRoomOrderPanel
               market={market ?? { symbol, lastPrice: price, spread: 0.00002 }}
               onMarketOrder={onMarketOrder}
-              disabled={guestMode}
+              disabled={tradingDisabled}
               showAdvancedOrder={false}
             />
             <div className="mt-3 flex items-center justify-between text-[10px] text-[var(--trade-text-muted)] px-1">
@@ -103,7 +111,7 @@ export function TradingRoomSidebar({
                 onClick={() => onAdvancedOrderClick?.()}
                 className="flex items-center gap-1 hover:text-[var(--trade-text)]"
               >
-                <IconShield className="size-3" />
+                <IconSettings className="size-3" />
                 Advanced Order
               </button>
               <div className="flex gap-2">
@@ -174,7 +182,6 @@ export function TradingRoomSidebar({
 
   return (
     <div className="flex h-full w-full flex-col">
-      {/* Search and Favorites/Top Movers */}
       <div className="shrink-0 border-b border-[var(--trade-border)] p-3">
         <div className="mb-3 flex items-center justify-between">
           <div className="flex gap-4">
@@ -210,13 +217,12 @@ export function TradingRoomSidebar({
         <div className="relative">
           <input
             type="text"
-            placeholder="Search symbols"
+            placeholder="Symbol"
             className="w-full rounded border border-[var(--trade-border)] bg-[var(--trade-dark)] px-3 py-1.5 text-sm text-[var(--trade-text)] placeholder:text-[var(--trade-text-muted)] focus:border-[var(--trade-accent-blue)] focus:outline-none focus:ring-1 focus:ring-[var(--trade-accent-blue)]"
           />
         </div>
       </div>
 
-      {/* Popular section + symbols list */}
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
         <div className="flex shrink-0 items-center justify-between border-b border-[var(--trade-border)] bg-[var(--trade-dark)]/40 px-3 py-2">
           <div className="flex items-center gap-2">
@@ -234,14 +240,6 @@ export function TradingRoomSidebar({
             })}
           </div>
         </ScrollArea>
-      </div>
-
-      {/* Bottom: News/Calendar icons (minimal) */}
-      <div className="flex shrink-0 justify-between border-t border-[var(--trade-border)] bg-[var(--trade-dark)]/30 p-2 text-[var(--trade-text-muted)]">
-        <div className="flex gap-4">
-          <button type="button" className="hover:text-[var(--trade-text)]">News</button>
-          <button type="button" className="hover:text-[var(--trade-text)]">Calendar</button>
-        </div>
       </div>
     </div>
   );

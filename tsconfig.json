@@ -47,7 +47,7 @@
     "src/components/markets/markets-view.back",
     "src/components/trading-view/trading-actions.back",
     "src/components/user/portfolio/user-positions-table-room-stock.tsx"
-, "src/components/trading-room/trading-room-chart-bar.tsx.bak"  ],
+  ],
   "exclude": [
     "node_modules"
   ],

@@ -126,17 +126,22 @@ export function TradingRoomOrderPanel({
           −
         </button>
         <div className="text-center">
-          <input
-            type="text"
-            inputMode="decimal"
-            value={lotSize}
-            onChange={handleLotChange}
-            onBlur={handleLotBlur}
-            disabled={disabled}
-            className="w-14 bg-transparent text-center text-xs font-bold text-[var(--trade-text)] outline-none focus:ring-0 disabled:opacity-50 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-          />
+          <div className="flex items-baseline justify-center gap-1">
+            <input
+              type="text"
+              inputMode="decimal"
+              value={lotSize}
+              onChange={handleLotChange}
+              onBlur={handleLotBlur}
+              disabled={disabled}
+              className="w-12 bg-transparent text-center text-xs font-bold text-[var(--trade-text)] outline-none focus:ring-0 disabled:opacity-50 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+            />
+            <span className="text-[9px] font-medium text-[var(--trade-text-muted)]">lots</span>
+          </div>
           <div className="text-[9px] text-[var(--trade-text-muted)]">
-            ≈ {formatUsd(notionalUsd)} USD
+            ≈ {(parseFloat(lotSize) || 0.01) * price < 1000
+              ? `${((parseFloat(lotSize) || 0.01) * price).toFixed(3)} USD`
+              : `${formatUsd(notionalUsd)} USD`}
           </div>
         </div>
         <button

@@ -121,20 +121,22 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-/* Stitch-inspired trade room theme - dark (default) and light variants */
-.trade-room {
-  --trade-dark: #0b1218;
-  --trade-panel: #161d26;
-  --trade-border: #242d38;
-  --trade-accent-blue: #1e88e5;
-  --trade-green: #00bfa5;
-  --trade-red: #ff5252;
-  --trade-text: #ffffff;
-  --trade-text-muted: #90a4ae;
+/* Watch-Trader–style trade room (dark) + light variant */
+.trade-room,
+.watch-trader-shell {
+  --trade-dark: #12151c;
+  --trade-panel: #161b22;
+  --trade-border: #2a3441;
+  --trade-accent-blue: #19f0ff;
+  --trade-green: #00e5b0;
+  --trade-red: #ff6b8a;
+  --trade-text: #e6edf3;
+  --trade-text-muted: #8b9cb3;
 }
 
 /* Light mode - when html does not have .dark */
-html:not(.dark) .trade-room {
+html:not(.dark) .trade-room,
+html:not(.dark) .watch-trader-shell {
   --trade-dark: #f1f5f9;
   --trade-panel: #ffffff;
   --trade-border: #e2e8f0;
