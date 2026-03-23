@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 import { useSearchParams } from 'next/navigation';
 import {
@@ -69,6 +69,44 @@ export function TradingRoomLayout({
           spread: 0.00002
         }
       : null;
+
+  // When the left panel is resized down to 30% of its original width, we want it to fully collapse
+  // (width -> 0) so the chart panel can use the remaining space.
+  const leftPanelInitialSizeRef = useRef<number | null>(null);
+  const [leftPanelMinSize, setLeftPanelMinSize] = useState(14);
+  const [leftCollapseEnabled, setLeftCollapseEnabled] = useState(false);
+
+  const handleHorizontalLayout = useCallback((sizes: number[]) => {
+    if (leftPanelInitialSizeRef.current != null) return;
+    const initialLeftSize = sizes[0] ?? 20;
+    leftPanelInitialSizeRef.current = initialLeftSize;
+
+    // With `collapsedSize=0`, react-resizable-panels collapses around the halfway point between
+    // collapsedSize and minSize. That means collapse threshold is roughly `minSize / 2`.
+    // We want: minSize/2 = 30% of initialLeftSize => minSize = 60% of initialLeftSize.
+    // Bias slightly upward because the library collapses when `size < halfwayPoint` (strict).
+    const computedMinSize = Math.max(1, Math.min(100, initialLeftSize * 0.61));
+    setLeftPanelMinSize(computedMinSize);
+    setLeftCollapseEnabled(true);
+  }, []);
+
+  // Right side vertical split (Chart on top / Positions on bottom):
+  // collapse the bottom panel when it shrinks to ~30% of its initial height.
+  const bottomPanelInitialSizeRef = useRef<number | null>(null);
+  const [bottomPanelMinSize, setBottomPanelMinSize] = useState(20);
+  const [bottomCollapseEnabled, setBottomCollapseEnabled] = useState(false);
+
+  const handleRightVerticalLayout = useCallback((sizes: number[]) => {
+    if (bottomPanelInitialSizeRef.current != null) return;
+    const initialBottomSize = sizes[1] ?? 0;
+    bottomPanelInitialSizeRef.current = initialBottomSize;
+
+    // With collapsedSize=0, collapse happens around `minSize/2` (strict),
+    // so we set `minSize ≈ 2 * (0.30 * initialBottomSize)` => 0.60 * initial.
+    const computedMinSize = Math.max(1, Math.min(100, initialBottomSize * 0.61));
+    setBottomPanelMinSize(computedMinSize);
+    setBottomCollapseEnabled(true);
+  }, []);
 
   useEffect(() => {
     if (initialSymbols.length > 0) return;
@@ -151,11 +189,17 @@ export function TradingRoomLayout({
   return (
     <div className="trade-room flex h-[calc(100dvh-2.75rem)] max-h-[calc(100dvh-2.75rem)] min-h-0 w-full min-w-0 flex-col overflow-hidden bg-[var(--trade-dark)] text-[var(--trade-text)]">
       <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-        <ResizablePanelGroup direction="horizontal" className="min-h-0 min-w-0 flex-1">
+        <ResizablePanelGroup
+          direction="horizontal"
+          className="min-h-0 min-w-0 flex-1"
+          onLayout={handleHorizontalLayout}
+        >
           <ResizablePanel
             defaultSize={20}
-            minSize={14}
+            minSize={leftPanelMinSize}
             maxSize={32}
+            collapsible={leftCollapseEnabled}
+            collapsedSize={0}
             className="flex min-w-0 flex-col overflow-hidden"
           >
             {advancedOrderOpen && advancedOrderMarket ? (
@@ -197,7 +241,11 @@ export function TradingRoomLayout({
           </ResizablePanel>
           <ResizableHandle withHandle className="shrink-0 bg-[var(--trade-border)]" />
           <ResizablePanel defaultSize={80} minSize={50} className="flex min-h-0 min-w-0 flex-col overflow-hidden">
-            <ResizablePanelGroup direction="vertical" className="h-full min-h-0 min-w-0 w-full flex-1">
+            <ResizablePanelGroup
+              direction="vertical"
+              className="h-full min-h-0 min-w-0 w-full flex-1"
+              onLayout={handleRightVerticalLayout}
+            >
               <ResizablePanel defaultSize={68} minSize={40} className="flex min-h-0 flex-col overflow-hidden">
                 <TradingRoomChart
                   symbol={chartSymbol}
@@ -209,8 +257,10 @@ export function TradingRoomLayout({
               <ResizableHandle withHandle className="shrink-0 bg-[var(--trade-border)]" />
               <ResizablePanel
                 defaultSize={32}
-                minSize={20}
+                minSize={bottomPanelMinSize}
                 maxSize={55}
+                collapsible={bottomCollapseEnabled}
+                collapsedSize={0}
                 className="flex min-h-0 min-w-0 flex-col overflow-hidden"
               >
                 <TradingRoomPositionsPanel />
