@@ -4,39 +4,6 @@ import { prisma } from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
 import { z } from 'zod';
 
-/**
- * @swagger
- * /api/user/messages:
- *   get:
- *     tags:
- *       - User - Messages
- *     summary: Get messages for user
- *     description: Retrieve all messages where user is sender or receiver.
- *     security:
- *       - ApiKeyAuth: []
- *     parameters:
- *       - in: query
- *         name: page
- *         schema:
- *           type: integer
- *           minimum: 1
- *           default: 1
- *         description: Page number for pagination
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *           minimum: 1
- *           maximum: 100
- *           default: 20
- *         description: Number of messages per page
- *     responses:
- *       200:
- *         description: Messages retrieved successfully
- *       401:
- *         description: Unauthorized
- */
-
 // Validation schema
 const getUserMessagesSchema = z.object({
   page: z.coerce.number().int().min(1).optional().default(1),

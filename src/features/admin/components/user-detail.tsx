@@ -28,16 +28,20 @@ import { useState } from 'react';
 import { updateUserBalance } from '@/features/admin/services/users';
 import { useSession } from 'next-auth/react';
 
+type UserWithBalance = User & { balance?: number };
+
 type UserDetailProps = {
-  user: User;
-  onUserUpdate?: (updatedUser: User) => void;
+  user: UserWithBalance;
+  onUserUpdate?: (updatedUser: UserWithBalance) => void;
 };
 
 export default function UserDetail({ user, onUserUpdate }: UserDetailProps) {
   const router = useRouter();
   const { data: session } = useSession();
   const [isEditingBalance, setIsEditingBalance] = useState(false);
-  const [balanceValue, setBalanceValue] = useState(user.balance.toString());
+  const [balanceValue, setBalanceValue] = useState(
+    (user.balance ?? 0).toString()
+  );
   const [isUpdatingBalance, setIsUpdatingBalance] = useState(false);
 
   // Check if current user is trying to modify their own account
@@ -68,7 +72,7 @@ export default function UserDetail({ user, onUserUpdate }: UserDetailProps) {
   };
 
   const handleBalanceCancel = () => {
-    setBalanceValue(user.balance.toString());
+    setBalanceValue((user.balance ?? 0).toString());
     setIsEditingBalance(false);
   };
 
@@ -291,7 +295,7 @@ export default function UserDetail({ user, onUserUpdate }: UserDetailProps) {
                 ) : (
                   <div className='mt-1 flex items-center justify-between'>
                     <p className='text-2xl font-bold text-green-600'>
-                      ${user.balance.toFixed(2)}
+                      ${(user.balance ?? 0).toFixed(2)}
                     </p>
                     <Button
                       size='sm'

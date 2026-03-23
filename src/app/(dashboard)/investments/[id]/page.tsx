@@ -45,7 +45,7 @@ export default function InvestmentPage() {
       try {
         const [investmentRes, financialRes] = await Promise.all([
           fetch(`/api/investments/${id}`),
-          fetch('/api/user/financial')
+          fetch('/api/user/financial?balanceType=REAL')
         ]);
 
         if (investmentRes.status === 404) {

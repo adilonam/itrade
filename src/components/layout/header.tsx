@@ -31,7 +31,7 @@ export default function Header({
   // Load financial data from API
   const loadFinancialData = useCallback(async () => {
     try {
-      const response = await fetch('/api/user/financial');
+      const response = await fetch('/api/user/financial?balanceType=REAL');
       if (!response.ok) {
         throw new Error('Failed to fetch financial data');
       }

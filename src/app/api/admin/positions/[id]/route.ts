@@ -5,81 +5,6 @@ import type { Position } from '@/lib/prisma/generated/client';
 // Update position data type
 type UpdatePositionData = Partial<Position>;
 
-/**
- * @swagger
- * /api/admin/positions/{id}:
- *   get:
- *     summary: Get a specific position by ID
- *     tags: [Admin, Positions]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: Position ID
- *     responses:
- *       200:
- *         description: Position details
- *       404:
- *         description: Position not found
- *   put:
- *     summary: Update a position
- *     tags: [Admin, Positions]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: Position ID
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               type:
- *                 type: string
- *                 enum: [BUY, SELL, DEPOSIT, WITHDRAWAL, TRANSFER_IN, TRANSFER_OUT, FEE, BONUS, REFUND]
- *               status:
- *                 type: string
- *                 enum: [PLACED, CLOSED, FAILED, PENDING]
- *               marketId:
- *                 type: string
- *               quantity:
- *                 type: number
- *               description:
- *                 type: string
- *               executedAt:
- *                 type: string
- *                 format: date-time
- *               pnl:
- *                 type: number
- *     responses:
- *       200:
- *         description: Position updated successfully
- *       404:
- *         description: Position not found
- *       400:
- *         description: Invalid input data
- *   delete:
- *     summary: Delete a position
- *     tags: [Admin, Positions]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: Position ID
- *     responses:
- *       200:
- *         description: Position deleted successfully
- *       404:
- *         description: Position not found
- */
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -198,8 +123,7 @@ export async function PUT(
             select: {
               id: true,
               name: true,
-              email: true,
-              balance: true
+              email: true
             }
           },
           market: {
@@ -216,19 +140,17 @@ export async function PUT(
       // Update user balance and create transaction if P&L changed
       if (shouldCreateTransaction && balanceChange !== 0) {
         // Update user balance
-        await tx.user.update({
-          where: { id: existingPosition.userId },
-          data: {
-            balance: {
-              increment: balanceChange
-            }
-          }
+        await tx.userBalance.upsert({
+          where: { userId_type: { userId: existingPosition.userId, type: 'REAL' } },
+          update: { amount: { increment: balanceChange } },
+          create: { userId: existingPosition.userId, type: 'REAL', amount: balanceChange }
         });
 
         // Create transaction record for history
         await tx.transaction.create({
           data: {
             userId: existingPosition.userId,
+            balanceType: 'REAL',
             type: balanceChange > 0 ? 'GAIN' : 'LOSS',
             absoluteAmount: Math.abs(balanceChange),
             description: `Admin P&L adjustment for position ${id.slice(0, 8)}... - Balance ${balanceChange > 0 ? '+' : ''}${balanceChange.toFixed(2)}`

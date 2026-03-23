@@ -6,23 +6,6 @@ import {
   calculateUserFinancialInfo
 } from '@/lib/calculator-server';
 
-/**
- * @swagger
- * /api/refresh-position:
- *   get:
- *     summary: Scheduled endpoint to refresh position data and update PnL calculations
- *     tags: [Schedule, Positions]
- *     security:
- *       - BearerAuth: []
- *       - VercelCron: []
- *     responses:
- *       200:
- *         description: Position refresh completed successfully
- *       401:
- *         description: Unauthorized - Invalid authentication
- *       500:
- *         description: Internal server error
- */
 export async function GET(request: NextRequest) {
   try {
     // Authentication check

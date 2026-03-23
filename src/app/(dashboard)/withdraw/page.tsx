@@ -107,7 +107,7 @@ export default function WithdrawPage() {
   useEffect(() => {
     const fetchFinancialData = async () => {
       try {
-        const response = await fetch('/api/user/financial');
+        const response = await fetch('/api/user/financial?balanceType=REAL');
         if (response.ok) {
           const data = await response.json();
           // Use freeMargin as the available balance for withdrawal
@@ -180,6 +180,7 @@ export default function WithdrawPage() {
         body: JSON.stringify({
           amount: withdrawAmount,
           withdrawMethod,
+          balanceType: 'REAL',
           withdrawDetails
         })
       });

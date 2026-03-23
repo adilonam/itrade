@@ -44,14 +44,20 @@ import {
   calculateRequiredMargin,
   calculateLotSizeFromMargin
 } from '@/lib/calculator-client';
+import type { Room } from '@/lib/prisma/generated/client';
 
 interface TradingActionsRoomTradingProps {
   market?: Market | null;
+  room?: Room;
+  refreshEventName?: string;
 }
 
 export function TradingActionsRoomTrading({
-  market: propMarket
+  market: propMarket,
+  room = 'TRADING',
+  refreshEventName = 'room-trading-positions-refresh'
 }: TradingActionsRoomTradingProps) {
+  const balanceType = room === 'INSTITUTIONAL' ? 'INSTITUTIONAL' : 'REAL';
   const { data: session } = useSession();
   const [inputMode, setInputMode] = useState<'LOT' | 'AMOUNT'>('LOT');
   const [inputValue, setInputValue] = useState<string>('');
@@ -100,7 +106,7 @@ export function TradingActionsRoomTrading({
             userId: session.user.id,
             type: 'BUY' as const,
             status: 'PLACED' as const,
-            room: 'TRADING' as const,
+            room,
             marketId: propMarket.id,
             quantity: inputNum,
             executedPrice:
@@ -143,6 +149,7 @@ export function TradingActionsRoomTrading({
     inputValue,
     inputMode,
     propMarket,
+    room,
     session?.user,
     orderType,
     limitPrice,
@@ -188,7 +195,8 @@ export function TradingActionsRoomTrading({
         body: JSON.stringify({
           type,
           status: orderType === 'LIMIT' ? 'PENDING' : 'PLACED',
-          room: 'TRADING',
+          balanceType,
+          room,
           executedPrice:
             orderType === 'LIMIT' ? parseFloat(limitPrice) : undefined,
           marketId: propMarket.id,
@@ -209,7 +217,7 @@ export function TradingActionsRoomTrading({
 
       // Notify positions list to refresh
       if (typeof window !== 'undefined') {
-        window.dispatchEvent(new CustomEvent('room-trading-positions-refresh'));
+        window.dispatchEvent(new CustomEvent(refreshEventName));
       }
 
       // Reset form

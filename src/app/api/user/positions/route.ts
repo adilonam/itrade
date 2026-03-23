@@ -7,199 +7,11 @@ import {
   calculatePositionPnL,
   couldOpenPosition
 } from '@/lib/calculator-server';
+import { getUserBalanceAmount, parseBalanceType } from '@/lib/balance';
 // Create position data type
 type CreatePositionData = Position;
 import { Market, Position } from '@/lib/prisma/generated/client';
 
-/**
- * @swagger
- * /api/user/positions:
- *   get:
- *     summary: Get current user's positions with filtering and pagination
- *     tags: [User, Positions]
- *     parameters:
- *       - in: query
- *         name: page
- *         schema:
- *           type: integer
- *           default: 1
- *         description: Page number
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *           default: 10
- *         description: Number of positions per page
- *       - in: query
- *         name: type
- *         schema:
- *           type: string
- *           enum: [BUY, SELL, DEPOSIT, WITHDRAWAL, TRANSFER_IN, TRANSFER_OUT, FEE, BONUS, REFUND]
- *         description: Filter by position type
- *       - in: query
- *         name: status
- *         schema:
- *           type: string
- *           enum: [PENDING, COMPLETED, FAILED, CANCELLED, PENDING]
- *         description: Filter by position status
- *       - in: query
- *         name: marketId
- *         schema:
- *           type: string
- *         description: Filter by market ID
- *       - in: query
- *         name: search
- *         schema:
- *           type: string
- *         description: Search in description
- *       - in: query
- *         name: room
- *         schema:
- *           type: string
- *           enum: [STOCK, TRADING]
- *         description: Filter by room type
- *     responses:
- *       200:
- *         description: List of user's positions with calculated PnL
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 positions:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: string
- *                       type:
- *                         type: string
- *                       status:
- *                         type: string
- *                       quantity:
- *                         type: number
- *                       pnl:
- *                         type: number
- *                         nullable: true
- *                         description: Stored PnL value (automatically calculated and saved)
- *                       calculatedPnL:
- *                         type: number
- *                         nullable: true
- *                         description: Real-time calculated PnL for PLACED BUY/SELL positions based on current market price
- *                       requiredMargin:
- *                         type: number
- *                         nullable: true
- *                         description: Required margin for the position (calculated for PLACED positions)
- *                       market:
- *                         type: object
- *                         properties:
- *                           symbol:
- *                             type: string
- *                           name:
- *                             type: string
- *                           type:
- *                             type: string
- *                 pagination:
- *                   type: object
- *                   properties:
- *                     page:
- *                       type: number
- *                     limit:
- *                       type: number
- *                     total:
- *                       type: number
- *                     pages:
- *                       type: number
- *       401:
- *         description: Unauthorized
- *       500:
- *         description: Internal server error
- *   post:
- *     summary: Create a new position for current user
- *     tags: [User, Positions]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required: [type, quantity]
- *             properties:
- *               type:
- *                 type: string
- *                 enum: [BUY, SELL, DEPOSIT, WITHDRAWAL, TRANSFER_IN, TRANSFER_OUT, FEE, BONUS, REFUND]
- *               status:
- *                 type: string
- *                 enum: [PLACED, CLOSED, FAILED, PENDING]
- *               room:
- *                 type: string
- *                 enum: [STOCK, TRADING]
- *                 description: Room type (defaults to TRADING)
- *               marketId:
- *                 type: string
- *               quantity:
- *                 type: number
- *               description:
- *                 type: string
- *               executedAt:
- *                 type: string
- *                 format: date-time
- *               executedPrice:
- *                 type: number
- *                 description: Executed price (required for PENDING status)
- *               takeProfit:
- *                 type: number
- *                 description: Take profit price level
- *               stopLoss:
- *                 type: number
- *                 description: Stop loss price level
- *               pnl:
- *                 type: number
- *     responses:
- *       201:
- *         description: Position created successfully with calculated PnL
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: string
- *                 type:
- *                   type: string
- *                 status:
- *                   type: string
- *                 quantity:
- *                   type: number
- *                 pnl:
- *                   type: number
- *                   nullable: true
- *                   description: Stored PnL value (automatically calculated and saved)
- *                 calculatedPnL:
- *                   type: number
- *                   nullable: true
- *                   description: Real-time calculated PnL for PLACED BUY/SELL positions based on current market price
- *                 requiredMargin:
- *                   type: number
- *                   nullable: true
- *                   description: Required margin for the position (calculated for PLACED positions)
- *                 market:
- *                   type: object
- *                   properties:
- *                     symbol:
- *                       type: string
- *                     name:
- *                       type: string
- *                     type:
- *                       type: string
- *       400:
- *         description: Invalid input data
- *       401:
- *         description: Unauthorized
- *       500:
- *         description: Internal server error
- */
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -327,7 +139,9 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const body: Omit<CreatePositionData, 'userId'> = await request.json();
+    const body: Omit<CreatePositionData, 'userId'> & { balanceType?: unknown } =
+      await request.json();
+    const balanceType = parseBalanceType(body.balanceType);
 
     // Validate required fields
     if (!body.type || body.quantity === undefined) {
@@ -348,7 +162,7 @@ export async function POST(request: NextRequest) {
     // Get user data including balance
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { balance: true }
+      select: { id: true }
     });
 
     if (!user) {
@@ -535,12 +349,14 @@ export async function POST(request: NextRequest) {
         where: { id: session.user.id },
         select: {
           id: true,
-          balance: true,
           leverage: true
         }
       });
 
       if (userWithLeverage) {
+        const balance = await prisma.$transaction((tx) =>
+          getUserBalanceAmount(tx, session.user.id, balanceType)
+        );
         // Create a temporary position object for margin calculation and position check
         const tempPosition = {
           id: 'temp',
@@ -558,7 +374,10 @@ export async function POST(request: NextRequest) {
           executedAt: body.executedAt || new Date(),
           closedAt: null,
           pnl: null,
-          user: userWithLeverage,
+          user: {
+            ...userWithLeverage,
+            balance
+          },
           market: market
         };
 

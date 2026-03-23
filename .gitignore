@@ -61,3 +61,5 @@ src/lib/prisma/generated
 backup/
 
 public/uploads/
+
+.cursor/

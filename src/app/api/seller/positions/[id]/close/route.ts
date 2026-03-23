@@ -12,45 +12,6 @@ import {
   TransactionType
 } from '@/lib/prisma/generated/client';
 
-/**
- * @swagger
- * /api/seller/positions/{id}/close:
- *   patch:
- *     tags:
- *       - Seller - Positions
- *     summary: Close a position of a linked user
- *     description: Close a position belonging to a user linked to the seller. Requires SELLER, ADMIN, or SUPERADMIN role.
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: Position ID
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               status:
- *                 type: string
- *                 enum: [CLOSED]
- *                 default: CLOSED
- *     responses:
- *       200:
- *         description: Position closed successfully
- *       400:
- *         description: Bad request
- *       401:
- *         description: Unauthorized
- *       403:
- *         description: Forbidden - position not linked to seller
- *       404:
- *         description: Position not found
- */
-
 // Helper function to check seller permissions
 async function checkSellerPermission(session: any) {
   if (!session?.user?.id) {
@@ -194,19 +155,17 @@ export async function PATCH(
         const absoluteAmount = Math.abs(calculatedPnL);
 
         // Update user balance
-        await tx.user.update({
-          where: { id: existingPosition.userId },
-          data: {
-            balance: {
-              increment: calculatedPnL
-            }
-          }
+        await tx.userBalance.upsert({
+          where: { userId_type: { userId: existingPosition.userId, type: 'REAL' } },
+          update: { amount: { increment: calculatedPnL } },
+          create: { userId: existingPosition.userId, type: 'REAL', amount: calculatedPnL }
         });
 
         // Create transaction record
         await tx.transaction.create({
           data: {
             userId: existingPosition.userId,
+            balanceType: 'REAL',
             type: transactionType,
             absoluteAmount: absoluteAmount,
             description: `Position ${existingPosition.type} closed - ${existingPosition.market?.symbol || 'Unknown'}`

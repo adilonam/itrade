@@ -53,7 +53,7 @@ export function InvestOverview() {
     try {
       setLoading(true);
       setError(null);
-      const res = await fetch('/api/user/investments');
+      const res = await fetch('/api/user/investments?balanceType=REAL');
       if (!res.ok) throw new Error('Failed to fetch investments');
       const data = await res.json();
       setInvestments(data.userInvestments ?? []);

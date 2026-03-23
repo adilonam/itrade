@@ -5,106 +5,6 @@ import { authOptions } from '@/lib/auth';
 import bcrypt from 'bcryptjs';
 import { z } from 'zod';
 
-/**
- * @swagger
- * /api/admin/users:
- *   get:
- *     tags:
- *       - Admin - Users
- *     summary: Get all users
- *     description: Retrieve a list of all users with pagination and filtering. Requires ADMIN or SUPERADMIN role.
- *     security:
- *       - ApiKeyAuth: []
- *     parameters:
- *       - in: query
- *         name: page
- *         schema:
- *           type: integer
- *           minimum: 1
- *           default: 1
- *         description: Page number for pagination
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *           minimum: 1
- *           maximum: 100
- *           default: 10
- *         description: Number of users per page
- *       - in: query
- *         name: search
- *         schema:
- *           type: string
- *         description: Search term to filter users by name or email
- *       - in: query
- *         name: role
- *         schema:
- *           type: string
- *           enum: [USER, ADMIN, SUPERADMIN]
- *         description: Filter users by role
- *     responses:
- *       200:
- *         description: Users retrieved successfully
- *       401:
- *         description: Unauthorized
- *       403:
- *         description: Forbidden - insufficient permissions
- *   post:
- *     tags:
- *       - Admin - Users
- *     summary: Create a new user
- *     description: Create a new user. Requires ADMIN or SUPERADMIN role.
- *     security:
- *       - ApiKeyAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - name
- *               - email
- *               - password
- *               - role
- *             properties:
- *               name:
- *                 type: string
- *               email:
- *                 type: string
- *                 format: email
- *               password:
- *                 type: string
- *                 minLength: 8
- *               role:
- *                 type: string
- *                 enum: [USER, ADMIN, SUPERADMIN]
- *               balance:
- *                 type: number
- *                 minimum: 0
- *                 description: User account balance
- *               leverage:
- *                 type: number
- *                 minimum: 1
- *                 description: Trading leverage multiplier
- *               emailVerified:
- *                 type: string
- *                 format: date-time
- *                 nullable: true
- *                 description: Email verification date (null for unverified)
- *     responses:
- *       201:
- *         description: User created successfully
- *       400:
- *         description: Validation error
- *       401:
- *         description: Unauthorized
- *       403:
- *         description: Forbidden - insufficient permissions
- *       409:
- *         description: User already exists
- */
-
 // Validation schemas
 const getUsersSchema = z.object({
   page: z.coerce.number().int().min(1).optional().default(1),
@@ -201,7 +101,10 @@ export async function GET(request: NextRequest) {
           id: true,
           name: true,
           email: true,
-          balance: true,
+          balances: {
+            where: { type: 'REAL' },
+            select: { amount: true }
+          },
           leverage: true,
           role: true,
           emailVerified: true,
@@ -221,8 +124,13 @@ export async function GET(request: NextRequest) {
       prisma.user.count({ where })
     ]);
 
+    const normalizedUsers = users.map((user) => ({
+      ...user,
+      balance: user.balances[0]?.amount ?? 0
+    }));
+
     return NextResponse.json({
-      users,
+      users: normalizedUsers,
       pagination: {
         page,
         limit,
@@ -295,14 +203,22 @@ export async function POST(request: NextRequest) {
         email,
         password: hashedPassword,
         role,
-        balance: balance || 0,
+        balances: {
+          create: [
+            { type: 'REAL', amount: balance || 0 },
+            { type: 'DEMO', amount: 10000 }
+          ]
+        },
         leverage: leverage || 1
       },
       select: {
         id: true,
         name: true,
         email: true,
-        balance: true,
+        balances: {
+          where: { type: 'REAL' },
+          select: { amount: true }
+        },
         leverage: true,
         role: true,
         emailVerified: true,
@@ -312,7 +228,13 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json(
-      { message: 'User created successfully', user },
+      {
+        message: 'User created successfully',
+        user: {
+          ...user,
+          balance: user.balances[0]?.amount ?? 0
+        }
+      },
       { status: 201 }
     );
   } catch (error) {

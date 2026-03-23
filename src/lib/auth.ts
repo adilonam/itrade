@@ -87,12 +87,22 @@ export const authOptions: NextAuthOptions = {
       if (token.id) {
         const dbUser = await prisma.user.findUnique({
           where: { id: token.id as string },
-          select: { role: true, balance: true, leverage: true, image: true }
+          select: {
+            role: true,
+            leverage: true,
+            image: true,
+            balances: {
+              select: { type: true, amount: true }
+            }
+          }
         });
 
         if (dbUser) {
+          const selectedBalance = dbUser.balances.find(
+            (balance) => balance.type === 'REAL'
+          );
           token.role = dbUser.role;
-          token.balance = dbUser.balance;
+          token.balance = selectedBalance?.amount ?? 0;
           token.leverage = dbUser.leverage;
           token.image = dbUser.image ?? token.image;
         }
@@ -109,6 +119,19 @@ export const authOptions: NextAuthOptions = {
         session.user.image = (token.image as string) ?? session.user.image;
       }
       return session;
+    }
+  },
+  events: {
+    async createUser({ user }) {
+      if (!user?.id) return;
+
+      await prisma.userBalance.createMany({
+        data: [
+          { userId: user.id, type: 'REAL', amount: 0 },
+          { userId: user.id, type: 'DEMO', amount: 10000 }
+        ],
+        skipDuplicates: true
+      });
     }
   },
   secret: process.env.NEXTAUTH_SECRET

@@ -18,6 +18,7 @@ import { Suspense } from 'react';
 type Transaction = {
   id: string;
   type: 'GAIN' | 'LOSS' | 'DEPOSIT' | 'WITHDRAW';
+  balanceType: 'REAL' | 'DEMO' | 'INSTITUTIONAL';
   absoluteAmount: number;
   description: string | null;
   createdAt: string;
@@ -52,7 +53,8 @@ function UserTransactionsListingContent() {
       setLoading(true);
       const params = new URLSearchParams({
         page: pagination.page.toString(),
-        limit: pagination.limit.toString()
+        limit: pagination.limit.toString(),
+        balanceType: 'REAL'
       });
 
       if (typeFilter && typeFilter !== 'all') {
@@ -85,7 +87,12 @@ function UserTransactionsListingContent() {
     } finally {
       setLoading(false);
     }
-  }, [pagination.page, pagination.limit, typeFilter, categoryFilter]);
+  }, [
+    pagination.page,
+    pagination.limit,
+    typeFilter,
+    categoryFilter
+  ]);
 
   useEffect(() => {
     loadTransactions();

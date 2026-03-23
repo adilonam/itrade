@@ -3,33 +3,6 @@ import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
 
-/**
- * @swagger
- * /api/user/messages/{id}/read:
- *   patch:
- *     tags:
- *       - User - Messages
- *     summary: Mark a message as read
- *     description: Mark a message as read where user is receiver.
- *     security:
- *       - ApiKeyAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: Message ID
- *     responses:
- *       200:
- *         description: Message marked as read successfully
- *       401:
- *         description: Unauthorized
- *       404:
- *         description: Message not found
- */
-
-// PATCH - Mark a message as read
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }

@@ -52,7 +52,8 @@ export function InvestmentEnrollmentForm({
           body: JSON.stringify({
             investmentId: investment.id,
             amount: data.amount,
-            autoReinvest: data.autoReinvest
+            autoReinvest: data.autoReinvest,
+            balanceType: 'REAL'
           })
         });
 

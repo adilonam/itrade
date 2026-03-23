@@ -11,49 +11,8 @@ import {
   Position,
   TransactionType
 } from '@/lib/prisma/generated/client';
+import { parseBalanceType } from '@/lib/balance';
 
-/**
- * @swagger
- * /api/user/positions/{id}/close:
- *   patch:
- *     summary: Close/cancel a position for current user (supports partial closing for STOCK room)
- *     tags: [User, Positions]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: Position ID
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               status:
- *                 type: string
- *                 enum: [CLOSED]
- *                 default: CLOSED
- *                 description: New status for the position
- *               amount:
- *                 type: number
- *                 description: Amount to close (for STOCK room only). If less than position quantity, the position will be split into two - one closed and one remaining open.
- *     responses:
- *       200:
- *         description: Position closed successfully. For partial closes, returns both closed and remaining positions.
- *       400:
- *         description: Bad request - invalid amount or position already closed
- *       401:
- *         description: Unauthorized
- *       403:
- *         description: Forbidden - position doesn't belong to user
- *       404:
- *         description: Position not found
- *       500:
- *         description: Internal server error
- */
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -84,7 +43,8 @@ export async function PATCH(
 
     const { id } = await params;
     const body = await request.json();
-    const { status = 'CLOSED', amount } = body;
+    const { status = 'CLOSED', amount, balanceType: rawBalanceType } = body;
+    const balanceType = parseBalanceType(rawBalanceType);
 
     // Validate status
     if (status !== 'CLOSED') {
@@ -268,19 +228,17 @@ export async function PATCH(
           const absoluteAmount = Math.abs(calculatedPnL);
 
           // Update user balance
-          await tx.user.update({
-            where: { id: session.user.id },
-            data: {
-              balance: {
-                increment: calculatedPnL
-              }
-            }
+          await tx.userBalance.upsert({
+            where: { userId_type: { userId: session.user.id, type: balanceType } },
+            update: { amount: { increment: calculatedPnL } },
+            create: { userId: session.user.id, type: balanceType, amount: calculatedPnL }
           });
 
           // Create transaction record
           await tx.transaction.create({
             data: {
               userId: session.user.id,
+              balanceType,
               type: transactionType,
               absoluteAmount: absoluteAmount,
               description: `Partial position ${existingPosition.type} closed - ${existingPosition.market?.symbol || 'Unknown'} (${amount} shares)`
@@ -308,19 +266,17 @@ export async function PATCH(
           const absoluteAmount = Math.abs(calculatedPnL);
 
           // Update user balance
-          await tx.user.update({
-            where: { id: session.user.id },
-            data: {
-              balance: {
-                increment: calculatedPnL
-              }
-            }
+          await tx.userBalance.upsert({
+            where: { userId_type: { userId: session.user.id, type: balanceType } },
+            update: { amount: { increment: calculatedPnL } },
+            create: { userId: session.user.id, type: balanceType, amount: calculatedPnL }
           });
 
           // Create transaction record
           await tx.transaction.create({
             data: {
               userId: session.user.id,
+              balanceType,
               type: transactionType,
               absoluteAmount: absoluteAmount,
               description: `Position ${existingPosition.type} closed - ${existingPosition.market?.symbol || 'Unknown'}`

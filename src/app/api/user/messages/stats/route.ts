@@ -3,23 +3,6 @@ import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
 
-/**
- * @swagger
- * /api/user/messages/stats:
- *   get:
- *     tags:
- *       - User - Messages
- *     summary: Get message stats for user
- *     description: Returns total count and unread count (as receiver) for the current user.
- *     security:
- *       - ApiKeyAuth: []
- *     responses:
- *       200:
- *         description: Stats retrieved successfully
- *       401:
- *         description: Unauthorized
- */
-
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);

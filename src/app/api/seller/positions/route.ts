@@ -9,58 +9,6 @@ import {
 } from '@/lib/calculator-server';
 import { Market, Position } from '@/lib/prisma/generated/client';
 
-/**
- * @swagger
- * /api/seller/positions:
- *   get:
- *     tags:
- *       - Seller - Positions
- *     summary: Get positions of seller's linked users
- *     description: Retrieve positions of all users linked to the authenticated seller. Requires SELLER, ADMIN, or SUPERADMIN role.
- *     security:
- *       - ApiKeyAuth: []
- *     parameters:
- *       - in: query
- *         name: page
- *         schema:
- *           type: integer
- *           minimum: 1
- *           default: 1
- *         description: Page number for pagination
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *           minimum: 1
- *           maximum: 100
- *           default: 10
- *         description: Number of positions per page
- *       - in: query
- *         name: room
- *         schema:
- *           type: string
- *           enum: [TRADING, STOCK]
- *         description: Filter by room type
- *       - in: query
- *         name: userId
- *         schema:
- *           type: string
- *         description: Filter by user ID
- *       - in: query
- *         name: status
- *         schema:
- *           type: string
- *           enum: [PLACED, CLOSED, PENDING, FAILED]
- *         description: Filter by position status
- *     responses:
- *       200:
- *         description: Seller user positions retrieved successfully
- *       401:
- *         description: Unauthorized
- *       403:
- *         description: Forbidden - insufficient permissions
- */
-
 // Helper function to check seller permissions
 async function checkSellerPermission(session: any) {
   if (!session?.user?.id) {
@@ -204,57 +152,6 @@ export async function GET(request: NextRequest) {
     );
   }
 }
-
-/**
- * @swagger
- * /api/seller/positions:
- *   post:
- *     tags:
- *       - Seller - Positions
- *     summary: Create a position for a linked user
- *     description: Create a new position for a user linked to the seller. Requires SELLER, ADMIN, or SUPERADMIN role.
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required: [userId, type, quantity, marketId, room]
- *             properties:
- *               userId:
- *                 type: string
- *               type:
- *                 type: string
- *                 enum: [BUY, SELL]
- *               quantity:
- *                 type: number
- *               marketId:
- *                 type: string
- *               room:
- *                 type: string
- *                 enum: [TRADING, STOCK]
- *               executedPrice:
- *                 type: number
- *               takeProfit:
- *                 type: number
- *               stopLoss:
- *                 type: number
- *               description:
- *                 type: string
- *               status:
- *                 type: string
- *                 enum: [PLACED, PENDING]
- *                 default: PLACED
- *     responses:
- *       201:
- *         description: Position created successfully
- *       400:
- *         description: Bad request
- *       401:
- *         description: Unauthorized
- *       403:
- *         description: Forbidden - user not linked to seller
- */
 
 const createPositionSchema = z.object({
   userId: z.string().min(1),

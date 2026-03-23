@@ -4,115 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
 import bcrypt from 'bcryptjs';
 import { z } from 'zod';
-
-/**
- * @swagger
- * /api/admin/users/{id}:
- *   get:
- *     tags:
- *       - Admin - Users
- *     summary: Get user by ID
- *     description: Retrieve a specific user by their ID. Requires ADMIN or SUPERADMIN role.
- *     security:
- *       - ApiKeyAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: User ID
- *     responses:
- *       200:
- *         description: User retrieved successfully
- *       401:
- *         description: Unauthorized
- *       403:
- *         description: Forbidden - insufficient permissions
- *       404:
- *         description: User not found
- *   put:
- *     tags:
- *       - Admin - Users
- *     summary: Update user
- *     description: Update a user's information. Requires ADMIN or SUPERADMIN role. Users can modify their own accounts.
- *     security:
- *       - ApiKeyAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: User ID
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               name:
- *                 type: string
- *               email:
- *                 type: string
- *                 format: email
- *               password:
- *                 type: string
- *                 minLength: 8
- *               role:
- *                 type: string
- *                 enum: [USER, ADMIN, SUPERADMIN]
- *               balance:
- *                 type: number
- *                 minimum: 0
- *                 description: User account balance
- *               leverage:
- *                 type: number
- *                 minimum: 1
- *                 description: Trading leverage multiplier
- *               emailVerified:
- *                 type: string
- *                 format: date-time
- *                 nullable: true
- *                 description: Email verification date (null for unverified)
- *     responses:
- *       200:
- *         description: User updated successfully
- *       400:
- *         description: Validation error
- *       401:
- *         description: Unauthorized
- *       403:
- *         description: Forbidden - insufficient permissions
- *       404:
- *         description: User not found
- *       409:
- *         description: Email already exists
- *   delete:
- *     tags:
- *       - Admin - Users
- *     summary: Delete user
- *     description: Delete a user. Requires ADMIN or SUPERADMIN role.
- *     security:
- *       - ApiKeyAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: User ID
- *     responses:
- *       200:
- *         description: User deleted successfully
- *       401:
- *         description: Unauthorized
- *       403:
- *         description: Forbidden - insufficient permissions
- *       404:
- *         description: User not found
- */
+import { ensureUserBalance } from '@/lib/balance';
 
 // Validation schemas
 const updateUserSchema = z
@@ -172,7 +64,10 @@ export async function GET(
         id: true,
         name: true,
         email: true,
-        balance: true,
+        balances: {
+          where: { type: 'REAL' },
+          select: { amount: true }
+        },
         leverage: true,
         role: true,
         emailVerified: true,
@@ -191,7 +86,9 @@ export async function GET(
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    return NextResponse.json({ user });
+    return NextResponse.json({
+      user: { ...user, balance: user.balances[0]?.amount ?? 0 }
+    });
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('Get user error:', error);
@@ -241,6 +138,8 @@ export async function PUT(
     // Allow users to modify themselves through admin interface
 
     const updateData = { ...validation.data };
+    const nextRealBalance = updateData.balance;
+    delete (updateData as { balance?: number }).balance;
 
     // Check email uniqueness if email is being updated
     if (updateData.email && updateData.email !== existingUser.email) {
@@ -283,25 +182,40 @@ export async function PUT(
     }
 
     // Update user
-    const updatedUser = await prisma.user.update({
-      where: { id },
-      data: updateData,
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        balance: true,
-        leverage: true,
-        role: true,
-        emailVerified: true,
-        createdAt: true,
-        updatedAt: true
+    const updatedUser = await prisma.$transaction(async (tx) => {
+      if (nextRealBalance != null) {
+        await ensureUserBalance(tx, id, 'REAL');
+        await tx.userBalance.update({
+          where: { userId_type: { userId: id, type: 'REAL' } },
+          data: { amount: nextRealBalance }
+        });
       }
+      return tx.user.update({
+        where: { id },
+        data: updateData,
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          balances: {
+            where: { type: 'REAL' },
+            select: { amount: true }
+          },
+          leverage: true,
+          role: true,
+          emailVerified: true,
+          createdAt: true,
+          updatedAt: true
+        }
+      });
     });
 
     return NextResponse.json({
       message: 'User updated successfully',
-      user: updatedUser
+      user: {
+        ...updatedUser,
+        balance: updatedUser.balances[0]?.amount ?? 0
+      }
     });
   } catch (error) {
     // eslint-disable-next-line no-console

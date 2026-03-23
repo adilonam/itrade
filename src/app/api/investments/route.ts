@@ -1,42 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-/**
- * @swagger
- * /api/investments:
- *   get:
- *     tags:
- *       - Investments
- *     summary: Get active investments
- *     description: Retrieve all active investment opportunities available to users
- *     parameters:
- *       - in: query
- *         name: country
- *         schema:
- *           type: string
- *         description: Filter by country
- *       - in: query
- *         name: riskLevel
- *         schema:
- *           type: string
- *           enum: [LOW, MEDIUM, HIGH]
- *         description: Filter by risk level
- *       - in: query
- *         name: minDuration
- *         schema:
- *           type: integer
- *         description: Filter by minimum duration in months
- *       - in: query
- *         name: maxDuration
- *         schema:
- *           type: integer
- *         description: Filter by maximum duration in months
- *     responses:
- *       200:
- *         description: Active investments retrieved successfully
- *       500:
- *         description: Internal server error
- */
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);

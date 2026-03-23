@@ -4,45 +4,6 @@ import { prisma } from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
 import { z } from 'zod';
 
-/**
- * @swagger
- * /api/admin/investments:
- *   get:
- *     tags:
- *       - Admin - Investments
- *     summary: Get all investments
- *     description: Retrieve a list of all investments with pagination. Requires ADMIN or SUPERADMIN role.
- *     security:
- *       - ApiKeyAuth: []
- *     parameters:
- *       - in: query
- *         name: page
- *         schema:
- *           type: integer
- *           minimum: 1
- *           default: 1
- *         description: Page number for pagination
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *           minimum: 1
- *           maximum: 100
- *           default: 10
- *         description: Number of investments per page
- *       - in: query
- *         name: search
- *         schema:
- *           type: string
- *         description: Search term to filter investments by title or country
- *     responses:
- *       200:
- *         description: Investments retrieved successfully
- *       401:
- *         description: Unauthorized
- *       403:
- *         description: Forbidden - Admin role required
- */
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -124,68 +85,6 @@ const CreateInvestmentSchema = z.object({
   imageUrl: z.string().url().optional()
 });
 
-/**
- * @swagger
- * /api/admin/investments:
- *   post:
- *     tags:
- *       - Admin - Investments
- *     summary: Create new investment
- *     description: Create a new investment offering. Requires ADMIN or SUPERADMIN role.
- *     security:
- *       - ApiKeyAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - title
- *               - country
- *               - duration
- *               - rentability
- *               - minInvestment
- *             properties:
- *               title:
- *                 type: string
- *               description:
- *                 type: string
- *               country:
- *                 type: string
- *               duration:
- *                 type: integer
- *                 minimum: 1
- *               rentability:
- *                 type: number
- *                 minimum: 0
- *               minInvestment:
- *                 type: number
- *                 minimum: 0
- *               maxInvestment:
- *                 type: number
- *               autoReinvestment:
- *                 type: boolean
- *               totalCapacity:
- *                 type: number
- *               riskLevel:
- *                 type: string
- *                 enum: [LOW, MEDIUM, HIGH]
- *               isActive:
- *                 type: boolean
- *               imageUrl:
- *                 type: string
- *                 format: uri
- *     responses:
- *       201:
- *         description: Investment created successfully
- *       400:
- *         description: Bad request - Validation error
- *       401:
- *         description: Unauthorized
- *       403:
- *         description: Forbidden - Admin role required
- */
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);

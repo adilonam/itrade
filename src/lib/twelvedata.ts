@@ -2,7 +2,9 @@ import type {
   TwelveDataPriceResponse,
   TwelveDataQuoteResponse,
   TwelveDataErrorResponse,
-  TwelveDataCombinedResponse
+  TwelveDataCombinedResponse,
+  TwelveDataRsiResponse,
+  TwelveDataEmaResponse
 } from '@/types/twelvedata';
 import { prisma } from '@/lib/prisma';
 
@@ -152,6 +154,130 @@ class TwelveDataService {
     } catch (error) {
       return {
         error: 'Failed to fetch combined market data',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      };
+    }
+  }
+
+  /**
+   * Get RSI (Relative Strength Index) for a symbol and interval
+   * @see https://api.twelvedata.com/rsi
+   */
+  async getRsi(
+    symbol: string,
+    interval: string
+  ): Promise<
+    | { rsi: number; datetime: string }
+    | TwelveDataErrorResponse
+  > {
+    try {
+      const url = new URL(`${this.baseUrl}/rsi`);
+      url.searchParams.set('symbol', symbol);
+      url.searchParams.set('interval', interval);
+      url.searchParams.set('apikey', this.apiKey);
+
+      const response = await fetch(url.toString(), {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (!response.ok) {
+        return {
+          error: 'Failed to fetch RSI from Twelve Data',
+          message: `HTTP ${response.status}: ${response.statusText}`
+        };
+      }
+
+      const data = (await response.json()) as TwelveDataRsiResponse | TwelveDataErrorResponse;
+
+      if ('error' in data && data.error) {
+        return data as TwelveDataErrorResponse;
+      }
+
+      const rsiData = data as TwelveDataRsiResponse;
+      if (rsiData.status !== 'ok' || !rsiData.values?.length) {
+        return {
+          error: 'Invalid RSI response',
+          message: 'No RSI values returned'
+        };
+      }
+
+      const latest = rsiData.values[0];
+      const rsi = parseFloat(latest.rsi);
+      if (Number.isNaN(rsi)) {
+        return {
+          error: 'Invalid RSI value',
+          message: `Could not parse RSI: ${latest.rsi}`
+        };
+      }
+
+      return { rsi, datetime: latest.datetime };
+    } catch (error) {
+      return {
+        error: 'Network error while fetching RSI',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      };
+    }
+  }
+
+  /**
+   * Get EMA (Exponential Moving Average) for a symbol and interval
+   * @see https://api.twelvedata.com/ema
+   */
+  async getEma(
+    symbol: string,
+    interval: string,
+    timePeriod: number = 9
+  ): Promise<
+    | { ema: number; datetime: string }
+    | TwelveDataErrorResponse
+  > {
+    try {
+      const url = new URL(`${this.baseUrl}/ema`);
+      url.searchParams.set('symbol', symbol);
+      url.searchParams.set('interval', interval);
+      url.searchParams.set('time_period', String(timePeriod));
+      url.searchParams.set('apikey', this.apiKey);
+
+      const response = await fetch(url.toString(), {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (!response.ok) {
+        return {
+          error: 'Failed to fetch EMA from Twelve Data',
+          message: `HTTP ${response.status}: ${response.statusText}`
+        };
+      }
+
+      const data = (await response.json()) as TwelveDataEmaResponse | TwelveDataErrorResponse;
+
+      if ('error' in data && data.error) {
+        return data as TwelveDataErrorResponse;
+      }
+
+      const emaData = data as TwelveDataEmaResponse;
+      if (emaData.status !== 'ok' || !emaData.values?.length) {
+        return {
+          error: 'Invalid EMA response',
+          message: 'No EMA values returned'
+        };
+      }
+
+      const latest = emaData.values[0];
+      const ema = parseFloat(latest.ema);
+      if (Number.isNaN(ema)) {
+        return {
+          error: 'Invalid EMA value',
+          message: `Could not parse EMA: ${latest.ema}`
+        };
+      }
+
+      return { ema, datetime: latest.datetime };
+    } catch (error) {
+      return {
+        error: 'Network error while fetching EMA',
         message: error instanceof Error ? error.message : 'Unknown error'
       };
     }

@@ -41,6 +41,7 @@ import {
   IconMinus
 } from '@tabler/icons-react';
 import { toast } from 'sonner';
+import type { Room } from '@/lib/prisma/generated/client';
 
 type PositionWithMarket = Position & {
   market: Market | null;
@@ -154,9 +155,11 @@ export function UserPositionsTableRoomTrading({
   if (loading) {
     return (
       <Card>
-        <CardContent className='flex items-center justify-center py-8'>
-          <IconLoader2 className='h-6 w-6 animate-spin' />
-          <span className='ml-2'>Loading room trading positions...</span>
+        <CardContent className='flex flex-col items-center justify-center py-12'>
+          <IconLoader2 className='text-muted-foreground mb-4 h-6 w-6 animate-spin' />
+          <p className='text-muted-foreground text-center'>
+            Loading room trading positions...
+          </p>
         </CardContent>
       </Card>
     );
@@ -165,16 +168,10 @@ export function UserPositionsTableRoomTrading({
   if (positions.length === 0) {
     return (
       <Card>
-        <CardContent className='flex items-center justify-center py-8'>
-          <div className='text-center'>
-            <p className='text-muted-foreground'>
-              No room trading positions found
-            </p>
-            <p className='text-muted-foreground mt-1 text-sm'>
-              Your room trading positions will appear here once you start
-              trading
-            </p>
-          </div>
+        <CardContent className='flex flex-col items-center justify-center py-12'>
+          <p className='text-muted-foreground text-center'>
+            No room trading positions found. Positions will appear here once you start trading.
+          </p>
         </CardContent>
       </Card>
     );
@@ -406,11 +403,18 @@ export type PositionTabFilter = 'open' | 'pending' | 'closed';
  * card (e.g. at the bottom of the trading view page).
  * @param statusFilter - Filter by position status tab: open (PLACED), pending (PENDING), closed (CLOSED, FAILED)
  */
-export function UserPositionsTableCardRoomTrading({
-  statusFilter = 'open'
-}: {
+interface UserPositionsTableCardRoomTradingProps {
   statusFilter?: PositionTabFilter;
-}) {
+  room?: Room;
+  refreshEventName?: string;
+}
+
+export function UserPositionsTableCardRoomTrading({
+  statusFilter = 'open',
+  room = 'TRADING',
+  refreshEventName = 'room-trading-positions-refresh'
+}: UserPositionsTableCardRoomTradingProps) {
+  const balanceType = room === 'INSTITUTIONAL' ? 'INSTITUTIONAL' : 'REAL';
   const [positions, setPositions] = useState<PositionWithMarket[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -423,7 +427,8 @@ export function UserPositionsTableCardRoomTrading({
       const params = new URLSearchParams({
         page: '1',
         limit: '10',
-        room: 'TRADING'
+        room,
+        balanceType
       });
       if (statusFilter === 'open') params.set('status', 'PLACED');
       else if (statusFilter === 'pending') params.set('status', 'PENDING');
@@ -437,7 +442,7 @@ export function UserPositionsTableCardRoomTrading({
     } finally {
       setLoading(false);
     }
-  }, [statusFilter]);
+  }, [room, balanceType, statusFilter]);
 
   useEffect(() => {
     loadPositions();
@@ -446,10 +451,10 @@ export function UserPositionsTableCardRoomTrading({
   // Refresh positions when buy/sell is completed (e.g. from trading actions on this page)
   useEffect(() => {
     const handler = () => loadPositions();
-    window.addEventListener('room-trading-positions-refresh', handler);
+    window.addEventListener(refreshEventName, handler);
     return () =>
-      window.removeEventListener('room-trading-positions-refresh', handler);
-  }, [loadPositions]);
+      window.removeEventListener(refreshEventName, handler);
+  }, [loadPositions, refreshEventName]);
 
   const handleClosePosition = useCallback(
     async (positionId: string) => {
@@ -459,7 +464,7 @@ export function UserPositionsTableCardRoomTrading({
           {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ status: 'CLOSED' })
+            body: JSON.stringify({ status: 'CLOSED', balanceType })
           }
         );
         if (!response.ok) {
@@ -474,7 +479,7 @@ export function UserPositionsTableCardRoomTrading({
         );
       }
     },
-    [loadPositions]
+    [loadPositions, balanceType]
   );
 
   const updateRealTimePnL = useCallback((positionId: string, pnl: number) => {

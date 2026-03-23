@@ -4,26 +4,6 @@ import { prisma } from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
 import { z } from 'zod';
 
-/**
- * @swagger
- * /api/admin/users/{id}/seller-users:
- *   get:
- *     tags:
- *       - Admin - Users
- *     summary: Get seller's linked users
- *     description: Retrieve all users linked to a seller (via sellerUsers relation). Requires ADMIN or SUPERADMIN role.
- *   post:
- *     tags:
- *       - Admin - Users
- *     summary: Add user to seller
- *     description: Link a user to a seller by email. Requires ADMIN or SUPERADMIN role.
- *   delete:
- *     tags:
- *       - Admin - Users
- *     summary: Remove user from seller
- *     description: Unlink a user from a seller. Requires ADMIN or SUPERADMIN role.
- */
-
 const addUserSchema = z.object({
   email: z.string().email('Invalid email address')
 });
@@ -107,7 +87,10 @@ export async function GET(
           id: true,
           name: true,
           email: true,
-          balance: true,
+          balances: {
+            where: { type: 'REAL' },
+            select: { amount: true }
+          },
           role: true,
           createdAt: true
         },
@@ -123,7 +106,10 @@ export async function GET(
     ]);
 
     return NextResponse.json({
-      users: linkedUsers,
+      users: linkedUsers.map((u) => ({
+        ...u,
+        balance: u.balances[0]?.amount ?? 0
+      })),
       pagination: {
         page,
         limit,
@@ -225,14 +211,23 @@ export async function POST(
         id: true,
         name: true,
         email: true,
-        balance: true,
+        balances: {
+          where: { type: 'REAL' },
+          select: { amount: true }
+        },
         role: true,
         createdAt: true
       }
     });
 
     return NextResponse.json(
-      { message: 'User added to seller successfully', user: updatedUser },
+      {
+        message: 'User added to seller successfully',
+        user: {
+          ...updatedUser,
+          balance: updatedUser.balances[0]?.amount ?? 0
+        }
+      },
       { status: 200 }
     );
   } catch (error) {

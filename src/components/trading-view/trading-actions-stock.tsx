@@ -177,6 +177,7 @@ export function TradingActionsStock({
         body: JSON.stringify({
           type,
           status: orderType === 'LIMIT' ? 'PENDING' : 'PLACED',
+          balanceType: 'REAL',
           room: 'STOCK',
           executedPrice:
             orderType === 'LIMIT' ? parseFloat(limitPrice) : undefined,

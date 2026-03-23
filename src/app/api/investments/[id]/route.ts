@@ -1,29 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-/**
- * @swagger
- * /api/investments/{id}:
- *   get:
- *     tags:
- *       - Investments
- *     summary: Get investment details
- *     description: Retrieve detailed information about a specific investment
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: Investment ID
- *     responses:
- *       200:
- *         description: Investment details retrieved successfully
- *       404:
- *         description: Investment not found
- *       500:
- *         description: Internal server error
- */
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }

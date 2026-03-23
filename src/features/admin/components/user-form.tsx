@@ -30,6 +30,8 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import SellerUsersSection from './seller-users-section';
 
+type UserWithBalance = User & { balance?: number };
+
 const createFormSchema = z.object({
   name: z.string().min(2, {
     message: 'Name must be at least 2 characters.'
@@ -96,7 +98,7 @@ export default function UserForm({
   initialData,
   pageTitle
 }: {
-  initialData: User | null;
+  initialData: UserWithBalance | null;
   pageTitle: string;
 }) {
   const router = useRouter();
@@ -113,7 +115,7 @@ export default function UserForm({
     email: initialData?.email || '',
     password: '',
     role: initialData?.role || ('USER' as const),
-    balance: initialData?.balance || 0,
+    balance: initialData?.balance ?? 0,
     leverage: initialData?.leverage || 1,
     emailVerified: !!initialData?.emailVerified
   };

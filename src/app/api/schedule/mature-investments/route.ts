@@ -1,24 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { ensureUserBalance } from '@/lib/balance';
 
-/**
- * @swagger
- * /api/schedule/mature-investments:
- *   post:
- *     tags:
- *       - Schedule
- *     summary: Process matured investments
- *     description: Check for investments that have reached their end date and complete them
- *     security:
- *       - ApiKeyAuth: []
- *     responses:
- *       200:
- *         description: Investments processed successfully
- *       401:
- *         description: Unauthorized
- *       500:
- *         description: Internal server error
- */
 export async function POST(request: NextRequest) {
   try {
     // Verify the request is from an authorized source (e.g., cron job or Vercel)
@@ -43,12 +26,6 @@ export async function POST(request: NextRequest) {
         }
       },
       include: {
-        user: {
-          select: {
-            id: true,
-            balance: true
-          }
-        },
         investment: {
           select: {
             id: true,
@@ -87,11 +64,16 @@ export async function POST(request: NextRequest) {
             }
           });
 
-          // Return funds to user balance
-          await tx.user.update({
-            where: { id: userInvestment.userId },
+          // Return funds to REAL balance
+          const userBalance = await ensureUserBalance(
+            tx,
+            userInvestment.userId,
+            'REAL'
+          );
+          await tx.userBalance.update({
+            where: { userId_type: { userId: userInvestment.userId, type: 'REAL' } },
             data: {
-              balance: userInvestment.user.balance + totalReturn
+              amount: userBalance.amount + totalReturn
             }
           });
 
@@ -99,6 +81,7 @@ export async function POST(request: NextRequest) {
           await tx.transaction.create({
             data: {
               userId: userInvestment.userId,
+              balanceType: 'REAL',
               type: 'DEPOSIT',
               absoluteAmount: userInvestment.amount,
               description: `Investment matured: ${userInvestment.investment.title} - Principal returned`
@@ -110,6 +93,7 @@ export async function POST(request: NextRequest) {
             await tx.transaction.create({
               data: {
                 userId: userInvestment.userId,
+                balanceType: 'REAL',
                 type: 'GAIN',
                 absoluteAmount: userInvestment.expectedReturn,
                 description: `Investment return: ${userInvestment.investment.title} - ${userInvestment.investment.country}`

@@ -3,34 +3,6 @@ import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
 
-/**
- * @swagger
- * /api/seller/messages/{id}/read:
- *   patch:
- *     tags:
- *       - Seller - Messages
- *     summary: Mark a message as read
- *     description: Mark a message as read where seller is receiver. Requires SELLER, ADMIN, or SUPERADMIN role.
- *     security:
- *       - ApiKeyAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: Message ID
- *     responses:
- *       200:
- *         description: Message marked as read successfully
- *       401:
- *         description: Unauthorized
- *       403:
- *         description: Forbidden - insufficient permissions
- *       404:
- *         description: Message not found
- */
-
 // Helper function to check seller permissions
 async function checkSellerPermission(session: any) {
   if (!session?.user?.id) {

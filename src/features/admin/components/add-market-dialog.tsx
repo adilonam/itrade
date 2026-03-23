@@ -49,7 +49,7 @@ const formSchema = z.object({
   type: z.enum(['FOREX', 'CRYPTO', 'STOCKS', 'COMMODITIES', 'INDICES'], {
     required_error: 'Please select a market type'
   }),
-  room: z.enum(['STOCK', 'TRADING'], {
+  room: z.enum(['STOCK', 'TRADING', 'INSTITUTIONAL'], {
     required_error: 'Please select a market room'
   }),
   spread: z.coerce.number().min(0, 'Spread must be non-negative').optional(),
@@ -171,7 +171,7 @@ export function AddMarketDialog({
                   <FormLabel>Symbol</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder='e.g., EURUSD, AAPL, BTCUSD'
+                      placeholder='e.g., EUR/USD, AAPL, BTC/USD'
                       {...field}
                       onChange={(e) =>
                         field.onChange(e.target.value.toUpperCase())
@@ -232,6 +232,9 @@ export function AddMarketDialog({
                     <SelectContent>
                       <SelectItem value='TRADING'>Trading Only</SelectItem>
                       <SelectItem value='STOCK'>Stock Only</SelectItem>
+                      <SelectItem value='INSTITUTIONAL'>
+                        Institutional Only
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />

@@ -5,79 +5,6 @@ import { authOptions } from '@/lib/auth';
 import { twelveDataService } from '@/lib/twelvedata';
 import { z } from 'zod';
 
-/**
- * @swagger
- * /api/admin/markets/{id}:
- *   put:
- *     tags:
- *       - Admin - Markets
- *     summary: Update market visibility
- *     description: Update market visibility and other properties. Requires ADMIN or SUPERADMIN role.
- *     security:
- *       - ApiKeyAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: Market ID
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               visible:
- *                 type: boolean
- *                 description: Market visibility
- *               spread:
- *                 type: number
- *                 minimum: 0
- *                 description: Market spread
- *     responses:
- *       200:
- *         description: Market updated successfully
- *       400:
- *         description: Invalid request data
- *       401:
- *         description: Unauthorized
- *       403:
- *         description: Forbidden - requires admin role
- *       404:
- *         description: Market not found
- *       500:
- *         description: Internal server error
- *   delete:
- *     tags:
- *       - Admin - Markets
- *     summary: Delete a market
- *     description: Delete a market from the system. Requires ADMIN or SUPERADMIN role.
- *     security:
- *       - ApiKeyAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: Market ID
- *     responses:
- *       200:
- *         description: Market deleted successfully
- *       401:
- *         description: Unauthorized
- *       403:
- *         description: Forbidden - requires admin role
- *       404:
- *         description: Market not found
- *       409:
- *         description: Cannot delete market with existing positions
- *       500:
- *         description: Internal server error
- */
-
 const updateMarketSchema = z.object({
   symbol: z
     .string()
@@ -93,7 +20,7 @@ const updateMarketSchema = z.object({
     .optional(),
   visible: z.boolean().optional(),
   spread: z.number().min(0).optional(),
-  room: z.enum(['STOCK', 'TRADING']).optional(),
+  room: z.enum(['STOCK', 'TRADING', 'INSTITUTIONAL']).optional(),
   image: z.string().nullable().optional()
 });
 

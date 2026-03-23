@@ -4,41 +4,6 @@ import { prisma } from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
 import { z } from 'zod';
 
-/**
- * @swagger
- * /api/seller/messages:
- *   get:
- *     tags:
- *       - Seller - Messages
- *     summary: Get messages for seller
- *     description: Retrieve messages where seller is sender or receiver. Requires SELLER, ADMIN, or SUPERADMIN role.
- *     security:
- *       - ApiKeyAuth: []
- *     parameters:
- *       - in: query
- *         name: page
- *         schema:
- *           type: integer
- *           minimum: 1
- *           default: 1
- *         description: Page number for pagination
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *           minimum: 1
- *           maximum: 100
- *           default: 20
- *         description: Number of messages per page
- *     responses:
- *       200:
- *         description: Messages retrieved successfully
- *       401:
- *         description: Unauthorized
- *       403:
- *         description: Forbidden - insufficient permissions
- */
-
 // Helper function to check seller permissions
 async function checkSellerPermission(session: any) {
   if (!session?.user?.id) {

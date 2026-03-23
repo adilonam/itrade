@@ -11,18 +11,6 @@ import {
   TransactionType
 } from '@/lib/prisma/generated/client';
 
-/**
- * @swagger
- * /api/schedule/close-positions:
- *   get:
- *     summary: Scheduled endpoint to automatically close positions based on take profit/stop loss
- *     tags: [Schedule, Positions]
- *     responses:
- *       200:
- *         description: Positions processed successfully
- *       500:
- *         description: Internal server error
- */
 export async function GET() {
   try {
     // eslint-disable-next-line no-console
@@ -124,19 +112,17 @@ export async function GET() {
                 const absoluteAmount = Math.abs(calculatedPnL);
 
                 // Update user balance
-                await tx.user.update({
-                  where: { id: position.userId },
-                  data: {
-                    balance: {
-                      increment: calculatedPnL
-                    }
-                  }
+                await tx.userBalance.upsert({
+                  where: { userId_type: { userId: position.userId, type: 'REAL' } },
+                  update: { amount: { increment: calculatedPnL } },
+                  create: { userId: position.userId, type: 'REAL', amount: calculatedPnL }
                 });
 
                 // Create transaction record
                 await tx.transaction.create({
                   data: {
                     userId: position.userId,
+                    balanceType: 'REAL',
                     type: transactionType,
                     absoluteAmount: absoluteAmount,
                     description: `Position ${position.type} closed by MARGIN CALL - ${position.market?.symbol || 'Unknown'} (Margin Level: ${financialInfo.marginLevel?.toFixed(2)}%)`
@@ -322,19 +308,17 @@ export async function GET() {
               const absoluteAmount = Math.abs(calculatedPnL);
 
               // Update user balance
-              await tx.user.update({
-                where: { id: position.userId },
-                data: {
-                  balance: {
-                    increment: calculatedPnL
-                  }
-                }
+              await tx.userBalance.upsert({
+                where: { userId_type: { userId: position.userId, type: 'REAL' } },
+                update: { amount: { increment: calculatedPnL } },
+                create: { userId: position.userId, type: 'REAL', amount: calculatedPnL }
               });
 
               // Create transaction record
               await tx.transaction.create({
                 data: {
                   userId: position.userId,
+                  balanceType: 'REAL',
                   type: transactionType,
                   absoluteAmount: absoluteAmount,
                   description: `Position ${position.type} auto-closed - ${position.market?.symbol || 'Unknown'} (${closeReason})`
