@@ -20,6 +20,13 @@ enum Role {
   SUPERADMIN
 }
 
+enum KycStatus {
+  NOT_SUBMITTED
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 // Demo-friendly multi-account balances for a single user.
 enum BalanceType {
   REAL
@@ -79,6 +86,14 @@ model User {
   address             String?              @map("address")
   postalCode          String?              @map("postal_code")
   city                String?              @map("city")
+  country             String?              @map("country")
+  gender              String?              @map("gender")
+  kycStatus           KycStatus            @default(NOT_SUBMITTED) @map("kyc_status")
+  kycDocumentType     String?              @map("kyc_document_type")
+  kycFrontImageUrl    String?              @db.Text @map("kyc_front_image_url")
+  kycBackImageUrl     String?              @db.Text @map("kyc_back_image_url")
+  kycSelfieUrl        String?              @db.Text @map("kyc_selfie_url")
+  kycUtilityBillUrl   String?              @db.Text @map("kyc_utility_bill_url")
   accounts            Account[]
   sessions            Session[]
   mfaChallenges       MfaChallenge[]

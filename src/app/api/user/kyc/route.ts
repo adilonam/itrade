@@ -1,0 +1,147 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { put } from '@vercel/blob';
+import { prisma } from '@/lib/prisma';
+import { authOptions } from '@/lib/auth';
+const DOC_TYPES = ['passport', 'national_id', 'drivers_license'] as const;
+
+async function uploadKycFile(userId: string, label: string, ts: number, file: File) {
+  const ext = file.name.split('.').pop() || 'jpg';
+  const filename = `kyc-${userId}-${label}-${ts}.${ext}`;
+  const blob = await put(filename, file, {
+    access: 'public',
+    addRandomSuffix: true
+  });
+  return blob.url;
+}
+
+export async function GET() {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: {
+        kycStatus: true,
+        kycDocumentType: true,
+        kycFrontImageUrl: true,
+        kycBackImageUrl: true,
+        kycSelfieUrl: true,
+        kycUtilityBillUrl: true
+      }
+    });
+
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    return NextResponse.json({
+      kycStatus: user.kycStatus,
+      kycDocumentType: user.kycDocumentType,
+      hasFront: !!user.kycFrontImageUrl,
+      hasBack: !!user.kycBackImageUrl,
+      hasSelfie: !!user.kycSelfieUrl,
+      hasUtilityBill: !!user.kycUtilityBillUrl
+    });
+  } catch {
+    return NextResponse.json(
+      { error: 'Failed to load KYC status' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const existing = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { kycStatus: true }
+    });
+
+    if (!existing) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    if (existing.kycStatus === 'PENDING') {
+      return NextResponse.json(
+        { error: 'Your documents are already under review.' },
+        { status: 400 }
+      );
+    }
+
+    if (existing.kycStatus === 'APPROVED') {
+      return NextResponse.json(
+        { error: 'Your identity is already verified.' },
+        { status: 400 }
+      );
+    }
+
+    const formData = await request.formData();
+    const documentType = formData.get('documentType') as string | null;
+    const front = formData.get('front') as File | null;
+    const back = formData.get('back') as File | null;
+    const selfie = formData.get('selfie') as File | null;
+    const utilityBill = formData.get('utilityBill') as File | null;
+
+    if (
+      !documentType ||
+      !DOC_TYPES.includes(documentType as (typeof DOC_TYPES)[number])
+    ) {
+      return NextResponse.json(
+        { error: 'Select a valid document type.' },
+        { status: 400 }
+      );
+    }
+
+    if (!front?.size || !back?.size || !selfie?.size) {
+      return NextResponse.json(
+        { error: 'Front, back, and selfie images are required.' },
+        { status: 400 }
+      );
+    }
+
+    if (!utilityBill?.size) {
+      return NextResponse.json(
+        { error: 'A proof of address (utility bill) is required.' },
+        { status: 400 }
+      );
+    }
+
+    const uid = session.user.id;
+    const ts = Date.now();
+
+    const [frontUrl, backUrl, selfieUrl, billUrl] = await Promise.all([
+      uploadKycFile(uid, 'front', ts, front),
+      uploadKycFile(uid, 'back', ts, back),
+      uploadKycFile(uid, 'selfie', ts, selfie),
+      uploadKycFile(uid, 'utility', ts, utilityBill)
+    ]);
+
+    await prisma.user.update({
+      where: { id: session.user.id },
+      data: {
+        kycDocumentType: documentType,
+        kycFrontImageUrl: frontUrl,
+        kycBackImageUrl: backUrl,
+        kycSelfieUrl: selfieUrl,
+        kycUtilityBillUrl: billUrl,
+        kycStatus: 'PENDING'
+      }
+    });
+
+    return NextResponse.json({ success: true });
+  } catch {
+    return NextResponse.json(
+      { error: 'Failed to submit KYC documents' },
+      { status: 500 }
+    );
+  }
+}

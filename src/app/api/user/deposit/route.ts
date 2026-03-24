@@ -17,6 +17,13 @@ export async function POST(request: NextRequest) {
     const { amount, paymentMethod, balanceType: rawBalanceType } = body;
     const balanceType = parseBalanceType(rawBalanceType);
 
+    if (balanceType !== 'REAL') {
+      return NextResponse.json(
+        { error: 'Deposits are only supported for the real balance.' },
+        { status: 400 }
+      );
+    }
+
     // Validate input
     if (!amount || amount <= 0) {
       return NextResponse.json(
@@ -25,9 +32,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!paymentMethod || !['card', 'paypal'].includes(paymentMethod)) {
+    const allowedMethods = [
+      'card',
+      'paypal',
+      'btc',
+      'usdc',
+      'usdt'
+    ] as const;
+    if (!paymentMethod || !allowedMethods.includes(paymentMethod)) {
       return NextResponse.json(
-        { error: 'Invalid payment method. Must be "card" or "paypal".' },
+        {
+          error:
+            'Invalid payment method. Must be "card", "paypal", "btc", "usdc", or "usdt".'
+        },
         { status: 400 }
       );
     }
@@ -55,6 +72,14 @@ export async function POST(request: NextRequest) {
         data: { amount: newBalance }
       });
 
+      const methodLabel: Record<string, string> = {
+        card: 'Credit/Debit Card',
+        paypal: 'PayPal',
+        btc: 'Bitcoin (BTC)',
+        usdc: 'USD Coin (USDC)',
+        usdt: 'Tether (USDT)'
+      };
+
       // Create deposit transaction
       const transaction = await tx.transaction.create({
         data: {
@@ -62,7 +87,7 @@ export async function POST(request: NextRequest) {
           balanceType,
           type: TransactionType.DEPOSIT,
           absoluteAmount: amount,
-          description: `Deposit via ${paymentMethod === 'card' ? 'Credit/Debit Card' : 'PayPal'}`
+          description: `Deposit via ${methodLabel[paymentMethod] ?? paymentMethod}`
         }
       });
 

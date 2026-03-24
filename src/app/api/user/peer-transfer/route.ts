@@ -1,0 +1,239 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
+import { TransactionType } from '@/lib/prisma/generated/client';
+import { ensureUserBalance, parseBalanceType } from '@/lib/balance';
+
+function normalizeEmail(raw: unknown): string | null {
+  if (typeof raw !== 'string') return null;
+  const t = raw.trim().toLowerCase();
+  return t.length > 0 ? t : null;
+}
+
+export async function GET(request: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const email = normalizeEmail(
+      request.nextUrl.searchParams.get('email') ?? ''
+    );
+    if (!email) {
+      return NextResponse.json(
+        { error: 'Email is required' },
+        { status: 400 }
+      );
+    }
+
+    const me = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { email: true }
+    });
+    const myEmail = me?.email?.trim().toLowerCase();
+    if (myEmail && email === myEmail) {
+      return NextResponse.json(
+        { error: 'You cannot transfer to your own email' },
+        { status: 400 }
+      );
+    }
+
+    const recipient = await prisma.user.findFirst({
+      where: { email: { equals: email, mode: 'insensitive' } },
+      select: { id: true, name: true, email: true }
+    });
+
+    if (!recipient) {
+      return NextResponse.json({ error: 'No user found with this email' }, { status: 404 });
+    }
+
+    if (recipient.id === session.user.id) {
+      return NextResponse.json(
+        { error: 'You cannot transfer to yourself' },
+        { status: 400 }
+      );
+    }
+
+    return NextResponse.json({
+      recipient: {
+        id: recipient.id,
+        name: recipient.name,
+        email: recipient.email
+      }
+    });
+  } catch {
+    return NextResponse.json(
+      { error: 'Failed to look up recipient' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const body = await request.json();
+    const amountRaw = Number(body?.amount);
+    const amount = Number.isFinite(amountRaw) ? amountRaw : 0;
+    const balanceType = parseBalanceType(body?.balanceType);
+    const recipientEmail = normalizeEmail(body?.recipientEmail);
+
+    if (balanceType !== 'REAL') {
+      return NextResponse.json(
+        { error: 'Peer transfers are only supported for the real balance.' },
+        { status: 400 }
+      );
+    }
+
+    if (amount <= 0) {
+      return NextResponse.json(
+        { error: 'Invalid amount. Amount must be greater than 0.' },
+        { status: 400 }
+      );
+    }
+
+    if (!recipientEmail) {
+      return NextResponse.json(
+        { error: 'Recipient email is required' },
+        { status: 400 }
+      );
+    }
+
+    const result = await prisma.$transaction(async (tx) => {
+      const senderRow = await tx.user.findUnique({
+        where: { id: session.user.id },
+        select: { id: true, email: true, name: true }
+      });
+      if (!senderRow) {
+        return { ok: false as const, code: 'NOT_FOUND' as const };
+      }
+
+      const senderEmailLower = senderRow.email?.trim().toLowerCase() ?? '';
+      if (recipientEmail === senderEmailLower) {
+        return { ok: false as const, code: 'SELF' as const };
+      }
+
+      const recipientUser = await tx.user.findFirst({
+        where: { email: { equals: recipientEmail, mode: 'insensitive' } },
+        select: { id: true, email: true, name: true }
+      });
+
+      if (!recipientUser) {
+        return { ok: false as const, code: 'RECIPIENT_NOT_FOUND' as const };
+      }
+
+      if (recipientUser.id === session.user.id) {
+        return { ok: false as const, code: 'SELF' as const };
+      }
+
+      const fromBalance = await ensureUserBalance(
+        tx,
+        session.user.id,
+        balanceType
+      );
+      if (fromBalance.amount < amount) {
+        return {
+          ok: false as const,
+          code: 'INSUFFICIENT' as const,
+          currentBalance: fromBalance.amount
+        };
+      }
+
+      const toBalance = await ensureUserBalance(
+        tx,
+        recipientUser.id,
+        balanceType
+      );
+
+      await tx.userBalance.update({
+        where: { userId_type: { userId: session.user.id, type: balanceType } },
+        data: { amount: fromBalance.amount - amount }
+      });
+
+      await tx.userBalance.update({
+        where: {
+          userId_type: { userId: recipientUser.id, type: balanceType }
+        },
+        data: { amount: toBalance.amount + amount }
+      });
+
+      const toLabel = recipientUser.name?.trim() || recipientUser.email;
+      const fromLabel = senderRow.name?.trim() || senderRow.email;
+
+      await tx.transaction.create({
+        data: {
+          userId: session.user.id,
+          balanceType,
+          type: TransactionType.WITHDRAW,
+          absoluteAmount: amount,
+          description: `Transfer to ${toLabel}`
+        }
+      });
+
+      await tx.transaction.create({
+        data: {
+          userId: recipientUser.id,
+          balanceType,
+          type: TransactionType.DEPOSIT,
+          absoluteAmount: amount,
+          description: `Transfer from ${fromLabel}`
+        }
+      });
+
+      const newSenderBalance = fromBalance.amount - amount;
+
+      return {
+        ok: true as const,
+        recipient: {
+          id: recipientUser.id,
+          email: recipientUser.email,
+          name: recipientUser.name
+        },
+        newSenderBalance
+      };
+    });
+
+    if (!result.ok) {
+      if (result.code === 'NOT_FOUND') {
+        return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      }
+      if (result.code === 'SELF') {
+        return NextResponse.json(
+          { error: 'You cannot transfer to yourself' },
+          { status: 400 }
+        );
+      }
+      if (result.code === 'RECIPIENT_NOT_FOUND') {
+        return NextResponse.json(
+          { error: 'No user found with this email' },
+          { status: 404 }
+        );
+      }
+      return NextResponse.json(
+        {
+          error: 'Insufficient balance for this transfer',
+          currentBalance: result.currentBalance
+        },
+        { status: 400 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: 'Transfer completed',
+      newSenderBalance: result.newSenderBalance,
+      recipient: result.recipient
+    });
+  } catch {
+    return NextResponse.json(
+      { error: 'Failed to transfer balance' },
+      { status: 500 }
+    );
+  }
+}

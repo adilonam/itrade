@@ -311,6 +311,22 @@ export const tenantNavItems: TenantNavItems = {
  
 };
 
+/** User-management area (PaySnap-style shell): sidebar links under `/user-management`. */
+export type UserManagementNavItem = {
+  title: string;
+  url: string;
+};
+
+export const userManagementNavPrimary: UserManagementNavItem[] = [
+  { title: 'Dashboard', url: '/user-management' },
+  { title: 'Deposit', url: '/user-management/deposit' },
+  { title: 'Transfer', url: '/user-management/transfer' },
+  { title: 'Withdrawal', url: '/user-management/withdrawal' },
+  { title: 'Settings', url: '/user-management/settings' }
+];
+
+export const userManagementNavSecondary: UserManagementNavItem[] = [];
+
 // Legacy exports for backward compatibility (if needed elsewhere)
 export const navItemsUser: NavItem[] =
   tenantNavItems['Room Trading']?.USER || [];
