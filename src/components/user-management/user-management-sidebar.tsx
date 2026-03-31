@@ -8,7 +8,8 @@ import {
   IconBolt,
   IconLayoutGrid,
   IconPlus,
-  IconSettings
+  IconSettings,
+  IconShield
 } from '@tabler/icons-react';
 import { cn } from '@/lib/utils';
 import {
@@ -25,7 +26,8 @@ const iconByUrl: Record<
   '/user-management/deposit': IconPlus,
   '/user-management/transfer': IconArrowRight,
   '/user-management/withdrawal': IconArrowDownLeft,
-  '/user-management/settings': IconSettings
+  '/user-management/settings': IconSettings,
+  '/user-management/kyc': IconShield
 };
 
 function isActive(pathname: string): (item: UserManagementNavItem) => boolean {
@@ -64,6 +66,7 @@ function NavRow({
 export function UserManagementSidebar() {
   const pathname = usePathname() ?? '';
   const checkActive = isActive(pathname);
+  const appName = process.env.NEXT_PUBLIC_APP_NAME ?? 'PaySnap';
 
   return (
     <aside className="flex min-h-0 w-[260px] shrink-0 flex-col self-stretch border-r border-[var(--trade-border)] bg-[var(--trade-panel)]">
@@ -76,7 +79,7 @@ export function UserManagementSidebar() {
           <IconBolt className="size-5" stroke={2} />
         </span>
         <span className="text-base font-bold tracking-tight text-[var(--trade-text)]">
-          PaySnap
+          {appName}
         </span>
       </Link>
       <nav

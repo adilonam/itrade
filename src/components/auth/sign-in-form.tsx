@@ -110,10 +110,10 @@ export function SignInForm() {
   }
 
   return (
-    <Card className='w-full max-w-md'>
+    <Card className='w-full max-w-md border-[var(--trade-border)] bg-[var(--trade-panel)] text-[var(--trade-text)] shadow-sm'>
       <CardHeader>
-        <CardTitle>Sign In</CardTitle>
-        <CardDescription>
+        <CardTitle className='text-[var(--trade-text)]'>Sign In</CardTitle>
+        <CardDescription className='text-[var(--trade-text-muted)]'>
           Enter your email and password to access your account
         </CardDescription>
       </CardHeader>
@@ -122,7 +122,7 @@ export function SignInForm() {
           <Button
             type='button'
             variant='outline'
-            className='w-full'
+            className='w-full border-[var(--trade-border)] bg-[var(--trade-dark)] text-[var(--trade-text)] hover:bg-[var(--trade-border)]/40'
             onClick={handleGoogleSignIn}
           >
             <IconBrandGoogle className='mr-2 h-4 w-4' />
@@ -131,10 +131,10 @@ export function SignInForm() {
 
           <div className='relative'>
             <div className='absolute inset-0 flex items-center'>
-              <Separator className='w-full' />
+              <Separator className='w-full bg-[var(--trade-border)]' />
             </div>
             <div className='relative flex justify-center text-xs uppercase'>
-              <span className='bg-background text-muted-foreground px-2'>
+              <span className='bg-[var(--trade-panel)] px-2 text-[var(--trade-text-muted)]'>
                 Or continue with
               </span>
             </div>
@@ -143,22 +143,30 @@ export function SignInForm() {
 
         <form onSubmit={handleSubmit} className='mt-4 space-y-4'>
           <div className='space-y-2'>
-            <Label htmlFor='email'>Email</Label>
+            <Label htmlFor='email' className='text-[var(--trade-text-muted)]'>
+              Email
+            </Label>
             <Input
               id='email'
               type='email'
               placeholder='Enter your email'
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              className='border-[var(--trade-border)] bg-[var(--trade-dark)] text-[var(--trade-text)] placeholder:text-[var(--trade-text-muted)] focus-visible:ring-[var(--trade-accent-blue)]'
               required
             />
           </div>
           <div className='space-y-2'>
             <div className='flex items-center justify-between'>
-              <Label htmlFor='password'>Password</Label>
+              <Label
+                htmlFor='password'
+                className='text-[var(--trade-text-muted)]'
+              >
+                Password
+              </Label>
               <Link
                 href='/auth/forgot-password'
-                className='text-muted-foreground hover:text-primary text-xs underline underline-offset-4'
+                className='text-xs text-[var(--trade-text-muted)] underline underline-offset-4 hover:text-[var(--trade-accent-blue)]'
               >
                 Forgot password?
               </Link>
@@ -169,18 +177,23 @@ export function SignInForm() {
               placeholder='Enter your password'
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              className='border-[var(--trade-border)] bg-[var(--trade-dark)] text-[var(--trade-text)] placeholder:text-[var(--trade-text-muted)] focus-visible:ring-[var(--trade-accent-blue)]'
               required
             />
           </div>
-          <Button type='submit' className='w-full' disabled={isLoading}>
+          <Button
+            type='submit'
+            className='w-full bg-[#45a29e] text-white hover:opacity-90'
+            disabled={isLoading}
+          >
             {isLoading ? 'Signing in...' : 'Sign In'}
           </Button>
         </form>
-        <div className='mt-4 text-center text-sm'>
+        <div className='mt-4 text-center text-sm text-[var(--trade-text-muted)]'>
           Don&apos;t have an account?{' '}
           <Link
             href='/auth/sign-up'
-            className='hover:text-primary underline underline-offset-4'
+            className='text-[var(--trade-accent-blue)] underline underline-offset-4'
           >
             Sign up
           </Link>

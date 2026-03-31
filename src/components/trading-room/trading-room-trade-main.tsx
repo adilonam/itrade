@@ -12,8 +12,7 @@ import { useTradingRoomShell } from './trading-room-shell-context';
 
 /** Chart + positions column for `/trade` and `/trading-view-room-trading` (main area next to persistent market/news palette). */
 export function TradingRoomTradeMain() {
-  const { chartSymbol, headerLastPrice, chartInterval, setChartInterval } =
-    useTradingRoomShell();
+  const { chartSymbol, headerLastPrice, chartInterval } = useTradingRoomShell();
 
   const bottomPanelInitialSizeRef = useRef<number | null>(null);
   const [bottomPanelMinSize, setBottomPanelMinSize] = useState(20);
@@ -38,7 +37,6 @@ export function TradingRoomTradeMain() {
         <TradingRoomChart
           symbol={chartSymbol}
           interval={chartInterval}
-          onIntervalChange={setChartInterval}
           lastPrice={headerLastPrice}
         />
       </ResizablePanel>

@@ -5,7 +5,8 @@ import {
   IconCheck,
   IconChevronLeft,
   IconChevronRight,
-  IconLoader2
+  IconLoader2,
+  IconRefresh
 } from '@tabler/icons-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -51,6 +52,16 @@ function fmtUsd(n: number) {
 }
 
 type StepIndex = 0 | 1 | 2;
+type WithdrawalRequestStatus = 'PENDING' | 'REJECTED' | 'PROCESSING' | 'APPROVED';
+
+type UserWithdrawalRequest = {
+  id: string;
+  amount: number;
+  method: string;
+  status: WithdrawalRequestStatus;
+  details: unknown;
+  createdAt: string;
+};
 
 function addressLooksPlausible(asset: (typeof CRYPTOS)[number]['id'], raw: string) {
   const t = raw.trim();
@@ -73,6 +84,10 @@ export function UserManagementWithdrawalPage() {
   );
   const [address, setAddress] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [requestHistory, setRequestHistory] = useState<UserWithdrawalRequest[]>(
+    []
+  );
+  const [loadingHistory, setLoadingHistory] = useState(true);
 
   const [loadingBalances, setLoadingBalances] = useState(true);
   const [balanceError, setBalanceError] = useState<string | null>(null);
@@ -105,9 +120,33 @@ export function UserManagementWithdrawalPage() {
     }
   }, []);
 
+  const loadRequestHistory = useCallback(async () => {
+    try {
+      setLoadingHistory(true);
+      const res = await fetch('/api/user/withdraw-requests');
+      if (res.status === 401) {
+        setRequestHistory([]);
+        return;
+      }
+      if (!res.ok) {
+        throw new Error('Failed to load withdrawal requests');
+      }
+      const json = (await res.json()) as { requests?: UserWithdrawalRequest[] };
+      setRequestHistory(json.requests ?? []);
+    } catch {
+      setRequestHistory([]);
+    } finally {
+      setLoadingHistory(false);
+    }
+  }, []);
+
   useEffect(() => {
     void loadBalances();
   }, [loadBalances]);
+
+  useEffect(() => {
+    void loadRequestHistory();
+  }, [loadRequestHistory]);
 
   const amountNum = useMemo(() => {
     const n = parseFloat(amountRaw.replace(',', '.'));
@@ -150,16 +189,43 @@ export function UserManagementWithdrawalPage() {
     if (!crypto || !amountOk || !addressOk) return;
     try {
       setSubmitting(true);
-      await new Promise((r) => setTimeout(r, 600));
-      toast.success('Withdrawal request recorded (UI preview — backend pending)');
+      const res = await fetch('/api/user/withdraw', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: amountNum,
+          withdrawMethod: 'bank',
+          balanceType: REAL_BALANCE_TYPE,
+          withdrawDetails: {
+            cryptoAsset: crypto,
+            destinationAddress: address.trim()
+          }
+        })
+      });
+      const data = (await res.json()) as { error?: string };
+      if (!res.ok) {
+        toast.error(data.error ?? 'Failed to submit withdrawal request');
+        return;
+      }
+      toast.success('Withdrawal request submitted');
       setStep(0);
       setAmountRaw('');
       setCrypto(null);
       setAddress('');
       void loadBalances();
+      void loadRequestHistory();
+    } catch {
+      toast.error('Failed to submit withdrawal request');
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const statusTone: Record<WithdrawalRequestStatus, string> = {
+    PENDING: 'text-[var(--trade-text-muted)]',
+    PROCESSING: 'text-[var(--trade-accent-blue)]',
+    APPROVED: 'text-[var(--trade-green)]',
+    REJECTED: 'text-[var(--trade-red)]'
   };
 
   return (
@@ -201,13 +267,13 @@ export function UserManagementWithdrawalPage() {
                       >
                         {label}
                       </span>
-                      <span className="mt-1 flex items-center gap-1.5 text-sm font-semibold text-[var(--trade-text)]">
+                      <span className="mt-1 flex min-h-6 items-center gap-1.5 text-sm font-semibold text-[var(--trade-text)]">
                         {done ? (
                           <span className="flex size-6 items-center justify-center rounded-full bg-[var(--trade-accent-blue)]/20 text-[var(--trade-accent-blue)]">
                             <IconCheck className="size-3.5" stroke={2.5} />
                           </span>
                         ) : (
-                          <span className="font-mono text-[var(--trade-text-muted)]">
+                          <span className="flex size-6 items-center justify-center font-mono text-[var(--trade-text-muted)]">
                             {i + 1}
                           </span>
                         )}
@@ -510,6 +576,88 @@ export function UserManagementWithdrawalPage() {
                     )}
                   </button>
                 </div>
+              </div>
+            )}
+          </section>
+
+          <section className="rounded-xl border border-[var(--trade-border)] bg-[var(--trade-panel)] p-6 shadow-sm">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h2 className="text-sm font-semibold text-[var(--trade-text)]">
+                  Previous withdrawal requests
+                </h2>
+                <p className="mt-1 text-xs text-[var(--trade-text-muted)]">
+                  Track submitted withdrawals and their current processing status.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => void loadRequestHistory()}
+                disabled={loadingHistory}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)] px-3 py-2 text-xs font-medium text-[var(--trade-text)] hover:bg-[var(--trade-border)]/40 disabled:opacity-50"
+              >
+                <IconRefresh className={cn('size-3.5', loadingHistory && 'animate-spin')} />
+                Refresh
+              </button>
+            </div>
+
+            {loadingHistory ? (
+              <div className="mt-4 h-[72px] animate-pulse rounded-lg bg-[var(--trade-border)]/60" />
+            ) : requestHistory.length === 0 ? (
+              <p className="mt-4 rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)] px-4 py-3 text-sm text-[var(--trade-text-muted)]">
+                No withdrawal requests yet.
+              </p>
+            ) : (
+              <div className="mt-4 overflow-hidden rounded-lg border border-[var(--trade-border)]">
+                <table className="w-full text-left text-sm">
+                  <thead className="bg-[var(--trade-dark)] text-[var(--trade-text-muted)]">
+                    <tr>
+                      <th className="px-4 py-2.5 font-medium">Date</th>
+                      <th className="px-4 py-2.5 font-medium">Amount</th>
+                      <th className="px-4 py-2.5 font-medium">Asset</th>
+                      <th className="px-4 py-2.5 font-medium">Address</th>
+                      <th className="px-4 py-2.5 font-medium">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[var(--trade-border)] bg-[var(--trade-panel)]">
+                    {requestHistory.map((req) => {
+                      const details =
+                        req.details && typeof req.details === 'object'
+                          ? (req.details as Record<string, unknown>)
+                          : null;
+                      const asset =
+                        typeof details?.cryptoAsset === 'string'
+                          ? details.cryptoAsset.toUpperCase()
+                          : '—';
+                      const destinationAddress =
+                        typeof details?.destinationAddress === 'string'
+                          ? details.destinationAddress
+                          : '—';
+                      return (
+                        <tr key={req.id}>
+                          <td className="px-4 py-2.5 text-xs text-[var(--trade-text-muted)]">
+                            {new Date(req.createdAt).toLocaleString()}
+                          </td>
+                          <td className="px-4 py-2.5 font-mono font-semibold tabular-nums text-[var(--trade-text)]">
+                            {fmtUsd(req.amount)}
+                          </td>
+                          <td className="px-4 py-2.5 font-mono text-[var(--trade-text)]">
+                            {asset}
+                          </td>
+                          <td
+                            className="max-w-[280px] truncate px-4 py-2.5 font-mono text-xs text-[var(--trade-text-muted)]"
+                            title={destinationAddress}
+                          >
+                            {destinationAddress}
+                          </td>
+                          <td className={cn('px-4 py-2.5 text-xs font-semibold', statusTone[req.status])}>
+                            {req.status}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               </div>
             )}
           </section>

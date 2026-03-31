@@ -6,6 +6,7 @@ import {
   IconChevronLeft,
   IconChevronRight,
   IconLoader2,
+  IconRefresh,
   IconUserSearch
 } from '@tabler/icons-react';
 import { toast } from 'sonner';
@@ -35,6 +36,16 @@ type RecipientPreview = {
   email: string;
 };
 
+type TransferRequestStatus = 'PENDING' | 'REJECTED' | 'PROCESSING' | 'APPROVED';
+
+type UserTransferRequest = {
+  id: string;
+  amount: number;
+  status: TransferRequestStatus;
+  createdAt: string;
+  recipientUser: RecipientPreview;
+};
+
 export function UserManagementTransferPage() {
   const [step, setStep] = useState<StepIndex>(0);
   const [amountRaw, setAmountRaw] = useState('');
@@ -43,6 +54,8 @@ export function UserManagementTransferPage() {
   const [lookupError, setLookupError] = useState<string | null>(null);
   const [lookupLoading, setLookupLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [requestHistory, setRequestHistory] = useState<UserTransferRequest[]>([]);
+  const [loadingHistory, setLoadingHistory] = useState(true);
 
   const [loadingBalances, setLoadingBalances] = useState(true);
   const [balanceError, setBalanceError] = useState<string | null>(null);
@@ -78,6 +91,30 @@ export function UserManagementTransferPage() {
   useEffect(() => {
     void loadBalances();
   }, [loadBalances]);
+
+  const loadRequestHistory = useCallback(async () => {
+    try {
+      setLoadingHistory(true);
+      const res = await fetch('/api/user/transfer-requests');
+      if (res.status === 401) {
+        setRequestHistory([]);
+        return;
+      }
+      if (!res.ok) {
+        throw new Error('Failed to load transfer requests');
+      }
+      const json = (await res.json()) as { requests?: UserTransferRequest[] };
+      setRequestHistory(json.requests ?? []);
+    } catch {
+      setRequestHistory([]);
+    } finally {
+      setLoadingHistory(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void loadRequestHistory();
+  }, [loadRequestHistory]);
 
   const amountNum = useMemo(() => {
     const n = parseFloat(amountRaw.replace(',', '.'));
@@ -161,18 +198,26 @@ export function UserManagementTransferPage() {
         toast.error(data.error ?? 'Transfer failed');
         return;
       }
-      toast.success('Transfer completed');
+      toast.success('Transfer request submitted');
       setStep(0);
       setAmountRaw('');
       setRecipientEmail('');
       setRecipient(null);
       setLookupError(null);
       void loadBalances();
+      void loadRequestHistory();
     } catch {
       toast.error('Transfer failed');
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const statusTone: Record<TransferRequestStatus, string> = {
+    PENDING: 'text-[var(--trade-text-muted)]',
+    PROCESSING: 'text-[var(--trade-accent-blue)]',
+    APPROVED: 'text-[var(--trade-green)]',
+    REJECTED: 'text-[var(--trade-red)]'
   };
 
   return (
@@ -182,8 +227,8 @@ export function UserManagementTransferPage() {
           Transfer
         </h1>
         <p className="mt-1 text-sm text-[var(--trade-text-muted)]">
-          Send funds from your real balance to another PaySnap user by email.
-          The recipient is credited on their real balance.
+          Request a transfer from your real balance to another PaySnap user by
+          email. Requests are created with pending status for review.
         </p>
       </header>
 
@@ -214,13 +259,13 @@ export function UserManagementTransferPage() {
                       >
                         {label}
                       </span>
-                      <span className="mt-1 flex items-center gap-1.5 text-sm font-semibold text-[var(--trade-text)]">
+                      <span className="mt-1 flex min-h-6 items-center gap-1.5 text-sm font-semibold text-[var(--trade-text)]">
                         {done ? (
                           <span className="flex size-6 items-center justify-center rounded-full bg-[var(--trade-accent-blue)]/20 text-[var(--trade-accent-blue)]">
                             <IconCheck className="size-3.5" stroke={2.5} />
                           </span>
                         ) : (
-                          <span className="font-mono text-[var(--trade-text-muted)]">
+                          <span className="flex size-6 items-center justify-center font-mono text-[var(--trade-text-muted)]">
                             {i + 1}
                           </span>
                         )}
@@ -490,6 +535,72 @@ export function UserManagementTransferPage() {
                     )}
                   </button>
                 </div>
+              </div>
+            )}
+          </section>
+
+          <section className="rounded-xl border border-[var(--trade-border)] bg-[var(--trade-panel)] p-6 shadow-sm">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h2 className="text-sm font-semibold text-[var(--trade-text)]">
+                  Previous transfer requests
+                </h2>
+                <p className="mt-1 text-xs text-[var(--trade-text-muted)]">
+                  Track submitted transfers and their current processing status.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => void loadRequestHistory()}
+                disabled={loadingHistory}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)] px-3 py-2 text-xs font-medium text-[var(--trade-text)] hover:bg-[var(--trade-border)]/40 disabled:opacity-50"
+              >
+                <IconRefresh className={cn('size-3.5', loadingHistory && 'animate-spin')} />
+                Refresh
+              </button>
+            </div>
+
+            {loadingHistory ? (
+              <div className="mt-4 h-[72px] animate-pulse rounded-lg bg-[var(--trade-border)]/60" />
+            ) : requestHistory.length === 0 ? (
+              <p className="mt-4 rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)] px-4 py-3 text-sm text-[var(--trade-text-muted)]">
+                No transfer requests yet.
+              </p>
+            ) : (
+              <div className="mt-4 overflow-hidden rounded-lg border border-[var(--trade-border)]">
+                <table className="w-full text-left text-sm">
+                  <thead className="bg-[var(--trade-dark)] text-[var(--trade-text-muted)]">
+                    <tr>
+                      <th className="px-4 py-2.5 font-medium">Date</th>
+                      <th className="px-4 py-2.5 font-medium">Recipient</th>
+                      <th className="px-4 py-2.5 font-medium">Amount</th>
+                      <th className="px-4 py-2.5 font-medium">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[var(--trade-border)] bg-[var(--trade-panel)]">
+                    {requestHistory.map((req) => (
+                      <tr key={req.id}>
+                        <td className="px-4 py-2.5 text-xs text-[var(--trade-text-muted)]">
+                          {new Date(req.createdAt).toLocaleString()}
+                        </td>
+                        <td className="px-4 py-2.5">
+                          <p className="text-sm font-semibold text-[var(--trade-text)]">
+                            {req.recipientUser.name?.trim() || req.recipientUser.email}
+                          </p>
+                          <p className="font-mono text-xs text-[var(--trade-text-muted)]">
+                            {req.recipientUser.email}
+                          </p>
+                        </td>
+                        <td className="px-4 py-2.5 font-mono font-semibold tabular-nums text-[var(--trade-text)]">
+                          {fmtUsd(req.amount)}
+                        </td>
+                        <td className={cn('px-4 py-2.5 text-xs font-semibold', statusTone[req.status])}>
+                          {req.status}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             )}
           </section>

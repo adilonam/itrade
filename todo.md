@@ -144,3 +144,10 @@
 - [x] kyc part of user 
 - [x] make possilbe as i can similar to match trader 
 - [x] make this expand btn like match trader 
+
+
+
+
+- [x] dashboard to make balances clickable and then stats for this current bl
+- [x] make navbar bigger
+- [x] on header show the three blances 

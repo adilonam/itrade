@@ -11,7 +11,6 @@ import {
 import { TradingRoomMarketsPanel } from './trading-room-markets-panel';
 import { TradingRoomNewsPanel } from './trading-room-news-panel';
 import { TradingRoomAdvancedOrderPanel } from './trading-room-advanced-order-panel';
-import { IconMessageCircle } from '@tabler/icons-react';
 import { cn } from '@/lib/utils';
 
 function TradingRoomShellInner({ children }: { children: React.ReactNode }) {
@@ -128,15 +127,6 @@ function TradingRoomShellInner({ children }: { children: React.ReactNode }) {
           </ResizablePanel>
         </ResizablePanelGroup>
       </main>
-      <div className="fixed bottom-4 right-4 z-50">
-        <button
-          type="button"
-          className="flex items-center gap-2 rounded-lg border border-[var(--trade-border)] bg-[var(--trade-panel)] px-4 py-2 text-sm font-medium text-[var(--trade-text)] shadow-xl transition-all hover:scale-105 hover:bg-[var(--trade-border)]"
-        >
-          <span>Let&apos;s Chat</span>
-          <IconMessageCircle className="size-5" />
-        </button>
-      </div>
     </div>
   );
 }

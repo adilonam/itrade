@@ -68,68 +68,92 @@ export function SignUpForm() {
   };
 
   return (
-    <Card className='w-full max-w-md'>
+    <Card className='w-full max-w-md border-[var(--trade-border)] bg-[var(--trade-panel)] text-[var(--trade-text)] shadow-sm'>
       <CardHeader>
-        <CardTitle>Sign Up</CardTitle>
-        <CardDescription>Create a new account to get started</CardDescription>
+        <CardTitle className='text-[var(--trade-text)]'>Sign Up</CardTitle>
+        <CardDescription className='text-[var(--trade-text-muted)]'>
+          Create a new account to get started
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className='space-y-4'>
           <div className='space-y-2'>
-            <Label htmlFor='name'>Name</Label>
+            <Label htmlFor='name' className='text-[var(--trade-text-muted)]'>
+              Name
+            </Label>
             <Input
               id='name'
               type='text'
               placeholder='Enter your name'
               value={name}
               onChange={(e) => setName(e.target.value)}
+              className='border-[var(--trade-border)] bg-[var(--trade-dark)] text-[var(--trade-text)] placeholder:text-[var(--trade-text-muted)] focus-visible:ring-[var(--trade-accent-blue)]'
               required
             />
           </div>
           <div className='space-y-2'>
-            <Label htmlFor='email'>Email</Label>
+            <Label htmlFor='email' className='text-[var(--trade-text-muted)]'>
+              Email
+            </Label>
             <Input
               id='email'
               type='email'
               placeholder='Enter your email'
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              className='border-[var(--trade-border)] bg-[var(--trade-dark)] text-[var(--trade-text)] placeholder:text-[var(--trade-text-muted)] focus-visible:ring-[var(--trade-accent-blue)]'
               required
             />
           </div>
           <div className='space-y-2'>
-            <Label htmlFor='password'>Password</Label>
+            <Label
+              htmlFor='password'
+              className='text-[var(--trade-text-muted)]'
+            >
+              Password
+            </Label>
             <Input
               id='password'
               type='password'
               placeholder='Enter your password'
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              className='border-[var(--trade-border)] bg-[var(--trade-dark)] text-[var(--trade-text)] placeholder:text-[var(--trade-text-muted)] focus-visible:ring-[var(--trade-accent-blue)]'
               required
               minLength={6}
             />
           </div>
           <div className='space-y-2'>
-            <Label htmlFor='confirmPassword'>Confirm Password</Label>
+            <Label
+              htmlFor='confirmPassword'
+              className='text-[var(--trade-text-muted)]'
+            >
+              Confirm Password
+            </Label>
             <Input
               id='confirmPassword'
               type='password'
               placeholder='Confirm your password'
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
+              className='border-[var(--trade-border)] bg-[var(--trade-dark)] text-[var(--trade-text)] placeholder:text-[var(--trade-text-muted)] focus-visible:ring-[var(--trade-accent-blue)]'
               required
               minLength={6}
             />
           </div>
-          <Button type='submit' className='w-full' disabled={isLoading}>
+          <Button
+            type='submit'
+            className='w-full bg-[#45a29e] text-white hover:opacity-90'
+            disabled={isLoading}
+          >
             {isLoading ? 'Creating account...' : 'Sign Up'}
           </Button>
         </form>
-        <div className='mt-4 text-center text-sm'>
+        <div className='mt-4 text-center text-sm text-[var(--trade-text-muted)]'>
           Already have an account?{' '}
           <Link
             href='/auth/sign-in'
-            className='hover:text-primary underline underline-offset-4'
+            className='text-[var(--trade-accent-blue)] underline underline-offset-4'
           >
             Sign in
           </Link>

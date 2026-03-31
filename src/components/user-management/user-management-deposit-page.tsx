@@ -184,13 +184,13 @@ export function UserManagementDepositPage() {
                       >
                         {label}
                       </span>
-                      <span className="mt-1 flex items-center gap-1.5 text-sm font-semibold text-[var(--trade-text)]">
+                      <span className="mt-1 flex min-h-6 items-center gap-1.5 text-sm font-semibold text-[var(--trade-text)]">
                         {done ? (
                           <span className="flex size-6 items-center justify-center rounded-full bg-[var(--trade-accent-blue)]/20 text-[var(--trade-accent-blue)]">
                             <IconCheck className="size-3.5" stroke={2.5} />
                           </span>
                         ) : (
-                          <span className="font-mono text-[var(--trade-text-muted)]">
+                          <span className="flex size-6 items-center justify-center font-mono text-[var(--trade-text-muted)]">
                             {i + 1}
                           </span>
                         )}

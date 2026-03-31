@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { put } from '@vercel/blob';
 import { prisma } from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
+
 const DOC_TYPES = ['passport', 'national_id', 'drivers_license'] as const;
 
 async function uploadKycFile(userId: string, label: string, ts: number, file: File) {
@@ -38,13 +39,26 @@ export async function GET() {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
+    const requests = await prisma.kycVerificationRequest.findMany({
+      where: { userId: session.user.id },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        status: true,
+        documentType: true,
+        createdAt: true,
+        reviewedAt: true
+      }
+    });
+
     return NextResponse.json({
       kycStatus: user.kycStatus,
       kycDocumentType: user.kycDocumentType,
       hasFront: !!user.kycFrontImageUrl,
       hasBack: !!user.kycBackImageUrl,
       hasSelfie: !!user.kycSelfieUrl,
-      hasUtilityBill: !!user.kycUtilityBillUrl
+      hasUtilityBill: !!user.kycUtilityBillUrl,
+      requests
     });
   } catch {
     return NextResponse.json(
@@ -80,6 +94,21 @@ export async function POST(request: NextRequest) {
     if (existing.kycStatus === 'APPROVED') {
       return NextResponse.json(
         { error: 'Your identity is already verified.' },
+        { status: 400 }
+      );
+    }
+
+    const activeRequest = await prisma.kycVerificationRequest.findFirst({
+      where: {
+        userId: session.user.id,
+        status: { in: ['PENDING', 'IN_PROGRESS'] }
+      },
+      select: { id: true }
+    });
+
+    if (activeRequest) {
+      return NextResponse.json(
+        { error: 'A verification request is already in progress.' },
         { status: 400 }
       );
     }
@@ -125,16 +154,34 @@ export async function POST(request: NextRequest) {
       uploadKycFile(uid, 'utility', ts, utilityBill)
     ]);
 
-    await prisma.user.update({
-      where: { id: session.user.id },
-      data: {
-        kycDocumentType: documentType,
-        kycFrontImageUrl: frontUrl,
-        kycBackImageUrl: backUrl,
-        kycSelfieUrl: selfieUrl,
-        kycUtilityBillUrl: billUrl,
-        kycStatus: 'PENDING'
-      }
+    await prisma.$transaction(async (tx) => {
+      await tx.user.update({
+        where: { id: session.user.id },
+        data: {
+          kycDocumentType: documentType,
+          kycFrontImageUrl: frontUrl,
+          kycBackImageUrl: backUrl,
+          kycSelfieUrl: selfieUrl,
+          kycUtilityBillUrl: billUrl,
+          kycStatus: 'PENDING'
+        }
+      });
+
+      await tx.kycVerificationRequest.create({
+        data: {
+          userId: session.user.id,
+          documentType,
+          status: 'PENDING',
+          documents: {
+            create: [
+              { kind: 'FRONT', fileUrl: frontUrl },
+              { kind: 'BACK', fileUrl: backUrl },
+              { kind: 'SELFIE', fileUrl: selfieUrl },
+              { kind: 'UTILITY_BILL', fileUrl: billUrl }
+            ]
+          }
+        }
+      });
     });
 
     return NextResponse.json({ success: true });

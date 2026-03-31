@@ -7,14 +7,12 @@ import { TradingRoomChartHeader, type ChartInterval } from './trading-room-chart
 interface TradingRoomChartProps {
   symbol: string;
   interval: ChartInterval;
-  onIntervalChange: (v: ChartInterval) => void;
   lastPrice: number;
 }
 
 export function TradingRoomChart({
   symbol,
   interval,
-  onIntervalChange,
   lastPrice
 }: TradingRoomChartProps) {
   const [measureHintOpen, setMeasureHintOpen] = useState(true);
@@ -23,8 +21,6 @@ export function TradingRoomChart({
     <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-[var(--trade-dark)]">
       <TradingRoomChartHeader
         symbol={symbol}
-        interval={interval}
-        onIntervalChange={onIntervalChange}
         lastPrice={lastPrice}
       />
       <div className="relative min-h-0 flex-1">

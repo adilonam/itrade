@@ -44,6 +44,8 @@ type Props = {
   financialInstitutional: FinancialSnapshot;
 };
 
+type BalanceType = 'REAL' | 'INSTITUTIONAL' | 'DEMO';
+
 const fmtUsd = (n: number) =>
   new Intl.NumberFormat('en-US', {
     style: 'currency',
@@ -53,31 +55,60 @@ const fmtUsd = (n: number) =>
   }).format(n);
 
 function MarginsStrip({
+  selectedBalance,
+  onSelectBalance,
   financialReal,
   financialDemo,
   financialInstitutional
 }: Pick<
   Props,
   'financialReal' | 'financialDemo' | 'financialInstitutional'
->) {
+> & {
+  selectedBalance: BalanceType;
+  onSelectBalance: (balance: BalanceType) => void;
+}) {
   const rows = [
-    { label: 'Real', f: financialReal, accent: 'text-[var(--trade-green)]' },
     {
+      key: 'REAL' as const,
+      label: 'Real',
+      f: financialReal,
+      accent: 'text-[var(--trade-green)]'
+    },
+    {
+      key: 'INSTITUTIONAL' as const,
       label: 'Institutional',
       f: financialInstitutional,
       accent: 'text-[var(--trade-accent-blue)]'
     },
-    { label: 'Demo', f: financialDemo, accent: 'text-[var(--trade-text-muted)]' }
+    {
+      key: 'DEMO' as const,
+      label: 'Demo',
+      f: financialDemo,
+      accent: 'text-[var(--trade-text-muted)]'
+    }
   ];
 
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-      {rows.map(({ label, f, accent }) => (
+      {rows.map(({ key, label, f, accent }) => (
         <div
-          key={label}
+          key={key}
+          role="button"
+          tabIndex={0}
+          onClick={() => onSelectBalance(key)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              onSelectBalance(key);
+            }
+          }}
+          aria-pressed={selectedBalance === key}
           className={cn(
-            'rounded-lg border px-3 py-2.5',
-            'border-[var(--trade-border)] bg-[var(--trade-dark)]/80'
+            'rounded-lg border px-3 py-2.5 transition-colors',
+            'border-[var(--trade-border)] bg-[var(--trade-dark)]/80',
+            'cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--trade-accent-blue)]',
+            selectedBalance === key &&
+              'border-[var(--trade-accent-blue)] bg-[var(--trade-panel)]'
           )}
         >
           <div className="flex items-center justify-between gap-2">
@@ -119,21 +150,39 @@ export function DashboardOverviewTradeAnalytics({
   financialInstitutional
 }: Props) {
   const [range, setRange] = useState<TimeRange>('1y');
+  const [selectedBalance, setSelectedBalance] = useState<BalanceType>('REAL');
 
-  const balanceBase =
-    financialReal.balance +
-    financialDemo.balance +
-    financialInstitutional.balance;
+  const selectedFinancial = useMemo(() => {
+    if (selectedBalance === 'INSTITUTIONAL') return financialInstitutional;
+    if (selectedBalance === 'DEMO') return financialDemo;
+    return financialReal;
+  }, [selectedBalance, financialReal, financialDemo, financialInstitutional]);
 
-  const stats = useMemo(() => aggregatePnLStats(positions), [positions]);
-  const daily = useMemo(
-    () => dailyPerformanceFromClosed(positions),
-    [positions]
-  );
+  const filteredPositions = useMemo(() => {
+    return positions.filter((p) => {
+      const balanceType = (p as DashboardPosition & { balanceType?: string }).balanceType;
+      if (balanceType) {
+        return balanceType === selectedBalance;
+      }
+
+      if (selectedBalance === 'INSTITUTIONAL') {
+        return p.room === 'INSTITUTIONAL';
+      }
+      if (selectedBalance === 'DEMO') {
+        return p.room === 'TRADING';
+      }
+      return p.room === 'TRADING' || p.room === 'STOCK';
+    });
+  }, [positions, selectedBalance]);
+
+  const balanceBase = selectedFinancial.balance;
+
+  const stats = useMemo(() => aggregatePnLStats(filteredPositions), [filteredPositions]);
+  const daily = useMemo(() => dailyPerformanceFromClosed(filteredPositions), [filteredPositions]);
 
   const monthlySeries = useMemo(
-    () => buildMonthlySeries(positions, balanceBase, range),
-    [positions, balanceBase, range]
+    () => buildMonthlySeries(filteredPositions, balanceBase, range),
+    [filteredPositions, balanceBase, range]
   );
 
   const { roiPct, pnlUsd } = useMemo(
@@ -171,6 +220,8 @@ export function DashboardOverviewTradeAnalytics({
   return (
     <div className="space-y-4 pb-8">
       <MarginsStrip
+        selectedBalance={selectedBalance}
+        onSelectBalance={setSelectedBalance}
         financialReal={financialReal}
         financialDemo={financialDemo}
         financialInstitutional={financialInstitutional}

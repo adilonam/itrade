@@ -44,24 +44,24 @@ export default function MfaVerification({
   };
 
   return (
-    <Card className='mx-auto w-full max-w-md'>
+    <Card className='mx-auto w-full max-w-md border-[var(--trade-border)] bg-[var(--trade-panel)] text-[var(--trade-text)] shadow-sm'>
       <CardHeader className='space-y-1'>
         <div className='mb-4 flex items-center justify-center'>
-          <div className='flex h-12 w-12 items-center justify-center rounded-full bg-blue-100'>
-            <Shield className='h-6 w-6 text-blue-600' />
+          <div className='flex h-12 w-12 items-center justify-center rounded-full bg-[var(--trade-accent-blue)]/15'>
+            <Shield className='h-6 w-6 text-[var(--trade-accent-blue)]' />
           </div>
         </div>
-        <CardTitle className='text-center text-2xl'>
+        <CardTitle className='text-center text-2xl text-[var(--trade-text)]'>
           Two-Factor Authentication
         </CardTitle>
-        <CardDescription className='text-center'>
+        <CardDescription className='text-center text-[var(--trade-text-muted)]'>
           We&apos;ve sent a verification code to your email address
         </CardDescription>
       </CardHeader>
       <CardContent className='space-y-4'>
-        <div className='flex items-center justify-center rounded-lg bg-blue-50 p-3'>
-          <Mail className='mr-2 h-4 w-4 text-blue-600' />
-          <span className='text-sm text-blue-700'>{email}</span>
+        <div className='flex items-center justify-center rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)] p-3'>
+          <Mail className='mr-2 h-4 w-4 text-[var(--trade-accent-blue)]' />
+          <span className='text-sm text-[var(--trade-text)]'>{email}</span>
         </div>
 
         {error && (
@@ -73,7 +73,9 @@ export default function MfaVerification({
 
         <form onSubmit={handleVerifyCode} className='space-y-4'>
           <div className='space-y-2'>
-            <Label htmlFor='mfa-code'>Verification Code</Label>
+            <Label htmlFor='mfa-code' className='text-[var(--trade-text-muted)]'>
+              Verification Code
+            </Label>
             <Input
               id='mfa-code'
               type='text'
@@ -84,7 +86,7 @@ export default function MfaVerification({
                 setCode(value);
                 setError('');
               }}
-              className='text-center text-lg tracking-widest'
+              className='border-[var(--trade-border)] bg-[var(--trade-dark)] text-center text-lg tracking-widest text-[var(--trade-text)] placeholder:text-[var(--trade-text-muted)] focus-visible:ring-[var(--trade-accent-blue)]'
               maxLength={6}
               autoComplete='one-time-code'
               disabled={isVerifying}
@@ -93,7 +95,7 @@ export default function MfaVerification({
 
           <Button
             type='submit'
-            className='w-full'
+            className='w-full bg-[#45a29e] text-white hover:opacity-90'
             disabled={isVerifying || code.length !== 6}
           >
             {isVerifying ? (
@@ -108,7 +110,13 @@ export default function MfaVerification({
         </form>
 
         <div className='text-center'>
-          <Button type='button' variant='ghost' size='sm' onClick={onBack}>
+          <Button
+            type='button'
+            variant='ghost'
+            size='sm'
+            className='text-[var(--trade-text-muted)] hover:text-[var(--trade-text)]'
+            onClick={onBack}
+          >
             Back to Sign In
           </Button>
         </div>

@@ -1,16 +1,6 @@
 'use client';
 
-import { cn } from '@/lib/utils';
-
-const TIMEFRAMES = [
-  { label: '1m', value: '1' },
-  { label: '5m', value: '5' },
-  { label: '15m', value: '15' },
-  { label: 'H1', value: '60' },
-  { label: 'D', value: 'D' }
-] as const;
-
-export type ChartInterval = (typeof TIMEFRAMES)[number]['value'];
+export type ChartInterval = '1' | '5' | '15' | '60' | 'D';
 
 function formatOhlc(n: number, symbol: string) {
   const isJpy = symbol.toUpperCase().includes('JPY');
@@ -20,15 +10,11 @@ function formatOhlc(n: number, symbol: string) {
 
 interface TradingRoomChartHeaderProps {
   symbol: string;
-  interval: ChartInterval;
-  onIntervalChange: (v: ChartInterval) => void;
   lastPrice: number;
 }
 
 export function TradingRoomChartHeader({
   symbol,
-  interval,
-  onIntervalChange,
   lastPrice
 }: TradingRoomChartHeaderProps) {
   const spread = symbol.length > 4 ? lastPrice * 0.00015 : 0.00025;
@@ -46,23 +32,6 @@ export function TradingRoomChartHeader({
             O {formatOhlc(o, symbol)} H {formatOhlc(h, symbol)} L {formatOhlc(l, symbol)} C{' '}
             {formatOhlc(c, symbol)}
           </span>
-        </div>
-        <div className="flex flex-wrap items-center gap-1">
-          {TIMEFRAMES.map((tf) => (
-            <button
-              key={tf.value}
-              type="button"
-              onClick={() => onIntervalChange(tf.value)}
-              className={cn(
-                'rounded px-2 py-1 text-[10px] font-semibold transition-colors',
-                interval === tf.value
-                  ? 'bg-[var(--trade-accent-blue)]/20 text-[var(--trade-accent-blue)]'
-                  : 'text-[var(--trade-text-muted)] hover:bg-[var(--trade-dark)] hover:text-[var(--trade-text)]'
-              )}
-            >
-              {tf.label}
-            </button>
-          ))}
         </div>
       </div>
     </div>

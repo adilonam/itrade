@@ -67,7 +67,7 @@ export const tenantNavItems: TenantNavItems = {
     
       {
         title: 'Account',
-        url: '/profile',
+        url: '/user-management',
         icon: 'billing',
         isActive: false,
         shortcut: ['p', 'r'],
@@ -109,7 +109,7 @@ export const tenantNavItems: TenantNavItems = {
       },
       {
         title: 'Account',
-        url: '/profile',
+        url: '/user-management',
         icon: 'billing',
         isActive: false,
         shortcut: ['p', 'r'],
@@ -190,8 +190,16 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
+        title: 'KYC Requests',
+        url: '/admin/kyc-requests',
+        icon: 'user',
+        isActive: false,
+        shortcut: ['k', 'y'],
+        items: []
+      },
+      {
         title: 'Account',
-        url: '/profile',
+        url: '/user-management',
         icon: 'billing',
         isActive: false,
         shortcut: ['p', 'r'],
@@ -250,7 +258,7 @@ export const tenantNavItems: TenantNavItems = {
     
       {
         title: 'Account',
-        url: '/profile',
+        url: '/user-management',
         icon: 'billing',
         isActive: false,
         shortcut: ['p', 'r'],
@@ -289,6 +297,14 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
+        title: 'KYC Requests',
+        url: '/admin/kyc-requests',
+        icon: 'user',
+        isActive: false,
+        shortcut: ['k', 'y'],
+        items: []
+      },
+      {
         title: 'Settings',
         url: '/super-admin/app-settings',
         icon: 'settings',
@@ -322,7 +338,8 @@ export const userManagementNavPrimary: UserManagementNavItem[] = [
   { title: 'Deposit', url: '/user-management/deposit' },
   { title: 'Transfer', url: '/user-management/transfer' },
   { title: 'Withdrawal', url: '/user-management/withdrawal' },
-  { title: 'Settings', url: '/user-management/settings' }
+  { title: 'Settings', url: '/user-management/settings' },
+  { title: 'KYC verification', url: '/user-management/kyc' }
 ];
 
 export const userManagementNavSecondary: UserManagementNavItem[] = [];

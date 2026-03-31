@@ -8,15 +8,10 @@ import {
   IconEyeOff,
   IconLoader2,
   IconLock,
-  IconPhoto,
-  IconShield,
-  IconTrash,
-  IconUpload
+  IconPhoto
 } from '@tabler/icons-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
-import type { KycStatus } from '@/lib/prisma/generated/client';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Collapsible,
   CollapsibleContent,
@@ -39,12 +34,6 @@ const COUNTRIES = [
   { value: 'CA', label: 'Canada' },
   { value: 'AU', label: 'Australia' },
   { value: 'JP', label: 'Japan' }
-] as const;
-
-const DOC_OPTIONS = [
-  { value: 'passport', label: 'Passport' },
-  { value: 'national_id', label: 'National ID card' },
-  { value: 'drivers_license', label: "Driver's license" }
 ] as const;
 
 function splitName(full: string | null | undefined) {
@@ -74,11 +63,9 @@ type ProfileUser = {
   country: string | null;
   gender: string | null;
   hasPassword: boolean;
-  kycStatus: KycStatus;
 };
 
 export function UserManagementSettingsPage() {
-  const [tab, setTab] = useState('account');
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<ProfileUser | null>(null);
 
@@ -107,20 +94,6 @@ export function UserManagementSettingsPage() {
   const [showPw, setShowPw] = useState<Record<string, boolean>>({});
   const [savingPw, setSavingPw] = useState(false);
 
-  const [kycStatus, setKycStatus] = useState<KycStatus | null>(null);
-  const [kycDocType, setKycDocType] = useState('');
-  const [kycFront, setKycFront] = useState<File | null>(null);
-  const [kycBack, setKycBack] = useState<File | null>(null);
-  const [kycSelfie, setKycSelfie] = useState<File | null>(null);
-  const [kycBill, setKycBill] = useState<File | null>(null);
-  const [kycSubmitting, setKycSubmitting] = useState(false);
-
-  const [sessions, setSessions] = useState<
-    { id: string; expires: string; tokenHint: string }[]
-  >([]);
-  const [sessionsLoading, setSessionsLoading] = useState(false);
-  const [revoking, setRevoking] = useState<string | null>(null);
-
   const loadProfile = useCallback(async () => {
     try {
       setLoading(true);
@@ -144,7 +117,6 @@ export function UserManagementSettingsPage() {
       setCountry(u.country ?? '');
       setImagePreview(null);
       setImageFile(null);
-      setKycStatus(u.kycStatus);
     } catch {
       toast.error('Could not load profile');
     } finally {
@@ -152,41 +124,9 @@ export function UserManagementSettingsPage() {
     }
   }, []);
 
-  const loadKycMeta = useCallback(async () => {
-    try {
-      const res = await fetch('/api/user/kyc');
-      if (!res.ok) return;
-      const data = (await res.json()) as { kycStatus: KycStatus };
-      setKycStatus(data.kycStatus);
-    } catch {
-      /* ignore */
-    }
-  }, []);
-
-  const loadSessions = useCallback(async () => {
-    try {
-      setSessionsLoading(true);
-      const res = await fetch('/api/user/sessions');
-      if (!res.ok) return;
-      const data = (await res.json()) as {
-        sessions?: { id: string; expires: string; tokenHint: string }[];
-      };
-      setSessions(data.sessions ?? []);
-    } catch {
-      setSessions([]);
-    } finally {
-      setSessionsLoading(false);
-    }
-  }, []);
-
   useEffect(() => {
     void loadProfile();
   }, [loadProfile]);
-
-  useEffect(() => {
-    if (tab === 'kyc') void loadKycMeta();
-    if (tab === 'sessions') void loadSessions();
-  }, [tab, loadKycMeta, loadSessions]);
 
   const onPickImage = (f: File | null) => {
     setImageFile(f);
@@ -285,94 +225,10 @@ export function UserManagementSettingsPage() {
     }
   };
 
-  const submitKyc = async () => {
-    if (!kycDocType) {
-      toast.error('Select a document type');
-      return;
-    }
-    if (!kycFront || !kycBack || !kycSelfie || !kycBill) {
-      toast.error('Upload all required images');
-      return;
-    }
-    try {
-      setKycSubmitting(true);
-      const fd = new FormData();
-      fd.set('documentType', kycDocType);
-      fd.set('front', kycFront);
-      fd.set('back', kycBack);
-      fd.set('selfie', kycSelfie);
-      fd.set('utilityBill', kycBill);
-      const res = await fetch('/api/user/kyc', { method: 'POST', body: fd });
-      const data = (await res.json()) as { error?: string };
-      if (!res.ok) {
-        toast.error(data.error ?? 'Submit failed');
-        return;
-      }
-      toast.success('Documents submitted for review');
-      setKycFront(null);
-      setKycBack(null);
-      setKycSelfie(null);
-      setKycBill(null);
-      void loadKycMeta();
-      void loadProfile();
-    } catch {
-      toast.error('Submit failed');
-    } finally {
-      setKycSubmitting(false);
-    }
-  };
-
-  const revokeSession = async (id: string) => {
-    try {
-      setRevoking(id);
-      const res = await fetch(`/api/user/sessions/${id}`, { method: 'DELETE' });
-      if (!res.ok) {
-        toast.error('Could not revoke session');
-        return;
-      }
-      toast.success('Session revoked');
-      void loadSessions();
-    } catch {
-      toast.error('Could not revoke session');
-    } finally {
-      setRevoking(null);
-    }
-  };
-
   const avatarSrc = useMemo(
     () => imagePreview ?? user?.image ?? undefined,
     [imagePreview, user?.image]
   );
-
-  const kycBanner = useMemo(() => {
-    const s = kycStatus ?? user?.kycStatus;
-    if (!s || s === 'NOT_SUBMITTED') {
-      return {
-        tone: 'muted' as const,
-        text: 'You have not submitted documents yet. Your account is unverified until KYC is completed.'
-      };
-    }
-    if (s === 'PENDING') {
-      return {
-        tone: 'pending' as const,
-        text: 'Your documents are under review. We will notify you when verification is complete.'
-      };
-    }
-    if (s === 'APPROVED') {
-      return {
-        tone: 'ok' as const,
-        text: 'Your identity has been verified.'
-      };
-    }
-    return {
-      tone: 'bad' as const,
-      text: 'Your submission was rejected. You may upload new documents.'
-    };
-  }, [kycStatus, user?.kycStatus]);
-
-  const kycLocked =
-    (kycStatus ?? user?.kycStatus) === 'PENDING' ||
-    (kycStatus ?? user?.kycStatus) === 'APPROVED';
 
   const togglePw = (key: string) => {
     setShowPw((s) => ({ ...s, [key]: !s[key] }));
@@ -394,48 +250,12 @@ export function UserManagementSettingsPage() {
           Settings
         </h1>
         <p className="mt-1 text-sm text-[var(--trade-text-muted)]">
-          Manage your profile, identity verification, and active sessions.
+          Manage your profile, address, and security settings.
         </p>
       </header>
 
       <div className="flex flex-1 flex-col gap-6 p-6">
-        <div className="mx-auto w-full max-w-3xl">
-          <Tabs value={tab} onValueChange={setTab} className="gap-6">
-            <TabsList
-              className={cn(
-                'flex h-auto w-full flex-wrap items-stretch justify-start gap-1 rounded-xl border border-[var(--trade-border)] bg-[var(--trade-dark)] p-1.5'
-              )}
-            >
-              <TabsTrigger
-                value="account"
-                className={cn(
-                  'rounded-lg px-4 py-2.5 text-sm font-medium text-[var(--trade-text-muted)]',
-                  'data-[state=active]:bg-[var(--trade-accent-blue)]/20 data-[state=active]:text-[var(--trade-accent-blue)]'
-                )}
-              >
-                Account
-              </TabsTrigger>
-              <TabsTrigger
-                value="kyc"
-                className={cn(
-                  'rounded-lg px-4 py-2.5 text-sm font-medium text-[var(--trade-text-muted)]',
-                  'data-[state=active]:bg-[var(--trade-accent-blue)]/20 data-[state=active]:text-[var(--trade-accent-blue)]'
-                )}
-              >
-                KYC verification
-              </TabsTrigger>
-              <TabsTrigger
-                value="sessions"
-                className={cn(
-                  'rounded-lg px-4 py-2.5 text-sm font-medium text-[var(--trade-text-muted)]',
-                  'data-[state=active]:bg-[var(--trade-accent-blue)]/20 data-[state=active]:text-[var(--trade-accent-blue)]'
-                )}
-              >
-                Login sessions
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="account" className="mt-0 space-y-4">
+        <div className="mx-auto w-full max-w-3xl space-y-4">
               <section className="rounded-xl border border-[var(--trade-border)] bg-[var(--trade-panel)] p-6 shadow-sm">
                 <h2 className="text-sm font-semibold text-[var(--trade-text)]">
                   Profile
@@ -799,171 +619,6 @@ export function UserManagementSettingsPage() {
                   </CollapsibleContent>
                 </div>
               </Collapsible>
-            </TabsContent>
-
-            <TabsContent value="kyc" className="mt-0 space-y-4">
-              <div
-                className={cn(
-                  'flex gap-3 rounded-lg border px-4 py-3 text-sm',
-                  kycBanner.tone === 'ok' &&
-                    'border-[var(--trade-green)]/40 bg-[var(--trade-green)]/10 text-[var(--trade-text)]',
-                  kycBanner.tone === 'pending' &&
-                    'border-[var(--trade-border)] bg-[var(--trade-dark)] text-[var(--trade-text)]',
-                  kycBanner.tone === 'muted' &&
-                    'border-[var(--trade-border)] bg-[var(--trade-dark)] text-[var(--trade-text-muted)]',
-                  kycBanner.tone === 'bad' &&
-                    'border-[var(--trade-red)]/40 bg-[var(--trade-red)]/10 text-[var(--trade-text)]'
-                )}
-              >
-                <IconShield
-                  className="mt-0.5 size-5 shrink-0 text-[var(--trade-accent-blue)]"
-                  stroke={1.75}
-                />
-                <p>{kycBanner.text}</p>
-              </div>
-
-              <section className="rounded-xl border border-[var(--trade-border)] bg-[var(--trade-panel)] p-6 shadow-sm">
-                <h2 className="text-sm font-semibold text-[var(--trade-text)]">
-                  Documents
-                </h2>
-                <div className="mt-4">
-                  <label
-                    htmlFor="doctype"
-                    className="text-xs font-medium text-[var(--trade-text-muted)]"
-                  >
-                    Document type
-                  </label>
-                  <select
-                    id="doctype"
-                    disabled={kycLocked}
-                    value={kycDocType}
-                    onChange={(e) => setKycDocType(e.target.value)}
-                    className="mt-1.5 w-full max-w-md rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)] px-3 py-2 text-sm text-[var(--trade-text)] outline-none disabled:opacity-50"
-                  >
-                    <option value="">Select document type</option>
-                    {DOC_OPTIONS.map((d) => (
-                      <option key={d.value} value={d.value}>
-                        {d.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <p className="mt-6 text-xs font-medium uppercase tracking-wide text-[var(--trade-text-muted)]">
-                  Attach images
-                </p>
-                <div className="mt-3 grid gap-4 sm:grid-cols-2">
-                  <KycDrop
-                    label="Front side"
-                    disabled={kycLocked}
-                    file={kycFront}
-                    onFile={setKycFront}
-                  />
-                  <KycDrop
-                    label="Back side"
-                    disabled={kycLocked}
-                    file={kycBack}
-                    onFile={setKycBack}
-                  />
-                </div>
-
-                <p className="mt-6 text-xs font-medium uppercase tracking-wide text-[var(--trade-text-muted)]">
-                  Attach selfie
-                </p>
-                <div className="mt-3">
-                  <KycDrop
-                    label="Selfie"
-                    disabled={kycLocked}
-                    file={kycSelfie}
-                    onFile={setKycSelfie}
-                  />
-                </div>
-
-                <p className="mt-6 text-xs font-medium uppercase tracking-wide text-[var(--trade-text-muted)]">
-                  Proof of address (utility bill)
-                </p>
-                <div className="mt-3">
-                  <KycDrop
-                    label="Utility bill"
-                    disabled={kycLocked}
-                    file={kycBill}
-                    onFile={setKycBill}
-                  />
-                </div>
-
-                <div className="mt-6 flex justify-end">
-                  <button
-                    type="button"
-                    disabled={kycLocked || kycSubmitting}
-                    onClick={() => void submitKyc()}
-                    className="inline-flex items-center gap-2 rounded-lg bg-[#45a29e] px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-40"
-                  >
-                    {kycSubmitting ? (
-                      <IconLoader2 className="size-4 animate-spin" />
-                    ) : null}
-                    Submit for review
-                  </button>
-                </div>
-              </section>
-            </TabsContent>
-
-            <TabsContent value="sessions" className="mt-0">
-              <section className="rounded-xl border border-[var(--trade-border)] bg-[var(--trade-panel)] p-6 shadow-sm">
-                <h2 className="text-sm font-semibold text-[var(--trade-text)]">
-                  Active sessions
-                </h2>
-                <p className="mt-1 text-xs text-[var(--trade-text-muted)]">
-                  Sessions stored for your account. If you use passwordless or
-                  JWT-only sign-in, this list may be empty.
-                </p>
-                {sessionsLoading ? (
-                  <p className="mt-6 text-sm text-[var(--trade-text-muted)]">
-                    Loading…
-                  </p>
-                ) : sessions.length === 0 ? (
-                  <p className="mt-6 text-sm text-[var(--trade-text-muted)]">
-                    No database sessions found. Your current browser session may
-                    still be active.
-                  </p>
-                ) : (
-                  <ul className="mt-4 divide-y divide-[var(--trade-border)] rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)]">
-                    {sessions.map((s) => (
-                      <li
-                        key={s.id}
-                        className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 text-sm"
-                      >
-                        <div>
-                          <p className="font-mono text-[var(--trade-text)]">
-                            {s.tokenHint}
-                          </p>
-                          <p className="text-xs text-[var(--trade-text-muted)]">
-                            Expires{' '}
-                            {new Date(s.expires).toLocaleString(undefined, {
-                              dateStyle: 'medium',
-                              timeStyle: 'short'
-                            })}
-                          </p>
-                        </div>
-                        <button
-                          type="button"
-                          disabled={revoking === s.id}
-                          onClick={() => void revokeSession(s.id)}
-                          className="inline-flex items-center gap-1 rounded-lg border border-[var(--trade-border)] px-3 py-1.5 text-xs font-medium text-[var(--trade-red)] hover:bg-[var(--trade-red)]/10 disabled:opacity-50"
-                        >
-                          {revoking === s.id ? (
-                            <IconLoader2 className="size-3.5 animate-spin" />
-                          ) : (
-                            <IconTrash className="size-3.5" />
-                          )}
-                          Revoke
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </section>
-            </TabsContent>
-          </Tabs>
         </div>
       </div>
     </div>
@@ -1016,59 +671,6 @@ function PwField({
             <IconEye className="size-4" />
           )}
         </button>
-      </div>
-    </div>
-  );
-}
-
-function KycDrop({
-  label,
-  file,
-  onFile,
-  disabled
-}: {
-  label: string;
-  file: File | null;
-  onFile: (f: File | null) => void;
-  disabled?: boolean;
-}) {
-  const id = `kyc-${label.replace(/\s+/g, '-').toLowerCase()}`;
-  return (
-    <div>
-      <p className="text-xs font-medium text-[var(--trade-text-muted)]">
-        {label}
-      </p>
-      <div className="mt-2 flex flex-col items-center justify-center rounded-lg border border-dashed border-[var(--trade-border)] bg-[var(--trade-dark)] px-4 py-8 text-center">
-        <IconUpload
-          className="mx-auto size-8 text-[#45a29e]"
-          stroke={1.25}
-        />
-        <p className="mt-2 text-xs text-[var(--trade-text-muted)]">
-          Drag and drop a file here or upload
-        </p>
-        {file ? (
-          <p className="mt-2 truncate text-xs font-medium text-[var(--trade-text)]">
-            {file.name}
-          </p>
-        ) : null}
-        <input
-          id={id}
-          type="file"
-          accept="image/*,.pdf"
-          disabled={disabled}
-          className="sr-only"
-          onChange={(e) => onFile(e.target.files?.[0] ?? null)}
-        />
-        <label
-          htmlFor={id}
-          className={cn(
-            'mt-4 inline-flex cursor-pointer items-center gap-2 rounded-lg bg-[#45a29e] px-4 py-2 text-xs font-semibold text-white hover:opacity-90',
-            disabled && 'pointer-events-none opacity-40'
-          )}
-        >
-          <IconUpload className="size-3.5" />
-          Upload
-        </label>
       </div>
     </div>
   );

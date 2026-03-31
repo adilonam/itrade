@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { TransactionType } from '@/lib/prisma/generated/client';
-import { ensureUserBalance, parseBalanceType } from '@/lib/balance';
+import { parseBalanceType } from '@/lib/balance';
 
 function normalizeEmail(raw: unknown): string | null {
   if (typeof raw !== 'string') return null;
@@ -132,70 +131,24 @@ export async function POST(request: NextRequest) {
         return { ok: false as const, code: 'SELF' as const };
       }
 
-      const fromBalance = await ensureUserBalance(
-        tx,
-        session.user.id,
-        balanceType
-      );
-      if (fromBalance.amount < amount) {
-        return {
-          ok: false as const,
-          code: 'INSUFFICIENT' as const,
-          currentBalance: fromBalance.amount
-        };
-      }
-
-      const toBalance = await ensureUserBalance(
-        tx,
-        recipientUser.id,
-        balanceType
-      );
-
-      await tx.userBalance.update({
-        where: { userId_type: { userId: session.user.id, type: balanceType } },
-        data: { amount: fromBalance.amount - amount }
-      });
-
-      await tx.userBalance.update({
-        where: {
-          userId_type: { userId: recipientUser.id, type: balanceType }
-        },
-        data: { amount: toBalance.amount + amount }
-      });
-
-      const toLabel = recipientUser.name?.trim() || recipientUser.email;
-      const fromLabel = senderRow.name?.trim() || senderRow.email;
-
-      await tx.transaction.create({
+      const transferRequest = await tx.transferRequest.create({
         data: {
-          userId: session.user.id,
+          senderUserId: session.user.id,
+          recipientUserId: recipientUser.id,
+          amount,
           balanceType,
-          type: TransactionType.WITHDRAW,
-          absoluteAmount: amount,
-          description: `Transfer to ${toLabel}`
+          status: 'PENDING'
         }
       });
-
-      await tx.transaction.create({
-        data: {
-          userId: recipientUser.id,
-          balanceType,
-          type: TransactionType.DEPOSIT,
-          absoluteAmount: amount,
-          description: `Transfer from ${fromLabel}`
-        }
-      });
-
-      const newSenderBalance = fromBalance.amount - amount;
 
       return {
         ok: true as const,
+        transferRequestId: transferRequest.id,
         recipient: {
           id: recipientUser.id,
           email: recipientUser.email,
           name: recipientUser.name
-        },
-        newSenderBalance
+        }
       };
     });
 
@@ -215,19 +168,13 @@ export async function POST(request: NextRequest) {
           { status: 404 }
         );
       }
-      return NextResponse.json(
-        {
-          error: 'Insufficient balance for this transfer',
-          currentBalance: result.currentBalance
-        },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Unable to create transfer request' }, { status: 400 });
     }
 
     return NextResponse.json({
       success: true,
-      message: 'Transfer completed',
-      newSenderBalance: result.newSenderBalance,
+      message: 'Transfer request created',
+      transferRequestId: result.transferRequestId,
       recipient: result.recipient
     });
   } catch {
