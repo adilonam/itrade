@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
-import { TransactionType } from '@/lib/prisma/generated/client';
-import { ensureUserBalance, parseBalanceType } from '@/lib/balance';
+import { DepositRequestStatus } from '@/lib/prisma/generated/client';
+import { parseBalanceType } from '@/lib/balance';
+import { externalApiLinks } from '@/constants/data';
 
 export async function POST(request: NextRequest) {
   try {
@@ -32,74 +33,98 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const allowedMethods = [
-      'card',
-      'paypal',
-      'btc',
-      'usdc',
-      'usdt'
-    ] as const;
+    const allowedMethods = ['btc', 'usdc', 'usdt'] as const;
     if (!paymentMethod || !allowedMethods.includes(paymentMethod)) {
       return NextResponse.json(
         {
           error:
-            'Invalid payment method. Must be "card", "paypal", "btc", "usdc", or "usdt".'
+            'Invalid payment method. Must be "btc", "usdc", or "usdt".'
         },
         { status: 400 }
       );
     }
 
-    // Process deposit in a transaction
-    const result = await prisma.$transaction(async (tx) => {
-      // Get current user
-      const user = await tx.user.findUnique({
-        where: { id: session.user.id },
-        select: { id: true }
-      });
-
-      if (!user) {
-        throw new Error('User not found');
-      }
-
-      const currentBalance = await ensureUserBalance(
-        tx,
-        session.user.id,
-        balanceType
+    const nowPaymentsApiKey = process.env.NOWPAYMENTS_API_KEY;
+    if (!nowPaymentsApiKey) {
+      return NextResponse.json(
+        { error: 'NOWPayments is not configured on the server.' },
+        { status: 500 }
       );
-      const newBalance = currentBalance.amount + amount;
-      await tx.userBalance.update({
-        where: { userId_type: { userId: session.user.id, type: balanceType } },
-        data: { amount: newBalance }
-      });
+    }
 
-      const methodLabel: Record<string, string> = {
-        card: 'Credit/Debit Card',
-        paypal: 'PayPal',
-        btc: 'Bitcoin (BTC)',
-        usdc: 'USD Coin (USDC)',
-        usdt: 'Tether (USDT)'
-      };
+    const payCurrency = paymentMethod.toLowerCase();
+    const baseUrl = process.env.NEXTAUTH_URL ?? request.nextUrl.origin;
+    const orderId = `dep_${session.user.id}_${Date.now()}`;
 
-      // Create deposit transaction
-      const transaction = await tx.transaction.create({
+    const depositRequest = await prisma.depositRequest.create({
+      data: {
+        userId: session.user.id,
+        amountUsd: amount,
+        payCurrency,
+        balanceType,
+        status: DepositRequestStatus.PENDING,
+        orderId
+      }
+    });
+
+    const invoiceRes = await fetch(externalApiLinks.nowPaymentsInvoiceApi, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': nowPaymentsApiKey
+      },
+      body: JSON.stringify({
+        price_amount: Number(amount.toFixed(2)),
+        price_currency: 'usd',
+        pay_currency: payCurrency,
+        ipn_callback_url: `${baseUrl}/api/webhooks/nowpayments`,
+        order_id: orderId,
+        order_description: `Deposit for user ${session.user.id}`,
+        success_url: `${baseUrl}/user-management/deposit?status=success`,
+        cancel_url: `${baseUrl}/user-management/deposit?status=cancelled`
+      })
+    });
+
+    const invoiceData = (await invoiceRes.json()) as {
+      id?: string | number;
+      invoice_url?: string;
+      status?: string;
+      message?: string;
+    };
+
+    if (!invoiceRes.ok || !invoiceData.invoice_url) {
+      await prisma.depositRequest.update({
+        where: { id: depositRequest.id },
         data: {
-          userId: session.user.id,
-          balanceType,
-          type: TransactionType.DEPOSIT,
-          absoluteAmount: amount,
-          description: `Deposit via ${methodLabel[paymentMethod] ?? paymentMethod}`
+          status: DepositRequestStatus.FAILED,
+          nowPaymentStatus: invoiceData.status ?? 'invoice_creation_failed'
         }
       });
 
-      return { transaction, newBalance };
+      return NextResponse.json(
+        {
+          error: invoiceData.message ?? 'Failed to create NOWPayments invoice.'
+        },
+        { status: 502 }
+      );
+    }
+
+    await prisma.depositRequest.update({
+      where: { id: depositRequest.id },
+      data: {
+        status: DepositRequestStatus.WAITING,
+        nowPaymentId: invoiceData.id ? String(invoiceData.id) : null,
+        nowPaymentStatus: invoiceData.status ?? 'waiting',
+        checkoutUrl: invoiceData.invoice_url
+      }
     });
 
     return NextResponse.json({
       success: true,
-      message: 'Deposit processed successfully',
-      transaction: result.transaction,
+      message: 'Deposit request created. Continue payment in gateway.',
+      checkoutUrl: invoiceData.invoice_url,
       balanceType,
-      newBalance: result.newBalance
+      newBalance: 0
     });
   } catch {
     return NextResponse.json(

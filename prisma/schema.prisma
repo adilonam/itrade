@@ -127,6 +127,7 @@ model User {
   reviewedKycRequests KycVerificationRequest[] @relation("KycReviewedBy")
   transferRequestsSent TransferRequest[] @relation("TransferRequestsSent")
   transferRequestsReceived TransferRequest[] @relation("TransferRequestsReceived")
+  depositRequests     DepositRequest[]
 
   @@map("users")
 }
@@ -451,6 +452,16 @@ enum TransferRequestStatus {
   APPROVED
 }
 
+enum DepositRequestStatus {
+  PENDING
+  WAITING
+  CONFIRMING
+  FINISHED
+  FAILED
+  EXPIRED
+  REFUNDED
+}
+
 model WithdrawRequest {
   id         String                @id @default(cuid())
   userId     String                @map("user_id")
@@ -487,6 +498,30 @@ model TransferRequest {
   @@index([recipientUserId])
   @@index([status])
   @@map("transfer_requests")
+}
+
+model DepositRequest {
+  id                String               @id @default(cuid())
+  userId            String               @map("user_id")
+  amountUsd         Float                @map("amount_usd")
+  payCurrency       String               @map("pay_currency")
+  balanceType       BalanceType          @default(REAL) @map("balance_type")
+  status            DepositRequestStatus @default(PENDING) @map("status")
+  nowPaymentId      String?              @unique @map("now_payment_id")
+  nowPaymentStatus  String?              @map("now_payment_status")
+  checkoutUrl       String?              @db.Text @map("checkout_url")
+  orderId           String               @unique @map("order_id")
+  creditedAt        DateTime?            @map("credited_at")
+  lastWebhookAt     DateTime?            @map("last_webhook_at")
+  rawWebhookPayload Json?                @map("raw_webhook_payload")
+  createdAt         DateTime             @default(now()) @map("created_at")
+  updatedAt         DateTime             @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@map("deposit_requests")
 }
 
 enum Bot {

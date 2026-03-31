@@ -361,6 +361,10 @@ export const navItems: NavItem[] = [
   ...navItemsSuperAdmin
 ];
 
+export const externalApiLinks = {
+  nowPaymentsInvoiceApi: 'https://api.nowpayments.io/v1/invoice'
+} as const;
+
 export interface SaleUser {
   id: number;
   name: string;

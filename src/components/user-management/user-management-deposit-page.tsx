@@ -126,16 +126,20 @@ export function UserManagementDepositPage() {
           balanceType: REAL_BALANCE_TYPE
         })
       });
-      const data = (await res.json()) as { error?: string };
+      const data = (await res.json()) as { error?: string; checkoutUrl?: string };
       if (!res.ok) {
         toast.error(data.error ?? 'Deposit failed');
         return;
       }
-      toast.success('Deposit processed successfully');
+      if (!data.checkoutUrl) {
+        toast.error('Payment gateway URL is missing.');
+        return;
+      }
+      toast.success('Redirecting to NOWPayments...');
+      window.location.assign(data.checkoutUrl);
       setStep(0);
       setAmountRaw('');
       setCrypto(null);
-      void loadBalances();
     } catch {
       toast.error('Deposit failed');
     } finally {
@@ -399,12 +403,13 @@ export function UserManagementDepositPage() {
                 </dl>
 
                 <p className="text-xs leading-relaxed text-[var(--trade-text-muted)]">
-                  By confirming, you authorize crediting{' '}
+                  By confirming, you will be redirected to NOWPayments to complete{' '}
+                  payment for{' '}
                   <span className="font-mono text-[var(--trade-text)]">
                     {fmtUsd(amountNum)}
-                  </span>{' '}
-                  to your {REAL_WALLET_LABEL} balance after the simulated
-                  crypto deposit clears.
+                  </span>
+                  . Your {REAL_WALLET_LABEL} balance will be credited after
+                  on-chain confirmation and webhook verification.
                 </p>
 
                 <div className="flex flex-wrap justify-end gap-2 pt-2">
