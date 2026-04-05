@@ -17,7 +17,14 @@ import { Suspense } from 'react';
 
 type Transaction = {
   id: string;
-  type: 'GAIN' | 'LOSS' | 'DEPOSIT' | 'WITHDRAW';
+  type:
+    | 'GAIN'
+    | 'INVESTMENT_GAIN'
+    | 'LOSS'
+    | 'DEPOSIT'
+    | 'WITHDRAW'
+    | 'TRANSFER_IN'
+    | 'TRANSFER_OUT';
   balanceType: 'REAL' | 'DEMO' | 'INSTITUTIONAL';
   absoluteAmount: number;
   description: string | null;
@@ -43,7 +50,7 @@ function UserTransactionsListingContent() {
     pages: 0
   });
   const [loading, setLoading] = useState(true);
-  const [typeFilter, setTypeFilter] = useState<string>('all'); // GAIN, LOSS, DEPOSIT, WITHDRAW
+  const [typeFilter, setTypeFilter] = useState<string>('all');
   const [categoryFilter, setCategoryFilter] = useState<string>(
     transactionTypeParam || 'all' // trade, stock, invest
   );
@@ -150,9 +157,12 @@ function UserTransactionsListingContent() {
             <SelectContent>
               <SelectItem value='all'>All Types</SelectItem>
               <SelectItem value='GAIN'>Gain</SelectItem>
+              <SelectItem value='INVESTMENT_GAIN'>Investment gain</SelectItem>
               <SelectItem value='LOSS'>Loss</SelectItem>
               <SelectItem value='DEPOSIT'>Deposit</SelectItem>
               <SelectItem value='WITHDRAW'>Withdraw</SelectItem>
+              <SelectItem value='TRANSFER_IN'>Transfer in</SelectItem>
+              <SelectItem value='TRANSFER_OUT'>Transfer out</SelectItem>
             </SelectContent>
           </Select>
         </div>

@@ -1,17 +1,18 @@
+import { getAppSettingsRow } from '@/lib/app-settings';
+import { getAuthSession } from '@/lib/auth';
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
 
 const ALPHA_VANTAGE_BASE = 'https://www.alphavantage.co/query';
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const key = process.env.ALPHAVANTAGE_API_KEY;
+    const settings = await getAppSettingsRow();
+    const key = settings?.alphaVantageApiKey?.trim();
     if (!key) {
       return NextResponse.json(
         { error: 'Alpha Vantage API key not configured' },

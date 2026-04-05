@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
-import { authOptions } from '@/lib/auth';
 import { twelveDataService } from '@/lib/twelvedata';
 import { z } from 'zod';
+import { getAuthSession } from '@/lib/auth';
 
 const createMarketSchema = z.object({
   symbol: z.string().min(1, 'Symbol is required').max(12, 'Symbol too long'),
@@ -17,7 +16,7 @@ const createMarketSchema = z.object({
 export async function GET(request: NextRequest) {
   try {
     // Check authentication
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
     if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -104,7 +103,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     // Check authentication
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
     if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

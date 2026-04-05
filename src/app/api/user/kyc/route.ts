@@ -1,24 +1,26 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { put } from '@vercel/blob';
+import { getBlobPutOptions } from '@/lib/blob-upload';
+import { getAuthSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { authOptions } from '@/lib/auth';
+import { put } from '@vercel/blob';
+import { NextRequest, NextResponse } from 'next/server';
 
 const DOC_TYPES = ['passport', 'national_id', 'drivers_license'] as const;
 
 async function uploadKycFile(userId: string, label: string, ts: number, file: File) {
   const ext = file.name.split('.').pop() || 'jpg';
   const filename = `kyc-${userId}-${label}-${ts}.${ext}`;
+  const blobOpts = await getBlobPutOptions();
   const blob = await put(filename, file, {
     access: 'public',
-    addRandomSuffix: true
+    addRandomSuffix: true,
+    ...blobOpts
   });
   return blob.url;
 }
 
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -70,7 +72,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

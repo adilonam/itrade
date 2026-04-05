@@ -1,13 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { TransactionType } from '@/lib/prisma/generated/client';
 import { ensureUserBalance } from '@/lib/balance';
+import { getAuthSession } from '@/lib/auth';
+
+function parseDirection(raw: unknown) {
+  return raw === 'INSTITUTIONAL_TO_REAL'
+    ? 'INSTITUTIONAL_TO_REAL'
+    : 'REAL_TO_INSTITUTIONAL';
+}
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -16,6 +21,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const amountRaw = Number(body?.amount);
     const amount = Number.isFinite(amountRaw) ? amountRaw : 0;
+    const direction = parseDirection(body?.direction);
 
     if (amount <= 0) {
       return NextResponse.json(
@@ -32,42 +38,87 @@ export async function POST(request: NextRequest) {
         'INSTITUTIONAL'
       );
 
-      if (realBalance.amount < amount) {
+      if (direction === 'REAL_TO_INSTITUTIONAL') {
+        if (realBalance.amount < amount) {
+          return {
+            ok: false as const,
+            reason: 'INSUFFICIENT_REAL' as const,
+            currentRealBalance: realBalance.amount
+          };
+        }
+
+        const updatedReal = await tx.userBalance.update({
+          where: { userId_type: { userId: session.user.id, type: 'REAL' } },
+          data: { amount: realBalance.amount - amount }
+        });
+
+        const updatedInstitutional = await tx.userBalance.update({
+          where: {
+            userId_type: { userId: session.user.id, type: 'INSTITUTIONAL' }
+          },
+          data: { amount: institutionalBalance.amount + amount }
+        });
+
+        await tx.transaction.create({
+          data: {
+            userBalanceId: realBalance.id,
+            type: TransactionType.TRANSFER_OUT,
+            absoluteAmount: amount,
+            description: 'Transfer to institutional balance'
+          }
+        });
+
+        await tx.transaction.create({
+          data: {
+            userBalanceId: institutionalBalance.id,
+            type: TransactionType.TRANSFER_IN,
+            absoluteAmount: amount,
+            description: 'Transfer from real balance'
+          }
+        });
+
         return {
-          ok: false as const,
-          currentRealBalance: realBalance.amount
+          ok: true as const,
+          realBalance: updatedReal.amount,
+          institutionalBalance: updatedInstitutional.amount
         };
       }
 
-      const updatedReal = await tx.userBalance.update({
-        where: { userId_type: { userId: session.user.id, type: 'REAL' } },
-        data: { amount: realBalance.amount - amount }
-      });
+      if (institutionalBalance.amount < amount) {
+        return {
+          ok: false as const,
+          reason: 'INSUFFICIENT_INSTITUTIONAL' as const,
+          currentInstitutionalBalance: institutionalBalance.amount
+        };
+      }
 
       const updatedInstitutional = await tx.userBalance.update({
         where: {
           userId_type: { userId: session.user.id, type: 'INSTITUTIONAL' }
         },
-        data: { amount: institutionalBalance.amount + amount }
+        data: { amount: institutionalBalance.amount - amount }
+      });
+
+      const updatedReal = await tx.userBalance.update({
+        where: { userId_type: { userId: session.user.id, type: 'REAL' } },
+        data: { amount: realBalance.amount + amount }
       });
 
       await tx.transaction.create({
         data: {
-          userId: session.user.id,
-          balanceType: 'REAL',
-          type: TransactionType.WITHDRAW,
+          userBalanceId: institutionalBalance.id,
+          type: TransactionType.TRANSFER_OUT,
           absoluteAmount: amount,
-          description: 'Transfer to institutional balance'
+          description: 'Transfer to real balance'
         }
       });
 
       await tx.transaction.create({
         data: {
-          userId: session.user.id,
-          balanceType: 'INSTITUTIONAL',
-          type: TransactionType.DEPOSIT,
+          userBalanceId: realBalance.id,
+          type: TransactionType.TRANSFER_IN,
           absoluteAmount: amount,
-          description: 'Transfer from real balance'
+          description: 'Transfer from institutional balance'
         }
       });
 
@@ -79,10 +130,19 @@ export async function POST(request: NextRequest) {
     });
 
     if (!result.ok) {
+      if (result.reason === 'INSUFFICIENT_REAL') {
+        return NextResponse.json(
+          {
+            error: 'Insufficient REAL balance for transfer',
+            currentRealBalance: result.currentRealBalance
+          },
+          { status: 400 }
+        );
+      }
       return NextResponse.json(
         {
-          error: 'Insufficient REAL balance for transfer',
-          currentRealBalance: result.currentRealBalance
+          error: 'Insufficient INSTITUTIONAL balance for transfer',
+          currentInstitutionalBalance: result.currentInstitutionalBalance
         },
         { status: 400 }
       );

@@ -1,5 +1,6 @@
 'use client';
 
+import { usePublicAppName } from '@/hooks/use-public-app-name';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSession } from 'next-auth/react';
@@ -41,7 +42,7 @@ export function WatchTraderHeader() {
     INSTITUTIONAL: 'Institutional'
   };
 
-  const appName = process.env.NEXT_PUBLIC_APP_NAME ?? 'Watch-Trader';
+  const appName = usePublicAppName();
   const pathname = usePathname() ?? '';
   const { data: session } = useSession();
   const [time, setTime] = useState(utcClockString);
@@ -263,7 +264,7 @@ export function WatchTraderHeader() {
           <IconWifi className="size-4" />
         </span>
         <ModeToggle />
-        <UserNav />
+        <UserNav variant="trade" />
         <time
           className="hidden font-mono text-[10px] text-[var(--trade-text-muted)] xl:block"
           dateTime={new Date().toISOString()}

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
-import { authOptions } from '@/lib/auth';
+import { getAuthSession } from '@/lib/auth';
 
 // Helper function to check seller permissions
 async function checkSellerPermission(session: any) {
@@ -32,7 +31,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
     const permissionCheck = await checkSellerPermission(session);
 
     if (permissionCheck.error) {

@@ -2,15 +2,14 @@ import PageContainer from '@/components/layout/page-container';
 import { Heading } from '@/components/ui/heading';
 import { Separator } from '@/components/ui/separator';
 import { UserPositionsViewRoomTrading } from '@/components/user/positions/user-positions-view-room-trading';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { getAuthSession } from '@/lib/auth';
 
 export const metadata = {
   title: 'Dashboard: My Positions Room Trading'
 };
 
 export default async function Page() {
-  const session = await getServerSession(authOptions);
+  const session = await getAuthSession();
 
   if (!session?.user?.id) {
     return (

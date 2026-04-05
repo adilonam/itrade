@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
-import { authOptions } from '@/lib/auth';
+import { getAuthSession } from '@/lib/auth';
 
 function isAdmin(session: { user?: { role?: string } } | null) {
   return (
@@ -11,17 +10,28 @@ function isAdmin(session: { user?: { role?: string } } | null) {
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
     if (!session?.user?.id || !isAdmin(session)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     const status = request.nextUrl.searchParams.get('status');
-    const where = status
-      ? {
-          status: status as 'PENDING' | 'IN_PROGRESS' | 'VERIFIED' | 'REJECTED'
-        }
-      : {};
+    const userId = request.nextUrl.searchParams.get('userId');
+
+    const where: {
+      status?: 'PENDING' | 'IN_PROGRESS' | 'VERIFIED' | 'REJECTED';
+      userId?: string;
+    } = {};
+    if (status) {
+      where.status = status as
+        | 'PENDING'
+        | 'IN_PROGRESS'
+        | 'VERIFIED'
+        | 'REJECTED';
+    }
+    if (userId) {
+      where.userId = userId;
+    }
 
     const requests = await prisma.kycVerificationRequest.findMany({
       where,

@@ -22,6 +22,12 @@ import {
   IconArrowRight
 } from '@tabler/icons-react';
 
+const tradeRoomCardClass =
+  'border border-[var(--trade-border)] bg-[var(--trade-panel)] text-[var(--trade-text)] shadow-none py-4 gap-4';
+
+const inputTradeClass =
+  'border-[var(--trade-border)] bg-[var(--trade-dark)]/40 text-sm text-[var(--trade-text)] placeholder:text-[var(--trade-text-muted)] focus-visible:border-[var(--trade-accent-blue)] focus-visible:ring-[var(--trade-accent-blue)]/25';
+
 interface InvestmentWithDetails {
   id: string;
   title: string;
@@ -50,14 +56,14 @@ interface InvestmentDetailsProps {
   isLoading?: boolean;
 }
 
-const getRiskColor = (riskLevel: string) => {
+const getRiskBadgeClass = (riskLevel: string) => {
   switch (riskLevel) {
     case 'LOW':
-      return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
+      return 'border-[var(--trade-green)]/40 bg-[var(--trade-green)]/15 text-[var(--trade-green)]';
     case 'HIGH':
-      return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
-    default: // MEDIUM
-      return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
+      return 'border-[var(--trade-red)]/40 bg-[var(--trade-red)]/15 text-[var(--trade-red)]';
+    default:
+      return 'border-[var(--trade-accent-blue)]/40 bg-[var(--trade-accent-blue)]/15 text-[var(--trade-accent-blue)]';
   }
 };
 
@@ -151,63 +157,70 @@ export function InvestmentDetails({
 
   return (
     <div className='grid gap-6 lg:grid-cols-3'>
-      {/* Investment Details */}
       <div className='space-y-6 lg:col-span-2'>
-        <Card>
+        <Card className={cn('overflow-hidden', tradeRoomCardClass)}>
           {investment.imageUrl && (
-            <div className='relative h-64 bg-gradient-to-br from-green-400 to-green-600'>
+            <div className='relative h-56 border-b border-[var(--trade-border)] bg-[var(--trade-dark)] sm:h-64'>
               <Image
                 src={investment.imageUrl}
                 alt={investment.title}
                 fill
-                className='object-cover'
+                className='object-cover opacity-90'
               />
-              <div className='absolute inset-0 bg-black/20' />
+              <div className='absolute inset-0 bg-gradient-to-t from-[var(--trade-dark)] via-[var(--trade-dark)]/40 to-transparent' />
               <Badge
                 className={cn(
-                  'absolute top-4 right-4',
-                  getRiskColor(investment.riskLevel)
+                  'absolute top-4 right-4 border',
+                  getRiskBadgeClass(investment.riskLevel)
                 )}
+                variant='outline'
               >
                 <IconShield className='mr-1 h-4 w-4' />
-                {investment.riskLevel} Risk
+                {investment.riskLevel} risk
               </Badge>
             </div>
           )}
 
-          <CardHeader>
-            <div className='flex items-start justify-between'>
-              <div className='space-y-2'>
-                <CardTitle className='text-2xl'>{investment.title}</CardTitle>
-                <div className='text-muted-foreground flex items-center space-x-4'>
-                  <div className='flex items-center'>
-                    <IconMapPin className='mr-1 h-4 w-4' />
+          <CardHeader className='px-4 pb-2 pt-4'>
+            <div className='flex items-start justify-between gap-3'>
+              <div className='min-w-0 space-y-2'>
+                <CardTitle className='text-lg text-[var(--trade-text)] sm:text-xl'>
+                  {investment.title}
+                </CardTitle>
+                <div className='flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-[var(--trade-text-muted)]'>
+                  <div className='flex items-center gap-1'>
+                    <IconMapPin className='size-3.5 shrink-0' />
                     {investment.country}
                   </div>
-                  <div className='flex items-center'>
-                    <IconCalendar className='mr-1 h-4 w-4' />
+                  <div className='flex items-center gap-1'>
+                    <IconCalendar className='size-3.5 shrink-0' />
                     {investment.duration} months
                   </div>
-                  <div className='flex items-center'>
-                    <IconUsers className='mr-1 h-4 w-4' />
-                    {investment._count?.userInvestments || 0} investors
+                  <div className='flex items-center gap-1'>
+                    <IconUsers className='size-3.5 shrink-0' />
+                    {investment._count?.userInvestments ?? 0} investors
                   </div>
                 </div>
               </div>
               {!investment.imageUrl && (
-                <Badge className={cn(getRiskColor(investment.riskLevel))}>
+                <Badge
+                  className={cn('shrink-0 border', getRiskBadgeClass(investment.riskLevel))}
+                  variant='outline'
+                >
                   <IconShield className='mr-1 h-4 w-4' />
-                  {investment.riskLevel} Risk
+                  {investment.riskLevel} risk
                 </Badge>
               )}
             </div>
           </CardHeader>
 
-          <CardContent className='space-y-6'>
+          <CardContent className='space-y-6 px-4 pb-4'>
             {investment.description && (
               <div>
-                <h3 className='mb-2 font-semibold'>About this Investment</h3>
-                <p className='text-muted-foreground leading-relaxed'>
+                <h3 className='mb-2 text-sm font-semibold text-[var(--trade-text)]'>
+                  About this investment
+                </h3>
+                <p className='text-sm leading-relaxed text-[var(--trade-text-muted)]'>
                   {investment.description}
                 </p>
               </div>
@@ -216,37 +229,41 @@ export function InvestmentDetails({
             <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
               <div className='space-y-4'>
                 <div>
-                  <h3 className='mb-3 font-semibold'>Investment Terms</h3>
-                  <div className='space-y-3'>
-                    <div className='flex justify-between'>
-                      <span className='text-muted-foreground'>
-                        Annual Return
+                  <h3 className='mb-3 text-sm font-semibold text-[var(--trade-text)]'>
+                    Investment terms
+                  </h3>
+                  <div className='space-y-3 text-sm'>
+                    <div className='flex justify-between gap-2'>
+                      <span className='text-[var(--trade-text-muted)]'>
+                        Annual return
                       </span>
-                      <div className='flex items-center font-semibold text-green-600'>
-                        <IconTrendingUp className='mr-1 h-4 w-4' />
+                      <div className='flex items-center font-mono font-semibold text-[var(--trade-green)]'>
+                        <IconTrendingUp className='mr-1 size-4 shrink-0' />
                         {investment.rentability}%
                       </div>
                     </div>
-                    <div className='flex justify-between'>
-                      <span className='text-muted-foreground'>Duration</span>
-                      <span className='font-medium'>
+                    <div className='flex justify-between gap-2'>
+                      <span className='text-[var(--trade-text-muted)]'>
+                        Duration
+                      </span>
+                      <span className='font-medium text-[var(--trade-text)]'>
                         {investment.duration} months
                       </span>
                     </div>
-                    <div className='flex justify-between'>
-                      <span className='text-muted-foreground'>
-                        Min. Investment
+                    <div className='flex justify-between gap-2'>
+                      <span className='text-[var(--trade-text-muted)]'>
+                        Min. investment
                       </span>
-                      <span className='font-medium'>
+                      <span className='font-mono font-medium text-[var(--trade-text)]'>
                         {formatCurrency(investment.minInvestment)}
                       </span>
                     </div>
                     {investment.maxInvestment && (
-                      <div className='flex justify-between'>
-                        <span className='text-muted-foreground'>
-                          Max. Investment
+                      <div className='flex justify-between gap-2'>
+                        <span className='text-[var(--trade-text-muted)]'>
+                          Max. investment
                         </span>
-                        <span className='font-medium'>
+                        <span className='font-mono font-medium text-[var(--trade-text)]'>
                           {formatCurrency(investment.maxInvestment)}
                         </span>
                       </div>
@@ -257,30 +274,38 @@ export function InvestmentDetails({
 
               <div className='space-y-4'>
                 <div>
-                  <h3 className='mb-3 font-semibold'>Capacity</h3>
+                  <h3 className='mb-3 text-sm font-semibold text-[var(--trade-text)]'>
+                    Capacity
+                  </h3>
                   {investment.totalCapacity ? (
                     <div className='space-y-3'>
-                      <div className='flex justify-between text-sm'>
-                        <span className='text-muted-foreground'>Progress</span>
-                        <span className='font-medium'>
+                      <div className='flex justify-between text-xs'>
+                        <span className='text-[var(--trade-text-muted)]'>
+                          Progress
+                        </span>
+                        <span className='font-mono font-medium text-[var(--trade-text)]'>
                           {Math.round(capacityPercentage)}%
                         </span>
                       </div>
-                      <div className='bg-muted h-3 overflow-hidden rounded-full'>
+                      <div className='h-2 overflow-hidden rounded-full bg-[var(--trade-dark)]/80'>
                         <div
-                          className='h-full bg-gradient-to-r from-green-500 to-green-600 transition-all'
+                          className='h-full rounded-full bg-[var(--trade-accent-blue)] transition-all'
                           style={{ width: `${capacityPercentage}%` }}
                         />
                       </div>
-                      <div className='flex justify-between text-sm'>
-                        <span className='text-muted-foreground'>Available</span>
-                        <span className='font-medium'>
+                      <div className='flex justify-between text-xs'>
+                        <span className='text-[var(--trade-text-muted)]'>
+                          Available
+                        </span>
+                        <span className='font-mono font-medium text-[var(--trade-text)]'>
                           {formatCurrency(investment.availableCapacity || 0)}
                         </span>
                       </div>
                     </div>
                   ) : (
-                    <p className='text-muted-foreground'>Unlimited capacity</p>
+                    <p className='text-sm text-[var(--trade-text-muted)]'>
+                      Unlimited capacity
+                    </p>
                   )}
                 </div>
               </div>
@@ -289,18 +314,24 @@ export function InvestmentDetails({
         </Card>
       </div>
 
-      {/* Enrollment Form */}
       <div className='space-y-6'>
-        <Card>
-          <CardHeader>
-            <CardTitle className='flex items-center'>
-              <IconCalculator className='mr-2 h-5 w-5' />
-              Investment Calculator
+        <Card className={tradeRoomCardClass}>
+          <CardHeader className='px-4 pb-2 pt-0'>
+            <CardTitle className='flex items-center gap-2 text-sm font-semibold text-[var(--trade-text)]'>
+              <div className='rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)]/40 p-2'>
+                <IconCalculator className='size-4 text-[var(--trade-accent-blue)]' />
+              </div>
+              Investment calculator
             </CardTitle>
           </CardHeader>
-          <CardContent className='space-y-4'>
+          <CardContent className='space-y-4 px-4 pt-0'>
             <div className='space-y-2'>
-              <Label htmlFor='amount'>Investment Amount</Label>
+              <Label
+                htmlFor='amount'
+                className='text-xs text-[var(--trade-text-muted)]'
+              >
+                Investment amount
+              </Label>
               <Input
                 id='amount'
                 type='number'
@@ -309,17 +340,24 @@ export function InvestmentDetails({
                 placeholder='Enter amount'
                 min={investment.minInvestment}
                 max={investment.maxInvestment || undefined}
+                className={inputTradeClass}
               />
-              <p className='text-muted-foreground text-xs'>
-                Your balance: {formatCurrency(userBalance)}
+              <p className='text-xs text-[var(--trade-text-muted)]'>
+                Your balance:{' '}
+                <span className='font-mono text-[var(--trade-text)]'>
+                  {formatCurrency(userBalance)}
+                </span>
               </p>
             </div>
 
             {errors.length > 0 && (
-              <Alert variant='destructive'>
+              <Alert
+                variant='destructive'
+                className='border-[var(--trade-red)]/40 bg-[var(--trade-red)]/10 text-[var(--trade-text)] [&_svg]:text-[var(--trade-red)]'
+              >
                 <IconInfoCircle className='h-4 w-4' />
                 <AlertDescription>
-                  <ul className='list-inside list-disc space-y-1'>
+                  <ul className='list-inside list-disc space-y-1 text-sm'>
                     {errors.map((error, index) => (
                       <li key={index}>{error}</li>
                     ))}
@@ -328,27 +366,33 @@ export function InvestmentDetails({
               </Alert>
             )}
 
-            <Separator />
+            <Separator className='bg-[var(--trade-border)]' />
 
             <div className='space-y-3'>
-              <h4 className='text-sm font-semibold'>Projected Returns</h4>
+              <h4 className='text-xs font-semibold uppercase tracking-wide text-[var(--trade-text-muted)]'>
+                Projected returns
+              </h4>
               <div className='space-y-2 text-sm'>
-                <div className='flex justify-between'>
-                  <span className='text-muted-foreground'>Monthly Return</span>
-                  <span className='font-medium'>
+                <div className='flex justify-between gap-2'>
+                  <span className='text-[var(--trade-text-muted)]'>
+                    Monthly return
+                  </span>
+                  <span className='font-mono font-medium text-[var(--trade-text)]'>
                     {formatCurrency(returns.monthlyReturn)}
                   </span>
                 </div>
-                <div className='flex justify-between'>
-                  <span className='text-muted-foreground'>Total Return</span>
-                  <span className='font-medium text-green-600'>
+                <div className='flex justify-between gap-2'>
+                  <span className='text-[var(--trade-text-muted)]'>
+                    Total return
+                  </span>
+                  <span className='font-mono font-medium text-[var(--trade-green)]'>
                     +{formatCurrency(returns.totalReturn)}
                   </span>
                 </div>
-                <Separator />
-                <div className='flex justify-between font-semibold'>
-                  <span>Total Amount</span>
-                  <span className='text-green-600'>
+                <Separator className='bg-[var(--trade-border)]' />
+                <div className='flex justify-between gap-2 font-semibold'>
+                  <span className='text-[var(--trade-text)]'>Total at maturity</span>
+                  <span className='font-mono text-[var(--trade-green)]'>
                     {formatCurrency(returns.totalAmount)}
                   </span>
                 </div>
@@ -356,7 +400,7 @@ export function InvestmentDetails({
             </div>
 
             <Button
-              className='w-full'
+              className='w-full bg-[var(--trade-accent-blue)] text-[var(--trade-panel)] shadow-none hover:opacity-90'
               onClick={handleEnroll}
               disabled={!canEnroll || isLoading}
             >
@@ -373,20 +417,24 @@ export function InvestmentDetails({
         </Card>
 
         {investment.autoReinvestment && (
-          <Card>
-            <CardHeader>
-              <CardTitle className='text-sm'>
-                Auto-Reinvestment Available
+          <Card className={tradeRoomCardClass}>
+            <CardHeader className='px-4 pb-2 pt-0'>
+              <CardTitle className='text-sm font-semibold text-[var(--trade-text)]'>
+                Auto-reinvestment
               </CardTitle>
             </CardHeader>
-            <CardContent className='space-y-3'>
-              <p className='text-muted-foreground text-xs'>
-                This investment supports automatic reinvestment of returns. When
-                enabled, your returns will be automatically reinvested at the
-                end of each term.
+            <CardContent className='space-y-3 px-4 pt-0'>
+              <p className='text-xs leading-relaxed text-[var(--trade-text-muted)]'>
+                When enabled, returns are reinvested automatically at the end of
+                each term.
               </p>
-              <div className='flex items-center justify-between'>
-                <Label htmlFor='auto-reinvest'>Enable auto-reinvestment</Label>
+              <div className='flex items-center justify-between gap-3 border-t border-[var(--trade-border)] pt-3'>
+                <Label
+                  htmlFor='auto-reinvest'
+                  className='text-sm text-[var(--trade-text)]'
+                >
+                  Enable auto-reinvestment
+                </Label>
                 <Switch
                   id='auto-reinvest'
                   checked={autoReinvest}

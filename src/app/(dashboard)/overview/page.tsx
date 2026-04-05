@@ -1,8 +1,7 @@
-import { authOptions } from '@/lib/auth';
-import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
 import PageContainer from '@/components/layout/page-container';
 import { DashboardOverview } from '@/components/dashboard/dashboard-overview';
+import { getAuthSession } from '@/lib/auth';
 
 export const metadata = {
   title: 'Dashboard: Overview',
@@ -10,7 +9,7 @@ export const metadata = {
 };
 
 export default async function Dashboard() {
-  const session = await getServerSession(authOptions);
+  const session = await getAuthSession();
 
   if (!session) {
     return redirect('/auth/sign-in');

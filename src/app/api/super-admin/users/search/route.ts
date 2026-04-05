@@ -1,18 +1,16 @@
-import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { getServerSession } from 'next-auth';
 import { NextRequest, NextResponse } from 'next/server';
+import { getAuthSession } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
   try {
     // Check authentication
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
     if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Check if user is super admin
-    if (session.user.role !== 'SUPERADMIN') {
+    if (session.user.role !== 'ADMIN' && session.user.role !== 'SUPERADMIN') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 

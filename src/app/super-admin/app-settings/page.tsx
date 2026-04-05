@@ -1,36 +1,35 @@
-import { Breadcrumbs } from '@/components/breadcrumbs';
-import { Heading } from '@/components/ui/heading';
+import PageContainer from '@/components/layout/page-container';
 import { Separator } from '@/components/ui/separator';
 import { AppSettingsForm } from '@/components/super-admin/app-settings-form';
 import { prisma } from '@/lib/prisma';
 
+export const metadata = {
+  title: 'App settings'
+};
+
 export default async function AppSettingsPage() {
-  // Fetch current app settings
   const settings = await prisma.appSettings.findUnique({
     where: { id: 'default' }
   });
 
   return (
-    <div className='flex h-full w-full flex-col overflow-y-auto'>
-      <div className='flex flex-1 flex-col gap-4 p-4 pt-0'>
-        <div className='space-y-4'>
-          <Breadcrumbs />
-          <div className='flex items-center justify-between'>
-            <Heading
-              title='App Settings'
-              description='Configure application branding and global settings'
-            />
-          </div>
-          <Separator />
+    <PageContainer scrollable={true}>
+      <div className='flex flex-1 flex-col space-y-4'>
+        <div>
+          <h2 className='text-xl font-bold tracking-tight text-[var(--trade-text)]'>
+            App settings
+          </h2>
+          <p className='mt-1 text-sm text-[var(--trade-text-muted)]'>
+            Branding, integrations, and limits. Database-stored values; public
+            fields are available via GET /api/app-settings with an optional
+            label query.
+          </p>
         </div>
-
-        <div className='max-w-2xl pb-8'>
-          <AppSettingsForm
-            initialIcon={settings?.appIcon}
-            initialName={settings?.appName}
-          />
+        <Separator className='bg-[var(--trade-border)]' />
+        <div className='max-w-3xl pb-8'>
+          <AppSettingsForm initialSettings={settings} />
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 }

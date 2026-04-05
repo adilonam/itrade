@@ -8,7 +8,14 @@ import type { FinancialSnapshot } from '@/components/dashboard/dashboard-overvie
 
 type ApiTransaction = {
   id: string;
-  type: 'GAIN' | 'LOSS' | 'DEPOSIT' | 'WITHDRAW';
+  type:
+    | 'GAIN'
+    | 'INVESTMENT_GAIN'
+    | 'LOSS'
+    | 'DEPOSIT'
+    | 'WITHDRAW'
+    | 'TRANSFER_IN'
+    | 'TRANSFER_OUT';
   balanceType: 'REAL' | 'DEMO' | 'INSTITUTIONAL';
   absoluteAmount: number;
   description: string | null;
@@ -27,12 +34,18 @@ function txTypeLabel(type: ApiTransaction['type']) {
   switch (type) {
     case 'GAIN':
       return 'Gain';
+    case 'INVESTMENT_GAIN':
+      return 'Investment gain';
     case 'LOSS':
       return 'Loss';
     case 'DEPOSIT':
       return 'Deposit';
     case 'WITHDRAW':
       return 'Withdraw';
+    case 'TRANSFER_IN':
+      return 'Transfer in';
+    case 'TRANSFER_OUT':
+      return 'Transfer out';
     default:
       return type;
   }
@@ -52,12 +65,23 @@ function walletLabel(balanceType: ApiTransaction['balanceType']) {
 }
 
 function formatTxAmount(amount: number, type: ApiTransaction['type']) {
-  const sign = type === 'GAIN' || type === 'DEPOSIT' ? '+' : '−';
+  const sign =
+    type === 'GAIN' ||
+    type === 'INVESTMENT_GAIN' ||
+    type === 'DEPOSIT' ||
+    type === 'TRANSFER_IN'
+      ? '+'
+      : '−';
   return `${sign}${Math.abs(amount).toFixed(2)}`;
 }
 
 function txAmountClass(type: ApiTransaction['type']) {
-  if (type === 'GAIN' || type === 'DEPOSIT') {
+  if (
+    type === 'GAIN' ||
+    type === 'INVESTMENT_GAIN' ||
+    type === 'DEPOSIT' ||
+    type === 'TRANSFER_IN'
+  ) {
     return 'text-[var(--trade-green)]';
   }
   return 'text-[var(--trade-red)]';
@@ -174,7 +198,7 @@ export function UserManagementPanelControl() {
       setTxLoading(true);
       setTxError(null);
       const res = await fetch(
-        '/api/user/transactions?limit=8&page=1&balanceType=REAL'
+        '/api/user/transactions?limit=8&page=1&balanceType=REAL&types=DEPOSIT,WITHDRAW'
       );
       if (res.status === 401) {
         setTxError('Sign in to view transactions.');
@@ -341,7 +365,7 @@ export function UserManagementPanelControl() {
                       colSpan={5}
                       className="px-4 py-8 text-center text-[var(--trade-text-muted)]"
                     >
-                      No recent transactions on your real wallet.
+                      No recent deposits or withdrawals on your real wallet.
                     </td>
                   </tr>
                 ) : (

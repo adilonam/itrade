@@ -1,10 +1,12 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { UserDepositRequestsSection } from '@/components/user-management/user-deposit-requests-section';
 import {
   IconCheck,
   IconChevronLeft,
   IconChevronRight,
+  IconCopy,
   IconLoader2
 } from '@tabler/icons-react';
 import { toast } from 'sonner';
@@ -50,7 +52,20 @@ function fmtUsd(n: number) {
 
 type StepIndex = 0 | 1 | 2;
 
-export function UserManagementDepositPage() {
+type UserManagementDepositPageProps = {
+  paymentReturnStatus?: string | null;
+};
+
+export function UserManagementDepositPage({
+  paymentReturnStatus = null
+}: UserManagementDepositPageProps) {
+  const urlRefreshPart =
+    paymentReturnStatus === 'success' || paymentReturnStatus === 'cancelled'
+      ? 1
+      : 0;
+  const [depositListExtraRefresh, setDepositListExtraRefresh] = useState(0);
+  const depositListRefreshKey = urlRefreshPart + depositListExtraRefresh;
+
   const [step, setStep] = useState<StepIndex>(0);
   const [amountRaw, setAmountRaw] = useState('');
   const [crypto, setCrypto] = useState<(typeof CRYPTOS)[number]['id'] | null>(
@@ -156,7 +171,8 @@ export function UserManagementDepositPage() {
           Deposit
         </h1>
         <p className="mt-1 text-sm text-[var(--trade-text-muted)]">
-          Add funds via crypto. Amounts credit your real (live) balance in USD.
+          Add funds via NOWPayments or a manual USDT transfer. Amounts credit
+          your real (live) balance in USD after confirmation.
         </p>
       </header>
 
@@ -445,8 +461,207 @@ export function UserManagementDepositPage() {
               </div>
             )}
           </section>
+
+          <UserManagementManualDepositSection
+            onRequestCreated={() =>
+              setDepositListExtraRefresh((n) => n + 1)
+            }
+          />
+        </div>
+
+        <div className="mx-auto w-full max-w-5xl pb-6">
+          <UserDepositRequestsSection refreshKey={depositListRefreshKey} />
         </div>
       </div>
     </div>
+  );
+}
+
+type ManualDepositResult = {
+  walletAddress: string;
+  orderId: string;
+  amountUsd: number;
+};
+
+function UserManagementManualDepositSection({
+  onRequestCreated
+}: {
+  onRequestCreated?: () => void;
+}) {
+  const [amountRaw, setAmountRaw] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [result, setResult] = useState<ManualDepositResult | null>(null);
+
+  const amountNum = useMemo(() => {
+    const n = parseFloat(amountRaw.replace(',', '.'));
+    return Number.isFinite(n) ? n : NaN;
+  }, [amountRaw]);
+
+  const amountOk = Number.isFinite(amountNum) && amountNum > 0;
+
+  const submitManual = async () => {
+    if (!amountOk) return;
+    try {
+      setSubmitting(true);
+      const res = await fetch('/api/user/deposit/manual', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: amountNum,
+          balanceType: REAL_BALANCE_TYPE
+        })
+      });
+      const data = (await res.json()) as {
+        error?: string;
+        walletAddress?: string;
+        orderId?: string;
+        amountUsd?: number;
+      };
+      if (!res.ok) {
+        toast.error(data.error ?? 'Could not create deposit request');
+        return;
+      }
+      if (
+        !data.walletAddress ||
+        !data.orderId ||
+        data.amountUsd === undefined
+      ) {
+        toast.error('Invalid response from server.');
+        return;
+      }
+      toast.success('Deposit request created');
+      onRequestCreated?.();
+      setResult({
+        walletAddress: data.walletAddress,
+        orderId: data.orderId,
+        amountUsd: data.amountUsd
+      });
+      setAmountRaw('');
+    } catch {
+      toast.error('Could not create deposit request');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const copyAddress = async () => {
+    if (!result?.walletAddress) return;
+    try {
+      await navigator.clipboard.writeText(result.walletAddress);
+      toast.success('Address copied');
+    } catch {
+      toast.error('Could not copy');
+    }
+  };
+
+  return (
+    <section
+      className="rounded-xl border border-[var(--trade-border)] bg-[var(--trade-panel)] p-6 shadow-sm"
+      aria-labelledby="manual-deposit-heading"
+    >
+      <h2
+        id="manual-deposit-heading"
+        className="text-sm font-semibold text-[var(--trade-text)]"
+      >
+        Manual USDT deposit
+      </h2>
+      <p className="mt-1 text-xs text-[var(--trade-text-muted)]">
+        USDT only. Enter the USD amount you will send. After you create the
+        request, you will see the platform wallet address. Your balance is
+        updated after an administrator verifies your transfer.
+      </p>
+
+      {!result ? (
+        <div className="mt-6 space-y-4">
+          <div>
+            <label
+              htmlFor="manual-deposit-amount"
+              className="text-sm font-semibold text-[var(--trade-text)]"
+            >
+              Amount (USD equivalent)
+            </label>
+            <input
+              id="manual-deposit-amount"
+              type="text"
+              inputMode="decimal"
+              autoComplete="off"
+              placeholder="0.00"
+              value={amountRaw}
+              onChange={(e) => setAmountRaw(e.target.value)}
+              className={cn(
+                'mt-3 w-full max-w-md rounded-lg border bg-[var(--trade-dark)] px-4 py-3 font-mono text-[var(--trade-text)] outline-none transition-[box-shadow,border-color]',
+                'border-[var(--trade-border)] placeholder:text-[var(--trade-text-muted)]/60',
+                'focus:border-[var(--trade-accent-blue)] focus:ring-2 focus:ring-[var(--trade-accent-blue)]/25'
+              )}
+            />
+            {!amountOk && amountRaw.trim() !== '' && (
+              <p className="mt-2 text-xs text-[var(--trade-red)]">
+                Enter a valid amount greater than zero.
+              </p>
+            )}
+          </div>
+          <button
+            type="button"
+            onClick={() => void submitManual()}
+            disabled={submitting || !amountOk}
+            className={cn(
+              'inline-flex min-w-[200px] items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold transition-colors',
+              'bg-[var(--trade-accent-blue)] text-[var(--trade-panel)] hover:opacity-90',
+              'disabled:pointer-events-none disabled:opacity-40'
+            )}
+          >
+            {submitting ? (
+              <>
+                <IconLoader2 className="size-4 animate-spin" />
+                Creating…
+              </>
+            ) : (
+              'Create deposit request'
+            )}
+          </button>
+        </div>
+      ) : (
+        <div className="mt-6 space-y-4">
+          <p className="rounded-lg border border-[var(--trade-green)]/40 bg-[var(--trade-green)]/10 px-4 py-3 text-sm text-[var(--trade-text)]">
+            Request created for{' '}
+            <span className="font-mono font-semibold tabular-nums">
+              {fmtUsd(result.amountUsd)}
+            </span>{' '}
+            (USDT). Send exactly from your wallet and include no other assets.
+          </p>
+          <div>
+            <div className="text-xs font-medium uppercase tracking-wide text-[var(--trade-text-muted)]">
+              USDT deposit address
+            </div>
+            <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-stretch">
+              <div className="min-w-0 flex-1 break-all rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)] px-4 py-3 font-mono text-xs text-[var(--trade-text)]">
+                {result.walletAddress}
+              </div>
+              <button
+                type="button"
+                onClick={() => void copyAddress()}
+                className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)] px-4 py-3 text-sm font-medium text-[var(--trade-text)] hover:bg-[var(--trade-border)]/40"
+              >
+                <IconCopy className="size-4" stroke={2} />
+                Copy
+              </button>
+            </div>
+          </div>
+          <p className="text-xs text-[var(--trade-text-muted)]">
+            Reference / order ID:{' '}
+            <span className="font-mono text-[var(--trade-text)]">
+              {result.orderId}
+            </span>
+          </p>
+          <button
+            type="button"
+            onClick={() => setResult(null)}
+            className="text-sm font-medium text-[var(--trade-accent-blue)] hover:underline"
+          >
+            Create another request
+          </button>
+        </div>
+      )}
+    </section>
   );
 }

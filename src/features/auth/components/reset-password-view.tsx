@@ -1,5 +1,6 @@
 'use client';
 
+import { usePublicAppName } from '@/hooks/use-public-app-name';
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -18,6 +19,7 @@ import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 export default function ResetPasswordView() {
+  const appName = usePublicAppName();
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
@@ -126,7 +128,7 @@ export default function ResetPasswordView() {
           >
             <path d='M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3' />
           </svg>
-          {process.env.NEXT_PUBLIC_APP_NAME ?? 'Trade Nova'}
+          {appName}
         </div>
         <div className='relative z-20 mt-auto'>
           <blockquote className='space-y-2'>

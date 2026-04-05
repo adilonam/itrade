@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
-import { authOptions } from '@/lib/auth';
 import { z } from 'zod';
+import { getAuthSession } from '@/lib/auth';
 
 // Validation schema
 const getSellerUsersSchema = z.object({
@@ -37,7 +36,7 @@ async function checkSellerPermission(session: any) {
 // GET - List seller's users with pagination and filtering
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
     const permissionCheck = await checkSellerPermission(session);
 
     if (permissionCheck.error) {

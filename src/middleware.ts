@@ -48,9 +48,9 @@ export default withAuth(
           return true;
         }
 
-        // Role-based: super-admin
+        // Role-based: super-admin shell (same privilege level as /admin)
         if (pathname.startsWith('/super-admin')) {
-          return token?.role === 'SUPERADMIN';
+          return token?.role === 'ADMIN' || token?.role === 'SUPERADMIN';
         }
 
         // Role-based: admin

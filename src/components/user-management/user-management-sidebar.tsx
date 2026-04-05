@@ -1,5 +1,6 @@
 'use client';
 
+import { usePublicAppName } from '@/hooks/use-public-app-name';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -66,7 +67,7 @@ function NavRow({
 export function UserManagementSidebar() {
   const pathname = usePathname() ?? '';
   const checkActive = isActive(pathname);
-  const appName = process.env.NEXT_PUBLIC_APP_NAME ?? 'PaySnap';
+  const appName = usePublicAppName();
 
   return (
     <aside className="flex min-h-0 w-[260px] shrink-0 flex-col self-stretch border-r border-[var(--trade-border)] bg-[var(--trade-panel)]">

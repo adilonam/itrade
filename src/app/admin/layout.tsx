@@ -1,9 +1,8 @@
 import { DashboardLayoutClient } from '@/components/layout/dashboard-layout-client';
 import ForbiddenPage from '@/components/errors/forbidden';
-import { authOptions } from '@/lib/auth';
-import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
 import type { Metadata } from 'next';
+import { getAuthSession } from '@/lib/auth';
 
 export const metadata: Metadata = {
   title: 'Admin Dashboard - Next Shadcn Dashboard',
@@ -16,7 +15,7 @@ export default async function AdminLayout({
   children: React.ReactNode;
 }) {
   // Get the user session
-  const session = await getServerSession(authOptions);
+  const session = await getAuthSession();
 
   // Redirect to sign in if not authenticated
   if (!session) {

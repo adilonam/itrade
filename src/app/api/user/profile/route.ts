@@ -1,14 +1,14 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { put } from '@vercel/blob';
+import { getBlobPutOptions } from '@/lib/blob-upload';
+import { getAuthSession } from '@/lib/auth';
+import { parseBalanceType } from '@/lib/balance';
 import type { Prisma } from '@/lib/prisma/generated/client';
 import { prisma } from '@/lib/prisma';
-import { authOptions } from '@/lib/auth';
-import { parseBalanceType } from '@/lib/balance';
+import { put } from '@vercel/blob';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -69,7 +69,7 @@ export async function GET(request: NextRequest) {
 
 export async function PATCH(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -100,9 +100,11 @@ export async function PATCH(request: NextRequest) {
     if (imageFile && imageFile.size > 0) {
       const ext = imageFile.name.split('.').pop() || 'jpg';
       const filename = `profile-${session.user.id}-${Date.now()}.${ext}`;
+      const blobOpts = await getBlobPutOptions();
       const blob = await put(filename, imageFile, {
         access: 'public',
-        addRandomSuffix: true
+        addRandomSuffix: true,
+        ...blobOpts
       });
       imageLink = blob.url;
     }

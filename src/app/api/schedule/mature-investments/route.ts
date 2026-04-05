@@ -77,29 +77,14 @@ export async function POST(request: NextRequest) {
             }
           });
 
-          // Create transaction record for investment return (principal)
           await tx.transaction.create({
             data: {
-              userId: userInvestment.userId,
-              balanceType: 'REAL',
-              type: 'DEPOSIT',
-              absoluteAmount: userInvestment.amount,
-              description: `Investment matured: ${userInvestment.investment.title} - Principal returned`
+              userBalanceId: userBalance.id,
+              type: 'INVESTMENT_GAIN',
+              absoluteAmount: totalReturn,
+              description: `Investment matured: ${userInvestment.investment.title} (${userInvestment.investment.country}) — principal ${userInvestment.amount.toFixed(2)} + return ${userInvestment.expectedReturn.toFixed(2)}`
             }
           });
-
-          // Create transaction record for investment gains
-          if (userInvestment.expectedReturn > 0) {
-            await tx.transaction.create({
-              data: {
-                userId: userInvestment.userId,
-                balanceType: 'REAL',
-                type: 'GAIN',
-                absoluteAmount: userInvestment.expectedReturn,
-                description: `Investment return: ${userInvestment.investment.title} - ${userInvestment.investment.country}`
-              }
-            });
-          }
 
           // Update investment current capacity (reduce by the amount that was invested)
           await tx.investment.update({
@@ -111,7 +96,7 @@ export async function POST(request: NextRequest) {
                   userInvestment.amount
               )
             }
-          }          );
+          });
 
           // eslint-disable-next-line no-console -- intentional logging for cron job monitoring
           console.log(

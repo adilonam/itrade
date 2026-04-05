@@ -7,7 +7,6 @@ import {
   useEffect,
   useState
 } from 'react';
-import { useSession } from 'next-auth/react';
 import { DEFAULT_ACTIVE_THEME } from '@/constants/theme';
 
 type ThemeContextType = {
@@ -25,57 +24,16 @@ export function ActiveThemeProvider({
   children: ReactNode;
   initialTheme?: string;
 }) {
-  const { data: session } = useSession();
   const [activeTheme, setActiveThemeState] = useState<string>(
     () => initialTheme || DEFAULT_ACTIVE_THEME
   );
-  const [isLoading, setIsLoading] = useState(true);
+  const isLoading = false;
 
-  // Load global theme settings from database
-  useEffect(() => {
-    const loadGlobalTheme = async () => {
-      try {
-        const response = await fetch('/api/global-theme-settings');
-        if (response.ok) {
-          const data = await response.json();
-          setActiveThemeState(data.themeColor || DEFAULT_ACTIVE_THEME);
-        } else {
-          // Fallback to initial theme or default
-          setActiveThemeState(initialTheme || DEFAULT_ACTIVE_THEME);
-        }
-      } catch {
-        // Fallback to initial theme or default
-        setActiveThemeState(initialTheme || DEFAULT_ACTIVE_THEME);
-      }
-      setIsLoading(false);
-    };
-
-    loadGlobalTheme();
-  }, [initialTheme]); // eslint-disable-line react-hooks/exhaustive-deps -- run once on mount
-
-  const setActiveTheme = async (theme: string) => {
+  const setActiveTheme = (theme: string) => {
     setActiveThemeState(theme);
-
-    // Only super-admins can change global theme settings
-    if (session?.user?.role === 'SUPERADMIN') {
-      try {
-        await fetch('/api/super-admin/global-theme-settings', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ themeColor: theme })
-        });
-      } catch {
-        // Failed to save - theme stays in local state
-      }
-    }
-    // For non-super-admin users, theme change is temporary (reverts on refresh)
   };
 
   useEffect(() => {
-    if (isLoading) return;
-
     Array.from(document.body.classList)
       .filter((className) => className.startsWith('theme-'))
       .forEach((className) => {
@@ -84,8 +42,10 @@ export function ActiveThemeProvider({
     document.body.classList.add(`theme-${activeTheme}`);
     if (activeTheme.endsWith('-scaled')) {
       document.body.classList.add('theme-scaled');
+    } else {
+      document.body.classList.remove('theme-scaled');
     }
-  }, [activeTheme, isLoading]);
+  }, [activeTheme]);
 
   return (
     <ThemeContext.Provider value={{ activeTheme, setActiveTheme, isLoading }}>

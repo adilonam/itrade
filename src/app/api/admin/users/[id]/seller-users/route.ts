@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
-import { authOptions } from '@/lib/auth';
 import { z } from 'zod';
+import { getAuthSession } from '@/lib/auth';
 
 const addUserSchema = z.object({
   email: z.string().email('Invalid email address')
@@ -36,7 +35,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
     const permissionCheck = await checkAdminPermission(session);
 
     if (permissionCheck.error) {
@@ -134,7 +133,7 @@ export async function POST(
 ) {
   try {
     const { id: sellerId } = await params;
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
     const permissionCheck = await checkAdminPermission(session);
 
     if (permissionCheck.error) {
@@ -247,7 +246,7 @@ export async function DELETE(
 ) {
   try {
     const { id: sellerId } = await params;
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
     const permissionCheck = await checkAdminPermission(session);
 
     if (permissionCheck.error) {

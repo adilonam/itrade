@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { Metadata } from 'next';
 import ResetPasswordView from '@/features/auth/components/reset-password-view';
 
@@ -7,5 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function ResetPasswordPage() {
-  return <ResetPasswordView />;
+  return (
+    <Suspense fallback={null}>
+      <ResetPasswordView />
+    </Suspense>
+  );
 }

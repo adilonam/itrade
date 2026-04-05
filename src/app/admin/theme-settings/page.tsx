@@ -2,27 +2,25 @@ import { Breadcrumbs } from '@/components/breadcrumbs';
 import { Heading } from '@/components/ui/heading';
 import { Separator } from '@/components/ui/separator';
 import { ThemeControlsCard } from '@/components/admin/theme-controls-card';
-import { authOptions } from '@/lib/auth';
-import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
 import ForbiddenPage from '@/components/errors/forbidden';
+import { getAuthSession } from '@/lib/auth';
 
 export default async function ThemeSettingsPage() {
   // Get the user session
-  const session = await getServerSession(authOptions);
+  const session = await getAuthSession();
 
   // Redirect to sign in if not authenticated
   if (!session) {
     redirect('/auth/sign-in');
   }
 
-  // Check if user has superadmin role
   const userRole = session.user?.role;
-  if (userRole !== 'SUPERADMIN') {
+  if (userRole !== 'ADMIN' && userRole !== 'SUPERADMIN') {
     return (
       <ForbiddenPage
-        title='Super Admin Access Required'
-        description='You need super administrator privileges to access theme settings. This feature is restricted to system administrators only.'
+        title='Admin Access Required'
+        description='You need administrator privileges to access theme settings.'
         showBackButton={true}
         showHomeButton={true}
       />

@@ -1,5 +1,6 @@
-import { NextResponse } from 'next/server';
+import { getAppSettingsRow } from '@/lib/app-settings';
 import { prisma } from '@/lib/prisma';
+import { NextResponse } from 'next/server';
 import {
   refreshSaveMarkets,
   calculatePositionPnL,
@@ -16,8 +17,11 @@ export async function GET() {
     // eslint-disable-next-line no-console
     console.log('Starting scheduled position closing process...');
 
-    // Get minimum margin level from environment or use default of 100%
-    const MIN_MARGIN_LEVEL = parseFloat(process.env.MIN_MARGIN_LEVEL || '100');
+    const appSettings = await getAppSettingsRow();
+    const MIN_MARGIN_LEVEL =
+      appSettings?.minMarginLevel && appSettings.minMarginLevel > 0
+        ? appSettings.minMarginLevel
+        : 100;
 
     // Step 1: Check all users with PLACED positions for margin calls
     const usersWithPositions = await prisma.user.findMany({
@@ -112,7 +116,7 @@ export async function GET() {
                 const absoluteAmount = Math.abs(calculatedPnL);
 
                 // Update user balance
-                await tx.userBalance.upsert({
+                const balanceRow = await tx.userBalance.upsert({
                   where: { userId_type: { userId: position.userId, type: 'REAL' } },
                   update: { amount: { increment: calculatedPnL } },
                   create: { userId: position.userId, type: 'REAL', amount: calculatedPnL }
@@ -121,8 +125,7 @@ export async function GET() {
                 // Create transaction record
                 await tx.transaction.create({
                   data: {
-                    userId: position.userId,
-                    balanceType: 'REAL',
+                    userBalanceId: balanceRow.id,
                     type: transactionType,
                     absoluteAmount: absoluteAmount,
                     description: `Position ${position.type} closed by MARGIN CALL - ${position.market?.symbol || 'Unknown'} (Margin Level: ${financialInfo.marginLevel?.toFixed(2)}%)`
@@ -308,7 +311,7 @@ export async function GET() {
               const absoluteAmount = Math.abs(calculatedPnL);
 
               // Update user balance
-              await tx.userBalance.upsert({
+              const balanceRowTp = await tx.userBalance.upsert({
                 where: { userId_type: { userId: position.userId, type: 'REAL' } },
                 update: { amount: { increment: calculatedPnL } },
                 create: { userId: position.userId, type: 'REAL', amount: calculatedPnL }
@@ -317,8 +320,7 @@ export async function GET() {
               // Create transaction record
               await tx.transaction.create({
                 data: {
-                  userId: position.userId,
-                  balanceType: 'REAL',
+                  userBalanceId: balanceRowTp.id,
                   type: transactionType,
                   absoluteAmount: absoluteAmount,
                   description: `Position ${position.type} auto-closed - ${position.market?.symbol || 'Unknown'} (${closeReason})`

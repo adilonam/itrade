@@ -1,8 +1,13 @@
-import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { getServerSession } from 'next-auth';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import { getAuthSession } from '@/lib/auth';
+
+const ALLOWED_ROLES = ['ADMIN', 'SUPERADMIN'];
+
+function isAllowed(role: string | undefined) {
+  return !!role && ALLOWED_ROLES.includes(role);
+}
 
 const UserThemeSettingsSchema = z.object({
   userId: z.string(),
@@ -14,9 +19,9 @@ const UserThemeSettingsSchema = z.object({
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
 
-    if (!session || session.user.role !== 'SUPERADMIN') {
+    if (!session || !isAllowed(session.user.role)) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
@@ -70,9 +75,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
 
-    if (!session || session.user.role !== 'SUPERADMIN') {
+    if (!session || !isAllowed(session.user.role)) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 

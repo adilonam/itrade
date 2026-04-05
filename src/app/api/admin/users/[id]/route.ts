@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
-import { authOptions } from '@/lib/auth';
 import bcrypt from 'bcryptjs';
 import { z } from 'zod';
 import { ensureUserBalance } from '@/lib/balance';
+import { getAuthSession } from '@/lib/auth';
 
 // Validation schemas
 const updateUserSchema = z
@@ -48,7 +47,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
     const permissionCheck = await checkAdminPermission(session);
 
     if (permissionCheck.error) {
@@ -70,6 +69,7 @@ export async function GET(
         },
         leverage: true,
         role: true,
+        kycStatus: true,
         emailVerified: true,
         createdAt: true,
         updatedAt: true,
@@ -116,7 +116,7 @@ export async function PUT(
 ) {
   try {
     const { id } = await params;
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
     const permissionCheck = await checkAdminPermission(session);
 
     if (permissionCheck.error) {
@@ -244,7 +244,7 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
     const permissionCheck = await checkAdminPermission(session);
 
     if (permissionCheck.error) {

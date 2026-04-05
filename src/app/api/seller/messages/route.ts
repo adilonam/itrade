@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
-import { authOptions } from '@/lib/auth';
 import { z } from 'zod';
+import { getAuthSession } from '@/lib/auth';
 
 // Helper function to check seller permissions
 async function checkSellerPermission(session: any) {
@@ -41,7 +40,7 @@ const createMessageSchema = z.object({
 // GET - Get messages where seller is sender or receiver
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
     const permissionCheck = await checkSellerPermission(session);
 
     if (permissionCheck.error) {
@@ -138,7 +137,7 @@ export async function GET(request: NextRequest) {
 // POST - Create a new message
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
     const permissionCheck = await checkSellerPermission(session);
 
     if (permissionCheck.error) {

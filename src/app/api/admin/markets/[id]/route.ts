@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
-import { authOptions } from '@/lib/auth';
 import { twelveDataService } from '@/lib/twelvedata';
 import { z } from 'zod';
+import { getAuthSession } from '@/lib/auth';
 
 const updateMarketSchema = z.object({
   symbol: z
@@ -33,7 +32,7 @@ type RouteParams = {
 export async function PUT(request: NextRequest, context: RouteParams) {
   try {
     // Check authentication
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
     if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -126,7 +125,7 @@ export async function PUT(request: NextRequest, context: RouteParams) {
 export async function DELETE(request: NextRequest, context: RouteParams) {
   try {
     // Check authentication
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
     if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

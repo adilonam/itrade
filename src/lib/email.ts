@@ -1,16 +1,16 @@
 import nodemailer from 'nodemailer';
+import { getAppSettingsRow } from '@/lib/app-settings';
 import { prisma } from './prisma';
 
-const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME ?? 'Trade Nova';
-
-const createTransporter = () => {
+const createTransporter = async () => {
+  const s = await getAppSettingsRow();
   return nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: parseInt(process.env.SMTP_PORT || '587'),
-    secure: process.env.SMTP_SECURE === 'true',
+    host: s?.smtpHost ?? undefined,
+    port: parseInt(s?.smtpPort || '587', 10),
+    secure: s?.smtpSecure === true,
     auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASSWORD
+      user: s?.smtpUser ?? undefined,
+      pass: s?.smtpPassword ?? undefined
     }
   });
 };
@@ -24,10 +24,17 @@ export interface EmailOptions {
 
 export const sendEmail = async (options: EmailOptions) => {
   try {
-    const transporter = createTransporter();
+    const s = await getAppSettingsRow();
+    const appName = s?.appName?.trim() || 'Trade Nova';
+    const fromEmail = s?.smtpFromEmail?.trim();
+    if (!fromEmail) {
+      return { success: false, error: 'SMTP from email is not configured' };
+    }
+
+    const transporter = await createTransporter();
 
     const mailOptions = {
-      from: `"${APP_NAME}" <${process.env.SMTP_FROM_EMAIL}>`,
+      from: `"${appName}" <${fromEmail}>`,
       to: options.to,
       subject: options.subject,
       text: options.text,
@@ -61,7 +68,9 @@ export const sendMfaVerificationEmail = async (
   code: string,
   name?: string
 ) => {
-  const subject = `Your Verification Code - ${APP_NAME}`;
+  const s = await getAppSettingsRow();
+  const appName = s?.appName?.trim() || 'Trade Nova';
+  const subject = `Your Verification Code - ${appName}`;
 
   const text = `Hello ${name || 'User'},
 
@@ -72,7 +81,7 @@ This code will expire in 10 minutes. Please enter this code to complete your sig
 If you didn't request this code, please ignore this email.
 
 Best regards,
-${APP_NAME} Team`;
+${appName} Team`;
 
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -96,7 +105,7 @@ ${APP_NAME} Team`;
       
       <p style="color: #666; font-size: 12px; text-align: center;">
         Best regards,<br>
-        ${APP_NAME} Team
+        ${appName} Team
       </p>
     </div>
   `;
@@ -114,7 +123,9 @@ export const sendPasswordResetEmail = async (
   resetLink: string,
   name?: string
 ) => {
-  const subject = `Reset your password - ${APP_NAME}`;
+  const s = await getAppSettingsRow();
+  const appName = s?.appName?.trim() || 'Trade Nova';
+  const subject = `Reset your password - ${appName}`;
 
   const text = `Hello ${name || 'User'},
 
@@ -125,7 +136,7 @@ ${resetLink}
 This link will expire in 1 hour. If you didn't request this, please ignore this email.
 
 Best regards,
-${APP_NAME} Team`;
+${appName} Team`;
 
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -139,7 +150,7 @@ ${APP_NAME} Team`;
       <p style="color: #666; font-size: 14px;">This link will expire in <strong>1 hour</strong>.</p>
       <p style="color: #666; font-size: 14px;">If you didn't request this, please ignore this email.</p>
       <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
-      <p style="color: #666; font-size: 12px; text-align: center;">Best regards,<br>${APP_NAME} Team</p>
+      <p style="color: #666; font-size: 12px; text-align: center;">Best regards,<br>${appName} Team</p>
     </div>
   `;
 

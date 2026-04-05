@@ -38,10 +38,11 @@ import type {
   User
 } from '@/lib/prisma/generated/client';
 
-// Extended position type with relations
-type PositionWithRelations = Position & {
+// Extended position type with relations (admin list adds calculated PnL for open legs)
+export type PositionWithRelations = Position & {
   user: User | null;
   market: Market | null;
+  calculatedPnL?: number | null;
 };
 import {
   IconEdit,
@@ -56,15 +57,41 @@ interface PositionsTableProps {
   loading: boolean;
   onEdit: (position: PositionWithRelations) => void;
   onDelete: () => void;
+  /** Hide edit/delete; use on admin user edit and similar read-only embeds */
+  readOnly?: boolean;
+  /** Single-user context: drop the User column */
+  omitUserColumn?: boolean;
+  cardDescription?: string;
+  /** Subtitle when the table has rows (default: manage-all-users copy) */
+  noPositionsHint?: string;
+  /** Smaller min-height for embedded layouts */
+  compact?: boolean;
 }
 
 export function PositionsTable({
   positions,
   loading,
   onEdit,
-  onDelete
+  onDelete,
+  readOnly = false,
+  omitUserColumn = false,
+  cardDescription,
+  noPositionsHint,
+  compact = false
 }: PositionsTableProps) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const description =
+    cardDescription ??
+    (readOnly
+      ? 'Open and closed positions for this user'
+      : 'Manage and monitor all user positions');
+
+  const emptyHint =
+    noPositionsHint ??
+    (readOnly
+      ? 'This user has no positions yet.'
+      : 'No positions match your current filters.');
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -112,6 +139,7 @@ export function PositionsTable({
   };
 
   const handleDelete = async (id: string) => {
+    if (readOnly) return;
     try {
       setDeletingId(id);
       const response = await fetch(`/api/admin/positions/${id}`, {
@@ -136,7 +164,7 @@ export function PositionsTable({
         <CardHeader className='px-4 pb-0 pt-0'>
           <CardTitle className='text-sm font-semibold'>Positions</CardTitle>
           <CardDescription className='text-xs text-[var(--trade-text-muted)]'>
-            Loading positions...
+            Loading positions…
           </CardDescription>
         </CardHeader>
         <CardContent className='px-4'>
@@ -154,12 +182,12 @@ export function PositionsTable({
         <CardHeader className='px-4 pb-0 pt-0'>
           <CardTitle className='text-sm font-semibold'>Positions</CardTitle>
           <CardDescription className='text-xs text-[var(--trade-text-muted)]'>
-            No positions found
+            {description}
           </CardDescription>
         </CardHeader>
         <CardContent className='px-4'>
           <div className='py-8 text-center text-xs text-[var(--trade-text-muted)]'>
-            No positions match your current filters.
+            {emptyHint}
           </div>
         </CardContent>
       </Card>
@@ -171,11 +199,17 @@ export function PositionsTable({
       <CardHeader className='px-4 pb-0 pt-0'>
         <CardTitle className='text-sm font-semibold'>Positions</CardTitle>
         <CardDescription className='text-xs text-[var(--trade-text-muted)]'>
-          Manage and monitor all user positions
+          {description}
         </CardDescription>
       </CardHeader>
       <CardContent className='px-4'>
-        <div className='relative flex min-h-[600px] flex-col'>
+        <div
+          className={
+            compact
+              ? 'relative flex min-h-[280px] flex-col'
+              : 'relative flex min-h-[600px] flex-col'
+          }
+        >
           <div className='flex flex-1 flex-col space-y-4'>
             <div className='relative flex flex-1'>
               <div className='absolute inset-0 flex overflow-hidden rounded-lg border border-[var(--trade-border)]'>
@@ -186,9 +220,11 @@ export function PositionsTable({
                         <TableHead className='text-xs font-medium text-[var(--trade-text-muted)]'>
                           ID
                         </TableHead>
-                        <TableHead className='text-xs font-medium text-[var(--trade-text-muted)]'>
-                          User
-                        </TableHead>
+                        {!omitUserColumn ? (
+                          <TableHead className='text-xs font-medium text-[var(--trade-text-muted)]'>
+                            User
+                          </TableHead>
+                        ) : null}
                         <TableHead className='text-xs font-medium text-[var(--trade-text-muted)]'>
                           Type
                         </TableHead>
@@ -219,9 +255,11 @@ export function PositionsTable({
                         <TableHead className='text-xs font-medium text-[var(--trade-text-muted)]'>
                           Closed
                         </TableHead>
-                        <TableHead className='text-xs font-medium text-[var(--trade-text-muted)]'>
-                          Actions
-                        </TableHead>
+                        {!readOnly ? (
+                          <TableHead className='text-xs font-medium text-[var(--trade-text-muted)]'>
+                            Actions
+                          </TableHead>
+                        ) : null}
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -233,16 +271,18 @@ export function PositionsTable({
                           <TableCell className='font-mono text-xs text-[var(--trade-text)]'>
                             {position.id.slice(0, 8)}...
                           </TableCell>
-                          <TableCell className='text-[var(--trade-text)]'>
-                            <div>
-                              <div className='text-sm font-medium'>
-                                {position.user?.name || 'N/A'}
+                          {!omitUserColumn ? (
+                            <TableCell className='text-[var(--trade-text)]'>
+                              <div>
+                                <div className='text-sm font-medium'>
+                                  {position.user?.name || 'N/A'}
+                                </div>
+                                <div className='text-xs text-[var(--trade-text-muted)]'>
+                                  {position.user?.email}
+                                </div>
                               </div>
-                              <div className='text-xs text-[var(--trade-text-muted)]'>
-                                {position.user?.email}
-                              </div>
-                            </div>
-                          </TableCell>
+                            </TableCell>
+                          ) : null}
                           <TableCell>
                             <Badge className={getTypeColor(position.type)}>
                               {position.type}
@@ -286,28 +326,41 @@ export function PositionsTable({
                               : 'N/A'}
                           </TableCell>
                           <TableCell>
-                            {position.pnl !== null ? (
-                              <div
-                                className={`flex items-center gap-1 font-mono text-xs ${
-                                  position.pnl > 0
-                                    ? 'text-[var(--trade-green)]'
-                                    : position.pnl < 0
-                                      ? 'text-[var(--trade-red)]'
-                                      : 'text-[var(--trade-text-muted)]'
-                                }`}
-                              >
-                                {position.pnl > 0 ? (
-                                  <IconTrendingUp className='h-3 w-3' />
-                                ) : position.pnl < 0 ? (
-                                  <IconTrendingDown className='h-3 w-3' />
-                                ) : null}
-                                {formatCurrency(position.pnl)}
-                              </div>
-                            ) : (
-                              <span className='text-xs text-[var(--trade-text-muted)]'>
-                                N/A
-                              </span>
-                            )}
+                            {(() => {
+                              const pnlValue =
+                                position.pnl !== null &&
+                                position.pnl !== undefined
+                                  ? position.pnl
+                                  : position.calculatedPnL !== null &&
+                                      position.calculatedPnL !== undefined
+                                    ? position.calculatedPnL
+                                    : null;
+                              if (pnlValue === null) {
+                                return (
+                                  <span className='text-xs text-[var(--trade-text-muted)]'>
+                                    N/A
+                                  </span>
+                                );
+                              }
+                              return (
+                                <div
+                                  className={`flex items-center gap-1 font-mono text-xs ${
+                                    pnlValue > 0
+                                      ? 'text-[var(--trade-green)]'
+                                      : pnlValue < 0
+                                        ? 'text-[var(--trade-red)]'
+                                        : 'text-[var(--trade-text-muted)]'
+                                  }`}
+                                >
+                                  {pnlValue > 0 ? (
+                                    <IconTrendingUp className='h-3 w-3' />
+                                  ) : pnlValue < 0 ? (
+                                    <IconTrendingDown className='h-3 w-3' />
+                                  ) : null}
+                                  {formatCurrency(pnlValue)}
+                                </div>
+                              );
+                            })()}
                           </TableCell>
                           <TableCell className='text-xs text-[var(--trade-text-muted)]'>
                             {formatDate(position.executedAt || new Date())}
@@ -317,62 +370,66 @@ export function PositionsTable({
                               ? formatDate(position.closedAt)
                               : 'N/A'}
                           </TableCell>
-                          <TableCell>
-                            <div className='flex items-center gap-2'>
-                              <Button
-                                variant='outline'
-                                size='sm'
-                                onClick={() => onEdit(position)}
-                              >
-                                <IconEdit className='h-3 w-3' />
-                              </Button>
+                          {!readOnly ? (
+                            <TableCell>
+                              <div className='flex items-center gap-2'>
+                                <Button
+                                  variant='outline'
+                                  size='sm'
+                                  onClick={() => onEdit(position)}
+                                >
+                                  <IconEdit className='h-3 w-3' />
+                                </Button>
 
-                              <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                  <Button
-                                    variant='outline'
-                                    size='sm'
-                                    disabled={deletingId === position.id}
-                                  >
-                                    <IconTrash className='h-3 w-3' />
-                                  </Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                  <AlertDialogHeader>
-                                    <AlertDialogTitle>
-                                      Delete Position
-                                    </AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                      Are you sure you want to delete this
-                                      position? This action cannot be undone.
-                                      <br />
-                                      <br />
-                                      <strong>Position ID:</strong>{' '}
-                                      {position.id}
-                                      <br />
-                                      <strong>Type:</strong> {position.type}
-                                      <br />
-                                      <strong>Quantity:</strong>{' '}
-                                      {position.quantity
-                                        ? position.quantity.toFixed(4)
-                                        : 'N/A'}
-                                    </AlertDialogDescription>
-                                  </AlertDialogHeader>
-                                  <AlertDialogFooter>
-                                    <AlertDialogCancel>
-                                      Cancel
-                                    </AlertDialogCancel>
-                                    <AlertDialogAction
-                                      onClick={() => handleDelete(position.id)}
-                                      className='bg-red-600 hover:bg-red-700'
+                                <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                    <Button
+                                      variant='outline'
+                                      size='sm'
+                                      disabled={deletingId === position.id}
                                     >
-                                      Delete
-                                    </AlertDialogAction>
-                                  </AlertDialogFooter>
-                                </AlertDialogContent>
-                              </AlertDialog>
-                            </div>
-                          </TableCell>
+                                      <IconTrash className='h-3 w-3' />
+                                    </Button>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle>
+                                        Delete Position
+                                      </AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                        Are you sure you want to delete this
+                                        position? This action cannot be undone.
+                                        <br />
+                                        <br />
+                                        <strong>Position ID:</strong>{' '}
+                                        {position.id}
+                                        <br />
+                                        <strong>Type:</strong> {position.type}
+                                        <br />
+                                        <strong>Quantity:</strong>{' '}
+                                        {position.quantity
+                                          ? position.quantity.toFixed(4)
+                                          : 'N/A'}
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                      <AlertDialogCancel>
+                                        Cancel
+                                      </AlertDialogCancel>
+                                      <AlertDialogAction
+                                        onClick={() =>
+                                          handleDelete(position.id)
+                                        }
+                                        className='bg-red-600 hover:bg-red-700'
+                                      >
+                                        Delete
+                                      </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
+                              </div>
+                            </TableCell>
+                          ) : null}
                         </TableRow>
                       ))}
                     </TableBody>

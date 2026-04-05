@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
-import { authOptions } from '@/lib/auth';
 import { z } from 'zod';
 import { ensureUserBalance } from '@/lib/balance';
+import { getAuthSession } from '@/lib/auth';
 
 async function checkSellerPermission(
   session: { user?: { id?: string } } | null
@@ -41,7 +40,7 @@ const getSchema = z.object({
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
     const permissionCheck = await checkSellerPermission(session);
 
     if (permissionCheck.error) {
@@ -137,7 +136,7 @@ const createSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
     const permissionCheck = await checkSellerPermission(session);
 
     if (permissionCheck.error) {
@@ -245,8 +244,7 @@ export async function POST(request: NextRequest) {
 
       await tx.transaction.create({
         data: {
-          userId: user.id,
-          balanceType: 'REAL',
+          userBalanceId: userBalance.id,
           type: 'WITHDRAW',
           absoluteAmount: amount,
           description: `Investment in ${investment.title} - ${investment.country}`

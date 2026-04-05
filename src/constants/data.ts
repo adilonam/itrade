@@ -126,7 +126,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'Institutional-User',
+        title: 'Institutional',
         url: '/trading-view-room-institutional',
         icon: 'market',
         isActive: false,
@@ -134,7 +134,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'Institutional',
+        title: 'Institutional-admin',
         url: '/admin/positions',
         icon: 'market',
         isActive: false,
@@ -182,7 +182,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'Investments',
+        title: 'Investments-admin',
         url: '/admin/investments',
         icon: 'pigMoney',
         isActive: false,
@@ -195,6 +195,22 @@ export const tenantNavItems: TenantNavItems = {
         icon: 'user',
         isActive: false,
         shortcut: ['k', 'y'],
+        items: []
+      },
+      {
+        title: 'Deposits',
+        url: '/admin/deposit',
+        icon: 'add',
+        isActive: false,
+        shortcut: ['d', 'p'],
+        items: []
+      },
+      {
+        title: 'Settings',
+        url: '/super-admin/app-settings',
+        icon: 'settings',
+        isActive: false,
+        shortcut: ['a', 's'],
         items: []
       },
       {
@@ -216,7 +232,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'Institutional-User',
+        title: 'Institutional',
         url: '/trading-view-room-institutional',
         icon: 'market',
         isActive: false,
@@ -224,7 +240,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'Institutional',
+        title: 'Institutional-admin',
         url: '/admin/positions',
         icon: 'market',
         isActive: false,
@@ -281,7 +297,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'Investments',
+        title: 'Investments-admin',
         url: '/admin/investments',
         icon: 'pigMoney',
         isActive: false,
@@ -294,6 +310,14 @@ export const tenantNavItems: TenantNavItems = {
         icon: 'minus',
         isActive: false,
         shortcut: ['w', 'r'],
+        items: []
+      },
+      {
+        title: 'Deposits',
+        url: '/admin/deposit',
+        icon: 'add',
+        isActive: false,
+        shortcut: ['d', 'p'],
         items: []
       },
       {
@@ -310,14 +334,6 @@ export const tenantNavItems: TenantNavItems = {
         icon: 'settings',
         isActive: false,
         shortcut: ['a', 's'],
-        items: []
-      },
-      {
-        title: 'Theme',
-        url: '/super-admin/theme-settings',
-        icon: 'palette',
-        isActive: false,
-        shortcut: ['t', 's'],
         items: []
       }
     ]

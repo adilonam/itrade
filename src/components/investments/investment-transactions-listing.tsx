@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { InvestmentTransaction } from './transactions-table/columns';
 import { columns } from './transactions-table/columns';
 import { TransactionsTable } from './transactions-table';
-import { parseAsInteger, parseAsStringEnum, useQueryStates } from 'nuqs';
+import { parseAsInteger, useQueryStates } from 'nuqs';
 import { Card, CardContent } from '@/components/ui/card';
 import {
   Select,
@@ -15,19 +15,26 @@ import {
 } from '@/components/ui/select';
 import { IconFilter } from '@tabler/icons-react';
 
-const TRANSACTION_TYPES = ['GAIN', 'LOSS', 'DEPOSIT', 'WITHDRAW'];
+const TRANSACTION_TYPES = [
+  'INVESTMENT_GAIN',
+  'GAIN',
+  'LOSS',
+  'DEPOSIT',
+  'WITHDRAW',
+  'TRANSFER_IN',
+  'TRANSFER_OUT'
+] as const;
 
 export default function InvestmentTransactionsListing() {
   const [transactions, setTransactions] = useState<InvestmentTransaction[]>([]);
   const [totalTransactions, setTotalTransactions] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [typeFilter, setTypeFilter] = useState<string>('INVESTMENT_GAIN');
 
-  // Use query states to sync with URL parameters
   const [queryParams, setQueryParams] = useQueryStates({
     page: parseAsInteger.withDefault(1),
-    perPage: parseAsInteger.withDefault(10),
-    type: parseAsStringEnum(TRANSACTION_TYPES)
+    perPage: parseAsInteger.withDefault(10)
   });
 
   const fetchTransactions = useCallback(async () => {
@@ -39,7 +46,9 @@ export default function InvestmentTransactionsListing() {
       params.append('page', queryParams.page.toString());
       params.append('limit', queryParams.perPage.toString());
       params.append('balanceType', 'REAL');
-      if (queryParams.type) params.append('type', queryParams.type);
+      if (typeFilter !== 'all') {
+        params.append('type', typeFilter);
+      }
 
       const response = await fetch(
         `/api/user/transactions?${params.toString()}`
@@ -57,7 +66,7 @@ export default function InvestmentTransactionsListing() {
     } finally {
       setIsLoading(false);
     }
-  }, [queryParams]);
+  }, [queryParams.page, queryParams.perPage, typeFilter]);
 
   useEffect(() => {
     fetchTransactions();
@@ -80,23 +89,38 @@ export default function InvestmentTransactionsListing() {
         <CardContent className='pt-6'>
           <div className='flex items-center space-x-4'>
             <Select
-              value={queryParams.type || 'all'}
-              onValueChange={(value) =>
-                setQueryParams({
-                  type: value === 'all' ? null : (value as any)
-                })
-              }
+              value={typeFilter}
+              onValueChange={(value) => {
+                setTypeFilter(value);
+                setQueryParams({ page: 1 });
+              }}
             >
-              <SelectTrigger className='w-[200px]'>
+              <SelectTrigger className='w-[220px]'>
                 <IconFilter className='mr-2 h-4 w-4' />
                 <SelectValue placeholder='Transaction Type' />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value='all'>All Types</SelectItem>
-                <SelectItem value='GAIN'>Gain</SelectItem>
-                <SelectItem value='LOSS'>Loss</SelectItem>
-                <SelectItem value='DEPOSIT'>Deposit</SelectItem>
-                <SelectItem value='WITHDRAW'>Withdraw</SelectItem>
+                <SelectItem value='all'>All types</SelectItem>
+                <SelectItem value='INVESTMENT_GAIN'>
+                  Investment gain
+                </SelectItem>
+                {TRANSACTION_TYPES.filter((t) => t !== 'INVESTMENT_GAIN').map(
+                  (t) => (
+                    <SelectItem key={t} value={t}>
+                      {t === 'GAIN'
+                        ? 'Gain (trading)'
+                        : t === 'LOSS'
+                          ? 'Loss'
+                          : t === 'DEPOSIT'
+                            ? 'Deposit'
+                            : t === 'WITHDRAW'
+                              ? 'Withdraw'
+                              : t === 'TRANSFER_IN'
+                                ? 'Transfer in'
+                                : 'Transfer out'}
+                    </SelectItem>
+                  )
+                )}
               </SelectContent>
             </Select>
           </div>

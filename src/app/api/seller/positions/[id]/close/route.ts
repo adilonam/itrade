@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { getAuthSession } from '@/lib/auth';
 import {
   refreshSaveMarkets,
   calculatePositionPnL
@@ -40,7 +39,7 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
     const permissionCheck = await checkSellerPermission(session);
 
     if (permissionCheck.error) {
@@ -155,7 +154,7 @@ export async function PATCH(
         const absoluteAmount = Math.abs(calculatedPnL);
 
         // Update user balance
-        await tx.userBalance.upsert({
+        const balanceRow = await tx.userBalance.upsert({
           where: { userId_type: { userId: existingPosition.userId, type: 'REAL' } },
           update: { amount: { increment: calculatedPnL } },
           create: { userId: existingPosition.userId, type: 'REAL', amount: calculatedPnL }
@@ -164,8 +163,7 @@ export async function PATCH(
         // Create transaction record
         await tx.transaction.create({
           data: {
-            userId: existingPosition.userId,
-            balanceType: 'REAL',
+            userBalanceId: balanceRow.id,
             type: transactionType,
             absoluteAmount: absoluteAmount,
             description: `Position ${existingPosition.type} closed - ${existingPosition.market?.symbol || 'Unknown'}`

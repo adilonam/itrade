@@ -287,7 +287,11 @@ export async function calculateUserFinancialInfo(
     }
 
     // Build where clause for positions
-    const whereClause: any = {
+    const whereClause: {
+      userId: string;
+      status: 'PLACED';
+      room?: 'STOCK' | 'TRADING' | 'INSTITUTIONAL' | { in: ('STOCK' | 'TRADING')[] };
+    } = {
       userId: user.id,
       status: 'PLACED'
     };
@@ -295,6 +299,13 @@ export async function calculateUserFinancialInfo(
     // Filter by room if specified (not ALL)
     if (room !== 'ALL') {
       whereClause.room = room;
+    } else {
+      // REAL/DEMO wallets only margin P&L from stock & trading rooms; INSTITUTIONAL wallet only from that room.
+      if (balanceType === 'INSTITUTIONAL') {
+        whereClause.room = 'INSTITUTIONAL';
+      } else {
+        whereClause.room = { in: ['STOCK', 'TRADING'] };
+      }
     }
 
     // Get all PLACED positions for the user (filtered by room if specified)

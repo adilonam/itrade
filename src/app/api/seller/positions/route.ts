@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
-import { authOptions } from '@/lib/auth';
 import { z } from 'zod';
+import { getAuthSession } from '@/lib/auth';
 import {
   refreshSaveMarkets,
   calculatePositionPnL
@@ -44,7 +43,7 @@ const getSellerPositionsSchema = z.object({
 // GET - Get positions of seller's linked users
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
     const permissionCheck = await checkSellerPermission(session);
 
     if (permissionCheck.error) {
@@ -169,7 +168,7 @@ const createPositionSchema = z.object({
 // POST - Create position for a linked user
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
     const permissionCheck = await checkSellerPermission(session);
 
     if (permissionCheck.error) {

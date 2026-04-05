@@ -10,12 +10,16 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { UserAvatarProfile } from '@/components/user-avatar-profile';
+import { useWatchTraderPortalContainer } from '@/contexts/watch-trader-portal-context';
+import { cn } from '@/lib/utils';
 import { signOut, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
-export function UserNav() {
+export function UserNav({ variant = 'default' }: { variant?: 'default' | 'trade' }) {
   const { data: session } = useSession();
   const router = useRouter();
+  const tradePortalContainer = useWatchTraderPortalContainer();
+  const isTrade = variant === 'trade';
 
   if (session?.user) {
     return (
@@ -26,41 +30,76 @@ export function UserNav() {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent
-          className='w-56'
+          className={cn(
+            'w-56',
+            isTrade &&
+              'border-trade-border bg-trade-panel p-1 font-sans text-xs text-trade-text shadow-lg'
+          )}
           align='end'
           sideOffset={10}
           forceMount
+          container={isTrade ? (tradePortalContainer ?? undefined) : undefined}
         >
-          <DropdownMenuLabel className='font-normal'>
-            <div className='flex flex-col space-y-1'>
-              <p className='text-sm leading-none font-medium'>
+          <DropdownMenuLabel
+            className={cn(
+              'font-normal',
+              isTrade && 'px-2 py-1.5 text-xs font-medium text-trade-text'
+            )}
+          >
+            <div className='flex flex-col gap-1'>
+              <p
+                className={cn(
+                  'leading-none font-medium',
+                  isTrade ? 'text-xs' : 'text-sm'
+                )}
+              >
                 {session.user.name}
                 {session.user.role && session.user.role !== 'USER' && (
-                  <span className='ml-2 text-green-600'>
+                  <span
+                    className={cn(
+                      'ml-2',
+                      isTrade ? 'text-trade-green' : 'text-green-600'
+                    )}
+                  >
                     {session.user.role}
                   </span>
                 )}
               </p>
-              <p className='text-muted-foreground text-xs leading-none'>
+              <p
+                className={cn(
+                  'leading-none',
+                  isTrade ? 'text-trade-text-muted' : 'text-muted-foreground text-xs'
+                )}
+              >
                 {session.user.email}
               </p>
             </div>
           </DropdownMenuLabel>
-          <DropdownMenuSeparator />
+          <DropdownMenuSeparator
+            className={isTrade ? 'bg-trade-border' : undefined}
+          />
           <DropdownMenuGroup>
-            <DropdownMenuItem onClick={() => router.push('/user-management')}>
+            <DropdownMenuItem
+              className={cn(
+                isTrade &&
+                  'text-xs focus:bg-trade-dark focus:text-trade-text'
+              )}
+              onClick={() => router.push('/user-management')}
+            >
               Profile
             </DropdownMenuItem>
           </DropdownMenuGroup>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem>
-            <Button
-              variant='ghost'
-              className='w-full justify-start p-0 text-left'
-              onClick={() => signOut({ callbackUrl: '/auth/sign-in' })}
-            >
-              Sign Out
-            </Button>
+          <DropdownMenuSeparator
+            className={isTrade ? 'bg-trade-border' : undefined}
+          />
+          <DropdownMenuItem
+            className={cn(
+              isTrade &&
+                'text-xs focus:bg-trade-dark focus:text-trade-text'
+            )}
+            onClick={() => signOut({ callbackUrl: '/auth/sign-in' })}
+          >
+            Sign Out
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

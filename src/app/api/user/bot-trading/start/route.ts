@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import type { Bot } from '@/lib/prisma/generated/client';
+import { getAuthSession } from '@/lib/auth';
 
 const BOT_ENUM_VALUES: Bot[] = ['RSI', 'GRID_TRADING', 'TREND_FOLLOWING'];
 
@@ -24,7 +23,7 @@ export type BotInterval = (typeof BOT_INTERVAL_VALUES)[number];
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

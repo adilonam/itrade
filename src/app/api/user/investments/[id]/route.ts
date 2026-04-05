@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
-import { authOptions } from '@/lib/auth';
 import { ensureUserBalance, parseBalanceType } from '@/lib/balance';
+import { getAuthSession } from '@/lib/auth';
 
 interface RouteParams {
   params: Promise<{
@@ -12,7 +11,7 @@ interface RouteParams {
 
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -90,8 +89,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       // Create transaction record for cancellation refund
       await tx.transaction.create({
         data: {
-          userId: userInvestment.userId,
-          balanceType,
+          userBalanceId: userBalance.id,
           type: 'DEPOSIT',
           absoluteAmount: refundAmount,
           description: `Investment cancelled: ${userInvestment.investment.title} - ${userInvestment.investment.country}`
@@ -102,8 +100,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       if (penalty > 0) {
         await tx.transaction.create({
           data: {
-            userId: userInvestment.userId,
-            balanceType,
+            userBalanceId: userBalance.id,
             type: 'LOSS',
             absoluteAmount: penalty,
             description: `Early cancellation penalty: ${userInvestment.investment.title}`

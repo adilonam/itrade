@@ -149,7 +149,8 @@ export default function InvestmentsPage() {
     );
   }
 
-  const userBalance = financial?.freeMargin ?? 0;
+  /** Real-account free margin (equity minus margin on STOCK/TRADING positions). */
+  const realFreeMargin = financial?.freeMargin ?? 0;
   const activeUserInvestments = userInvestments.filter(
     (i) => i.status === 'ACTIVE'
   );
@@ -193,10 +194,10 @@ export default function InvestmentsPage() {
           <div className='flex items-start space-x-3'>
             <div className='text-right'>
               <p className='text-xs text-[var(--trade-text-muted)]'>
-                Available Balance (Free Margin)
+                Real balance · free margin
               </p>
               <p className='font-mono text-sm font-bold text-[var(--trade-green)]'>
-                {currencyFormatter.format(userBalance)}
+                {currencyFormatter.format(realFreeMargin)}
               </p>
             </div>
             <div className='rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)]/40 p-2'>

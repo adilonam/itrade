@@ -1,14 +1,17 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
+import { getAppSettingsRow } from '@/lib/app-settings';
+import { getAuthSession } from '@/lib/auth';
+import { ensureUserBalance, parseBalanceType } from '@/lib/balance';
 import { prisma } from '@/lib/prisma';
-import { authOptions } from '@/lib/auth';
-import { DepositRequestStatus } from '@/lib/prisma/generated/client';
-import { parseBalanceType } from '@/lib/balance';
+import { NextRequest, NextResponse } from 'next/server';
+import {
+  DepositRequestChannel,
+  DepositRequestStatus
+} from '@/lib/prisma/generated/client';
 import { externalApiLinks } from '@/constants/data';
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -44,7 +47,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const nowPaymentsApiKey = process.env.NOWPAYMENTS_API_KEY;
+    const appSettings = await getAppSettingsRow();
+    const nowPaymentsApiKey = appSettings?.nowpaymentsApiKey?.trim();
     if (!nowPaymentsApiKey) {
       return NextResponse.json(
         { error: 'NOWPayments is not configured on the server.' },
@@ -56,12 +60,18 @@ export async function POST(request: NextRequest) {
     const baseUrl = process.env.NEXTAUTH_URL ?? request.nextUrl.origin;
     const orderId = `dep_${session.user.id}_${Date.now()}`;
 
+    const userBalance = await ensureUserBalance(
+      prisma,
+      session.user.id,
+      balanceType
+    );
+
     const depositRequest = await prisma.depositRequest.create({
       data: {
-        userId: session.user.id,
+        userBalanceId: userBalance.id,
         amountUsd: amount,
         payCurrency,
-        balanceType,
+        channel: DepositRequestChannel.GATEWAY,
         status: DepositRequestStatus.PENDING,
         orderId
       }

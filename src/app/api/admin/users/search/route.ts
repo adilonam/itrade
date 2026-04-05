@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
-import { authOptions } from '@/lib/auth';
 import { z } from 'zod';
+import { getAuthSession } from '@/lib/auth';
 
 const searchSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -29,7 +28,7 @@ async function checkAdminPermission(session: any) {
 // GET - Search users by email
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
     const permissionCheck = await checkAdminPermission(session);
 
     if (permissionCheck.error) {

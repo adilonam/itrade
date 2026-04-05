@@ -11,13 +11,7 @@ import {
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle
-} from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -38,18 +32,19 @@ import {
   IconLoader2,
   IconTrendingUp,
   IconTrendingDown,
-  IconMinus
+  IconMinus,
 } from '@tabler/icons-react';
 import { toast } from 'sonner';
 import type { Room } from '@/lib/prisma/generated/client';
 import { cn } from '@/lib/utils';
+import {
+  TRADE_ROOM_CARD_CLASS,
+  TRADE_ROOM_EMBEDDED_TABLE_CARD_CLASS
+} from '@/constants/trade-room-ui';
 
 type PositionWithMarket = Position & {
   market: Market | null;
 };
-
-const tradeRoomPositionsCardClass =
-  'border border-[var(--trade-border)] bg-[var(--trade-panel)] text-[var(--trade-text)] shadow-none py-4 gap-4';
 
 interface UserPositionsTableRoomTradingProps {
   positions: PositionWithMarket[];
@@ -59,15 +54,19 @@ interface UserPositionsTableRoomTradingProps {
   realTimePnL?: Record<string, number>;
   /** Match `/trade` trade-room panel typography and colors */
   panelVariant?: 'default' | 'trade';
+  /** When true with `trade`, omit nested card chrome (trade room bottom tabs panel). */
+  embeddedInTradePanel?: boolean;
 }
 export function UserPositionsTableRoomTrading({
   positions,
   loading,
   onClose,
   onUpdateRealTimePnL,
-  panelVariant = 'default'
+  panelVariant = 'default',
+  embeddedInTradePanel = false
 }: UserPositionsTableRoomTradingProps) {
   const isTradePanel = panelVariant === 'trade';
+  const isEmbeddedTrade = isTradePanel && embeddedInTradePanel;
   const [closingPositionId, setClosingPositionId] = useState<string | null>(
     null
   );
@@ -137,15 +136,33 @@ export function UserPositionsTableRoomTrading({
   };
 
   const getTypeIcon = (type: string) => {
+    const buy =
+      'h-4 w-4 ' +
+      (isTradePanel ? 'text-[var(--trade-green)]' : 'text-green-600');
+    const sell =
+      'h-4 w-4 ' +
+      (isTradePanel ? 'text-[var(--trade-red)]' : 'text-red-600');
+    const neutral =
+      'h-4 w-4 ' +
+      (isTradePanel ? 'text-[var(--trade-text-muted)]' : 'text-gray-600');
     switch (type) {
       case 'BUY':
-        return <IconTrendingUp className='h-4 w-4 text-green-600' />;
+        return <IconTrendingUp className={buy} />;
       case 'SELL':
-        return <IconTrendingDown className='h-4 w-4 text-red-600' />;
+        return <IconTrendingDown className={sell} />;
       default:
-        return <IconMinus className='h-4 w-4 text-gray-600' />;
+        return <IconMinus className={neutral} />;
     }
   };
+
+  const mutedCell = isTradePanel
+    ? 'text-[var(--trade-text-muted)]'
+    : 'text-muted-foreground';
+
+  const pnlPositive = isTradePanel ? 'text-[var(--trade-green)]' : 'text-green-600';
+  const pnlNegative = isTradePanel ? 'text-[var(--trade-red)]' : 'text-red-600';
+
+  const tradeNumericCell = isTradePanel ? 'font-mono tabular-nums' : '';
 
   const formatDate = (date: Date | string) => {
     return new Date(date).toLocaleDateString('en-US', {
@@ -164,23 +181,31 @@ export function UserPositionsTableRoomTrading({
   if (loading) {
     return (
       <Card
-        className={cn(isTradePanel && tradeRoomPositionsCardClass)}
+        className={cn(
+          'flex flex-col',
+          isEmbeddedTrade &&
+            cn(
+              TRADE_ROOM_EMBEDDED_TABLE_CARD_CLASS,
+              'h-full min-h-0 flex-1 overflow-hidden'
+            ),
+          isTradePanel && !isEmbeddedTrade && TRADE_ROOM_CARD_CLASS
+        )}
       >
         <CardContent
           className={cn(
             'flex flex-col items-center justify-center py-12',
-            isTradePanel && 'text-xs text-[var(--trade-text-muted)]'
+            isTradePanel && 'px-4 text-xs text-[var(--trade-text-muted)]'
           )}
         >
           <IconLoader2
             className={cn(
               'mb-4 h-6 w-6 animate-spin',
-              isTradePanel ? 'text-[var(--trade-text-muted)]' : 'text-muted-foreground'
+              isTradePanel
+                ? 'text-[var(--trade-text-muted)]'
+                : 'text-muted-foreground'
             )}
           />
-          <p className='text-center'>
-            Loading room trading positions...
-          </p>
+          <p className='text-center'>Loading room trading positions...</p>
         </CardContent>
       </Card>
     );
@@ -189,16 +214,25 @@ export function UserPositionsTableRoomTrading({
   if (positions.length === 0) {
     return (
       <Card
-        className={cn(isTradePanel && tradeRoomPositionsCardClass)}
+        className={cn(
+          'flex flex-col',
+          isEmbeddedTrade &&
+            cn(
+              TRADE_ROOM_EMBEDDED_TABLE_CARD_CLASS,
+              'h-full min-h-0 flex-1 overflow-hidden'
+            ),
+          isTradePanel && !isEmbeddedTrade && TRADE_ROOM_CARD_CLASS
+        )}
       >
         <CardContent
           className={cn(
             'flex flex-col items-center justify-center py-12',
-            isTradePanel && 'text-xs text-[var(--trade-text-muted)]'
+            isTradePanel && 'px-4 text-xs text-[var(--trade-text-muted)]'
           )}
         >
           <p className='text-center'>
-            No room trading positions found. Positions will appear here once you start trading.
+            No room trading positions found. Positions will appear here once you
+            start trading.
           </p>
         </CardContent>
       </Card>
@@ -208,51 +242,63 @@ export function UserPositionsTableRoomTrading({
   return (
     <Card
       className={cn(
-        'flex max-h-[min(70vh,520px)] flex-col overflow-hidden',
-        isTradePanel && tradeRoomPositionsCardClass
+        'flex flex-col overflow-hidden',
+        isEmbeddedTrade
+          ? cn(
+              TRADE_ROOM_EMBEDDED_TABLE_CARD_CLASS,
+              'h-full min-h-0 flex-1'
+            )
+          : 'max-h-[min(70vh,520px)]',
+        isTradePanel && !isEmbeddedTrade && TRADE_ROOM_CARD_CLASS
       )}
     >
-      <CardHeader
-        className={cn('shrink-0', isTradePanel && 'px-4 pb-0 pt-0')}
-      >
-        <CardTitle
-          className={cn(isTradePanel && 'text-sm font-semibold')}
-        >
-          Your Room Trading Positions
-        </CardTitle>
-        <CardDescription
-          className={cn(
-            isTradePanel && 'text-xs text-[var(--trade-text-muted)]'
-          )}
-        >
-          View and manage your room trading positions
-        </CardDescription>
-      </CardHeader>
       <CardContent
         className={cn(
           'min-h-[240px] min-w-0 flex-1 overflow-hidden',
-          isTradePanel && 'px-4'
+          isEmbeddedTrade
+            ? 'px-4 pb-3 pt-0'
+            : isTradePanel
+              ? 'px-4 pb-4 pt-3'
+              : 'pt-6'
         )}
       >
-        <div className='relative flex h-full min-h-[200px] flex-col'>
+        <div
+          className={cn(
+            'relative flex h-full flex-col',
+            isEmbeddedTrade ? 'min-h-0' : 'min-h-[200px]'
+          )}
+        >
           <div className='relative flex min-h-0 flex-1'>
             <div
               className={cn(
                 'absolute inset-0 flex overflow-auto rounded-lg border',
-                isTradePanel && 'border-[var(--trade-border)]'
+                isTradePanel &&
+                  (isEmbeddedTrade
+                    ? 'rounded-none border-0 bg-transparent'
+                    : 'rounded-md border-[var(--trade-border)] bg-[var(--trade-dark)]/20')
               )}
             >
               <ScrollArea className='h-full w-full'>
-                <Table className={cn(isTradePanel && 'text-xs')}>
+                <Table
+                  className={cn(
+                    isTradePanel &&
+                      'text-xs text-[var(--trade-text)] [&_td]:text-[var(--trade-text)]'
+                  )}
+                >
                   <TableHeader
                     className={cn(
                       'sticky top-0 z-10',
                       isTradePanel
-                        ? 'bg-[var(--trade-dark)]/50 [&_th]:h-9 [&_th]:px-2 [&_th]:text-xs'
+                        ? 'border-b border-[var(--trade-border)] bg-[var(--trade-panel)] [&_th]:h-9 [&_th]:px-2 [&_th]:text-[10px] [&_th]:font-semibold [&_th]:uppercase [&_th]:tracking-wide [&_th]:text-[var(--trade-text-muted)]'
                         : 'bg-muted'
                     )}
                   >
-                    <TableRow>
+                    <TableRow
+                      className={cn(
+                        isTradePanel &&
+                          'border-[var(--trade-border)] hover:bg-transparent'
+                      )}
+                    >
                       <TableHead>Type</TableHead>
                       <TableHead>Market</TableHead>
                       <TableHead>Quantity</TableHead>
@@ -268,9 +314,19 @@ export function UserPositionsTableRoomTrading({
                       <TableHead className='text-right'>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
-                  <TableBody>
+                  <TableBody
+                    className={cn(
+                      isTradePanel && '[&_tr]:border-[var(--trade-border)]/70'
+                    )}
+                  >
                     {positions.map((position) => (
-                      <TableRow key={position.id}>
+                      <TableRow
+                        key={position.id}
+                        className={cn(
+                          isTradePanel &&
+                            'border-[var(--trade-border)]/80 hover:bg-[var(--trade-dark)]/40'
+                        )}
+                      >
                         <TableCell>
                           <div className='flex items-center gap-2'>
                             {getTypeIcon(position.type)}
@@ -283,45 +339,61 @@ export function UserPositionsTableRoomTrading({
                               <div className='font-medium'>
                                 {position.market.symbol}
                               </div>
-                              <div className='text-muted-foreground text-sm'>
+                              <div
+                                className={cn('text-sm', mutedCell)}
+                              >
                                 {position.market.name}
                               </div>
                             </div>
                           ) : (
-                            <span className='text-muted-foreground'>-</span>
+                            <span className={mutedCell}>-</span>
                           )}
                         </TableCell>
-                        <TableCell className='text-xs'>
+                        <TableCell
+                          className={cn('text-xs', tradeNumericCell)}
+                        >
                           {position.quantity
                             ? parseFloat(position.quantity.toString())
                             : '-'}
                         </TableCell>
-                        <TableCell className='text-xs'>
+                        <TableCell
+                          className={cn('text-xs', tradeNumericCell)}
+                        >
                           {position.executedPrice
                             ? `$${position.executedPrice.toFixed(2)}`
                             : '-'}
                         </TableCell>
-                        <TableCell className='text-xs'>
+                        <TableCell
+                          className={cn('text-xs', tradeNumericCell)}
+                        >
                           {position.closedPrice
                             ? `$${position.closedPrice.toFixed(2)}`
                             : '-'}
                         </TableCell>
-                        <TableCell className='text-xs'>
+                        <TableCell
+                          className={cn('text-xs', tradeNumericCell)}
+                        >
                           {position.takeProfit
                             ? `$${position.takeProfit.toFixed(2)}`
                             : '-'}
                         </TableCell>
-                        <TableCell className='text-xs'>
+                        <TableCell
+                          className={cn('text-xs', tradeNumericCell)}
+                        >
                           {position.stopLoss
                             ? `$${position.stopLoss.toFixed(2)}`
                             : '-'}
                         </TableCell>
-                        <TableCell className='text-xs'>
+                        <TableCell
+                          className={cn('text-xs', tradeNumericCell)}
+                        >
                           {position.requiredMargin
                             ? `$${position.requiredMargin.toFixed(2)}`
                             : '-'}
                         </TableCell>
-                        <TableCell className='text-xs'>
+                        <TableCell
+                          className={cn('text-xs', tradeNumericCell)}
+                        >
                           {(() => {
                             // For non-placed positions, always show position.pnl
                             if (position.status !== 'PLACED') {
@@ -329,7 +401,7 @@ export function UserPositionsTableRoomTrading({
                               return (
                                 <span
                                   className={
-                                    pnl >= 0 ? 'text-green-600' : 'text-red-600'
+                                    pnl >= 0 ? pnlPositive : pnlNegative
                                   }
                                 >
                                   {pnl >= 0 ? '+' : ''}${pnl.toFixed(2)}
@@ -359,14 +431,19 @@ export function UserPositionsTableRoomTrading({
                               <span
                                 className={
                                   displayPnL >= 0
-                                    ? 'text-green-600'
-                                    : 'text-red-600'
+                                    ? pnlPositive
+                                    : pnlNegative
                                 }
                               >
                                 {displayPnL >= 0 ? '+' : ''}$
                                 {displayPnL.toFixed(2)}
                                 {isLive && (
-                                  <span className='text-muted-foreground ml-1 text-xs'>
+                                  <span
+                                    className={cn(
+                                      'ml-1 text-xs',
+                                      mutedCell
+                                    )}
+                                  >
                                     (live)
                                   </span>
                                 )}
@@ -377,15 +454,18 @@ export function UserPositionsTableRoomTrading({
                         <TableCell>
                           <Badge
                             variant={getStatusBadgeVariant(position.status)}
-                            className='text-xs'
+                            className={cn(
+                              'text-xs',
+                              isTradePanel && 'text-[10px] font-semibold tracking-wide'
+                            )}
                           >
                             {position.status}
                           </Badge>
                         </TableCell>
-                        <TableCell className='text-muted-foreground text-xs'>
+                        <TableCell className={cn('text-xs', mutedCell)}>
                           {formatDate(position.executedAt || new Date())}
                         </TableCell>
-                        <TableCell className='text-muted-foreground text-xs'>
+                        <TableCell className={cn('text-xs', mutedCell)}>
                           {position.closedAt
                             ? formatDate(position.closedAt)
                             : '-'}
@@ -398,6 +478,10 @@ export function UserPositionsTableRoomTrading({
                                   variant='outline'
                                   size='sm'
                                   disabled={closingPositionId === position.id}
+                                  className={cn(
+                                    isTradePanel &&
+                                      'h-8 border-[var(--trade-border)] bg-transparent text-xs text-[var(--trade-text)] hover:bg-[var(--trade-dark)]/50'
+                                  )}
                                 >
                                   {closingPositionId === position.id ? (
                                     <IconLoader2 className='h-4 w-4 animate-spin' />
@@ -424,7 +508,11 @@ export function UserPositionsTableRoomTrading({
                                     onClick={() =>
                                       handleClosePosition(position.id)
                                     }
-                                    className='bg-red-600 hover:bg-red-700'
+                                    className={
+                                      isTradePanel
+                                        ? 'bg-[var(--trade-red)] hover:opacity-90'
+                                        : 'bg-red-600 hover:bg-red-700'
+                                    }
                                   >
                                     Close Position
                                   </AlertDialogAction>
@@ -432,7 +520,7 @@ export function UserPositionsTableRoomTrading({
                               </AlertDialogContent>
                             </AlertDialog>
                           ) : (
-                            <span className='text-muted-foreground text-sm'>
+                            <span className={cn('text-sm', mutedCell)}>
                               {position.status === 'CLOSED'
                                 ? 'Closed'
                                 : 'Closed'}
@@ -459,8 +547,7 @@ export type PositionTabFilter = 'open' | 'pending' | 'closed';
 
 /**
  * Standalone card component that fetches room trading positions and renders
- * the table. Use this when you only need the "Your Room Trading Positions"
- * card (e.g. at the bottom of the trading view page).
+ * the table (e.g. at the bottom of the trading view page).
  * @param statusFilter - Filter by position status tab: open (PLACED), pending (PENDING), closed (CLOSED, FAILED)
  */
 interface UserPositionsTableCardRoomTradingProps {
@@ -468,13 +555,15 @@ interface UserPositionsTableCardRoomTradingProps {
   room?: Room;
   refreshEventName?: string;
   panelVariant?: 'default' | 'trade';
+  embeddedInTradePanel?: boolean;
 }
 
 export function UserPositionsTableCardRoomTrading({
   statusFilter = 'open',
   room = 'TRADING',
   refreshEventName = 'room-trading-positions-refresh',
-  panelVariant = 'default'
+  panelVariant = 'default',
+  embeddedInTradePanel = false
 }: UserPositionsTableCardRoomTradingProps) {
   const balanceType = room === 'INSTITUTIONAL' ? 'INSTITUTIONAL' : 'REAL';
   const [positions, setPositions] = useState<PositionWithMarket[]>([]);
@@ -549,24 +638,30 @@ export function UserPositionsTableCardRoomTrading({
   }, []);
 
   if (error) {
+    const isTrade = panelVariant === 'trade';
+    const embedded = embeddedInTradePanel && isTrade;
     return (
       <Card
         className={cn(
-          panelVariant === 'trade' && tradeRoomPositionsCardClass
+          'flex flex-col',
+          embedded &&
+            cn(
+              TRADE_ROOM_EMBEDDED_TABLE_CARD_CLASS,
+              'h-full min-h-0 flex-1 overflow-hidden'
+            ),
+          isTrade && !embedded && TRADE_ROOM_CARD_CLASS
         )}
       >
         <CardContent
           className={cn(
             'flex items-center justify-center py-8',
-            panelVariant === 'trade' && 'px-4 text-xs'
+            isTrade && 'px-4 text-xs'
           )}
         >
           <p
             className={cn(
               'text-sm',
-              panelVariant === 'trade'
-                ? 'text-[var(--trade-red)]'
-                : 'text-destructive'
+              isTrade ? 'text-[var(--trade-red)]' : 'text-destructive'
             )}
           >
             {error}
@@ -584,6 +679,7 @@ export function UserPositionsTableCardRoomTrading({
       onUpdateRealTimePnL={updateRealTimePnL}
       realTimePnL={realTimePnL}
       panelVariant={panelVariant}
+      embeddedInTradePanel={embeddedInTradePanel}
     />
   );
 }

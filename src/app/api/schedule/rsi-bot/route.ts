@@ -172,7 +172,7 @@ export async function GET() {
             if (calculatedPnL !== null && calculatedPnL !== 0) {
               const transactionType: TransactionType =
                 calculatedPnL > 0 ? 'GAIN' : 'LOSS';
-              await tx.userBalance.upsert({
+              const balanceRow = await tx.userBalance.upsert({
                 where: {
                   userId_type: { userId: existingPosition.userId, type: 'REAL' }
                 },
@@ -185,8 +185,7 @@ export async function GET() {
               });
               await tx.transaction.create({
                 data: {
-                  userId: existingPosition.userId,
-                  balanceType: 'REAL',
+                  userBalanceId: balanceRow.id,
                   type: transactionType,
                   absoluteAmount: Math.abs(calculatedPnL),
                   description: `Position ${existingPosition.type} closed by RSI bot - ${existingPosition.market?.symbol ?? 'Unknown'}`

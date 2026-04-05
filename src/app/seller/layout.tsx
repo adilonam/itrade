@@ -2,10 +2,9 @@ import KBar from '@/components/kbar';
 import Header from '@/components/layout/header';
 import { RoomTradingTopNav } from '@/components/layout/room-trading-top-nav';
 import ForbiddenPage from '@/components/errors/forbidden';
-import { authOptions } from '@/lib/auth';
-import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
 import type { Metadata } from 'next';
+import { getAuthSession } from '@/lib/auth';
 
 export const metadata: Metadata = {
   title: 'Seller Dashboard - Next Shadcn Dashboard',
@@ -18,7 +17,7 @@ export default async function SellerLayout({
   children: React.ReactNode;
 }) {
   // Get the user session
-  const session = await getServerSession(authOptions);
+  const session = await getAuthSession();
 
   // Redirect to sign in if not authenticated
   if (!session) {

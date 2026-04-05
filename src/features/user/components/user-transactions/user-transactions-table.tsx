@@ -25,12 +25,21 @@ import {
   IconTrendingUp,
   IconTrendingDown,
   IconArrowDown,
-  IconArrowUp
+  IconArrowUp,
+  IconArrowsRightLeft,
+  IconPigMoney
 } from '@tabler/icons-react';
 
 type Transaction = {
   id: string;
-  type: 'GAIN' | 'LOSS' | 'DEPOSIT' | 'WITHDRAW';
+  type:
+    | 'GAIN'
+    | 'INVESTMENT_GAIN'
+    | 'LOSS'
+    | 'DEPOSIT'
+    | 'WITHDRAW'
+    | 'TRANSFER_IN'
+    | 'TRANSFER_OUT';
   absoluteAmount: number;
   description: string | null;
   createdAt: string;
@@ -65,7 +74,13 @@ export function UserTransactionsTable({
   };
 
   const formatAmount = (amount: number, type: string) => {
-    const sign = type === 'GAIN' || type === 'DEPOSIT' ? '+' : '-';
+    const sign =
+      type === 'GAIN' ||
+      type === 'INVESTMENT_GAIN' ||
+      type === 'DEPOSIT' ||
+      type === 'TRANSFER_IN'
+        ? '+'
+        : '-';
     return `${sign}${Math.abs(amount).toFixed(2)}`;
   };
 
@@ -76,6 +91,13 @@ export function UserTransactionsTable({
           <Badge variant='default' className='bg-green-500 text-white'>
             <IconTrendingUp className='mr-1 h-3 w-3' />
             Gain
+          </Badge>
+        );
+      case 'INVESTMENT_GAIN':
+        return (
+          <Badge variant='default' className='bg-emerald-600 text-white'>
+            <IconPigMoney className='mr-1 h-3 w-3' />
+            Investment gain
           </Badge>
         );
       case 'LOSS':
@@ -99,6 +121,20 @@ export function UserTransactionsTable({
             Withdraw
           </Badge>
         );
+      case 'TRANSFER_IN':
+        return (
+          <Badge variant='default' className='bg-teal-600 text-white'>
+            <IconArrowsRightLeft className='mr-1 h-3 w-3' />
+            Transfer in
+          </Badge>
+        );
+      case 'TRANSFER_OUT':
+        return (
+          <Badge variant='secondary' className='bg-amber-600/90 text-white'>
+            <IconArrowsRightLeft className='mr-1 h-3 w-3' />
+            Transfer out
+          </Badge>
+        );
       default:
         return <Badge>{type}</Badge>;
     }
@@ -107,10 +143,13 @@ export function UserTransactionsTable({
   const getAmountColor = (type: string) => {
     switch (type) {
       case 'GAIN':
+      case 'INVESTMENT_GAIN':
       case 'DEPOSIT':
+      case 'TRANSFER_IN':
         return 'text-green-600 font-semibold';
       case 'LOSS':
       case 'WITHDRAW':
+      case 'TRANSFER_OUT':
         return 'text-red-600 font-semibold';
       default:
         return '';

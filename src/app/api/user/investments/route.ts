@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
-import { authOptions } from '@/lib/auth';
 import { z } from 'zod';
 import { ensureUserBalance, parseBalanceType } from '@/lib/balance';
+import { getAuthSession } from '@/lib/auth';
 
 const EnrollmentSchema = z.object({
   investmentId: z.string(),
@@ -13,7 +12,7 @@ const EnrollmentSchema = z.object({
 
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -48,7 +47,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -150,8 +149,7 @@ export async function POST(request: NextRequest) {
       // Create transaction record for investment
       await tx.transaction.create({
         data: {
-          userId: user.id,
-          balanceType,
+          userBalanceId: userBalance.id,
           type: 'WITHDRAW',
           absoluteAmount: amount,
           description: `Investment in ${investment.title} - ${investment.country}`

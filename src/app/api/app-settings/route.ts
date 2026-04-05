@@ -1,27 +1,31 @@
+import {
+  getPublicSettingValue,
+  isPublicAppSettingLabel,
+  pickPublicAppSettings
+} from '@/lib/app-settings';
 import { prisma } from '@/lib/prisma';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const label = request.nextUrl.searchParams.get('label');
     const settings = await prisma.appSettings.findUnique({
       where: { id: 'default' }
     });
 
-    return NextResponse.json(
-      settings || {
-        appName: 'Trading Dashboard',
-        appIcon: null,
-        openMarket: true
+    if (label) {
+      if (!isPublicAppSettingLabel(label)) {
+        return NextResponse.json(
+          { error: 'Unknown label or label is not public.' },
+          { status: 400 }
+        );
       }
-    );
-  } catch (error) {
-    return NextResponse.json(
-      {
-        appName: 'Trading Dashboard',
-        appIcon: null,
-        openMarket: true
-      },
-      { status: 200 }
-    );
+      const value = getPublicSettingValue(settings, label);
+      return NextResponse.json({ label, value });
+    }
+
+    return NextResponse.json(pickPublicAppSettings(settings));
+  } catch {
+    return NextResponse.json(pickPublicAppSettings(null), { status: 200 });
   }
 }

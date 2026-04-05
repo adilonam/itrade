@@ -29,6 +29,7 @@ import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import SellerUsersSection from './seller-users-section';
+import { AdminUserKycPositionsSection } from './admin-user-kyc-positions-section';
 
 type UserWithBalance = User & { balance?: number };
 
@@ -164,13 +165,14 @@ export default function UserForm({
   }
 
   return (
-    <Card className='mx-auto w-full'>
-      <CardHeader>
-        <CardTitle className='text-left text-2xl font-bold'>
-          {pageTitle}
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
+    <div className='mx-auto w-full space-y-6'>
+      <Card className='w-full'>
+        <CardHeader>
+          <CardTitle className='text-left text-2xl font-bold'>
+            {pageTitle}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
             <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
@@ -372,7 +374,15 @@ export default function UserForm({
             </div>
           </form>
         </Form>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+
+      {isEdit && initialData ? (
+        <AdminUserKycPositionsSection
+          userId={initialData.id}
+          kycStatus={initialData.kycStatus}
+        />
+      ) : null}
+    </div>
   );
 }

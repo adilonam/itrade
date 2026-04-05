@@ -6,14 +6,16 @@ import type {
   TwelveDataRsiResponse,
   TwelveDataEmaResponse
 } from '@/types/twelvedata';
+import { getAppSettingsRow } from '@/lib/app-settings';
 import { prisma } from '@/lib/prisma';
 
 class TwelveDataService {
   private readonly baseUrl = 'https://api.twelvedata.com';
-  private readonly apiKey: string;
 
-  constructor() {
-    this.apiKey = process.env.TWELVE_DATA_API_KEY || 'demo';
+  private async apiKey(): Promise<string> {
+    const s = await getAppSettingsRow();
+    const k = s?.twelveDataApiKey?.trim();
+    return k && k.length > 0 ? k : 'demo';
   }
 
   /**
@@ -25,7 +27,7 @@ class TwelveDataService {
     try {
       const url = new URL(`${this.baseUrl}/price`);
       url.searchParams.set('symbol', symbol);
-      url.searchParams.set('apikey', this.apiKey);
+      url.searchParams.set('apikey', await this.apiKey());
 
       const response = await fetch(url.toString(), {
         method: 'GET',
@@ -69,7 +71,7 @@ class TwelveDataService {
     try {
       const url = new URL(`${this.baseUrl}/quote`);
       url.searchParams.set('symbol', symbol);
-      url.searchParams.set('apikey', this.apiKey);
+      url.searchParams.set('apikey', await this.apiKey());
 
       const response = await fetch(url.toString(), {
         method: 'GET',
@@ -174,7 +176,7 @@ class TwelveDataService {
       const url = new URL(`${this.baseUrl}/rsi`);
       url.searchParams.set('symbol', symbol);
       url.searchParams.set('interval', interval);
-      url.searchParams.set('apikey', this.apiKey);
+      url.searchParams.set('apikey', await this.apiKey());
 
       const response = await fetch(url.toString(), {
         method: 'GET',
@@ -237,7 +239,7 @@ class TwelveDataService {
       url.searchParams.set('symbol', symbol);
       url.searchParams.set('interval', interval);
       url.searchParams.set('time_period', String(timePeriod));
-      url.searchParams.set('apikey', this.apiKey);
+      url.searchParams.set('apikey', await this.apiKey());
 
       const response = await fetch(url.toString(), {
         method: 'GET',

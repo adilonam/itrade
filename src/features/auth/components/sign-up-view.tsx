@@ -1,4 +1,5 @@
 import { SignUpForm } from '@/components/auth/sign-up-form';
+import { getAppSettingsRow } from '@/lib/app-settings';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { IconBolt } from '@tabler/icons-react';
@@ -8,7 +9,10 @@ export const metadata: Metadata = {
   description: 'Authentication forms built using the components.'
 };
 
-export default function SignUpViewPage() {
+export default async function SignUpViewPage() {
+  const row = await getAppSettingsRow();
+  const appName = row?.appName?.trim() || 'Trade Nova';
+
   return (
     <div className='trade-room flex min-h-screen w-full bg-[var(--trade-dark)] text-[var(--trade-text)]'>
       <div className='hidden w-full max-w-xl flex-col border-r border-[var(--trade-border)] bg-[var(--trade-panel)] p-10 lg:flex'>
@@ -16,9 +20,7 @@ export default function SignUpViewPage() {
           <span className='flex size-9 items-center justify-center rounded-md bg-[var(--trade-accent-blue)] text-white'>
             <IconBolt className='size-5' stroke={2} />
           </span>
-          <span className='text-base font-bold tracking-tight'>
-            {process.env.NEXT_PUBLIC_APP_NAME ?? 'PaySnap'}
-          </span>
+          <span className='text-base font-bold tracking-tight'>{appName}</span>
         </Link>
         <div className='mt-8 rounded-xl border border-[var(--trade-border)] bg-[var(--trade-dark)]/70 p-5'>
           <p className='text-sm text-[var(--trade-text-muted)]'>

@@ -6,7 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { IconArrowsTransferDown, IconLoader2 } from '@tabler/icons-react';
+import {
+  IconArrowsTransferDown,
+  IconLoader2
+} from '@tabler/icons-react';
 
 type FinancialData = {
   balance: number;
@@ -20,8 +23,14 @@ const currencyFormatter = new Intl.NumberFormat('en-US', {
 const tradeRoomCardClass =
   'border border-[var(--trade-border)] bg-[var(--trade-panel)] text-[var(--trade-text)] shadow-none py-4 gap-4';
 
+type TransferDirection =
+  | 'REAL_TO_INSTITUTIONAL'
+  | 'INSTITUTIONAL_TO_REAL';
+
 export function InstitutionalBalanceTransferCard() {
   const [amount, setAmount] = useState('');
+  const [direction, setDirection] =
+    useState<TransferDirection>('REAL_TO_INSTITUTIONAL');
   const [realBalance, setRealBalance] = useState<number>(0);
   const [institutionalBalance, setInstitutionalBalance] = useState<number>(0);
   const [loading, setLoading] = useState(true);
@@ -57,7 +66,9 @@ export function InstitutionalBalanceTransferCard() {
 
   const parsedAmount = useMemo(() => Number(amount), [amount]);
   const isValidAmount = Number.isFinite(parsedAmount) && parsedAmount > 0;
-  const hasEnoughBalance = isValidAmount && parsedAmount <= realBalance;
+  const sourceBalance =
+    direction === 'REAL_TO_INSTITUTIONAL' ? realBalance : institutionalBalance;
+  const hasEnoughBalance = isValidAmount && parsedAmount <= sourceBalance;
 
   const handleTransfer = async () => {
     if (!isValidAmount) {
@@ -72,7 +83,7 @@ export function InstitutionalBalanceTransferCard() {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ amount: parsedAmount })
+        body: JSON.stringify({ amount: parsedAmount, direction })
       });
 
       const data = await response.json();
@@ -103,10 +114,35 @@ export function InstitutionalBalanceTransferCard() {
       <CardHeader className='px-4 pb-0 pt-0'>
         <CardTitle className='flex items-center gap-2 text-sm font-semibold'>
           <IconArrowsTransferDown className='h-4 w-4 shrink-0' />
-          Transfer to Institutional Balance
+          Transfer between balances
         </CardTitle>
       </CardHeader>
       <CardContent className='space-y-4 px-4'>
+        <div className='flex flex-wrap gap-2'>
+          <Button
+            type='button'
+            size='sm'
+            variant={
+              direction === 'REAL_TO_INSTITUTIONAL' ? 'default' : 'outline'
+            }
+            className='h-8 flex-1 text-xs sm:flex-none'
+            onClick={() => setDirection('REAL_TO_INSTITUTIONAL')}
+          >
+            REAL → INSTITUTIONAL
+          </Button>
+          <Button
+            type='button'
+            size='sm'
+            variant={
+              direction === 'INSTITUTIONAL_TO_REAL' ? 'default' : 'outline'
+            }
+            className='h-8 flex-1 text-xs sm:flex-none'
+            onClick={() => setDirection('INSTITUTIONAL_TO_REAL')}
+          >
+            INSTITUTIONAL → REAL
+          </Button>
+        </div>
+
         <div className='grid gap-3 sm:grid-cols-2'>
           <div className='rounded-md border border-[var(--trade-border)] bg-[var(--trade-dark)]/30 p-3'>
             <p className='text-xs text-[var(--trade-text-muted)]'>REAL Balance</p>
@@ -131,7 +167,9 @@ export function InstitutionalBalanceTransferCard() {
             htmlFor='institutional-transfer-amount'
             className='text-xs font-medium text-[var(--trade-text-muted)]'
           >
-            Amount to transfer from REAL
+            {direction === 'REAL_TO_INSTITUTIONAL'
+              ? 'Amount to transfer from REAL'
+              : 'Amount to transfer from INSTITUTIONAL'}
           </Label>
           <Input
             id='institutional-transfer-amount'
@@ -144,7 +182,9 @@ export function InstitutionalBalanceTransferCard() {
           />
           {isValidAmount && !hasEnoughBalance ? (
             <p className='text-destructive text-xs'>
-              Insufficient REAL balance for this transfer.
+              {direction === 'REAL_TO_INSTITUTIONAL'
+                ? 'Insufficient REAL balance for this transfer.'
+                : 'Insufficient INSTITUTIONAL balance for this transfer.'}
             </p>
           ) : null}
         </div>

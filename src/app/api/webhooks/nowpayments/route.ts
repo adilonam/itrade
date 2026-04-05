@@ -1,12 +1,11 @@
 import crypto from 'crypto';
-import { NextRequest, NextResponse } from 'next/server';
+import { getAppSettingsRow } from '@/lib/app-settings';
 import { prisma } from '@/lib/prisma';
+import { NextRequest, NextResponse } from 'next/server';
 import {
   DepositRequestStatus,
   TransactionType
 } from '@/lib/prisma/generated/client';
-import { ensureUserBalance } from '@/lib/balance';
-
 type NowPaymentsWebhookPayload = {
   payment_id?: string | number;
   payment_status?: string;
@@ -47,7 +46,8 @@ function safeEquals(a: string, b: string): boolean {
 }
 
 export async function POST(request: NextRequest) {
-  const ipnSecret = process.env.NOWPAYMENTS_IPN_SECRET;
+  const row = await getAppSettingsRow();
+  const ipnSecret = row?.nowpaymentsIpnSecret?.trim();
   if (!ipnSecret) {
     return NextResponse.json(
       { error: 'NOWPayments webhook secret is not configured.' },
@@ -94,6 +94,9 @@ export async function POST(request: NextRequest) {
         ...(nowPaymentId ? [{ nowPaymentId }] : []),
         ...(orderId ? [{ orderId }] : [])
       ]
+    },
+    include: {
+      userBalance: { select: { id: true, userId: true, type: true } }
     }
   });
 
@@ -105,7 +108,10 @@ export async function POST(request: NextRequest) {
 
   await prisma.$transaction(async (tx) => {
     const current = await tx.depositRequest.findUnique({
-      where: { id: depositRequest.id }
+      where: { id: depositRequest.id },
+      include: {
+        userBalance: { select: { id: true, userId: true, type: true, amount: true } }
+      }
     });
 
     if (!current) return;
@@ -113,24 +119,17 @@ export async function POST(request: NextRequest) {
     const willCredit = shouldCreditDeposit(nowPaymentStatus) && !current.creditedAt;
 
     if (willCredit) {
-      const currentBalance = await ensureUserBalance(
-        tx,
-        current.userId,
-        current.balanceType
-      );
+      const ub = current.userBalance;
       await tx.userBalance.update({
-        where: {
-          userId_type: { userId: current.userId, type: current.balanceType }
-        },
+        where: { id: ub.id },
         data: {
-          amount: currentBalance.amount + current.amountUsd
+          amount: ub.amount + current.amountUsd
         }
       });
 
       await tx.transaction.create({
         data: {
-          userId: current.userId,
-          balanceType: current.balanceType,
+          userBalanceId: ub.id,
           type: TransactionType.DEPOSIT,
           absoluteAmount: current.amountUsd,
           description: `NOWPayments deposit (${current.payCurrency.toUpperCase()}) payment ${nowPaymentId ?? current.nowPaymentId ?? 'n/a'}`

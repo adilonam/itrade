@@ -9,7 +9,7 @@ interface AppBrandingProps {
 }
 
 export function AppBranding({ className }: AppBrandingProps) {
-  const [appName, setAppName] = useState('Trading Dashboard');
+  const [appName, setAppName] = useState('Trade Nova');
   const [appIcon, setAppIcon] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -21,8 +21,10 @@ export function AppBranding({ className }: AppBrandingProps) {
           const contentType = response.headers.get('content-type');
           if (contentType?.includes('application/json')) {
             const data = await response.json();
-            setAppName(data.appName || 'Trading Dashboard');
-            setAppIcon(data.appIcon);
+            if (typeof data.appName === 'string' && data.appName.trim()) {
+              setAppName(data.appName.trim());
+            }
+            setAppIcon(data.appIcon ?? null);
           }
         }
       } catch (error) {
@@ -35,23 +37,14 @@ export function AppBranding({ className }: AppBrandingProps) {
     fetchAppSettings();
   }, []);
 
-  if (isLoading) {
-    return (
-      <div className={`flex items-center gap-3 ${className}`}>
-        <div className='bg-muted flex h-10 w-10 animate-pulse items-center justify-center rounded-lg'>
-          <IconPhotoUp className='text-muted-foreground h-5 w-5' />
-        </div>
-        <div className='flex flex-col gap-1'>
-          <div className='bg-muted h-4 w-24 animate-pulse rounded' />
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className={`flex items-center gap-3 ${className}`}>
       <div className='flex h-10 w-10 items-center justify-center overflow-hidden rounded-lg'>
-        {appIcon ? (
+        {isLoading ? (
+          <div className='bg-muted flex h-full w-full animate-pulse items-center justify-center'>
+            <IconPhotoUp className='text-muted-foreground h-5 w-5' />
+          </div>
+        ) : appIcon ? (
           <Image src={appIcon} alt={`${appName} logo`} width={40} height={40} />
         ) : (
           <IconPhotoUp className='text-primary-foreground h-5 w-5' />

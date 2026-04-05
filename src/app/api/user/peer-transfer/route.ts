@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { parseBalanceType } from '@/lib/balance';
+import { ensureUserBalance, parseBalanceType } from '@/lib/balance';
+import { getAuthSession } from '@/lib/auth';
 
 function normalizeEmail(raw: unknown): string | null {
   if (typeof raw !== 'string') return null;
@@ -12,7 +11,7 @@ function normalizeEmail(raw: unknown): string | null {
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -72,7 +71,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -131,12 +130,22 @@ export async function POST(request: NextRequest) {
         return { ok: false as const, code: 'SELF' as const };
       }
 
+      const senderBalance = await ensureUserBalance(
+        tx,
+        session.user.id,
+        balanceType
+      );
+      const recipientBalance = await ensureUserBalance(
+        tx,
+        recipientUser.id,
+        balanceType
+      );
+
       const transferRequest = await tx.transferRequest.create({
         data: {
-          senderUserId: session.user.id,
-          recipientUserId: recipientUser.id,
+          senderUserBalanceId: senderBalance.id,
+          recipientUserBalanceId: recipientBalance.id,
           amount,
-          balanceType,
           status: 'PENDING'
         }
       });

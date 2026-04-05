@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
-import { authOptions } from '@/lib/auth';
 import bcrypt from 'bcryptjs';
 import { z } from 'zod';
+import { getAuthSession } from '@/lib/auth';
 
 // Validation schemas
 const getUsersSchema = z.object({
@@ -54,7 +53,7 @@ async function checkAdminPermission(session: any) {
 // GET - List users with pagination and filtering
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
     const permissionCheck = await checkAdminPermission(session);
 
     if (permissionCheck.error) {
@@ -151,7 +150,7 @@ export async function GET(request: NextRequest) {
 // POST - Create new user
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
     const permissionCheck = await checkAdminPermission(session);
 
     if (permissionCheck.error) {

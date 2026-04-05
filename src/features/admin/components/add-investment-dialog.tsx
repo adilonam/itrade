@@ -39,20 +39,6 @@ import {
 } from '../services/investments';
 import { toast } from 'sonner';
 
-// Common countries for investment
-const COUNTRIES = [
-  'Luxembourg',
-  'Switzerland',
-  'Germany',
-  'France',
-  'Netherlands',
-  'Belgium',
-  'Austria',
-  'United Kingdom',
-  'United States',
-  'Other'
-];
-
 const formSchema = z
   .object({
     title: z
@@ -63,7 +49,6 @@ const formSchema = z
       .string()
       .max(1000, 'Description must be 1000 characters or less')
       .optional(),
-    country: z.string().min(1, 'Country is required'),
     duration: z.coerce
       .number()
       .min(1, 'Duration must be at least 1 month')
@@ -127,7 +112,6 @@ export function AddInvestmentDialog({
     defaultValues: {
       title: '',
       description: '',
-      country: '',
       duration: 12,
       rentability: 5.0,
       minInvestment: 1000,
@@ -147,7 +131,7 @@ export function AddInvestmentDialog({
       const investmentData: CreateInvestmentParams = {
         title: data.title,
         description: data.description || undefined,
-        country: data.country,
+        country: 'Other',
         duration: data.duration,
         rentability: data.rentability,
         minInvestment: data.minInvestment,
@@ -217,34 +201,6 @@ export function AddInvestmentDialog({
                         {...field}
                       />
                     </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name='country'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Country *</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder='Select country' />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {COUNTRIES.map((country) => (
-                          <SelectItem key={country} value={country}>
-                            {country}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}

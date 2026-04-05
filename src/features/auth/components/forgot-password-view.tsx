@@ -1,5 +1,6 @@
 'use client';
 
+import { usePublicAppName } from '@/hooks/use-public-app-name';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,6 +18,7 @@ import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 export default function ForgotPasswordView() {
+  const appName = usePublicAppName();
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [sent, setSent] = useState(false);
@@ -71,7 +73,7 @@ export default function ForgotPasswordView() {
           >
             <path d='M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3' />
           </svg>
-          {process.env.NEXT_PUBLIC_APP_NAME ?? 'Trade Nova'}
+          {appName}
         </div>
         <div className='relative z-20 mt-auto'>
           <blockquote className='space-y-2'>

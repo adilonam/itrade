@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
-import { authOptions } from '@/lib/auth';
 import { TransactionType } from '@/lib/prisma/generated/client';
 import { z } from 'zod';
 import { ensureUserBalance } from '@/lib/balance';
+import { getAuthSession } from '@/lib/auth';
 
 function isAdmin(session: { user?: { role?: string } } | null) {
   return (
@@ -22,7 +21,7 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
     if (!session?.user?.id || !isAdmin(session)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
@@ -62,16 +61,14 @@ export async function PATCH(
             ...(data.adminNotes != null && { adminNotes: data.adminNotes })
           }
         });
+        const balance = await ensureUserBalance(tx, existing.userId, balanceType);
         await tx.userBalance.update({
-          where: {
-            userId_type: { userId: existing.userId, type: balanceType }
-          },
+          where: { id: balance.id },
           data: { amount: { decrement: existing.amount } }
         });
         await tx.transaction.create({
           data: {
-            userId: existing.userId,
-            balanceType,
+            userBalanceId: balance.id,
             type: TransactionType.WITHDRAW,
             absoluteAmount: existing.amount,
             description: 'Withdrawal approved'
