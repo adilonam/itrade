@@ -11,7 +11,6 @@ import {
   TableRow
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
@@ -22,6 +21,12 @@ import {
 import { Label } from '@/components/ui/label';
 import { IconLoader2 } from '@tabler/icons-react';
 import { toast } from 'sonner';
+import {
+  KycRequestStatusSelect,
+  KYC_REQUEST_ROW_STATUSES,
+  kycRequestRowStatusLabel,
+  type KycRequestRowStatus
+} from '@/features/admin/components/kyc-requests/kyc-request-status-select';
 
 type KycDocument = {
   id: string;
@@ -32,13 +37,11 @@ type KycDocument = {
 type KycRequestRow = {
   id: string;
   documentType: string;
-  status: 'PENDING' | 'IN_PROGRESS' | 'VERIFIED' | 'REJECTED';
+  status: KycRequestRowStatus;
   createdAt: string;
   user: { id: string; name: string | null; email: string };
   documents: KycDocument[];
 };
-
-const STATUSES = ['PENDING', 'IN_PROGRESS', 'VERIFIED', 'REJECTED'] as const;
 
 function statusVariant(status: KycRequestRow['status']) {
   switch (status) {
@@ -101,10 +104,7 @@ export default function KycRequestsListing() {
     void loadRequests();
   }, [loadRequests]);
 
-  const markStatus = async (
-    id: string,
-    status: 'IN_PROGRESS' | 'VERIFIED'
-  ) => {
+  const markStatus = async (id: string, status: KycRequestRowStatus) => {
     setUpdatingId(id);
     try {
       const res = await fetch(`/api/admin/kyc-requests/${id}`, {
@@ -153,9 +153,9 @@ export default function KycRequestsListing() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value='all'>All</SelectItem>
-                {STATUSES.map((status) => (
+                {KYC_REQUEST_ROW_STATUSES.map((status) => (
                   <SelectItem key={status} value={status}>
-                    {status}
+                    {kycRequestRowStatusLabel(status)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -178,15 +178,11 @@ export default function KycRequestsListing() {
                   <TableHead>Document type</TableHead>
                   <TableHead>Files</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead className='w-[230px]'>Actions</TableHead>
+                  <TableHead className='min-w-[200px]'>Set status</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {requests.map((request) => {
-                  const pending = request.status === 'PENDING';
-                  const inProgress = request.status === 'IN_PROGRESS';
-                  const verified = request.status === 'VERIFIED';
-
                   return (
                     <TableRow key={request.id}>
                       <TableCell className='text-muted-foreground text-xs'>
@@ -220,37 +216,16 @@ export default function KycRequestsListing() {
                       </TableCell>
                       <TableCell>
                         <Badge variant={statusVariant(request.status)}>
-                          {request.status}
+                          {kycRequestRowStatusLabel(request.status)}
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <div className='flex gap-2'>
-                          <Button
-                            size='sm'
-                            variant='outline'
-                            disabled={
-                              updatingId === request.id || !pending || verified
-                            }
-                            onClick={() =>
-                              void markStatus(request.id, 'IN_PROGRESS')
-                            }
-                          >
-                            {updatingId === request.id && inProgress ? (
-                              <IconLoader2 className='mr-1 h-4 w-4 animate-spin' />
-                            ) : null}
-                            In progress
-                          </Button>
-                          <Button
-                            size='sm'
-                            disabled={updatingId === request.id || verified}
-                            onClick={() => void markStatus(request.id, 'VERIFIED')}
-                          >
-                            {updatingId === request.id && !inProgress ? (
-                              <IconLoader2 className='mr-1 h-4 w-4 animate-spin' />
-                            ) : null}
-                            Verify
-                          </Button>
-                        </div>
+                        <KycRequestStatusSelect
+                          requestId={request.id}
+                          value={request.status}
+                          updating={updatingId === request.id}
+                          onChange={(id, next) => void markStatus(id, next)}
+                        />
                       </TableCell>
                     </TableRow>
                   );

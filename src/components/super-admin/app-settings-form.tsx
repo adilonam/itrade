@@ -74,9 +74,6 @@ export function AppSettingsForm({ initialSettings }: AppSettingsFormProps) {
   const [alphaVantageApiKey, setAlphaVantageApiKey] = useState(
     s?.alphaVantageApiKey ?? ''
   );
-  const [blobReadWriteToken, setBlobReadWriteToken] = useState(
-    s?.blobReadWriteToken ?? ''
-  );
   const [nowpaymentsApiKey, setNowpaymentsApiKey] = useState(
     s?.nowpaymentsApiKey ?? ''
   );
@@ -171,7 +168,6 @@ export function AppSettingsForm({ initialSettings }: AppSettingsFormProps) {
         smtpPassword: smtpPassword.trim() || null,
         smtpFromEmail: smtpFromEmail.trim() || null,
         alphaVantageApiKey: alphaVantageApiKey.trim() || null,
-        blobReadWriteToken: blobReadWriteToken.trim() || null,
         nowpaymentsApiKey: nowpaymentsApiKey.trim() || null,
         nowpaymentsIpnSecret: nowpaymentsIpnSecret.trim() || null,
         manualUsdtDepositWalletAddress:
@@ -488,18 +484,6 @@ export function AppSettingsForm({ initialSettings }: AppSettingsFormProps) {
                     id='av'
                     value={alphaVantageApiKey}
                     onChange={(e) => setAlphaVantageApiKey(e.target.value)}
-                    autoComplete='off'
-                    className={tradeInputClassName}
-                  />
-                </div>
-                <div className='space-y-2 sm:col-span-2'>
-                  <Label htmlFor='blob' className={tradeLabelClassName}>
-                    Vercel Blob read/write token
-                  </Label>
-                  <Input
-                    id='blob'
-                    value={blobReadWriteToken}
-                    onChange={(e) => setBlobReadWriteToken(e.target.value)}
                     autoComplete='off'
                     className={tradeInputClassName}
                   />

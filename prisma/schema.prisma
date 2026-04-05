@@ -411,8 +411,6 @@ model AppSettings {
 
   alphaVantageApiKey String? @map("alpha_vantage_api_key") @db.Text
 
-  blobReadWriteToken String? @map("blob_read_write_token") @db.Text
-
   nowpaymentsApiKey    String? @map("nowpayments_api_key") @db.Text
   nowpaymentsIpnSecret String? @map("nowpayments_ipn_secret") @db.Text
 

@@ -15,6 +15,26 @@ const createTransporter = async () => {
   });
 };
 
+/** Nodemailer `verify()` against SMTP from app settings (no email sent). */
+export async function verifySmtpConnection(): Promise<
+  { ok: true } | { ok: false; error: string }
+> {
+  try {
+    const s = await getAppSettingsRow();
+    if (!s?.smtpHost?.trim()) {
+      return { ok: false, error: 'SMTP host is not configured' };
+    }
+    const transporter = await createTransporter();
+    await transporter.verify();
+    return { ok: true };
+  } catch (error) {
+    return {
+      ok: false,
+      error: error instanceof Error ? error.message : 'SMTP verify failed'
+    };
+  }
+}
+
 export interface EmailOptions {
   to: string;
   subject: string;

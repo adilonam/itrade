@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -24,6 +23,11 @@ import {
   type PositionWithRelations
 } from '@/components/admin/positions/positions-table';
 import { TRADE_ROOM_CARD_CLASS } from '@/constants/trade-room-ui';
+import {
+  KycRequestStatusSelect,
+  kycRequestRowStatusLabel,
+  type KycRequestRowStatus
+} from '@/features/admin/components/kyc-requests/kyc-request-status-select';
 import type { KycStatus } from '@/lib/prisma/generated/client';
 import { IconLoader2 } from '@tabler/icons-react';
 import { toast } from 'sonner';
@@ -37,7 +41,7 @@ type KycDocument = {
 type KycRequestRow = {
   id: string;
   documentType: string;
-  status: 'PENDING' | 'IN_PROGRESS' | 'VERIFIED' | 'REJECTED';
+  status: KycRequestRowStatus;
   createdAt: string;
   user: { id: string; name: string | null; email: string };
   documents: KycDocument[];
@@ -145,10 +149,7 @@ export function AdminUserKycPositionsSection({
     void loadPositions();
   }, [loadPositions]);
 
-  const markStatus = async (
-    id: string,
-    status: 'IN_PROGRESS' | 'VERIFIED'
-  ) => {
+  const markStatus = async (id: string, status: KycRequestRowStatus) => {
     setUpdatingId(id);
     try {
       const res = await fetch(`/api/admin/kyc-requests/${id}`, {
@@ -220,16 +221,12 @@ export function AdminUserKycPositionsSection({
                       Status
                     </TableHead>
                     <TableHead className='text-xs font-medium text-[var(--trade-text-muted)]'>
-                      Actions
+                      Set status
                     </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {kycRequests.map((request) => {
-                    const pending = request.status === 'PENDING';
-                    const inProgress = request.status === 'IN_PROGRESS';
-                    const verified = request.status === 'VERIFIED';
-
                     return (
                       <TableRow
                         key={request.id}
@@ -258,39 +255,18 @@ export function AdminUserKycPositionsSection({
                         </TableCell>
                         <TableCell>
                           <Badge variant={statusVariant(request.status)}>
-                            {request.status}
+                            {kycRequestRowStatusLabel(request.status)}
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          <div className='flex flex-wrap gap-2'>
-                            <Button
-                              size='sm'
-                              variant='outline'
-                              disabled={
-                                updatingId === request.id || !pending || verified
-                              }
-                              onClick={() =>
-                                void markStatus(request.id, 'IN_PROGRESS')
-                              }
-                            >
-                              {updatingId === request.id && inProgress ? (
-                                <IconLoader2 className='mr-1 h-4 w-4 animate-spin' />
-                              ) : null}
-                              In progress
-                            </Button>
-                            <Button
-                              size='sm'
-                              disabled={updatingId === request.id || verified}
-                              onClick={() =>
-                                void markStatus(request.id, 'VERIFIED')
-                              }
-                            >
-                              {updatingId === request.id && !inProgress ? (
-                                <IconLoader2 className='mr-1 h-4 w-4 animate-spin' />
-                              ) : null}
-                              Verify
-                            </Button>
-                          </div>
+                          <KycRequestStatusSelect
+                            requestId={request.id}
+                            value={request.status}
+                            updating={updatingId === request.id}
+                            onChange={(id, next) => void markStatus(id, next)}
+                            triggerClassName='border-[var(--trade-border)] bg-[var(--trade-dark)] text-xs text-[var(--trade-text)] focus-visible:border-[var(--trade-accent-blue)] focus-visible:ring-[var(--trade-accent-blue)]/25'
+                            contentClassName='border-[var(--trade-border)] bg-[var(--trade-panel)] text-[var(--trade-text)]'
+                          />
                         </TableCell>
                       </TableRow>
                     );

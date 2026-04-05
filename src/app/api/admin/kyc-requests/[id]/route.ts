@@ -10,8 +10,16 @@ function isAdmin(session: { user?: { role?: string } } | null) {
 }
 
 const updateSchema = z.object({
-  status: z.enum(['IN_PROGRESS', 'VERIFIED'])
+  status: z.enum(['PENDING', 'IN_PROGRESS', 'VERIFIED', 'REJECTED'])
 });
+
+function userKycStatusForRequestStatus(
+  status: z.infer<typeof updateSchema>['status']
+): 'PENDING' | 'APPROVED' | 'REJECTED' {
+  if (status === 'VERIFIED') return 'APPROVED';
+  if (status === 'REJECTED') return 'REJECTED';
+  return 'PENDING';
+}
 
 export async function PATCH(
   request: NextRequest,
@@ -36,7 +44,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'Not found' }, { status: 404 });
     }
 
-    const nextUserKycStatus = data.status === 'VERIFIED' ? 'APPROVED' : 'PENDING';
+    const nextUserKycStatus = userKycStatusForRequestStatus(data.status);
 
     await prisma.$transaction(async (tx) => {
       await tx.kycVerificationRequest.update({

@@ -74,9 +74,6 @@ function buildPatch(): Prisma.AppSettingsUpdateInput {
   const av = pick('ALPHAVANTAGE_API_KEY');
   if (av !== undefined) data.alphaVantageApiKey = av;
 
-  const blob = pick('BLOB_READ_WRITE_TOKEN');
-  if (blob !== undefined) data.blobReadWriteToken = blob;
-
   const npKey = pick('NOWPAYMENTS_API_KEY');
   if (npKey !== undefined) data.nowpaymentsApiKey = npKey;
 

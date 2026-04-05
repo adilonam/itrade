@@ -233,3 +233,19 @@ This should be visible in the deposit section.
 - [x] 14. Transfer Functionality  
 Allow users to choose the source and destination accounts when transferring funds.  
 Example: from Trade → Institutional or Investment.
+
+
+
+- [ ] transfer migrate to trasnfer user management
+- [ ] add tp and sl for new position
+- [ ] remove the contry form plans
+- [ ] add more one wallet for usdt and usdc and btc 
+- [ ] resolve kyc upload
+
+
+
+### extra
+- [ ] close on date 
+- [ ] spanish langaue
+- [ ] demo account 
+- [ ] props challenge

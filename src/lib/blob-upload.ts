@@ -1,9 +1,6 @@
-import { getAppSettingsRow } from '@/lib/app-settings';
-
-/** Options for @vercel/blob `put` when token is stored in AppSettings. */
+/** Options for @vercel/blob `put`; token from `BLOB_READ_WRITE_TOKEN` env. */
 export async function getBlobPutOptions(): Promise<{ token: string } | Record<string, never>> {
-  const s = await getAppSettingsRow();
-  const token = s?.blobReadWriteToken?.trim();
+  const token = process.env.BLOB_READ_WRITE_TOKEN?.trim();
   if (token) {
     return { token };
   }

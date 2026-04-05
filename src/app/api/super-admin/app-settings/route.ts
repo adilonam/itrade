@@ -93,8 +93,6 @@ export async function PATCH(request: NextRequest) {
 
     const av = maybeStr('alphaVantageApiKey');
     if (av !== undefined) data.alphaVantageApiKey = av;
-    const blobTok = maybeStr('blobReadWriteToken');
-    if (blobTok !== undefined) data.blobReadWriteToken = blobTok;
     const npKey = maybeStr('nowpaymentsApiKey');
     if (npKey !== undefined) data.nowpaymentsApiKey = npKey;
     const npIpn = maybeStr('nowpaymentsIpnSecret');
