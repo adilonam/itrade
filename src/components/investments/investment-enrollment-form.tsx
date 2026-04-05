@@ -9,7 +9,6 @@ interface InvestmentWithDetails {
   id: string;
   title: string;
   description?: string | null;
-  country: string;
   duration: number;
   rentability: number;
   minInvestment: number;

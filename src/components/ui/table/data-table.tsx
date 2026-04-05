@@ -11,7 +11,7 @@ import {
   TableRow
 } from '@/components/ui/table';
 import { getCommonPinningStyles } from '@/lib/data-table';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface DataTableProps<TData> extends React.ComponentProps<'div'> {
   table: TanstackTable<TData>;
@@ -28,7 +28,7 @@ export function DataTable<TData>({
       {children}
       <div className='relative flex flex-1 overflow-hidden'>
         <div className='absolute inset-0 flex overflow-hidden rounded-lg border'>
-          <ScrollArea className='h-full w-full'>
+          <ScrollArea className='h-full w-full' horizontal>
             <Table>
               <TableHeader className='bg-muted sticky top-0 z-10'>
                 {table.getHeaderGroups().map((headerGroup) => (
@@ -86,7 +86,6 @@ export function DataTable<TData>({
                 )}
               </TableBody>
             </Table>
-            <ScrollBar orientation='horizontal' />
           </ScrollArea>
         </div>
       </div>

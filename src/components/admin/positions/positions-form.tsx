@@ -60,6 +60,8 @@ export function PositionForm({
     marketId: '',
     quantity: '',
     executedPrice: '',
+    takeProfit: '',
+    stopLoss: '',
     description: '',
     executedAt: '',
     pnl: ''
@@ -127,6 +129,9 @@ export function PositionForm({
           position.executedPrice != null
             ? String(position.executedPrice)
             : '',
+        takeProfit:
+          position.takeProfit != null ? String(position.takeProfit) : '',
+        stopLoss: position.stopLoss != null ? String(position.stopLoss) : '',
         description: position.description || '',
         executedAt: position.executedAt
           ? new Date(position.executedAt).toISOString().slice(0, 16)
@@ -222,6 +227,19 @@ export function PositionForm({
         throw new Error('Executed price is required');
       }
 
+      const parseTpSl = (raw: string, label: string): number | null => {
+        const t = raw.trim();
+        if (t === '') return null;
+        const n = parseFloat(t);
+        if (isNaN(n)) {
+          throw new Error(`${label} must be a valid number`);
+        }
+        return n;
+      };
+
+      const takeProfit = parseTpSl(formData.takeProfit, 'Take profit');
+      const stopLoss = parseTpSl(formData.stopLoss, 'Stop loss');
+
       const data: Record<string, unknown> = {
         userId: formData.userId,
         type: formData.type as PositionType,
@@ -230,6 +248,8 @@ export function PositionForm({
         marketId: formData.marketId,
         quantity,
         executedPrice,
+        takeProfit,
+        stopLoss,
         description: formData.description || undefined,
         pnl: formData.pnl ? parseFloat(formData.pnl) : undefined
       };
@@ -507,6 +527,32 @@ export function PositionForm({
                 }
                 placeholder='0.0000'
                 required
+              />
+            </div>
+
+            <div className='space-y-2'>
+              <Label htmlFor='takeProfit'>Take profit (optional)</Label>
+              <Input
+                id='takeProfit'
+                type='number'
+                step='0.0001'
+                value={formData.takeProfit}
+                onChange={(e) =>
+                  handleInputChange('takeProfit', e.target.value)
+                }
+                placeholder='Price level'
+              />
+            </div>
+
+            <div className='space-y-2'>
+              <Label htmlFor='stopLoss'>Stop loss (optional)</Label>
+              <Input
+                id='stopLoss'
+                type='number'
+                step='0.0001'
+                value={formData.stopLoss}
+                onChange={(e) => handleInputChange('stopLoss', e.target.value)}
+                placeholder='Price level'
               />
             </div>
 

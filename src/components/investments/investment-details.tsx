@@ -13,7 +13,6 @@ import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import {
   IconCalendar,
-  IconMapPin,
   IconTrendingUp,
   IconUsers,
   IconShield,
@@ -32,7 +31,6 @@ interface InvestmentWithDetails {
   id: string;
   title: string;
   description?: string | null;
-  country: string;
   duration: number;
   rentability: number;
   minInvestment: number;
@@ -188,10 +186,6 @@ export function InvestmentDetails({
                   {investment.title}
                 </CardTitle>
                 <div className='flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-[var(--trade-text-muted)]'>
-                  <div className='flex items-center gap-1'>
-                    <IconMapPin className='size-3.5 shrink-0' />
-                    {investment.country}
-                  </div>
                   <div className='flex items-center gap-1'>
                     <IconCalendar className='size-3.5 shrink-0' />
                     {investment.duration} months

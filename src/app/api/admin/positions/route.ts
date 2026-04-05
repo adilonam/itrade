@@ -12,6 +12,8 @@ type CreatePositionBody = {
   quantity: number;
   executedPrice: number;
   closedPrice?: number | null;
+  takeProfit?: number | null;
+  stopLoss?: number | null;
   description?: string | null;
   executedAt?: string | Date | null;
   pnl?: number | null;
@@ -222,6 +224,8 @@ export async function POST(request: NextRequest) {
         quantity: body.quantity,
         executedPrice,
         closedPrice: body.closedPrice,
+        takeProfit: body.takeProfit,
+        stopLoss: body.stopLoss,
         description: body.description,
         executedAt: body.executedAt
           ? new Date(body.executedAt)

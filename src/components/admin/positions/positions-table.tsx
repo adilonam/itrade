@@ -18,7 +18,7 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -213,7 +213,7 @@ export function PositionsTable({
           <div className='flex flex-1 flex-col space-y-4'>
             <div className='relative flex flex-1'>
               <div className='absolute inset-0 flex overflow-hidden rounded-lg border border-[var(--trade-border)]'>
-                <ScrollArea className='h-full w-full'>
+                <ScrollArea className='h-full w-full' horizontal>
                   <Table>
                     <TableHeader className='sticky top-0 z-10 border-b border-[var(--trade-border)] bg-[var(--trade-dark)]/80'>
                       <TableRow className='border-[var(--trade-border)] hover:bg-transparent'>
@@ -245,6 +245,12 @@ export function PositionsTable({
                         </TableHead>
                         <TableHead className='text-xs font-medium text-[var(--trade-text-muted)]'>
                           Closed Price
+                        </TableHead>
+                        <TableHead className='text-xs font-medium text-[var(--trade-text-muted)]'>
+                          TP
+                        </TableHead>
+                        <TableHead className='text-xs font-medium text-[var(--trade-text-muted)]'>
+                          SL
                         </TableHead>
                         <TableHead className='text-xs font-medium text-[var(--trade-text-muted)]'>
                           P&L
@@ -324,6 +330,16 @@ export function PositionsTable({
                             {position.closedPrice
                               ? `$${position.closedPrice.toFixed(2)}`
                               : 'N/A'}
+                          </TableCell>
+                          <TableCell className='font-mono text-xs text-[var(--trade-text)]'>
+                            {position.takeProfit != null
+                              ? `$${position.takeProfit.toFixed(2)}`
+                              : '—'}
+                          </TableCell>
+                          <TableCell className='font-mono text-xs text-[var(--trade-text)]'>
+                            {position.stopLoss != null
+                              ? `$${position.stopLoss.toFixed(2)}`
+                              : '—'}
                           </TableCell>
                           <TableCell>
                             {(() => {
@@ -434,7 +450,6 @@ export function PositionsTable({
                       ))}
                     </TableBody>
                   </Table>
-                  <ScrollBar orientation='horizontal' />
                 </ScrollArea>
               </div>
             </div>

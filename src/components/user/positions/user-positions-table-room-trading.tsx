@@ -23,7 +23,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger
 } from '@/components/ui/alert-dialog';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import type { Market, Position } from '@/lib/prisma/generated/client';
 import { useMarketsWebSocket } from '@/contexts/markets-websocket-context';
 import { calculatePnLClient } from '@/lib/calculator-client';
@@ -246,7 +245,7 @@ export function UserPositionsTableRoomTrading({
         isEmbeddedTrade
           ? cn(
               TRADE_ROOM_EMBEDDED_TABLE_CARD_CLASS,
-              'h-full min-h-0 flex-1'
+              'h-full min-h-0 min-w-0 flex-1'
             )
           : 'max-h-[min(70vh,520px)]',
         isTradePanel && !isEmbeddedTrade && TRADE_ROOM_CARD_CLASS
@@ -256,7 +255,7 @@ export function UserPositionsTableRoomTrading({
         className={cn(
           'min-h-[240px] min-w-0 flex-1 overflow-hidden',
           isEmbeddedTrade
-            ? 'px-4 pb-3 pt-0'
+            ? 'px-4 pb-6 pt-0'
             : isTradePanel
               ? 'px-4 pb-4 pt-3'
               : 'pt-6'
@@ -265,26 +264,25 @@ export function UserPositionsTableRoomTrading({
         <div
           className={cn(
             'relative flex h-full flex-col',
-            isEmbeddedTrade ? 'min-h-0' : 'min-h-[200px]'
+            isEmbeddedTrade ? 'min-h-0 min-w-0' : 'min-h-[200px]'
           )}
         >
-          <div className='relative flex min-h-0 flex-1'>
+          <div className='relative flex min-h-0 min-w-0 flex-1'>
             <div
               className={cn(
-                'absolute inset-0 flex overflow-auto rounded-lg border',
+                'absolute inset-0 min-h-0 min-w-0 overflow-auto rounded-lg border',
                 isTradePanel &&
                   (isEmbeddedTrade
                     ? 'rounded-none border-0 bg-transparent'
                     : 'rounded-md border-[var(--trade-border)] bg-[var(--trade-dark)]/20')
               )}
             >
-              <ScrollArea className='h-full w-full'>
-                <Table
-                  className={cn(
-                    isTradePanel &&
-                      'text-xs text-[var(--trade-text)] [&_td]:text-[var(--trade-text)]'
-                  )}
-                >
+              <Table
+                className={cn(
+                  isTradePanel &&
+                    'text-xs text-[var(--trade-text)] [&_td]:text-[var(--trade-text)]'
+                )}
+              >
                   <TableHeader
                     className={cn(
                       'sticky top-0 z-10',
@@ -531,9 +529,6 @@ export function UserPositionsTableRoomTrading({
                     ))}
                   </TableBody>
                 </Table>
-                <ScrollBar orientation='horizontal' />
-                <ScrollBar orientation='vertical' />
-              </ScrollArea>
             </div>
           </div>
         </div>

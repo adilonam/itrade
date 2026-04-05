@@ -28,7 +28,6 @@ type UserInvestment = {
     title: string;
     rentability: number;
     duration: number;
-    country: string;
   };
 };
 
@@ -230,7 +229,7 @@ export function InvestOverview() {
                   <div>
                     <p className='font-medium'>{inv.investment.title}</p>
                     <p className='text-muted-foreground text-xs'>
-                      {inv.investment.country} · {inv.investment.duration} mo ·{' '}
+                      {inv.investment.duration} mo ·{' '}
                       {inv.investment.rentability}% · Ends{' '}
                       {formatDate(inv.endDate)}
                     </p>

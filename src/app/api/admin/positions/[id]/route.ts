@@ -122,6 +122,9 @@ export async function PUT(
           marketId: body.marketId,
           quantity: body.quantity,
           executedPrice: body.executedPrice,
+          closedPrice: body.closedPrice,
+          takeProfit: body.takeProfit,
+          stopLoss: body.stopLoss,
           description: body.description,
           executedAt: body.executedAt
             ? new Date(body.executedAt as string | Date)

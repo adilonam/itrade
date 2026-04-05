@@ -37,7 +37,6 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
             select: {
               id: true,
               title: true,
-              country: true,
               currentCapacity: true
             }
           }
@@ -92,7 +91,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
           userBalanceId: userBalance.id,
           type: 'DEPOSIT',
           absoluteAmount: refundAmount,
-          description: `Investment cancelled: ${userInvestment.investment.title} - ${userInvestment.investment.country}`
+          description: `Investment cancelled: ${userInvestment.investment.title}`
         }
       });
 

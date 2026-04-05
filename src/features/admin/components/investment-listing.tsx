@@ -34,7 +34,6 @@ export default function InvestmentListingPage({}: InvestmentListingPageProps) {
     perPage: parseAsInteger.withDefault(10),
     search: parseAsString,
     riskLevel: parseAsStringEnum(RISK_LEVELS),
-    country: parseAsString,
     isActive: parseAsString
   });
 
@@ -47,7 +46,6 @@ export default function InvestmentListingPage({}: InvestmentListingPageProps) {
         limit: queryParams.perPage,
         search: queryParams.search || undefined,
         riskLevel: queryParams.riskLevel || undefined,
-        country: queryParams.country || undefined,
         isActive:
           queryParams.isActive === 'true'
             ? true

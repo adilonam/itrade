@@ -31,7 +31,6 @@ export async function GET(request: NextRequest) {
       ? {
           OR: [
             { title: { contains: search, mode: 'insensitive' as const } },
-            { country: { contains: search, mode: 'insensitive' as const } },
             { description: { contains: search, mode: 'insensitive' as const } }
           ]
         }
@@ -72,7 +71,6 @@ export async function GET(request: NextRequest) {
 const CreateInvestmentSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   description: z.string().optional(),
-  country: z.string().min(1, 'Country is required'),
   duration: z.number().min(1, 'Duration must be at least 1 month'),
   rentability: z.number().min(0, 'Rentability must be positive'),
   minInvestment: z.number().min(0, 'Minimum investment must be positive'),

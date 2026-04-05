@@ -131,7 +131,6 @@ export function AddInvestmentDialog({
       const investmentData: CreateInvestmentParams = {
         title: data.title,
         description: data.description || undefined,
-        country: 'Other',
         duration: data.duration,
         rentability: data.rentability,
         minInvestment: data.minInvestment,

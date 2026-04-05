@@ -1,7 +1,6 @@
 import { Separator } from '@/components/ui/separator';
 import { UserPositionsTableCardRoomTrading } from '@/components/user/positions/user-positions-table-room-trading';
 import { InstitutionalAccountInfoCard } from '@/components/trading-view/institutional-account-info-card';
-import { InstitutionalBalanceTransferCard } from '@/components/trading-view/institutional-balance-transfer-card';
 import { prisma } from '@/lib/prisma';
 import { notFound } from 'next/navigation';
 
@@ -59,8 +58,6 @@ export default async function Page(props: PageProps) {
         <Separator />
 
         <InstitutionalAccountInfoCard />
-
-        <InstitutionalBalanceTransferCard />
 
         <Separator />
 

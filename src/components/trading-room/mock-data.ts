@@ -13,6 +13,7 @@ export interface MockNewsItem {
   time: string;
   snippet: string;
   flag?: string;
+  source?: string;
 }
 
 export interface MockCalendarItem {
@@ -39,39 +40,58 @@ export const MOCK_SYMBOLS: MockSymbol[] = [
 
 export const MOCK_NEWS: MockNewsItem[] = [
   {
-    id: '1',
-    title: 'Japanese Yen stays defensive ahead of CPI',
-    time: '23:03',
-    snippet: 'Tokyo inflation expectations weigh on carry trades as traders trim exposure.',
-    flag: '🇯🇵'
+    id: 'n1',
+    title: 'US–Iran tensions flare after Strait incident; oil spikes in late trade',
+    time: '23:18',
+    snippet:
+      'Markets price higher geopolitical risk as officials trade warnings and energy routes come under scrutiny. Safe-haven flows into USD and gold intensify.',
+    flag: '🇺🇸',
+    source: 'Desk wire (mock)'
   },
   {
-    id: '2',
-    title: 'Pound Sterling declines as US prepares data',
-    time: '23:00',
-    snippet: 'Cable retreats from session highs as the dollar firms across the board.',
-    flag: '🇬🇧'
+    id: 'n2',
+    title: 'Pentagon confirms expanded carrier presence; Tehran vows proportional response',
+    time: '22:55',
+    snippet:
+      'Defense channels report additional naval assets; diplomatic channels remain open but fragile. Volatility in crude and regional FX expected overnight.',
+    flag: '🇮🇷',
+    source: 'Desk wire (mock)'
   },
   {
-    id: '3',
-    title: 'US considers ground operation headlines',
-    time: '22:50',
-    snippet: 'Risk sentiment flickers; crude and safe havens see two-way flows.',
-    flag: '🇺🇸'
+    id: 'n3',
+    title: 'Japan–US trade officials meet ahead of tariff review; yen whipsaws',
+    time: '22:40',
+    snippet:
+      'Tokyo and Washington discuss industrial policy and supply chains. USD/JPY swings on headline risk as traders reposition into the Tokyo open.',
+    flag: '🇯🇵',
+    source: 'Desk wire (mock)'
   },
   {
-    id: '4',
-    title: 'ECB officials hint at measured cuts',
+    id: 'n4',
+    title: 'White House: “All options on table” re Iran; allies urge de-escalation',
     time: '22:12',
-    snippet: 'Money markets price a shallow easing path through year-end.',
-    flag: '🇪🇺'
+    snippet:
+      'European and Gulf partners call for restraint; risk assets pare gains while energy complex leads sector moves.',
+    flag: '🇺🇸',
+    source: 'Desk wire (mock)'
   },
   {
-    id: '5',
-    title: 'Oil inventories surprise to the downside',
-    time: '21:40',
-    snippet: 'WTI bounces from lows as stockpiles shrink more than expected.',
-    flag: '🛢️'
+    id: 'n5',
+    title: 'BoJ watchers eye yield curve after US–Japan joint statement on stability',
+    time: '21:50',
+    snippet:
+      'Fixed-income desks parse language on FX and financial stability; JGB futures tick higher as curve flattens.',
+    flag: '🇯🇵',
+    source: 'Desk wire (mock)'
+  },
+  {
+    id: 'n6',
+    title: 'UN Security Council session requested on US–Iran standoff',
+    time: '21:22',
+    snippet:
+      'Diplomatic calendar fills up; emerging-market FX shows cautious bid as liquidity thins into the New York close.',
+    flag: '🇺🇳',
+    source: 'Desk wire (mock)'
   }
 ];
 

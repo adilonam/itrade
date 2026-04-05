@@ -6,7 +6,6 @@ export interface Investment {
   id: string;
   title: string;
   description?: string | null;
-  country: string;
   duration: number;
   rentability: number;
   minInvestment: number;
@@ -34,7 +33,6 @@ export interface UserInvestmentData {
   investment: {
     id: string;
     title: string;
-    country: string;
     duration: number;
     rentability: number;
     riskLevel: string;
@@ -71,7 +69,6 @@ export interface UseInvestmentEnrollmentResult {
 }
 
 export const useInvestments = (filters?: {
-  country?: string;
   riskLevel?: string;
   minDuration?: number;
   maxDuration?: number;
@@ -86,7 +83,6 @@ export const useInvestments = (filters?: {
       setError(null);
 
       const searchParams = new URLSearchParams();
-      if (filters?.country) searchParams.append('country', filters.country);
       if (filters?.riskLevel)
         searchParams.append('riskLevel', filters.riskLevel);
       if (filters?.minDuration)

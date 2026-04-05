@@ -25,7 +25,7 @@ export function TradingRoomPositionsPanel() {
         </div>
         <TabsContent
           value="open"
-          className="mt-0 flex min-h-0 flex-1 flex-col overflow-hidden data-[state=inactive]:hidden"
+          className="mt-0 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden data-[state=inactive]:hidden"
         >
           <UserPositionsTableCardRoomTrading
             embeddedInTradePanel
@@ -35,7 +35,7 @@ export function TradingRoomPositionsPanel() {
         </TabsContent>
         <TabsContent
           value="pending"
-          className="mt-0 flex min-h-0 flex-1 flex-col overflow-hidden data-[state=inactive]:hidden"
+          className="mt-0 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden data-[state=inactive]:hidden"
         >
           <UserPositionsTableCardRoomTrading
             embeddedInTradePanel
@@ -45,7 +45,7 @@ export function TradingRoomPositionsPanel() {
         </TabsContent>
         <TabsContent
           value="closed"
-          className="mt-0 flex min-h-0 flex-1 flex-col overflow-hidden data-[state=inactive]:hidden"
+          className="mt-0 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden data-[state=inactive]:hidden"
         >
           <UserPositionsTableCardRoomTrading
             embeddedInTradePanel

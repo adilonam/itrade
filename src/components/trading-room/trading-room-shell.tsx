@@ -119,7 +119,7 @@ function TradingRoomShellInner({ children }: { children: React.ReactNode }) {
             <div
               className={cn(
                 'flex min-h-0 min-w-0 flex-1 flex-col',
-                isTradeChartRoute ? 'overflow-hidden' : 'overflow-y-auto overflow-x-hidden'
+                isTradeChartRoute ? 'overflow-hidden' : 'overflow-y-auto overflow-x-auto'
               )}
             >
               {children}

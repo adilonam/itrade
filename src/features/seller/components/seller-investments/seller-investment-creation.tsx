@@ -31,7 +31,6 @@ type LinkedUser = {
 type InvestmentOption = {
   id: string;
   title: string;
-  country: string;
   duration: number;
   rentability: number;
   minInvestment: number;
@@ -118,10 +117,8 @@ export function SellerInvestmentCreation({
   const selectedUser = users.find((u) => u.id === selectedUserId);
 
   const filteredInvestments = investmentFilter.trim()
-    ? investments.filter(
-        (i) =>
-          i.title.toLowerCase().includes(investmentFilter.toLowerCase()) ||
-          i.country.toLowerCase().includes(investmentFilter.toLowerCase())
+    ? investments.filter((i) =>
+        i.title.toLowerCase().includes(investmentFilter.toLowerCase())
       )
     : investments;
 
@@ -244,9 +241,7 @@ export function SellerInvestmentCreation({
           {/* Investment: filter + select on one line */}
           <div className='flex flex-wrap items-end gap-2'>
             <div className='space-y-2'>
-              <Label htmlFor='investment-filter'>
-                Search by title or country
-              </Label>
+              <Label htmlFor='investment-filter'>Search by title</Label>
               <Input
                 id='investment-filter'
                 type='text'
@@ -278,8 +273,7 @@ export function SellerInvestmentCreation({
                   ) : (
                     filteredInvestments.map((i) => (
                       <SelectItem key={i.id} value={i.id}>
-                        {i.title} ({i.country}, {i.duration} mo, {i.rentability}
-                        %)
+                        {i.title} ({i.duration} mo, {i.rentability}%)
                       </SelectItem>
                     ))
                   )}

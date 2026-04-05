@@ -99,7 +99,6 @@ export async function GET(request: NextRequest) {
             select: {
               id: true,
               title: true,
-              country: true,
               duration: true,
               rentability: true,
               riskLevel: true
@@ -228,7 +227,6 @@ export async function POST(request: NextRequest) {
             select: {
               id: true,
               title: true,
-              country: true,
               duration: true,
               rentability: true,
               riskLevel: true
@@ -247,7 +245,7 @@ export async function POST(request: NextRequest) {
           userBalanceId: userBalance.id,
           type: 'WITHDRAW',
           absoluteAmount: amount,
-          description: `Investment in ${investment.title} - ${investment.country}`
+          description: `Investment in ${investment.title}`
         }
       });
 

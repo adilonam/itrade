@@ -237,10 +237,10 @@ Example: from Trade → Institutional or Investment.
 
 
 - [ ] transfer migrate to trasnfer user management
-- [ ] add tp and sl for new position
-- [ ] remove the contry form plans
-- [ ] add more one wallet for usdt and usdc and btc 
-- [ ] resolve kyc upload
+- [x] add tp and sl for new position
+- [x] remove the contry form plans
+- [?] add more one wallet for usdt and usdc and btc 
+- [x] resolve kyc upload
 
 
 

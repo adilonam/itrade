@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 import {
   IconArrowsTransferDown,
   IconLoader2
@@ -27,7 +28,15 @@ type TransferDirection =
   | 'REAL_TO_INSTITUTIONAL'
   | 'INSTITUTIONAL_TO_REAL';
 
-export function InstitutionalBalanceTransferCard() {
+type InstitutionalBalanceTransferCardProps = {
+  className?: string;
+  /** Called after a successful transfer (e.g. refresh parent wallet UI). */
+  onTransferComplete?: () => void;
+};
+
+export function InstitutionalBalanceTransferCard(
+  { className, onTransferComplete }: InstitutionalBalanceTransferCardProps = {}
+) {
   const [amount, setAmount] = useState('');
   const [direction, setDirection] =
     useState<TransferDirection>('REAL_TO_INSTITUTIONAL');
@@ -102,6 +111,7 @@ export function InstitutionalBalanceTransferCard() {
           new CustomEvent('room-institutional-balances-refresh')
         );
       }
+      onTransferComplete?.();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Transfer failed');
     } finally {
@@ -110,7 +120,7 @@ export function InstitutionalBalanceTransferCard() {
   };
 
   return (
-    <Card className={tradeRoomCardClass}>
+    <Card className={cn(tradeRoomCardClass, className)}>
       <CardHeader className='px-4 pb-0 pt-0'>
         <CardTitle className='flex items-center gap-2 text-sm font-semibold'>
           <IconArrowsTransferDown className='h-4 w-4 shrink-0' />

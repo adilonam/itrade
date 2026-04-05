@@ -40,7 +40,6 @@ type UserInvestmentWithDetails = UserInvestment & {
     Investment,
     | 'id'
     | 'title'
-    | 'country'
     | 'duration'
     | 'rentability'
     | 'riskLevel'

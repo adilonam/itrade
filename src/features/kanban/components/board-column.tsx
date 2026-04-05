@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { ColumnActions } from './column-action';
 import { TaskCard } from './task-card';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 export interface Column {
   id: UniqueIdentifier;
@@ -121,7 +121,7 @@ export function BoardContainer({ children }: { children: React.ReactNode }) {
   });
 
   return (
-    <ScrollArea className='w-full rounded-md whitespace-nowrap'>
+    <ScrollArea className='w-full rounded-md whitespace-nowrap' horizontal>
       <div
         className={variations({
           dragging: dndContext.active ? 'active' : 'default'
@@ -131,7 +131,6 @@ export function BoardContainer({ children }: { children: React.ReactNode }) {
           {children}
         </div>
       </div>
-      <ScrollBar orientation='horizontal' />
     </ScrollArea>
   );
 }

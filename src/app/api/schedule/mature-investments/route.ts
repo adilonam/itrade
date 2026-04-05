@@ -30,7 +30,6 @@ export async function POST(request: NextRequest) {
           select: {
             id: true,
             title: true,
-            country: true,
             currentCapacity: true
           }
         }
@@ -82,7 +81,7 @@ export async function POST(request: NextRequest) {
               userBalanceId: userBalance.id,
               type: 'INVESTMENT_GAIN',
               absoluteAmount: totalReturn,
-              description: `Investment matured: ${userInvestment.investment.title} (${userInvestment.investment.country}) — principal ${userInvestment.amount.toFixed(2)} + return ${userInvestment.expectedReturn.toFixed(2)}`
+              description: `Investment matured: ${userInvestment.investment.title} — principal ${userInvestment.amount.toFixed(2)} + return ${userInvestment.expectedReturn.toFixed(2)}`
             }
           });
 

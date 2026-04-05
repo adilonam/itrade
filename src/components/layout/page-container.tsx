@@ -11,8 +11,8 @@ export default function PageContainer({
   return (
     <>
       {scrollable ? (
-        <ScrollArea className='h-[calc(100dvh-2.75rem)]'>
-          <div className='p-4 md:px-6'>{children}</div>
+        <ScrollArea className='h-[calc(100dvh-2.75rem)] min-w-0 max-w-full'>
+          <div className='min-w-0 max-w-full p-4 md:px-6'>{children}</div>
         </ScrollArea>
       ) : (
         <div className='flex flex-1 p-4 md:px-6'>{children}</div>

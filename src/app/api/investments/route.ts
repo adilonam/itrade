@@ -4,7 +4,6 @@ import { prisma } from '@/lib/prisma';
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const country = searchParams.get('country');
     const riskLevel = searchParams.get('riskLevel');
     const minDuration = searchParams.get('minDuration');
     const maxDuration = searchParams.get('maxDuration');
@@ -13,10 +12,6 @@ export async function GET(request: NextRequest) {
     const where: any = {
       isActive: true
     };
-
-    if (country) {
-      where.country = { contains: country, mode: 'insensitive' };
-    }
 
     if (riskLevel) {
       where.riskLevel = riskLevel;
@@ -39,7 +34,6 @@ export async function GET(request: NextRequest) {
         id: true,
         title: true,
         description: true,
-        country: true,
         duration: true,
         rentability: true,
         minInvestment: true,

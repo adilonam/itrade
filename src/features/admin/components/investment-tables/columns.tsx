@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { DataTableColumnHeader } from '@/components/ui/table/data-table-column-header';
 import { formatDate } from '@/lib/format';
 import { Column, ColumnDef } from '@tanstack/react-table';
-import { Eye, EyeOff, TrendingUp, Users, MapPin } from 'lucide-react';
+import { Eye, EyeOff, TrendingUp, Users } from 'lucide-react';
 import { AdminInvestment } from '../../services/investments';
 import { CellAction } from './cell-action';
 
@@ -34,17 +34,12 @@ export const columns: ColumnDef<AdminInvestment>[] = [
     ),
     cell: ({ row }) => {
       const title = row.getValue('title') as string;
-      const country = row.original.country;
       const riskLevel = row.original.riskLevel;
 
       return (
         <div className='flex flex-col space-y-2'>
           <span className='text-sm font-medium'>{title}</span>
           <div className='flex items-center space-x-2'>
-            <div className='text-muted-foreground flex items-center text-xs'>
-              <MapPin className='mr-1 h-3 w-3' />
-              {country}
-            </div>
             <Badge
               variant='outline'
               className={`text-xs ${getRiskColor(riskLevel)}`}

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { MOCK_NEWS, MOCK_CALENDAR } from './mock-data';
+import { MOCK_CALENDAR, MOCK_NEWS } from './mock-data';
 import { IconNews, IconCalendar, IconChartBar, IconInfoCircle } from '@tabler/icons-react';
 import { cn } from '@/lib/utils';
 
@@ -93,19 +93,32 @@ export function TradingRoomNewsPanel({
           <ScrollArea className="min-h-0 flex-1">
             <div className="space-y-3 p-3">
               {MOCK_NEWS.map((item) => (
-                <div key={item.id} className="group cursor-pointer space-y-1 border-b border-[var(--trade-border)]/60 pb-3 last:border-0">
+                <div
+                  key={item.id}
+                  className="space-y-1 border-b border-[var(--trade-border)]/60 pb-3 last:border-0"
+                >
                   <div className="flex items-start justify-between gap-2">
-                    <span className="text-lg leading-none">{item.flag}</span>
+                    <span
+                      className="flex size-6 shrink-0 items-center justify-center rounded border border-[var(--trade-border)] bg-[var(--trade-dark)]/60 text-[11px] leading-none"
+                      title={item.source}
+                    >
+                      {item.flag ?? item.title.slice(0, 2)}
+                    </span>
                     <div className="min-w-0 flex-1">
-                      <div className="text-[11px] font-bold leading-snug text-[var(--trade-text)] transition-colors group-hover:text-[var(--trade-accent-blue)]">
+                      <div className="text-[11px] font-bold leading-snug text-[var(--trade-text)]">
                         {item.title}
                       </div>
+                      {item.source ? (
+                        <div className="mt-0.5 truncate text-[9px] text-[var(--trade-text-muted)]">
+                          {item.source}
+                        </div>
+                      ) : null}
                     </div>
                     <span className="shrink-0 font-mono text-[10px] text-[var(--trade-text-muted)]">
                       {item.time}
                     </span>
                   </div>
-                  <p className="pl-7 text-[10px] leading-relaxed text-[var(--trade-text-muted)]">
+                  <p className="pl-8 text-[10px] leading-relaxed text-[var(--trade-text-muted)]">
                     {item.snippet}
                   </p>
                 </div>

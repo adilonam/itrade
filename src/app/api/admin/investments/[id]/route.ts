@@ -6,7 +6,6 @@ import { getAuthSession } from '@/lib/auth';
 const UpdateInvestmentSchema = z.object({
   title: z.string().min(1).optional(),
   description: z.string().optional(),
-  country: z.string().min(1).optional(),
   duration: z.number().min(1).optional(),
   rentability: z.number().min(0).optional(),
   minInvestment: z.number().min(0).optional(),

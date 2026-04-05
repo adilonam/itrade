@@ -8,7 +8,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import {
   IconCalendar,
-  IconMapPin,
   IconTrendingUp,
   IconUsers,
   IconShield
@@ -18,7 +17,6 @@ interface Investment {
   id: string;
   title: string;
   description?: string | null;
-  country: string;
   duration: number;
   rentability: number;
   minInvestment: number;
@@ -110,10 +108,6 @@ export function InvestmentCard({ investment, className }: InvestmentCardProps) {
         </div>
 
         <div className='text-muted-foreground flex items-center space-x-4 text-sm'>
-          <div className='flex items-center'>
-            <IconMapPin className='mr-1 h-4 w-4' />
-            {investment.country}
-          </div>
           <div className='flex items-center'>
             <IconCalendar className='mr-1 h-4 w-4' />
             {investment.duration} months

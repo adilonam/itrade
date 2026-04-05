@@ -2,7 +2,6 @@ export interface AdminInvestment {
   id: string;
   title: string;
   description: string | null;
-  country: string;
   duration: number; // in months
   rentability: number; // annual percentage
   minInvestment: number;
@@ -25,7 +24,6 @@ export interface GetInvestmentsParams {
   limit?: number;
   search?: string;
   riskLevel?: string;
-  country?: string;
   isActive?: boolean;
 }
 
@@ -42,7 +40,6 @@ export interface GetInvestmentsResponse {
 export interface CreateInvestmentParams {
   title: string;
   description?: string;
-  country: string;
   duration: number;
   rentability: number;
   minInvestment: number;
@@ -66,7 +63,6 @@ export async function fetchInvestments(
   if (params.limit) searchParams.append('limit', params.limit.toString());
   if (params.search) searchParams.append('search', params.search);
   if (params.riskLevel) searchParams.append('riskLevel', params.riskLevel);
-  if (params.country) searchParams.append('country', params.country);
   if (params.isActive !== undefined)
     searchParams.append('isActive', params.isActive.toString());
 

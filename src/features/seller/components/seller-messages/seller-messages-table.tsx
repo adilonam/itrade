@@ -24,7 +24,7 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   IconLoader2,
   IconChevronLeft,
@@ -142,7 +142,7 @@ export function SellerMessagesTable({
           <div className='flex flex-1 flex-col space-y-4'>
             <div className='relative flex flex-1'>
               <div className='absolute inset-0 flex overflow-hidden rounded-lg border'>
-                <ScrollArea className='h-full w-full'>
+                <ScrollArea className='h-full w-full' horizontal>
                   <Table>
                     <TableHeader className='bg-muted sticky top-0 z-10'>
                       <TableRow>
@@ -220,7 +220,6 @@ export function SellerMessagesTable({
                       ))}
                     </TableBody>
                   </Table>
-                  <ScrollBar orientation='horizontal' />
                 </ScrollArea>
 
                 <Dialog

@@ -6,7 +6,6 @@ import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 import {
   IconCalendar,
-  IconMapPin,
   IconTrendingUp,
   IconClock,
   IconShield
@@ -24,7 +23,6 @@ interface UserInvestmentData {
   investment: {
     id: string;
     title: string;
-    country: string;
     duration: number;
     rentability: number;
     riskLevel: string;
@@ -120,10 +118,6 @@ export function UserInvestmentCard({
               {userInvestment.investment.title}
             </CardTitle>
             <div className='text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-1 text-sm'>
-              <div className='flex items-center'>
-                <IconMapPin className='mr-1 h-3 w-3 flex-shrink-0' />
-                {userInvestment.investment.country}
-              </div>
               <div className='flex items-center'>
                 <IconCalendar className='mr-1 h-3 w-3 flex-shrink-0' />
                 {userInvestment.investment.duration} months

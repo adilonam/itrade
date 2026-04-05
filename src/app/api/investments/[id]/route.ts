@@ -16,7 +16,6 @@ export async function GET(
         id: true,
         title: true,
         description: true,
-        country: true,
         duration: true,
         rentability: true,
         minInvestment: true,

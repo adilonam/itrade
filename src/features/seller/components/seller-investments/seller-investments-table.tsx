@@ -16,7 +16,7 @@ import {
   CardHeader,
   CardTitle
 } from '@/components/ui/card';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { IconLoader2 } from '@tabler/icons-react';
 
 export type UserInvestmentWithRelations = {
@@ -37,7 +37,6 @@ export type UserInvestmentWithRelations = {
   investment: {
     id: string;
     title: string;
-    country: string;
     duration: number;
     rentability: number;
     riskLevel: string;
@@ -136,7 +135,7 @@ export function SellerInvestmentsTable({
           <div className='flex flex-1 flex-col space-y-4'>
             <div className='relative flex flex-1'>
               <div className='absolute inset-0 flex overflow-hidden rounded-lg border'>
-                <ScrollArea className='h-full w-full'>
+                <ScrollArea className='h-full w-full' horizontal>
                   <Table>
                     <TableHeader className='bg-muted sticky top-0 z-10'>
                       <TableRow>
@@ -169,7 +168,6 @@ export function SellerInvestmentsTable({
                                 {ui.investment.title}
                               </div>
                               <div className='text-muted-foreground text-xs'>
-                                {ui.investment.country} ·{' '}
                                 {ui.investment.duration} mo ·{' '}
                                 {ui.investment.rentability}% ·{' '}
                                 {ui.investment.riskLevel}
@@ -205,7 +203,6 @@ export function SellerInvestmentsTable({
                       ))}
                     </TableBody>
                   </Table>
-                  <ScrollBar orientation='horizontal' />
                 </ScrollArea>
               </div>
             </div>

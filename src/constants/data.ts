@@ -198,11 +198,11 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'Deposits',
-        url: '/admin/deposit',
+        title: 'Deposit request',
+        url: '/admin/deposit-request',
         icon: 'add',
         isActive: false,
-        shortcut: ['d', 'p'],
+        shortcut: ['d', 'r'],
         items: []
       },
       {
@@ -313,11 +313,11 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'Deposits',
-        url: '/admin/deposit',
+        title: 'Deposit request',
+        url: '/admin/deposit-request',
         icon: 'add',
         isActive: false,
-        shortcut: ['d', 'p'],
+        shortcut: ['d', 'r'],
         items: []
       },
       {

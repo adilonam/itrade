@@ -125,6 +125,8 @@
 .trade-room,
 .watch-trader-shell {
   --trade-dark: #12151c;
+  /** Opaque menus (Select, etc.): darker than --trade-dark so list reads solid. */
+  --trade-select-menu: #05070b;
   --trade-panel: #161b22;
   --trade-border: #2a3441;
   --trade-accent-blue: #19f0ff;
@@ -138,6 +140,7 @@
 html:not(.dark) .trade-room,
 html:not(.dark) .watch-trader-shell {
   --trade-dark: #f1f5f9;
+  --trade-select-menu: #ffffff;
   --trade-panel: #ffffff;
   --trade-border: #e2e8f0;
   --trade-accent-blue: #0ea5e9;

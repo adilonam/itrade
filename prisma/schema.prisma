@@ -307,7 +307,6 @@ model Investment {
   id               String  @id @default(cuid())
   title            String
   description      String? @db.Text
-  country          String
   duration         Int // Duration in months
   rentability      Float // Annual rentability percentage
   minInvestment    Float   @map("min_investment")

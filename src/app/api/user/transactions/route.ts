@@ -1,8 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import type { BalanceType } from '@/lib/prisma/generated/client';
 import { z } from 'zod';
 import { parseBalanceType } from '@/lib/balance';
 import { getAuthSession } from '@/lib/auth';
+
+function parseBalanceTypesParam(raw: string | null): BalanceType[] | null {
+  if (raw == null || raw.trim() === '') return null;
+  const parts = raw
+    .split(',')
+    .map((t) => t.trim().toUpperCase())
+    .filter(Boolean);
+  const out: BalanceType[] = [];
+  for (const p of parts) {
+    if (p === 'REAL' || p === 'DEMO' || p === 'INSTITUTIONAL') {
+      out.push(p);
+    }
+  }
+  return out.length > 0 ? out : null;
+}
 
 const TRANSACTION_TYPE_VALUES = [
   'GAIN',
@@ -82,18 +98,26 @@ export async function GET(request: NextRequest) {
     }
 
     const { page, limit, type, transactionType } = validation.data;
+    const balanceTypesList = parseBalanceTypesParam(
+      searchParams.get('balanceTypes')
+    );
     const balanceType = parseBalanceType(searchParams.get('balanceType'));
     const skip = (page - 1) * limit;
 
+    const userBalanceWhere =
+      balanceTypesList != null
+        ? ({ userId, type: { in: balanceTypesList } } as const)
+        : ({ userId, type: balanceType } as const);
+
     // Build where clause (transactions are tied to a UserBalance row)
     const where: {
-      userBalance: { userId: string; type: typeof balanceType };
+      userBalance: typeof userBalanceWhere;
       type?:
         | ApiTransactionType
         | { in: ApiTransactionType[] };
       description?: { contains: string };
     } = {
-      userBalance: { userId, type: balanceType }
+      userBalance: userBalanceWhere
     };
 
     // Filter by transaction type(s); `types` (comma-separated) wins over single `type`

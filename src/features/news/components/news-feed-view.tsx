@@ -6,22 +6,12 @@ import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { IconNews } from '@tabler/icons-react';
 import Image from 'next/image';
+import {
+  type AlphaVantageNewsFeedItem,
+  formatAlphaVantageNewsDateTime
+} from '@/lib/alphavantage-news';
 
-type NewsItem = {
-  title: string;
-  url: string;
-  time_published: string;
-  authors?: string[];
-  summary: string;
-  banner_image?: string;
-  source: string;
-  overall_sentiment_score?: number;
-  overall_sentiment_label?: string;
-  ticker_sentiment?: Array<{
-    ticker: string;
-    ticker_sentiment_label: string;
-  }>;
-};
+type NewsItem = AlphaVantageNewsFeedItem;
 
 type NewsResponse = {
   feed?: NewsItem[];
@@ -29,16 +19,6 @@ type NewsResponse = {
   sentiment_score_definition?: string;
   relevance_score_definition?: string;
 };
-
-function formatTimePublished(tp: string): string {
-  if (!tp || tp.length < 14) return tp;
-  const y = tp.slice(0, 4);
-  const m = tp.slice(4, 6);
-  const d = tp.slice(6, 8);
-  const h = tp.slice(9, 11);
-  const min = tp.slice(11, 13);
-  return `${y}-${m}-${d} ${h}:${min}`;
-}
 
 function sentimentColor(label?: string): string {
   if (!label) return 'bg-muted';
@@ -142,7 +122,7 @@ export function NewsFeedView() {
                       {item.source}
                     </span>
                     <span className='text-muted-foreground text-xs'>
-                      {formatTimePublished(item.time_published)}
+                      {formatAlphaVantageNewsDateTime(item.time_published)}
                     </span>
                     {item.overall_sentiment_label && (
                       <Badge

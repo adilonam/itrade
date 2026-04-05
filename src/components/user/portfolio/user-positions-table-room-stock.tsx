@@ -16,7 +16,7 @@ import {
   CardHeader,
   CardTitle
 } from '@/components/ui/card';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import type { Market, Position } from '@/lib/prisma/generated/client';
 import { IconLoader2 } from '@tabler/icons-react';
 
@@ -91,7 +91,7 @@ export function UserPositionsTableRoomStock({
         <CardDescription>View your trading history</CardDescription>
       </CardHeader>
       <CardContent className='min-w-0'>
-        <ScrollArea className='w-full overflow-x-auto'>
+        <ScrollArea className='w-full overflow-x-auto' horizontal>
           <div className='min-w-[800px] rounded-md border'>
             <Table>
               <TableHeader>
@@ -177,7 +177,6 @@ export function UserPositionsTableRoomStock({
               </TableBody>
             </Table>
           </div>
-          <ScrollBar orientation='horizontal' />
         </ScrollArea>
       </CardContent>
     </Card>
