@@ -72,18 +72,20 @@ const formatCurrency = (amount: number) => {
   }).format(amount);
 };
 
+const DAYS_PER_YEAR = 365;
+
 const calculateReturns = (
   amount: number,
   rentability: number,
-  duration: number
+  durationDays: number
 ) => {
   const annualReturn = (amount * rentability) / 100;
-  const monthlyReturn = annualReturn / 12;
-  const totalReturn = monthlyReturn * duration;
+  const dailyReturn = annualReturn / DAYS_PER_YEAR;
+  const totalReturn = dailyReturn * durationDays;
   const totalAmount = amount + totalReturn;
 
   return {
-    monthlyReturn,
+    dailyReturn,
     totalReturn,
     totalAmount
   };
@@ -188,7 +190,7 @@ export function InvestmentDetails({
                 <div className='flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-[var(--trade-text-muted)]'>
                   <div className='flex items-center gap-1'>
                     <IconCalendar className='size-3.5 shrink-0' />
-                    {investment.duration} months
+                    {investment.duration} days
                   </div>
                   <div className='flex items-center gap-1'>
                     <IconUsers className='size-3.5 shrink-0' />
@@ -241,7 +243,7 @@ export function InvestmentDetails({
                         Duration
                       </span>
                       <span className='font-medium text-[var(--trade-text)]'>
-                        {investment.duration} months
+                        {investment.duration} days
                       </span>
                     </div>
                     <div className='flex justify-between gap-2'>
@@ -369,10 +371,10 @@ export function InvestmentDetails({
               <div className='space-y-2 text-sm'>
                 <div className='flex justify-between gap-2'>
                   <span className='text-[var(--trade-text-muted)]'>
-                    Monthly return
+                    Daily return (avg.)
                   </span>
                   <span className='font-mono font-medium text-[var(--trade-text)]'>
-                    {formatCurrency(returns.monthlyReturn)}
+                    {formatCurrency(returns.dailyReturn)}
                   </span>
                 </div>
                 <div className='flex justify-between gap-2'>

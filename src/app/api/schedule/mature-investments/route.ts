@@ -17,6 +17,9 @@ export async function POST(request: NextRequest) {
 
     const now = new Date();
 
+    // UserInvestment.endDate is set at enrollment as start + investment.duration
+    // calendar days; expectedReturn uses annual rentability pro-rata over those days.
+
     // Find all active investments that have reached their end date
     const maturedInvestments = await prisma.userInvestment.findMany({
       where: {

@@ -244,6 +244,21 @@ Example: from Trade → Institutional or Investment.
 
 
 
+
+
+
+- [?] Now the open trades are visible in live… I would like to add a tab for closed trades, where all closed trades can be viewed.
+
+- [x] Add closed trades. Include the “date closed,” which was previously active, so we can display the date and time when the trade was closed.
+
+- [?] This section… apply new number formatting and new colors.
+
+- [x] And basically... add the weekly and monthly return options that currently only have the annual one
+
+
+
+
+
 ### extra
 - [ ] close on date 
 - [ ] spanish langaue

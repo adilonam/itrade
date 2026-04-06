@@ -168,7 +168,7 @@ export function SellerInvestmentsTable({
                                 {ui.investment.title}
                               </div>
                               <div className='text-muted-foreground text-xs'>
-                                {ui.investment.duration} mo ·{' '}
+                                {ui.investment.duration} d ·{' '}
                                 {ui.investment.rentability}% ·{' '}
                                 {ui.investment.riskLevel}
                               </div>

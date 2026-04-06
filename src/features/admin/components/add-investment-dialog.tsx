@@ -51,8 +51,8 @@ const formSchema = z
       .optional(),
     duration: z.coerce
       .number()
-      .min(1, 'Duration must be at least 1 month')
-      .max(120, 'Duration cannot exceed 10 years'),
+      .min(1, 'Duration must be at least 1 day')
+      .max(3650, 'Duration cannot exceed 10 years (3650 days)'),
     rentability: z.coerce
       .number()
       .min(0, 'Rentability must be non-negative')
@@ -112,7 +112,7 @@ export function AddInvestmentDialog({
     defaultValues: {
       title: '',
       description: '',
-      duration: 12,
+      duration: 365,
       rentability: 5.0,
       minInvestment: 1000,
       maxInvestment: undefined,
@@ -236,9 +236,9 @@ export function AddInvestmentDialog({
                 name='duration'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Duration (months) *</FormLabel>
+                    <FormLabel>Duration (days) *</FormLabel>
                     <FormControl>
-                      <Input type='number' placeholder='12' {...field} />
+                      <Input type='number' placeholder='365' {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -250,7 +250,7 @@ export function AddInvestmentDialog({
                 name='rentability'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Annual Return (%) *</FormLabel>
+                    <FormLabel>Return *</FormLabel>
                     <FormControl>
                       <Input
                         type='number'

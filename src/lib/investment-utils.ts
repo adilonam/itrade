@@ -1,9 +1,15 @@
 /**
  * Investment calculation utilities
+ *
+ * Investment `duration` is stored as calendar days. Annual rentability is
+ * applied pro-rata over the holding period (simple interest vs 365-day year).
  */
 
+export const INVESTMENT_DAYS_PER_YEAR = 365;
+
 export interface InvestmentCalculation {
-  monthlyReturn: number;
+  /** Average return accrued per calendar day over the term */
+  dailyReturn: number;
   totalReturn: number;
   totalAmount: number;
   effectiveAnnualRate: number;
@@ -17,23 +23,43 @@ export interface InvestmentProjection {
 }
 
 /**
- * Calculate investment returns based on amount, annual rate, and duration
+ * Expected monetary return for principal at annualRate% held for durationDays.
+ */
+export function investmentExpectedReturn(
+  principal: number,
+  annualRatePercent: number,
+  durationDays: number
+): number {
+  const annualReturnAmount = (principal * annualRatePercent) / 100;
+  return (annualReturnAmount / INVESTMENT_DAYS_PER_YEAR) * durationDays;
+}
+
+/**
+ * End date = start + durationDays (calendar days).
+ */
+export function investmentEndDate(startDate: Date, durationDays: number): Date {
+  const end = new Date(startDate);
+  end.setDate(end.getDate() + durationDays);
+  return end;
+}
+
+/**
+ * Calculate investment returns based on amount, annual rate, and duration in days
  */
 export function calculateInvestmentReturns(
   amount: number,
   annualRate: number,
-  durationMonths: number
+  durationDays: number
 ): InvestmentCalculation {
   const annualReturn = (amount * annualRate) / 100;
-  const monthlyReturn = annualReturn / 12;
-  const totalReturn = monthlyReturn * durationMonths;
+  const dailyReturn = annualReturn / INVESTMENT_DAYS_PER_YEAR;
+  const totalReturn = dailyReturn * durationDays;
   const totalAmount = amount + totalReturn;
 
-  // Calculate effective annual rate considering compounding if applicable
   const effectiveAnnualRate = annualRate;
 
   return {
-    monthlyReturn,
+    dailyReturn,
     totalReturn,
     totalAmount,
     effectiveAnnualRate
@@ -46,23 +72,23 @@ export function calculateInvestmentReturns(
 export function calculateCompoundReturns(
   principal: number,
   annualRate: number,
-  durationMonths: number,
-  compoundingFrequency: number = 12 // monthly compounding by default
+  durationDays: number,
+  compoundingFrequency: number = 12
 ): InvestmentCalculation {
   const rate = annualRate / 100;
   const periodsPerYear = compoundingFrequency;
-  const years = durationMonths / 12;
+  const years = durationDays / INVESTMENT_DAYS_PER_YEAR;
 
   const totalAmount =
     principal * Math.pow(1 + rate / periodsPerYear, periodsPerYear * years);
   const totalReturn = totalAmount - principal;
-  const monthlyReturn = totalReturn / durationMonths;
+  const dailyReturn = durationDays > 0 ? totalReturn / durationDays : 0;
 
   const effectiveAnnualRate =
     (Math.pow(1 + rate / periodsPerYear, periodsPerYear) - 1) * 100;
 
   return {
-    monthlyReturn,
+    dailyReturn,
     totalReturn,
     totalAmount,
     effectiveAnnualRate
@@ -70,22 +96,22 @@ export function calculateCompoundReturns(
 }
 
 /**
- * Generate month-by-month investment projections
+ * Generate month-by-month investment projections (approximate months from duration in days)
  */
 export function generateInvestmentProjection(
   amount: number,
   annualRate: number,
-  durationMonths: number,
+  durationDays: number,
   isCompound: boolean = false
 ): InvestmentProjection[] {
   const projections: InvestmentProjection[] = [];
+  const monthCount = Math.max(1, Math.ceil(durationDays / (365 / 12)));
 
   if (isCompound) {
-    // Compound growth
     const monthlyRate = annualRate / 100 / 12;
     let currentAmount = amount;
 
-    for (let month = 1; month <= durationMonths; month++) {
+    for (let month = 1; month <= monthCount; month++) {
       const monthlyGain = currentAmount * monthlyRate;
       currentAmount += monthlyGain;
 
@@ -97,10 +123,10 @@ export function generateInvestmentProjection(
       });
     }
   } else {
-    // Simple interest
-    const monthlyReturn = (amount * annualRate) / 100 / 12;
+    const totalReturn = investmentExpectedReturn(amount, annualRate, durationDays);
+    const monthlyReturn = totalReturn / monthCount;
 
-    for (let month = 1; month <= durationMonths; month++) {
+    for (let month = 1; month <= monthCount; month++) {
       const cumulativeReturn = monthlyReturn * month;
 
       projections.push({
@@ -201,15 +227,13 @@ export function formatPercentage(value: number, decimals: number = 2): string {
 }
 
 /**
- * Calculate investment maturity date
+ * Calculate investment maturity date from start + duration in days
  */
 export function calculateMaturityDate(
   startDate: Date,
-  durationMonths: number
+  durationDays: number
 ): Date {
-  const maturityDate = new Date(startDate);
-  maturityDate.setMonth(maturityDate.getMonth() + durationMonths);
-  return maturityDate;
+  return investmentEndDate(startDate, durationDays);
 }
 
 /**

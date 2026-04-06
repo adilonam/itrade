@@ -2,7 +2,7 @@ export interface AdminInvestment {
   id: string;
   title: string;
   description: string | null;
-  duration: number; // in months
+  duration: number; // calendar days
   rentability: number; // annual percentage
   minInvestment: number;
   maxInvestment: number | null;

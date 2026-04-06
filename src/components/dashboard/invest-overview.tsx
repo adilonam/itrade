@@ -229,7 +229,7 @@ export function InvestOverview() {
                   <div>
                     <p className='font-medium'>{inv.investment.title}</p>
                     <p className='text-muted-foreground text-xs'>
-                      {inv.investment.duration} mo ·{' '}
+                      {inv.investment.duration} d ·{' '}
                       {inv.investment.rentability}% · Ends{' '}
                       {formatDate(inv.endDate)}
                     </p>

@@ -273,7 +273,7 @@ export function SellerInvestmentCreation({
                   ) : (
                     filteredInvestments.map((i) => (
                       <SelectItem key={i.id} value={i.id}>
-                        {i.title} ({i.duration} mo, {i.rentability}%)
+                        {i.title} ({i.duration} d, {i.rentability}%)
                       </SelectItem>
                     ))
                   )}

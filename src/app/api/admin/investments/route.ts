@@ -71,7 +71,7 @@ export async function GET(request: NextRequest) {
 const CreateInvestmentSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   description: z.string().optional(),
-  duration: z.number().min(1, 'Duration must be at least 1 month'),
+  duration: z.number().min(1, 'Duration must be at least 1 day'),
   rentability: z.number().min(0, 'Rentability must be positive'),
   minInvestment: z.number().min(0, 'Minimum investment must be positive'),
   maxInvestment: z.number().optional(),

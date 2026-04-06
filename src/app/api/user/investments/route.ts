@@ -3,6 +3,10 @@ import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 import { ensureUserBalance, parseBalanceType } from '@/lib/balance';
 import { getAuthSession } from '@/lib/auth';
+import {
+  investmentEndDate,
+  investmentExpectedReturn
+} from '@/lib/investment-utils';
 
 const EnrollmentSchema = z.object({
   investmentId: z.string(),
@@ -105,14 +109,13 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      // Calculate end date and expected return
       const startDate = new Date();
-      const endDate = new Date();
-      endDate.setMonth(endDate.getMonth() + investment.duration);
-
-      const annualReturn = (amount * investment.rentability) / 100;
-      const monthlyReturn = annualReturn / 12;
-      const expectedReturn = monthlyReturn * investment.duration;
+      const endDate = investmentEndDate(startDate, investment.duration);
+      const expectedReturn = investmentExpectedReturn(
+        amount,
+        investment.rentability,
+        investment.duration
+      );
 
       // Create user investment
       const userInvestment = await tx.userInvestment.create({

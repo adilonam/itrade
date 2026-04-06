@@ -58,7 +58,7 @@ export const columns: ColumnDef<AdminInvestment>[] = [
     ),
     cell: ({ row }) => {
       const duration = row.getValue('duration') as number;
-      return <span className='text-sm'>{duration} months</span>;
+      return <span className='text-sm'>{duration} days</span>;
     }
   },
   {

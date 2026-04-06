@@ -120,7 +120,7 @@ export function UserInvestmentCard({
             <div className='text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-1 text-sm'>
               <div className='flex items-center'>
                 <IconCalendar className='mr-1 h-3 w-3 flex-shrink-0' />
-                {userInvestment.investment.duration} months
+                {userInvestment.investment.duration} days
               </div>
               <div
                 className={cn(

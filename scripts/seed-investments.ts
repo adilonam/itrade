@@ -16,7 +16,7 @@ async function main() {
         title: 'Luxembourg Real Estate Fund',
         description:
           'Diversified real estate investment in Luxembourg premium properties with stable returns.',
-        duration: 12,
+        duration: 365,
         rentability: 8.5,
         minInvestment: 1000,
         maxInvestment: 50000,
@@ -30,7 +30,7 @@ async function main() {
         title: 'Swiss Green Energy Project',
         description:
           'Investment in renewable energy infrastructure across Switzerland.',
-        duration: 24,
+        duration: 730,
         rentability: 12.0,
         minInvestment: 5000,
         maxInvestment: 100000,
@@ -44,7 +44,7 @@ async function main() {
         title: 'German Tech Startups',
         description:
           'Early-stage investment in promising German technology startups.',
-        duration: 36,
+        duration: 1095,
         rentability: 15.0,
         minInvestment: 2000,
         maxInvestment: 25000,
@@ -58,7 +58,7 @@ async function main() {
         title: 'French Government Bonds',
         description:
           'Low-risk investment in French treasury bonds with guaranteed returns.',
-        duration: 6,
+        duration: 182,
         rentability: 3.5,
         minInvestment: 500,
         maxInvestment: null,

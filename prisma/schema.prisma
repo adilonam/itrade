@@ -80,50 +80,50 @@ model Session {
 }
 
 model User {
-  id                  String               @id @default(cuid())
-  name                String?
-  email               String               @unique
-  emailVerified       DateTime?            @map("email_verified")
-  image               String? // profile image URL (e.g. Vercel Blob URL)
-  password            String? // For credentials provider
-  role                Role                 @default(USER)
-  createdAt           DateTime             @default(now()) @map("created_at")
-  updatedAt           DateTime             @updatedAt @map("updated_at")
-  leverage            Int                  @default(1000) @map("leverage")
+  id                      String                   @id @default(cuid())
+  name                    String?
+  email                   String                   @unique
+  emailVerified           DateTime?                @map("email_verified")
+  image                   String? // profile image URL (e.g. Vercel Blob URL)
+  password                String? // For credentials provider
+  role                    Role                     @default(USER)
+  createdAt               DateTime                 @default(now()) @map("created_at")
+  updatedAt               DateTime                 @updatedAt @map("updated_at")
+  leverage                Int                      @default(1000) @map("leverage")
   // Theme preferences
-  themeMode           String?              @default("system") @map("theme_mode") // "light", "dark", "system"
-  themeColor          String?              @default("default") @map("theme_color") // "default", "blue", "green", etc.
-  reducedMotion       Boolean              @default(false) @map("reduced_motion")
-  highContrast        Boolean              @default(false) @map("high_contrast")
-  phone               String?              @map("phone")
-  dateOfBirth         DateTime?            @map("date_of_birth")
-  address             String?              @map("address")
-  postalCode          String?              @map("postal_code")
-  city                String?              @map("city")
-  country             String?              @map("country")
-  gender              String?              @map("gender")
-  kycStatus           KycStatus            @default(NOT_SUBMITTED) @map("kyc_status")
-  kycDocumentType     String?              @map("kyc_document_type")
-  kycFrontImageUrl    String?              @db.Text @map("kyc_front_image_url")
-  kycBackImageUrl     String?              @db.Text @map("kyc_back_image_url")
-  kycSelfieUrl        String?              @db.Text @map("kyc_selfie_url")
-  kycUtilityBillUrl   String?              @db.Text @map("kyc_utility_bill_url")
-  accounts            Account[]
-  sessions            Session[]
-  mfaChallenges       MfaChallenge[]
-  passwordResetTokens PasswordResetToken[]
-  positions           Position[]
-  userInvestments     UserInvestment[]
-  withdrawRequests    WithdrawRequest[]
-  seller              User?                @relation("SellerUsers", fields: [sellerId], references: [id], onDelete: SetNull)
-  sellerId            String?              @map("seller_id")
-  sellerUsers         User[]               @relation("SellerUsers")
-  sentMessages        Message[]            @relation("MessageSender")
-  receivedMessages    Message[]            @relation("MessageReceiver")
-  botUsers            BotUser[]
-  balances            UserBalance[]
+  themeMode               String?                  @default("system") @map("theme_mode") // "light", "dark", "system"
+  themeColor              String?                  @default("default") @map("theme_color") // "default", "blue", "green", etc.
+  reducedMotion           Boolean                  @default(false) @map("reduced_motion")
+  highContrast            Boolean                  @default(false) @map("high_contrast")
+  phone                   String?                  @map("phone")
+  dateOfBirth             DateTime?                @map("date_of_birth")
+  address                 String?                  @map("address")
+  postalCode              String?                  @map("postal_code")
+  city                    String?                  @map("city")
+  country                 String?                  @map("country")
+  gender                  String?                  @map("gender")
+  kycStatus               KycStatus                @default(NOT_SUBMITTED) @map("kyc_status")
+  kycDocumentType         String?                  @map("kyc_document_type")
+  kycFrontImageUrl        String?                  @map("kyc_front_image_url") @db.Text
+  kycBackImageUrl         String?                  @map("kyc_back_image_url") @db.Text
+  kycSelfieUrl            String?                  @map("kyc_selfie_url") @db.Text
+  kycUtilityBillUrl       String?                  @map("kyc_utility_bill_url") @db.Text
+  accounts                Account[]
+  sessions                Session[]
+  mfaChallenges           MfaChallenge[]
+  passwordResetTokens     PasswordResetToken[]
+  positions               Position[]
+  userInvestments         UserInvestment[]
+  withdrawRequests        WithdrawRequest[]
+  seller                  User?                    @relation("SellerUsers", fields: [sellerId], references: [id], onDelete: SetNull)
+  sellerId                String?                  @map("seller_id")
+  sellerUsers             User[]                   @relation("SellerUsers")
+  sentMessages            Message[]                @relation("MessageSender")
+  receivedMessages        Message[]                @relation("MessageReceiver")
+  botUsers                BotUser[]
+  balances                UserBalance[]
   kycVerificationRequests KycVerificationRequest[] @relation("KycUserRequests")
-  reviewedKycRequests KycVerificationRequest[] @relation("KycReviewedBy")
+  reviewedKycRequests     KycVerificationRequest[] @relation("KycReviewedBy")
 
   @@map("users")
 }
@@ -133,14 +133,14 @@ model KycVerificationRequest {
   userId       String                       @map("user_id")
   documentType String                       @map("document_type")
   status       KycVerificationRequestStatus @default(PENDING) @map("status")
-  notes        String?                      @db.Text @map("notes")
+  notes        String?                      @map("notes") @db.Text
   createdAt    DateTime                     @default(now()) @map("created_at")
   updatedAt    DateTime                     @updatedAt @map("updated_at")
   reviewedAt   DateTime?                    @map("reviewed_at")
   reviewedById String?                      @map("reviewed_by_id")
 
-  user       User                    @relation("KycUserRequests", fields: [userId], references: [id], onDelete: Cascade)
-  reviewedBy User?                   @relation("KycReviewedBy", fields: [reviewedById], references: [id], onDelete: SetNull)
+  user       User                      @relation("KycUserRequests", fields: [userId], references: [id], onDelete: Cascade)
+  reviewedBy User?                     @relation("KycReviewedBy", fields: [reviewedById], references: [id], onDelete: SetNull)
   documents  KycVerificationDocument[]
 
   @@index([userId])
@@ -152,7 +152,7 @@ model KycVerificationDocument {
   id        String          @id @default(cuid())
   requestId String          @map("request_id")
   kind      KycDocumentKind @map("kind")
-  fileUrl   String          @db.Text @map("file_url")
+  fileUrl   String          @map("file_url") @db.Text
   createdAt DateTime        @default(now()) @map("created_at")
 
   request KycVerificationRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
@@ -162,17 +162,17 @@ model KycVerificationDocument {
 }
 
 model UserBalance {
-  id        String       @id @default(cuid())
-  userId    String       @map("user_id")
+  id        String      @id @default(cuid())
+  userId    String      @map("user_id")
   type      BalanceType
-  amount    Float        @default(0) @map("amount")
-  createdAt DateTime     @default(now()) @map("created_at")
-  updatedAt DateTime     @updatedAt @map("updated_at")
+  amount    Float       @default(0) @map("amount")
+  createdAt DateTime    @default(now()) @map("created_at")
+  updatedAt DateTime    @updatedAt @map("updated_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  transactions           Transaction[]
-  depositRequests        DepositRequest[]
+  transactions             Transaction[]
+  depositRequests          DepositRequest[]
   transferRequestsSent     TransferRequest[] @relation("TransferSenderBalance")
   transferRequestsReceived TransferRequest[] @relation("TransferRecipientBalance")
 
@@ -279,7 +279,7 @@ model Position {
 
   // Reference and metadata
   description String? // Position description
-  bot        Bot?    @map("bot") // Bot that created the position, if any
+  bot         Bot?    @map("bot") // Bot that created the position, if any
 
   // Timestamps
   executedAt DateTime? @map("executed_at") // When position was executed
@@ -307,7 +307,7 @@ model Investment {
   id               String  @id @default(cuid())
   title            String
   description      String? @db.Text
-  duration         Int // Duration in months
+  duration         Int // Duration in calendar days
   rentability      Float // Annual rentability percentage
   minInvestment    Float   @map("min_investment")
   maxInvestment    Float?  @map("max_investment")
@@ -358,11 +358,11 @@ model UserInvestment {
 
 // Transaction model for tracking user financial transactions
 model Transaction {
-  id              String          @id @default(cuid())
-  userBalanceId   String          @map("user_balance_id")
-  type            TransactionType
-  absoluteAmount  Float           @default(0) // absolute amount of the transaction
-  description     String?
+  id             String          @id @default(cuid())
+  userBalanceId  String          @map("user_balance_id")
+  type           TransactionType
+  absoluteAmount Float           @default(0) // absolute amount of the transaction
+  description    String?
 
   // Timestamps
   createdAt DateTime @default(now()) @map("created_at")
@@ -387,11 +387,11 @@ enum TransactionType {
 
 // App Settings model for global configuration
 model AppSettings {
-  id            String   @id @default("default")
-  appIcon       String?  @map("app_icon") // Path to uploaded icon
-  appName       String   @default("Trade Nova") @map("app_name")
+  id         String  @id @default("default")
+  appIcon    String? @map("app_icon") // Path to uploaded icon
+  appName    String  @default("Trade Nova") @map("app_name")
   // When true, users can create/update/close positions; when false, only admin/superadmin can
-  openMarket    Boolean  @default(true) @map("open_market")
+  openMarket Boolean @default(true) @map("open_market")
 
   googleClientId     String? @map("google_client_id")
   googleClientSecret String? @map("google_client_secret") @db.Text
@@ -399,11 +399,11 @@ model AppSettings {
   twelveDataApiKeyPublic String? @map("twelve_data_api_key_public") @db.Text
   twelveDataApiKey       String? @map("twelve_data_api_key") @db.Text
 
-  smtpHost     String? @map("smtp_host")
-  smtpPort     String  @default("587") @map("smtp_port")
-  smtpSecure   Boolean @default(false) @map("smtp_secure")
-  smtpUser     String? @map("smtp_user")
-  smtpPassword String? @map("smtp_password") @db.Text
+  smtpHost      String? @map("smtp_host")
+  smtpPort      String  @default("587") @map("smtp_port")
+  smtpSecure    Boolean @default(false) @map("smtp_secure")
+  smtpUser      String? @map("smtp_user")
+  smtpPassword  String? @map("smtp_password") @db.Text
   smtpFromEmail String? @map("smtp_from_email")
 
   minMarginLevel Int @default(100) @map("min_margin_level")
@@ -415,8 +415,8 @@ model AppSettings {
 
   manualUsdtDepositWalletAddress String? @map("manual_usdt_deposit_wallet_address") @db.Text
 
-  createdAt     DateTime @default(now()) @map("created_at")
-  updatedAt     DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("app_settings")
 }
@@ -506,14 +506,14 @@ model WithdrawRequest {
 }
 
 model TransferRequest {
-  id                       String                @id @default(cuid())
-  senderUserBalanceId      String                @map("sender_user_balance_id")
-  recipientUserBalanceId   String                @map("recipient_user_balance_id")
-  amount                   Float                 @map("amount")
-  status                   TransferRequestStatus @default(PENDING) @map("status")
-  adminNotes               String?               @map("admin_notes") @db.Text
-  createdAt                DateTime              @default(now()) @map("created_at")
-  updatedAt                DateTime              @updatedAt @map("updated_at")
+  id                     String                @id @default(cuid())
+  senderUserBalanceId    String                @map("sender_user_balance_id")
+  recipientUserBalanceId String                @map("recipient_user_balance_id")
+  amount                 Float                 @map("amount")
+  status                 TransferRequestStatus @default(PENDING) @map("status")
+  adminNotes             String?               @map("admin_notes") @db.Text
+  createdAt              DateTime              @default(now()) @map("created_at")
+  updatedAt              DateTime              @updatedAt @map("updated_at")
 
   senderUserBalance    UserBalance @relation("TransferSenderBalance", fields: [senderUserBalanceId], references: [id], onDelete: Cascade)
   recipientUserBalance UserBalance @relation("TransferRecipientBalance", fields: [recipientUserBalanceId], references: [id], onDelete: Cascade)
@@ -525,22 +525,22 @@ model TransferRequest {
 }
 
 model DepositRequest {
-  id                String                 @id @default(cuid())
-  userBalanceId     String                 @map("user_balance_id")
-  amountUsd         Float                  @map("amount_usd")
-  payCurrency       String                 @map("pay_currency")
-  channel           DepositRequestChannel  @default(GATEWAY) @map("channel")
-  status            DepositRequestStatus   @default(PENDING) @map("status")
-  nowPaymentId      String?                @unique @map("now_payment_id")
-  nowPaymentStatus  String?                @map("now_payment_status")
-  checkoutUrl       String?                @db.Text @map("checkout_url")
-  orderId           String                 @unique @map("order_id")
-  creditedAt        DateTime?              @map("credited_at")
-  lastWebhookAt     DateTime?              @map("last_webhook_at")
-  rawWebhookPayload Json?                  @map("raw_webhook_payload")
-  adminNotes        String?                @map("admin_notes") @db.Text
-  createdAt         DateTime               @default(now()) @map("created_at")
-  updatedAt         DateTime               @updatedAt @map("updated_at")
+  id                String                @id @default(cuid())
+  userBalanceId     String                @map("user_balance_id")
+  amountUsd         Float                 @map("amount_usd")
+  payCurrency       String                @map("pay_currency")
+  channel           DepositRequestChannel @default(GATEWAY) @map("channel")
+  status            DepositRequestStatus  @default(PENDING) @map("status")
+  nowPaymentId      String?               @unique @map("now_payment_id")
+  nowPaymentStatus  String?               @map("now_payment_status")
+  checkoutUrl       String?               @map("checkout_url") @db.Text
+  orderId           String                @unique @map("order_id")
+  creditedAt        DateTime?             @map("credited_at")
+  lastWebhookAt     DateTime?             @map("last_webhook_at")
+  rawWebhookPayload Json?                 @map("raw_webhook_payload")
+  adminNotes        String?               @map("admin_notes") @db.Text
+  createdAt         DateTime              @default(now()) @map("created_at")
+  updatedAt         DateTime              @updatedAt @map("updated_at")
 
   userBalance UserBalance @relation(fields: [userBalanceId], references: [id], onDelete: Cascade)
 

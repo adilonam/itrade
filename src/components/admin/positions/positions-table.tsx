@@ -256,10 +256,10 @@ export function PositionsTable({
                           P&L
                         </TableHead>
                         <TableHead className='text-xs font-medium text-[var(--trade-text-muted)]'>
-                          Created
+                          Open date
                         </TableHead>
                         <TableHead className='text-xs font-medium text-[var(--trade-text-muted)]'>
-                          Closed
+                          Close date
                         </TableHead>
                         {!readOnly ? (
                           <TableHead className='text-xs font-medium text-[var(--trade-text-muted)]'>
@@ -379,7 +379,9 @@ export function PositionsTable({
                             })()}
                           </TableCell>
                           <TableCell className='text-xs text-[var(--trade-text-muted)]'>
-                            {formatDate(position.executedAt || new Date())}
+                            {position.executedAt
+                              ? formatDate(position.executedAt)
+                              : 'N/A'}
                           </TableCell>
                           <TableCell className='text-xs text-[var(--trade-text-muted)]'>
                             {position.closedAt

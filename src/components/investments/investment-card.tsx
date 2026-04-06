@@ -110,7 +110,7 @@ export function InvestmentCard({ investment, className }: InvestmentCardProps) {
         <div className='text-muted-foreground flex items-center space-x-4 text-sm'>
           <div className='flex items-center'>
             <IconCalendar className='mr-1 h-4 w-4' />
-            {investment.duration} months
+            {investment.duration} days
           </div>
         </div>
       </CardHeader>
@@ -124,7 +124,7 @@ export function InvestmentCard({ investment, className }: InvestmentCardProps) {
 
         <div className='grid grid-cols-2 gap-4 text-sm'>
           <div>
-            <p className='text-muted-foreground font-medium'>Annual Return</p>
+            <p className='text-muted-foreground font-medium'>Return</p>
             <div className='flex items-center font-semibold text-green-600'>
               <IconTrendingUp className='mr-1 h-4 w-4' />
               {investment.rentability}%
