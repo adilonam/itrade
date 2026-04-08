@@ -129,8 +129,8 @@ importers:
         specifier: ^7.0.1
         version: 7.0.1
       '@vercel/blob':
-        specifier: ^2.2.0
-        version: 2.2.0
+        specifier: ^2.3.3
+        version: 2.3.3
       bcryptjs:
         specifier: ^3.0.2
         version: 3.0.2
@@ -2371,8 +2371,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@vercel/blob@2.2.0':
-    resolution: {integrity: sha512-h9ruqqTyAlLrmLIT55NUDnfc889feZnQXWOBxpXrAiAzWKmHqIokLchuMBKFsT9MDV/jM0HRQlvlTyubMHrOKA==}
+  '@vercel/blob@2.3.3':
+    resolution: {integrity: sha512-MtD7VLo6hU07eHR7bmk5SIMD290q574UaNYTe46qeyRT+hWrCy26CoAqfd7PnIefVXvRehRZBzukxuTO9iGTVg==}
     engines: {node: '>=20.0.0'}
 
   '@vitest/expect@3.2.4':
@@ -7084,7 +7084,7 @@ snapshots:
   '@unrs/resolver-binding-win32-x64-msvc@1.3.2':
     optional: true
 
-  '@vercel/blob@2.2.0':
+  '@vercel/blob@2.3.3':
     dependencies:
       async-retry: 1.3.3
       is-buffer: 2.0.5

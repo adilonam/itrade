@@ -236,7 +236,7 @@ Example: from Trade → Institutional or Investment.
 
 
 
-- [ ] transfer migrate to trasnfer user management
+- [?] transfer migrate to trasnfer user management
 - [x] add tp and sl for new position
 - [x] remove the contry form plans
 - [?] add more one wallet for usdt and usdc and btc 
@@ -259,8 +259,28 @@ Example: from Trade → Institutional or Investment.
 
 
 
+- [ ] logo
+- [ ] institutional closed postion
+- [ ] fianace make as match trader 
+- [ ] upload files
+
+
+
 ### extra
-- [ ] close on date 
+- [ ] close on date schedule a close to
 - [ ] spanish langaue
 - [ ] demo account 
 - [ ] props challenge
+
+
+
+## monthly cost 
+
+- vercel or aws app == 20 usd per month
+- database --- 10 usd per month
+- google auth --- 2 usd per month
+- twleve data api -- 99 usd per month
+- alphavantage --- 15 uds per month
+- smtp server ---- 10 usd per month
+- file storage --- 5 usd month
+- my cost ---- 

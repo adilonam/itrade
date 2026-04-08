@@ -102,7 +102,7 @@ export async function PATCH(request: NextRequest) {
       const filename = `profile-${session.user.id}-${Date.now()}.${ext}`;
       const blobOpts = await getBlobPutOptions();
       const blob = await put(filename, imageFile, {
-        access: 'public',
+        access: 'private',
         addRandomSuffix: true,
         ...blobOpts
       });

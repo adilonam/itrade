@@ -172,7 +172,7 @@ export async function POST(request: NextRequest) {
       const ext = iconFile.name.split('.').pop() || 'png';
       const filename = `app-icon-${Date.now()}.${ext}`;
       const blob = await put(filename, iconFile, {
-        access: 'public',
+        access: 'private',
         addRandomSuffix: true,
         ...blobOpts
       });

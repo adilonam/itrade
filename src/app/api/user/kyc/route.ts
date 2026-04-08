@@ -11,7 +11,7 @@ async function uploadKycFile(userId: string, label: string, ts: number, file: Fi
   const filename = `kyc-${userId}-${label}-${ts}.${ext}`;
   const blobOpts = await getBlobPutOptions();
   const blob = await put(filename, file, {
-    access: 'public',
+    access: 'private',
     addRandomSuffix: true,
     ...blobOpts
   });
