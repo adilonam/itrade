@@ -259,10 +259,10 @@ Example: from Trade → Institutional or Investment.
 
 
 
-- [ ] logo
-- [ ] institutional closed postion
-- [ ] fianace make as match trader 
-- [ ] upload files
+- [x] logo
+- [x] institutional closed postion
+- [x] fianace make as match trader 
+- [x] upload files
 
 
 
@@ -282,5 +282,5 @@ Example: from Trade → Institutional or Investment.
 - twleve data api -- 99 usd per month
 - alphavantage --- 15 uds per month
 - smtp server ---- 10 usd per month
-- file storage --- 5 usd month
+- file storage --- 10 usd month
 - my cost ---- 

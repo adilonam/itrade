@@ -1,5 +1,5 @@
 import { Separator } from '@/components/ui/separator';
-import { UserPositionsTableCardRoomTrading } from '@/components/user/positions/user-positions-table-room-trading';
+import { UserRoomPositionsTabsPanel } from '@/components/user/positions/user-room-positions-tabs-panel';
 import { InstitutionalAccountInfoCard } from '@/components/trading-view/institutional-account-info-card';
 import { prisma } from '@/lib/prisma';
 import { notFound } from 'next/navigation';
@@ -61,10 +61,11 @@ export default async function Page(props: PageProps) {
 
         <Separator />
 
-        <UserPositionsTableCardRoomTrading
+        <UserRoomPositionsTabsPanel
+          layout='standalone-card'
           room='INSTITUTIONAL'
           refreshEventName='room-institutional-positions-refresh'
-          panelVariant='trade'
+          showFinanceTab={false}
         />
 
         <div className='h-8'></div>

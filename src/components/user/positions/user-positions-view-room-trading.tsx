@@ -324,6 +324,7 @@ export function UserPositionsViewRoomTrading() {
       {/* Finance Card */}
       {financialData && (
         <UserFinanceCard
+          variant="trade"
           balance={financialData.balance}
           usedMargin={financialData.usedMargin}
           equity={financialData.equity}

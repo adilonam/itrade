@@ -13,6 +13,13 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select';
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -32,6 +39,8 @@ import {
   IconTrendingUp,
   IconTrendingDown,
   IconMinus,
+  IconChevronLeft,
+  IconChevronRight
 } from '@tabler/icons-react';
 import { toast } from 'sonner';
 import type { Room } from '@/lib/prisma/generated/client';
@@ -45,6 +54,17 @@ type PositionWithMarket = Position & {
   market: Market | null;
 };
 
+const POSITION_PAGE_SIZE_OPTIONS = [5, 10, 25, 50] as const;
+
+export type PositionsTablePagination = {
+  page: number;
+  pageSize: number;
+  total: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+  onPageSizeChange: (size: number) => void;
+};
+
 interface UserPositionsTableRoomTradingProps {
   positions: PositionWithMarket[];
   loading: boolean;
@@ -55,6 +75,7 @@ interface UserPositionsTableRoomTradingProps {
   panelVariant?: 'default' | 'trade';
   /** When true with `trade`, omit nested card chrome (trade room bottom tabs panel). */
   embeddedInTradePanel?: boolean;
+  pagination?: PositionsTablePagination;
 }
 export function UserPositionsTableRoomTrading({
   positions,
@@ -62,7 +83,8 @@ export function UserPositionsTableRoomTrading({
   onClose,
   onUpdateRealTimePnL,
   panelVariant = 'default',
-  embeddedInTradePanel = false
+  embeddedInTradePanel = false,
+  pagination
 }: UserPositionsTableRoomTradingProps) {
   const isTradePanel = panelVariant === 'trade';
   const isEmbeddedTrade = isTradePanel && embeddedInTradePanel;
@@ -210,7 +232,7 @@ export function UserPositionsTableRoomTrading({
     );
   }
 
-  if (positions.length === 0) {
+  if (positions.length === 0 && (!pagination || pagination.total === 0)) {
     return (
       <Card
         className={cn(
@@ -253,18 +275,24 @@ export function UserPositionsTableRoomTrading({
     >
       <CardContent
         className={cn(
-          'min-h-[240px] min-w-0 flex-1 overflow-hidden',
+          'flex min-h-[240px] min-w-0 flex-1 flex-col overflow-hidden',
           isEmbeddedTrade
-            ? 'px-4 pb-6 pt-0'
+            ? cn(
+                'px-4 pt-0',
+                pagination && pagination.total > 0 ? 'pb-2' : 'pb-6'
+              )
             : isTradePanel
-              ? 'px-4 pb-4 pt-3'
-              : 'pt-6'
+              ? cn(
+                  'px-4 pt-3',
+                  pagination && pagination.total > 0 ? 'pb-2' : 'pb-4'
+                )
+              : cn('pt-6', pagination && pagination.total > 0 ? 'pb-2' : 'pb-6')
         )}
       >
         <div
           className={cn(
-            'relative flex h-full flex-col',
-            isEmbeddedTrade ? 'min-h-0 min-w-0' : 'min-h-[200px]'
+            'relative flex min-h-0 flex-1 flex-col',
+            isEmbeddedTrade ? 'min-w-0' : 'min-h-[200px]'
           )}
         >
           <div className='relative flex min-h-0 min-w-0 flex-1'>
@@ -317,7 +345,19 @@ export function UserPositionsTableRoomTrading({
                       isTradePanel && '[&_tr]:border-[var(--trade-border)]/70'
                     )}
                   >
-                    {positions.map((position) => (
+                    {positions.length === 0 &&
+                    pagination &&
+                    pagination.total > 0 ? (
+                      <TableRow>
+                        <TableCell
+                          colSpan={13}
+                          className={cn('py-8 text-center', mutedCell)}
+                        >
+                          No positions on this page.
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      positions.map((position) => (
                       <TableRow
                         key={position.id}
                         className={cn(
@@ -526,11 +566,127 @@ export function UserPositionsTableRoomTrading({
                           )}
                         </TableCell>
                       </TableRow>
-                    ))}
+                      ))
+                    )}
                   </TableBody>
                 </Table>
             </div>
           </div>
+          {pagination && pagination.total > 0 ? (
+            <div
+              className={cn(
+                'flex shrink-0 flex-wrap items-center justify-between gap-3 border-t px-1 py-2',
+                isTradePanel
+                  ? 'border-[var(--trade-border)] bg-[var(--trade-panel)]'
+                  : 'border-border bg-muted/30'
+              )}
+            >
+              <div className='flex items-center gap-2'>
+                <span
+                  className={cn(
+                    'whitespace-nowrap text-xs',
+                    isTradePanel
+                      ? 'text-[var(--trade-text-muted)]'
+                      : 'text-muted-foreground'
+                  )}
+                >
+                  Rows per page
+                </span>
+                <Select
+                  value={String(pagination.pageSize)}
+                  onValueChange={(v) =>
+                    pagination.onPageSizeChange(Number(v))
+                  }
+                >
+                  <SelectTrigger
+                    size='sm'
+                    className={cn(
+                      'h-8 w-[4.25rem] text-xs',
+                      isTradePanel &&
+                        'border-[var(--trade-border)] bg-[var(--trade-dark)]/40 text-[var(--trade-text)]'
+                    )}
+                  >
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {POSITION_PAGE_SIZE_OPTIONS.map((n) => (
+                      <SelectItem key={n} value={String(n)}>
+                        {n}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className='flex items-center gap-2'>
+                <span
+                  className={cn(
+                    'tabular-nums text-xs',
+                    isTradePanel
+                      ? 'text-[var(--trade-text-muted)]'
+                      : 'text-muted-foreground'
+                  )}
+                >
+                  {pagination.total === 0
+                    ? '0 of 0'
+                    : (() => {
+                        const from =
+                          (pagination.page - 1) * pagination.pageSize + 1;
+                        const to = Math.min(
+                          pagination.page * pagination.pageSize,
+                          pagination.total
+                        );
+                        return `${from}–${to} of ${pagination.total}`;
+                      })()}
+                </span>
+                <div className='flex items-center gap-1'>
+                  <Button
+                    type='button'
+                    variant='outline'
+                    size='sm'
+                    className={cn(
+                      'h-8 w-8 p-0',
+                      isTradePanel &&
+                        'border-[var(--trade-border)] bg-transparent text-[var(--trade-text)] hover:bg-[var(--trade-dark)]/50'
+                    )}
+                    disabled={pagination.page <= 1}
+                    onClick={() =>
+                      pagination.onPageChange(pagination.page - 1)
+                    }
+                    aria-label='Previous page'
+                  >
+                    <IconChevronLeft className='h-4 w-4' />
+                  </Button>
+                  <span
+                    className={cn(
+                      'min-w-[4.5rem] text-center text-xs tabular-nums',
+                      isTradePanel
+                        ? 'text-[var(--trade-text)]'
+                        : 'text-foreground'
+                    )}
+                  >
+                    {pagination.page} / {pagination.totalPages}
+                  </span>
+                  <Button
+                    type='button'
+                    variant='outline'
+                    size='sm'
+                    className={cn(
+                      'h-8 w-8 p-0',
+                      isTradePanel &&
+                        'border-[var(--trade-border)] bg-transparent text-[var(--trade-text)] hover:bg-[var(--trade-dark)]/50'
+                    )}
+                    disabled={pagination.page >= pagination.totalPages}
+                    onClick={() =>
+                      pagination.onPageChange(pagination.page + 1)
+                    }
+                    aria-label='Next page'
+                  >
+                    <IconChevronRight className='h-4 w-4' />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          ) : null}
         </div>
       </CardContent>
     </Card>
@@ -565,14 +721,24 @@ export function UserPositionsTableCardRoomTrading({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [realTimePnL, setRealTimePnL] = useState<Record<string, number>>({});
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [paginationMeta, setPaginationMeta] = useState<{
+    total: number;
+    pages: number;
+  } | null>(null);
+
+  useEffect(() => {
+    setPage(1);
+  }, [pageSize, statusFilter, room]);
 
   const loadPositions = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
       const params = new URLSearchParams({
-        page: '1',
-        limit: '10',
+        page: String(page),
+        limit: String(pageSize),
         room,
         balanceType
       });
@@ -583,16 +749,39 @@ export function UserPositionsTableCardRoomTrading({
       if (!response.ok) throw new Error('Failed to fetch positions');
       const data = await response.json();
       setPositions(data.positions ?? []);
+      const p = data.pagination;
+      if (
+        p &&
+        typeof p.total === 'number' &&
+        typeof p.pages === 'number'
+      ) {
+        setPaginationMeta({
+          total: p.total,
+          pages: Math.max(1, p.pages)
+        });
+      } else {
+        setPaginationMeta(null);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load positions');
     } finally {
       setLoading(false);
     }
-  }, [room, balanceType, statusFilter]);
+  }, [room, balanceType, statusFilter, page, pageSize]);
 
   useEffect(() => {
     loadPositions();
   }, [loadPositions]);
+
+  useEffect(() => {
+    if (
+      paginationMeta &&
+      page > paginationMeta.pages &&
+      paginationMeta.pages >= 1
+    ) {
+      setPage(paginationMeta.pages);
+    }
+  }, [paginationMeta, page]);
 
   // Refresh positions when buy/sell is completed (e.g. from trading actions on this page)
   useEffect(() => {
@@ -666,6 +855,18 @@ export function UserPositionsTableCardRoomTrading({
     );
   }
 
+  const paginationProp: PositionsTablePagination | undefined =
+    !loading && !error && paginationMeta
+      ? {
+          page,
+          pageSize,
+          total: paginationMeta.total,
+          totalPages: paginationMeta.pages,
+          onPageChange: setPage,
+          onPageSizeChange: setPageSize
+        }
+      : undefined;
+
   return (
     <UserPositionsTableRoomTrading
       positions={positions}
@@ -675,6 +876,7 @@ export function UserPositionsTableCardRoomTrading({
       realTimePnL={realTimePnL}
       panelVariant={panelVariant}
       embeddedInTradePanel={embeddedInTradePanel}
+      pagination={paginationProp}
     />
   );
 }

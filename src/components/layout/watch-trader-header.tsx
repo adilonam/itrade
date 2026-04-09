@@ -1,6 +1,7 @@
 'use client';
 
 import { usePublicAppName } from '@/hooks/use-public-app-name';
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSession } from 'next-auth/react';
@@ -154,9 +155,25 @@ export function WatchTraderHeader() {
       <div className="shrink-0 justify-self-start">
         <Link
           href="/trade"
-          className="font-bold tracking-tight text-[var(--trade-accent-blue)]"
+          className="relative flex h-[22px] shrink-0 items-center"
+          aria-label={appName}
         >
-          {appName}
+          <Image
+            src="/images/logo-light.png"
+            alt=""
+            width={200}
+            height={48}
+            className="h-[22px] w-auto max-h-[22px] dark:hidden"
+            priority
+          />
+          <Image
+            src="/images/logo-dark.png"
+            alt=""
+            width={200}
+            height={48}
+            className="hidden h-[22px] w-auto max-h-[22px] dark:block"
+            priority
+          />
         </Link>
       </div>
       <nav
