@@ -1,12 +1,12 @@
 'use client';
 
 import { usePublicAppName } from '@/hooks/use-public-app-name';
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   IconArrowDownLeft,
   IconArrowRight,
-  IconBolt,
   IconLayoutGrid,
   IconPlus,
   IconSettings,
@@ -73,14 +73,26 @@ export function UserManagementSidebar() {
     <aside className="flex min-h-0 w-[260px] shrink-0 flex-col self-stretch border-r border-[var(--trade-border)] bg-[var(--trade-panel)]">
       <Link
         href="/"
-        className="flex h-14 shrink-0 items-center gap-2 border-b border-[var(--trade-border)] px-4 transition-colors hover:bg-[var(--trade-border)]/30"
-        aria-label="Go to home"
+        className="flex h-14 shrink-0 items-center border-b border-[var(--trade-border)] px-4 transition-colors hover:bg-[var(--trade-border)]/30"
+        aria-label={`Go to home, ${appName}`}
       >
-        <span className="flex size-9 items-center justify-center rounded-md bg-[var(--trade-accent-blue)] text-white">
-          <IconBolt className="size-5" stroke={2} />
-        </span>
-        <span className="text-base font-bold tracking-tight text-[var(--trade-text)]">
-          {appName}
+        <span className="relative flex h-10 shrink-0 items-center">
+          <Image
+            src="/images/logo-light.png"
+            alt=""
+            width={200}
+            height={48}
+            className="h-10 w-auto max-h-10 dark:hidden"
+            priority
+          />
+          <Image
+            src="/images/logo-dark.png"
+            alt=""
+            width={200}
+            height={48}
+            className="hidden h-10 w-auto max-h-10 dark:block"
+            priority
+          />
         </span>
       </Link>
       <nav

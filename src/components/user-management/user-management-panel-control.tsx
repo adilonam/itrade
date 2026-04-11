@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { IconLoader2 } from '@tabler/icons-react';
+import { ModeToggle } from '@/components/layout/ThemeToggle/theme-toggle';
 import { cn } from '@/lib/utils';
 import type { FinancialSnapshot } from '@/components/dashboard/dashboard-overview-trade-analytics';
 
@@ -273,10 +274,11 @@ export function UserManagementPanelControl() {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-auto">
-      <header className="shrink-0 border-b border-[var(--trade-border)] bg-[var(--trade-panel)] px-6 py-4">
+      <header className="flex h-14 shrink-0 items-center justify-between gap-3 border-b border-[var(--trade-border)] bg-[var(--trade-panel)] px-6">
         <h1 className="text-base font-semibold text-[var(--trade-text)]">
           Dashboard
         </h1>
+        <ModeToggle />
       </header>
 
       <div className="flex flex-1 flex-col gap-6 p-6">
