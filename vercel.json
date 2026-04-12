@@ -2,15 +2,18 @@
   "crons": [
     {
       "path": "/api/schedule/close-positions",
-      "schedule": "*/20 * * * *"
+      "schedule": "* * * * *"
+ 
     },
     {
       "path": "/api/schedule/mature-investments",
-      "schedule": "0 * * * *"
-    },
+      "schedule": "0 0 * * *"
+    }
+ ,
     {
       "path": "/api/schedule/open-positions",
-      "schedule": "*/30 * * * *"
+      "schedule": "*/15 * * * *"
+ 
     }
   ]
 }
