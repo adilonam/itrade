@@ -17,6 +17,16 @@ export function TradingRoomChartHeader({
   symbol,
   lastPrice
 }: TradingRoomChartHeaderProps) {
+  const hasSymbol = symbol.trim().length > 0;
+
+  if (!hasSymbol) {
+    return (
+      <div className="flex shrink-0 flex-col gap-2 border-b border-[var(--trade-border)] bg-[var(--trade-panel)] px-3 py-2">
+        <div className="text-xs text-[var(--trade-text-muted)]">—</div>
+      </div>
+    );
+  }
+
   const spread = symbol.length > 4 ? lastPrice * 0.00015 : 0.00025;
   const c = lastPrice;
   const o = c - spread * 2;
@@ -27,8 +37,7 @@ export function TradingRoomChartHeader({
     <div className="flex shrink-0 flex-col gap-2 border-b border-[var(--trade-border)] bg-[var(--trade-panel)] px-3 py-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="min-w-0 font-mono text-xs text-[var(--trade-text)]">
-          <span className="font-bold text-sm">{symbol}</span>
-          <span className="ml-2 text-[var(--trade-text-muted)]">
+          <span className="text-[var(--trade-text-muted)]">
             O {formatOhlc(o, symbol)} H {formatOhlc(h, symbol)} L {formatOhlc(l, symbol)} C{' '}
             {formatOhlc(c, symbol)}
           </span>

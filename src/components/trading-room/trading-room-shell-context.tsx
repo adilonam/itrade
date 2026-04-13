@@ -16,7 +16,6 @@ import { toast } from 'sonner';
 import type { SymbolItem } from './trading-room-markets-panel';
 import type { AdvancedOrderMarket } from './trading-room-advanced-order-panel';
 import type { ChartInterval } from './trading-room-chart-header';
-import { MOCK_SYMBOLS } from './mock-data';
 
 export function getTradeRoomFromPath(pathname: string): 'TRADING' | 'INSTITUTIONAL' | 'STOCK' {
   if (pathname.startsWith('/trading-view-room-institutional')) return 'INSTITUTIONAL';
@@ -83,7 +82,7 @@ export function TradingRoomShellProvider({ children }: { children: React.ReactNo
   const noNavigation = pathname === '/trade';
   const symbolLinkBasePath = useMemo(() => getSymbolLinkBasePath(pathname), [pathname]);
 
-  const [symbols, setSymbols] = useState<SymbolItem[]>(() => [...MOCK_SYMBOLS]);
+  const [symbols, setSymbols] = useState<SymbolItem[]>([]);
   const [selectedSymbolId, setSelectedSymbolId] = useState<string | null>(null);
   const [selectedMarket, setSelectedMarket] = useState<Market | null>(null);
   const [advancedOrderOpen, setAdvancedOrderOpen] = useState(false);
@@ -116,26 +115,36 @@ export function TradingRoomShellProvider({ children }: { children: React.ReactNo
     ? toTradingViewSymbol(selectedMarket)
     : selectedSymbol
       ? (selectedSymbol as { symbol: string }).symbol
-      : 'EURUSD';
+      : '';
 
-  const headerLastPrice = selectedSymbol ? getPrice(selectedSymbol) : 1.15578;
+  const headerLastPrice = selectedSymbol ? getPrice(selectedSymbol) : 0;
 
   useEffect(() => {
     let cancelled = false;
+    setSymbols([]);
     fetch(`/api/markets?room=${tradeRoom}`)
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data: { markets?: Market[] } | null) => {
-        if (cancelled || !data?.markets?.length) return;
-        setSymbols(data.markets);
+      .then(async (r) => {
+        if (!r.ok) return { markets: [] as Market[] };
+        return (await r.json()) as { markets?: Market[] };
       })
-      .catch(() => {});
+      .then((data) => {
+        if (cancelled) return;
+        setSymbols(Array.isArray(data.markets) ? data.markets : []);
+      })
+      .catch(() => {
+        if (!cancelled) setSymbols([]);
+      });
     return () => {
       cancelled = true;
     };
   }, [tradeRoom]);
 
   useEffect(() => {
-    if (!symbols.length) return;
+    if (!symbols.length) {
+      setSelectedSymbolId(null);
+      setSelectedMarket(null);
+      return;
+    }
     if (pk) {
       const m = symbols.find((s) => isMarketItem(s) && s.id === pk) as Market | undefined;
       if (m && isMarketItem(m)) {

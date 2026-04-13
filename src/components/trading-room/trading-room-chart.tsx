@@ -14,6 +14,8 @@ export function TradingRoomChart({
   interval,
   lastPrice
 }: TradingRoomChartProps) {
+  const hasSymbol = symbol.trim().length > 0;
+
   return (
     <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-[var(--trade-dark)]">
       <TradingRoomChartHeader
@@ -21,12 +23,18 @@ export function TradingRoomChart({
         lastPrice={lastPrice}
       />
       <div className="relative min-h-0 flex-1">
-        <TradingViewRoomTrading
-          symbol={symbol}
-          interval={interval}
-          height="100%"
-          width="100%"
-        />
+        {hasSymbol ? (
+          <TradingViewRoomTrading
+            symbol={symbol}
+            interval={interval}
+            height="100%"
+            width="100%"
+          />
+        ) : (
+          <div className="flex h-full min-h-[200px] items-center justify-center px-4 text-center text-sm text-[var(--trade-text-muted)]">
+            No market selected.
+          </div>
+        )}
       </div>
     </div>
   );

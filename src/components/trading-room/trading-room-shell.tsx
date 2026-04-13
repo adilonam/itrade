@@ -101,9 +101,7 @@ function TradingRoomShellInner({ children }: { children: React.ReactNode }) {
                     <TradingRoomNewsPanel
                       variant="underMarkets"
                       symbol={chartSymbol}
-                      symbolFullName={
-                        selectedSymbol ? getName(selectedSymbol) : 'Euro vs US Dollar'
-                      }
+                      symbolFullName={selectedSymbol ? getName(selectedSymbol) : ''}
                     />
                   </ResizablePanel>
                 </ResizablePanelGroup>
