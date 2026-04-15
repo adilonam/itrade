@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import type { Position } from '@/lib/prisma/generated/client';
+import { getBalanceTypeForPositionRoom } from '@/lib/balance';
 
 // Update position data type
 type UpdatePositionData = Partial<Position>;
@@ -152,11 +153,21 @@ export async function PUT(
 
       // Update user balance and create transaction if P&L changed
       if (shouldCreateTransaction && balanceChange !== 0) {
+        const balanceType = getBalanceTypeForPositionRoom(
+          updatedPosition.room ?? existingPosition.room
+        );
+
         // Update user balance
         const balanceRow = await tx.userBalance.upsert({
-          where: { userId_type: { userId: existingPosition.userId, type: 'REAL' } },
+          where: {
+            userId_type: { userId: existingPosition.userId, type: balanceType }
+          },
           update: { amount: { increment: balanceChange } },
-          create: { userId: existingPosition.userId, type: 'REAL', amount: balanceChange }
+          create: {
+            userId: existingPosition.userId,
+            type: balanceType,
+            amount: balanceChange
+          }
         });
 
         // Create transaction record for history

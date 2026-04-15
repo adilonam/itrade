@@ -198,15 +198,6 @@ export function SignInForm({
             {isLoading ? 'Signing in...' : 'Sign In'}
           </Button>
         </form>
-        <div className='mt-4 text-center text-sm text-[var(--trade-text-muted)]'>
-          Don&apos;t have an account?{' '}
-          <Link
-            href='/auth/sign-up'
-            className='text-[var(--trade-accent-blue)] underline underline-offset-4'
-          >
-            Sign up
-          </Link>
-        </div>
       </CardContent>
     </Card>
   );

@@ -284,3 +284,9 @@ Example: from Trade → Institutional or Investment.
 - smtp server ---- 10 usd per month
 - file storage --- 10 usd month
 - my cost ---- 
+
+
+
+bugs :
+- [ ] dashboard institutional on close pos
+- [ ] pos decrease balance on intitional 

@@ -11,6 +11,7 @@ import {
   Position,
   TransactionType
 } from '@/lib/prisma/generated/client';
+import { getBalanceTypeForPositionRoom } from '@/lib/balance';
 
 export async function GET() {
   try {
@@ -114,12 +115,19 @@ export async function GET() {
                 const transactionType: TransactionType =
                   calculatedPnL > 0 ? 'GAIN' : 'LOSS';
                 const absoluteAmount = Math.abs(calculatedPnL);
+                const balanceType = getBalanceTypeForPositionRoom(position.room);
 
                 // Update user balance
                 const balanceRow = await tx.userBalance.upsert({
-                  where: { userId_type: { userId: position.userId, type: 'REAL' } },
+                  where: {
+                    userId_type: { userId: position.userId, type: balanceType }
+                  },
                   update: { amount: { increment: calculatedPnL } },
-                  create: { userId: position.userId, type: 'REAL', amount: calculatedPnL }
+                  create: {
+                    userId: position.userId,
+                    type: balanceType,
+                    amount: calculatedPnL
+                  }
                 });
 
                 // Create transaction record
@@ -309,12 +317,19 @@ export async function GET() {
               const transactionType: TransactionType =
                 calculatedPnL > 0 ? 'GAIN' : 'LOSS';
               const absoluteAmount = Math.abs(calculatedPnL);
+              const balanceType = getBalanceTypeForPositionRoom(position.room);
 
               // Update user balance
               const balanceRowTp = await tx.userBalance.upsert({
-                where: { userId_type: { userId: position.userId, type: 'REAL' } },
+                where: {
+                  userId_type: { userId: position.userId, type: balanceType }
+                },
                 update: { amount: { increment: calculatedPnL } },
-                create: { userId: position.userId, type: 'REAL', amount: calculatedPnL }
+                create: {
+                  userId: position.userId,
+                  type: balanceType,
+                  amount: calculatedPnL
+                }
               });
 
               // Create transaction record

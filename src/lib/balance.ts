@@ -9,6 +9,10 @@ export function parseBalanceType(input: unknown): BalanceType {
   return DEFAULT_BALANCE_TYPE;
 }
 
+export function getBalanceTypeForPositionRoom(room: unknown): BalanceType {
+  return room === 'INSTITUTIONAL' ? 'INSTITUTIONAL' : 'REAL';
+}
+
 export async function getUserBalanceAmount(
   tx: Prisma.TransactionClient,
   userId: string,

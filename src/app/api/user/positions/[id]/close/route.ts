@@ -10,7 +10,7 @@ import {
   Position,
   TransactionType
 } from '@/lib/prisma/generated/client';
-import { parseBalanceType } from '@/lib/balance';
+import { getBalanceTypeForPositionRoom } from '@/lib/balance';
 
 export async function PATCH(
   request: NextRequest,
@@ -42,8 +42,7 @@ export async function PATCH(
 
     const { id } = await params;
     const body = await request.json();
-    const { status = 'CLOSED', amount, balanceType: rawBalanceType } = body;
-    const balanceType = parseBalanceType(rawBalanceType);
+    const { status = 'CLOSED', amount } = body;
 
     // Validate status
     if (status !== 'CLOSED') {
@@ -74,6 +73,8 @@ export async function PATCH(
         { status: 404 }
       );
     }
+
+    const balanceType = getBalanceTypeForPositionRoom(existingPosition.room);
 
     // Check if position belongs to current user
     if (existingPosition.userId !== session.user.id) {
