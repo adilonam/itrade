@@ -21,11 +21,6 @@ import Link from 'next/link';
 import type { Bot } from '@/lib/prisma/generated/client';
 import { UserPositionsTableCardRoomTrading } from '@/components/user/positions/user-positions-table-room-trading';
 
-const formatCurrency = (amount: number) =>
-  new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(
-    amount
-  );
-
 const formatDate = (dateStr: string) =>
   new Date(dateStr).toLocaleDateString('en-US', {
     month: 'short',

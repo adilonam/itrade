@@ -84,23 +84,33 @@ export async function PUT(request: NextRequest, context: RouteParams) {
       updateData.type = validation.data.type;
     }
 
-    // If symbol is being updated, validate with TwelveData and update name
+    const effectiveRoom =
+      validation.data.room ?? existingMarket.room;
+    const validateSymbolWithTwelveData =
+      effectiveRoom === 'TRADING' || effectiveRoom === 'STOCK';
+
+    // If symbol is being updated, validate with TwelveData for trading/stock rooms
     if (validation.data.symbol !== undefined) {
       const upperSymbol = validation.data.symbol.toUpperCase();
       if (upperSymbol !== existingMarket.symbol) {
-        const marketData = await twelveDataService.getCombinedData(upperSymbol);
-        if ('error' in marketData) {
-          return NextResponse.json(
-            {
-              error: 'Market validation failed',
-              message: `Symbol "${upperSymbol}" failed TwelveData API validation`
-            },
-            { status: 400 }
-          );
+        if (validateSymbolWithTwelveData) {
+          const marketData =
+            await twelveDataService.getCombinedData(upperSymbol);
+          if ('error' in marketData) {
+            return NextResponse.json(
+              {
+                error: 'Market validation failed',
+                message: `Symbol "${upperSymbol}" failed TwelveData API validation`
+              },
+              { status: 400 }
+            );
+          }
+          updateData.symbol = upperSymbol;
+          updateData.name = marketData.name || upperSymbol;
+        } else {
+          updateData.symbol = upperSymbol;
+          updateData.name = upperSymbol;
         }
-        const marketName = marketData.name || upperSymbol;
-        updateData.symbol = upperSymbol;
-        updateData.name = marketName;
       }
     }
 

@@ -13,13 +13,21 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { useDebouncedCallback } from '@/hooks/use-debounced-callback';
 import {
   parseAsInteger,
   parseAsString,
   useQueryStates,
   parseAsStringEnum
 } from 'nuqs';
-import { IconPlus, IconExternalLink, IconLockOpen, IconLock } from '@tabler/icons-react';
+import {
+  IconPlus,
+  IconExternalLink,
+  IconLockOpen,
+  IconLock,
+  IconSearch
+} from '@tabler/icons-react';
 import { toast } from 'sonner';
 
 type MarketListingPageProps = {};
@@ -37,13 +45,27 @@ export default function MarketListingPage({}: MarketListingPageProps) {
   const [openMarketSettingLoading, setOpenMarketSettingLoading] = useState(true);
 
   // Use query states to sync with URL parameters
-  const [queryParams] = useQueryStates({
+  const [queryParams, setQueryParams] = useQueryStates({
     page: parseAsInteger.withDefault(1),
     perPage: parseAsInteger.withDefault(10),
     search: parseAsString,
     type: parseAsStringEnum(MARKET_TYPES),
     visible: parseAsString
   });
+
+  const [tableFilter, setTableFilter] = useState(queryParams.search ?? '');
+
+  useEffect(() => {
+    setTableFilter(queryParams.search ?? '');
+  }, [queryParams.search]);
+
+  const commitTableFilter = useDebouncedCallback((value: string) => {
+    const trimmed = value.trim();
+    void setQueryParams({
+      search: trimmed ? trimmed : null,
+      page: 1
+    });
+  }, 400);
 
   const loadMarkets = useCallback(async () => {
     try {
@@ -175,20 +197,46 @@ export default function MarketListingPage({}: MarketListingPageProps) {
         </CardContent>
       </Card>
 
-      <div className='mb-4 flex items-center justify-end gap-2'>
-        <Button
-          variant='outline'
-          onClick={() =>
-            window.open('https://twelvedata.com/markets', '_blank')
-          }
-        >
-          <IconExternalLink className='mr-2 h-4 w-4' />
-          Available Data
-        </Button>
-        <Button onClick={() => setIsAddDialogOpen(true)}>
-          <IconPlus className='mr-2 h-4 w-4' />
-          Add Market
-        </Button>
+      <div className='mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between'>
+        <div className='flex max-w-lg flex-1 flex-col gap-1.5'>
+          <Label htmlFor='market-table-filter' className='text-muted-foreground text-xs'>
+            Filter table
+          </Label>
+          <div className='relative'>
+            <IconSearch
+              className='text-muted-foreground pointer-events-none absolute top-1/2 left-2.5 h-4 w-4 -translate-y-1/2'
+              aria-hidden
+            />
+            <Input
+              id='market-table-filter'
+              type='search'
+              value={tableFilter}
+              onChange={(e) => {
+                const v = e.target.value;
+                setTableFilter(v);
+                commitTableFilter(v);
+              }}
+              placeholder='Search symbol, name, type, room, prices, visible/hidden, date…'
+              className='h-9 pl-9'
+              autoComplete='off'
+            />
+          </div>
+        </div>
+        <div className='flex shrink-0 items-center justify-end gap-2'>
+          <Button
+            variant='outline'
+            onClick={() =>
+              window.open('https://twelvedata.com/markets', '_blank')
+            }
+          >
+            <IconExternalLink className='mr-2 h-4 w-4' />
+            Available Data
+          </Button>
+          <Button onClick={() => setIsAddDialogOpen(true)}>
+            <IconPlus className='mr-2 h-4 w-4' />
+            Add Market
+          </Button>
+        </div>
       </div>
 
       <MarketTable

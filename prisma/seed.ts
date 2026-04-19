@@ -261,9 +261,18 @@ async function ensureSeedPosition(
   });
   if (existing) return existing;
 
+  const realBalance = await prisma.userBalance.findUnique({
+    where: { userId_type: { userId, type: 'REAL' } },
+    select: { id: true }
+  });
+  if (!realBalance) {
+    throw new Error(`seed: missing REAL user_balance for user ${userId}`);
+  }
+
   const pos = await prisma.position.create({
     data: {
       userId,
+      userBalanceId: realBalance.id,
       marketId,
       type: 'BUY',
       status: 'PLACED',
@@ -294,6 +303,18 @@ async function ensureSuperadminBulkPositions(
     );
   }
 
+  const realBalanceRow = await prisma.userBalance.findUnique({
+    where: { userId_type: { userId, type: 'REAL' } },
+    select: { id: true }
+  });
+  const instBalanceRow = await prisma.userBalance.findUnique({
+    where: { userId_type: { userId, type: 'INSTITUTIONAL' } },
+    select: { id: true }
+  });
+  if (!realBalanceRow || !instBalanceRow) {
+    throw new Error('seed: missing REAL or INSTITUTIONAL user_balance for superadmin');
+  }
+
   let createdTrading = 0;
   let createdInstitutional = 0;
 
@@ -316,6 +337,7 @@ async function ensureSuperadminBulkPositions(
     await prisma.position.create({
       data: {
         userId,
+        userBalanceId: realBalanceRow.id,
         marketId: market.id,
         type,
         status,
@@ -360,6 +382,7 @@ async function ensureSuperadminBulkPositions(
     await prisma.position.create({
       data: {
         userId,
+        userBalanceId: instBalanceRow.id,
         marketId: market.id,
         type,
         status,

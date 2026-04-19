@@ -10,7 +10,6 @@ import {
   Position,
   TransactionType
 } from '@/lib/prisma/generated/client';
-import { getBalanceTypeForPositionRoom } from '@/lib/balance';
 
 // Helper function to check seller permissions
 async function checkSellerPermission(session: any) {
@@ -89,8 +88,6 @@ export async function PATCH(
       );
     }
 
-    const balanceType = getBalanceTypeForPositionRoom(existingPosition.room);
-
     // Check if user is linked to this seller
     if (existingPosition.user.sellerId !== sellerId) {
       return NextResponse.json(
@@ -156,21 +153,14 @@ export async function PATCH(
           calculatedPnL > 0 ? 'GAIN' : 'LOSS';
         const absoluteAmount = Math.abs(calculatedPnL);
 
-        // Update user balance
-        const balanceRow = await tx.userBalance.upsert({
-          where: { userId_type: { userId: existingPosition.userId, type: balanceType } },
-          update: { amount: { increment: calculatedPnL } },
-          create: {
-            userId: existingPosition.userId,
-            type: balanceType,
-            amount: calculatedPnL
-          }
+        await tx.userBalance.update({
+          where: { id: existingPosition.userBalanceId },
+          data: { amount: { increment: calculatedPnL } }
         });
 
-        // Create transaction record
         await tx.transaction.create({
           data: {
-            userBalanceId: balanceRow.id,
+            userBalanceId: existingPosition.userBalanceId,
             type: transactionType,
             absoluteAmount: absoluteAmount,
             description: `Position ${existingPosition.type} closed - ${existingPosition.market?.symbol || 'Unknown'}`

@@ -37,6 +37,12 @@ type PositionWithRelations = Position & {
   market: Market | null;
 };
 
+/** `datetime-local` value in local calendar time (no timezone suffix). */
+function formatDatetimeLocal(d: Date): string {
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
 interface PortfolioSummaryProps {
   positions: PositionWithRelations[];
   financialData: {
@@ -49,7 +55,11 @@ interface PortfolioSummaryProps {
     leverage: number;
   };
   realTimePrices: Map<string, any>;
-  onClosePosition: (positionId: string, amount?: number) => void;
+  onClosePosition: (
+    positionId: string,
+    amount?: number,
+    closedAt?: string
+  ) => void;
 }
 
 export function PortfolioSummary({
@@ -60,6 +70,9 @@ export function PortfolioSummary({
 }: PortfolioSummaryProps) {
   const [realTimePnL, setRealTimePnL] = useState<Record<string, number>>({});
   const [sellAmounts, setSellAmounts] = useState<Record<string, string>>({});
+  const [closeAtByPosition, setCloseAtByPosition] = useState<
+    Record<string, string>
+  >({});
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
 
   const placedPositions = useMemo(
@@ -283,7 +296,18 @@ export function PortfolioSummary({
                                     </p>
                                   </div>
                                   {/* Sell Button with Confirmation */}
-                                  <AlertDialog>
+                                  <AlertDialog
+                                    onOpenChange={(open) => {
+                                      if (open) {
+                                        setCloseAtByPosition((prev) => ({
+                                          ...prev,
+                                          [position.id]: formatDatetimeLocal(
+                                            new Date()
+                                          )
+                                        }));
+                                      }
+                                    }}
+                                  >
                                     <AlertDialogTrigger asChild>
                                       <Button
                                         variant='outline'
@@ -364,6 +388,31 @@ export function PortfolioSummary({
                                                 shares.
                                               </p>
                                             </div>
+                                            <div className='space-y-2'>
+                                              <Label
+                                                htmlFor={`closed-at-${position.id}`}
+                                              >
+                                                Closed date
+                                              </Label>
+                                              <Input
+                                                id={`closed-at-${position.id}`}
+                                                type='datetime-local'
+                                                value={
+                                                  closeAtByPosition[
+                                                    position.id
+                                                  ] ?? ''
+                                                }
+                                                onChange={(e) => {
+                                                  setCloseAtByPosition(
+                                                    (prev) => ({
+                                                      ...prev,
+                                                      [position.id]:
+                                                        e.target.value
+                                                    })
+                                                  );
+                                                }}
+                                              />
+                                            </div>
                                             <p className='text-destructive text-sm font-medium'>
                                               This action cannot be undone.
                                             </p>
@@ -383,7 +432,8 @@ export function PortfolioSummary({
                                             );
                                             onClosePosition(
                                               position.id,
-                                              amount
+                                              amount,
+                                              closeAtByPosition[position.id]
                                             );
                                           }}
                                           className='bg-red-600 hover:bg-red-700'

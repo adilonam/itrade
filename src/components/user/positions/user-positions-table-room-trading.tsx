@@ -19,22 +19,10 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger
-} from '@/components/ui/alert-dialog';
 import type { Market, Position } from '@/lib/prisma/generated/client';
 import { useMarketsWebSocket } from '@/contexts/markets-websocket-context';
 import { calculatePnLClient } from '@/lib/calculator-client';
 import {
-  IconX,
   IconLoader2,
   IconTrendingUp,
   IconTrendingDown,
@@ -42,7 +30,6 @@ import {
   IconChevronLeft,
   IconChevronRight
 } from '@tabler/icons-react';
-import { toast } from 'sonner';
 import type { Room } from '@/lib/prisma/generated/client';
 import { cn } from '@/lib/utils';
 import {
@@ -68,7 +55,6 @@ export type PositionsTablePagination = {
 interface UserPositionsTableRoomTradingProps {
   positions: PositionWithMarket[];
   loading: boolean;
-  onClose: (positionId: string) => void;
   onUpdateRealTimePnL?: (positionId: string, pnl: number) => void;
   realTimePnL?: Record<string, number>;
   /** Match `/trade` trade-room panel typography and colors */
@@ -80,7 +66,6 @@ interface UserPositionsTableRoomTradingProps {
 export function UserPositionsTableRoomTrading({
   positions,
   loading,
-  onClose,
   onUpdateRealTimePnL,
   panelVariant = 'default',
   embeddedInTradePanel = false,
@@ -88,10 +73,6 @@ export function UserPositionsTableRoomTrading({
 }: UserPositionsTableRoomTradingProps) {
   const isTradePanel = panelVariant === 'trade';
   const isEmbeddedTrade = isTradePanel && embeddedInTradePanel;
-  const [closingPositionId, setClosingPositionId] = useState<string | null>(
-    null
-  );
-
   const { realTimePrices, isConnected, reset, subscribe } =
     useMarketsWebSocket();
 
@@ -131,15 +112,6 @@ export function UserPositionsTableRoomTrading({
       });
     }
   }, [positions, realTimePrices, onUpdateRealTimePnL]);
-
-  const handleClosePosition = async (positionId: string) => {
-    setClosingPositionId(positionId);
-    try {
-      await onClose(positionId);
-    } finally {
-      setClosingPositionId(null);
-    }
-  };
 
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
@@ -193,10 +165,6 @@ export function UserPositionsTableRoomTrading({
       hour: '2-digit',
       minute: '2-digit'
     });
-  };
-
-  const canClosePosition = (status: string) => {
-    return ['PLACED', 'PENDING'].includes(status);
   };
 
   if (loading) {
@@ -337,7 +305,6 @@ export function UserPositionsTableRoomTrading({
                       <TableHead>Status</TableHead>
                       <TableHead>Date</TableHead>
                       <TableHead>Closed</TableHead>
-                      <TableHead className='text-right'>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody
@@ -350,7 +317,7 @@ export function UserPositionsTableRoomTrading({
                     pagination.total > 0 ? (
                       <TableRow>
                         <TableCell
-                          colSpan={13}
+                          colSpan={12}
                           className={cn('py-8 text-center', mutedCell)}
                         >
                           No positions on this page.
@@ -507,63 +474,6 @@ export function UserPositionsTableRoomTrading({
                           {position.closedAt
                             ? formatDate(position.closedAt)
                             : '-'}
-                        </TableCell>
-                        <TableCell className='text-right'>
-                          {canClosePosition(position.status) ? (
-                            <AlertDialog>
-                              <AlertDialogTrigger asChild>
-                                <Button
-                                  variant='outline'
-                                  size='sm'
-                                  disabled={closingPositionId === position.id}
-                                  className={cn(
-                                    isTradePanel &&
-                                      'h-8 border-[var(--trade-border)] bg-transparent text-xs text-[var(--trade-text)] hover:bg-[var(--trade-dark)]/50'
-                                  )}
-                                >
-                                  {closingPositionId === position.id ? (
-                                    <IconLoader2 className='h-4 w-4 animate-spin' />
-                                  ) : (
-                                    <IconX className='h-4 w-4' />
-                                  )}
-                                  Close
-                                </Button>
-                              </AlertDialogTrigger>
-                              <AlertDialogContent>
-                                <AlertDialogHeader>
-                                  <AlertDialogTitle>
-                                    Close Room Trading Position
-                                  </AlertDialogTitle>
-                                  <AlertDialogDescription>
-                                    Are you sure you want to close this{' '}
-                                    {position.type} room trading position? This
-                                    action cannot be undone.
-                                  </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                  <AlertDialogAction
-                                    onClick={() =>
-                                      handleClosePosition(position.id)
-                                    }
-                                    className={
-                                      isTradePanel
-                                        ? 'bg-[var(--trade-red)] hover:opacity-90'
-                                        : 'bg-red-600 hover:bg-red-700'
-                                    }
-                                  >
-                                    Close Position
-                                  </AlertDialogAction>
-                                </AlertDialogFooter>
-                              </AlertDialogContent>
-                            </AlertDialog>
-                          ) : (
-                            <span className={cn('text-sm', mutedCell)}>
-                              {position.status === 'CLOSED'
-                                ? 'Closed'
-                                : 'Closed'}
-                            </span>
-                          )}
                         </TableCell>
                       </TableRow>
                       ))
@@ -791,32 +701,6 @@ export function UserPositionsTableCardRoomTrading({
       window.removeEventListener(refreshEventName, handler);
   }, [loadPositions, refreshEventName]);
 
-  const handleClosePosition = useCallback(
-    async (positionId: string) => {
-      try {
-        const response = await fetch(
-          `/api/user/positions/${positionId}/close`,
-          {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ status: 'CLOSED', balanceType })
-          }
-        );
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'Failed to close position');
-        }
-        toast.success('Position closed successfully');
-        loadPositions();
-      } catch (err) {
-        toast.error(
-          err instanceof Error ? err.message : 'Failed to close position'
-        );
-      }
-    },
-    [loadPositions, balanceType]
-  );
-
   const updateRealTimePnL = useCallback((positionId: string, pnl: number) => {
     setRealTimePnL((prev) => ({ ...prev, [positionId]: pnl }));
   }, []);
@@ -871,7 +755,6 @@ export function UserPositionsTableCardRoomTrading({
     <UserPositionsTableRoomTrading
       positions={positions}
       loading={loading}
-      onClose={handleClosePosition}
       onUpdateRealTimePnL={updateRealTimePnL}
       realTimePnL={realTimePnL}
       panelVariant={panelVariant}

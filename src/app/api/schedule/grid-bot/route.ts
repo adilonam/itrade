@@ -1,3 +1,4 @@
+/* eslint-disable no-console -- Scheduled job logging for serverless observability */
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import {
@@ -10,7 +11,11 @@ import {
   Position,
   TransactionType
 } from '@/lib/prisma/generated/client';
-import { getUserBalanceAmount } from '@/lib/balance';
+import {
+  ensureUserBalance,
+  getBalanceTypeForPositionRoom,
+  getUserBalanceAmount
+} from '@/lib/balance';
 
 export async function GET() {
   try {
@@ -175,20 +180,13 @@ export async function GET() {
             if (calculatedPnL !== null && calculatedPnL !== 0) {
               const transactionType: TransactionType =
                 calculatedPnL > 0 ? 'GAIN' : 'LOSS';
-              const balanceRow = await tx.userBalance.upsert({
-                where: {
-                  userId_type: { userId: existingPosition.userId, type: 'REAL' }
-                },
-                update: { amount: { increment: calculatedPnL } },
-                create: {
-                  userId: existingPosition.userId,
-                  type: 'REAL',
-                  amount: calculatedPnL
-                }
+              await tx.userBalance.update({
+                where: { id: existingPosition.userBalanceId },
+                data: { amount: { increment: calculatedPnL } }
               });
               await tx.transaction.create({
                 data: {
-                  userBalanceId: balanceRow.id,
+                  userBalanceId: existingPosition.userBalanceId,
                   type: transactionType,
                   absoluteAmount: Math.abs(calculatedPnL),
                   description: `Position ${existingPosition.type} closed by Grid Trading bot - ${existingPosition.market?.symbol ?? 'Unknown'}`
@@ -221,15 +219,20 @@ export async function GET() {
         const sp = marketForOpen.spread ?? 0;
         const executedPrice = signal === 'BUY' ? mid + sp / 2 : mid - sp / 2;
 
-        const realBalance = await prisma.$transaction((tx) =>
-          getUserBalanceAmount(tx, botUser.userId, 'REAL')
-        );
+        const balanceType = getBalanceTypeForPositionRoom(botUser.market.room);
+        const { botUserBalanceId, walletBalance } =
+          await prisma.$transaction(async (tx) => {
+            const ub = await ensureUserBalance(tx, botUser.userId, balanceType);
+            const amt = await getUserBalanceAmount(tx, botUser.userId, balanceType);
+            return { botUserBalanceId: ub.id, walletBalance: amt };
+          });
         const tempPosition = {
           id: 'temp',
           userId: botUser.userId,
           type: signal,
           status: 'PLACED' as const,
           room: botUser.market.room,
+          userBalanceId: botUserBalanceId,
           marketId: botUser.marketId,
           quantity: botUser.quantityLot,
           executedPrice,
@@ -240,7 +243,7 @@ export async function GET() {
           executedAt: new Date(),
           closedAt: null,
           pnl: null,
-          user: { ...botUser.user, balance: realBalance },
+          user: { ...botUser.user, balance: walletBalance },
           market: marketForOpen
         };
 
@@ -264,6 +267,7 @@ export async function GET() {
             type: signal,
             status: 'PLACED',
             room: botUser.market.room,
+            userBalanceId: botUserBalanceId,
             marketId: botUser.marketId,
             quantity: botUser.quantityLot,
             executedPrice,

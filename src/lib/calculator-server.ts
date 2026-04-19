@@ -416,12 +416,21 @@ export async function couldOpenPosition(
   try {
     const user = position.user;
 
-    // Get all user positions with PLACED status from database
+    // Get all user positions with PLACED status from database (same wallet only)
+    const placedWhere: {
+      userId: string;
+      status: 'PLACED';
+      userBalanceId?: string;
+    } = {
+      userId: user.id,
+      status: 'PLACED'
+    };
+    if (position.userBalanceId) {
+      placedWhere.userBalanceId = position.userBalanceId;
+    }
+
     const allUserPlacedPositions = await prisma.position.findMany({
-      where: {
-        userId: user.id,
-        status: 'PLACED'
-      },
+      where: placedWhere,
       include: { market: true }
     });
 

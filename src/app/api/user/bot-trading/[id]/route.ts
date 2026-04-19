@@ -1,3 +1,4 @@
+/* eslint-disable no-console -- Error path logging */
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthSession } from '@/lib/auth';

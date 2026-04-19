@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { calculatePositionPnL } from '@/lib/calculator-server';
 import type { Market, Position, PositionType, PositionStatus, Room } from '@/lib/prisma/generated/client';
+import { resolveUserBalanceForNewPosition } from '@/lib/balance';
 
 type CreatePositionBody = {
   userId: string;
@@ -12,11 +13,14 @@ type CreatePositionBody = {
   quantity: number;
   executedPrice: number;
   closedPrice?: number | null;
+  closedAt?: string | Date | null;
   takeProfit?: number | null;
   stopLoss?: number | null;
   description?: string | null;
   executedAt?: string | Date | null;
   pnl?: number | null;
+  userBalanceId?: string | null;
+  balanceType?: unknown;
 };
 
 export async function GET(request: NextRequest) {
@@ -102,7 +106,8 @@ export async function GET(request: NextRequest) {
               email: true
             }
           },
-          market: true
+          market: true,
+          userBalance: true
         },
         orderBy: {
           executedAt: 'desc'
@@ -214,16 +219,41 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const walletResult = await prisma.$transaction((tx) =>
+      resolveUserBalanceForNewPosition(tx, body.userId, {
+        userBalanceId: body.userBalanceId,
+        room: body.room,
+        balanceType: body.balanceType
+      })
+    );
+
+    if (!walletResult.ok) {
+      return NextResponse.json(
+        { error: 'Invalid userBalanceId for this user' },
+        { status: 400 }
+      );
+    }
+
+    const nextStatus = body.status || 'PLACED';
+    const closedAt =
+      nextStatus === 'CLOSED'
+        ? body.closedAt
+          ? new Date(body.closedAt)
+          : new Date()
+        : null;
+
     const position = await prisma.position.create({
       data: {
         userId: body.userId,
         type: body.type,
-        status: body.status || 'PLACED',
+        status: nextStatus,
         room: body.room,
+        userBalanceId: walletResult.id,
         marketId: body.marketId,
         quantity: body.quantity,
         executedPrice,
         closedPrice: body.closedPrice,
+        closedAt,
         takeProfit: body.takeProfit,
         stopLoss: body.stopLoss,
         description: body.description,
@@ -240,7 +270,8 @@ export async function POST(request: NextRequest) {
             email: true
           }
         },
-        market: true
+        market: true,
+        userBalance: true
       }
     });
 

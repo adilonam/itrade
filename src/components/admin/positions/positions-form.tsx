@@ -47,12 +47,18 @@ type AdminUserRow = {
   email: string;
 };
 
+/** `datetime-local` expects local calendar time without a timezone suffix. */
+function formatDatetimeLocal(d: Date): string {
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
 export function PositionForm({
   position,
   onClose,
   onSuccess
 }: PositionFormProps) {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState(() => ({
     userId: '',
     type: '' as PositionType | '',
     status: 'PLACED' as PositionStatus,
@@ -63,9 +69,10 @@ export function PositionForm({
     takeProfit: '',
     stopLoss: '',
     description: '',
-    executedAt: '',
+    executedAt: position ? '' : formatDatetimeLocal(new Date()),
+    closedAt: '' as string,
     pnl: ''
-  });
+  }));
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -134,8 +141,14 @@ export function PositionForm({
         stopLoss: position.stopLoss != null ? String(position.stopLoss) : '',
         description: position.description || '',
         executedAt: position.executedAt
-          ? new Date(position.executedAt).toISOString().slice(0, 16)
+          ? formatDatetimeLocal(new Date(position.executedAt))
           : '',
+        closedAt:
+          position.status === 'CLOSED' && position.closedAt
+            ? formatDatetimeLocal(new Date(position.closedAt))
+            : position.status === 'CLOSED'
+              ? formatDatetimeLocal(new Date())
+              : '',
         pnl: position.pnl?.toString() || ''
       });
       setUserEmailQuery(position.user?.email ?? '');
@@ -257,6 +270,17 @@ export function PositionForm({
         data.executedAt = new Date(formData.executedAt);
       }
 
+      if (formData.status === 'CLOSED') {
+        const raw = formData.closedAt.trim();
+        const parsed = raw ? new Date(raw) : new Date();
+        if (Number.isNaN(parsed.getTime())) {
+          throw new Error('Closed at must be a valid date and time');
+        }
+        data.closedAt = parsed;
+      } else {
+        data.closedAt = null;
+      }
+
       const url = position
         ? `/api/admin/positions/${position.id}`
         : '/api/admin/positions';
@@ -323,8 +347,12 @@ export function PositionForm({
               <Select
                 value={formData.room}
                 onValueChange={(value) => {
-                  handleInputChange('room', value);
-                  handleInputChange('marketId', '');
+                  setFormData((prev) => ({
+                    ...prev,
+                    room: value as Room,
+                    marketId: '',
+                    ...(!position ? { executedPrice: '' } : {})
+                  }));
                 }}
               >
                 <SelectTrigger id='room'>
@@ -440,7 +468,19 @@ export function PositionForm({
               <Label htmlFor='status'>Status</Label>
               <Select
                 value={formData.status}
-                onValueChange={(value) => handleInputChange('status', value)}
+                onValueChange={(value) => {
+                  const next = value as PositionStatus;
+                  setFormData((prev) => ({
+                    ...prev,
+                    status: next,
+                    closedAt:
+                      next === 'CLOSED'
+                        ? prev.closedAt.trim()
+                          ? prev.closedAt
+                          : formatDatetimeLocal(new Date())
+                        : ''
+                  }));
+                }}
               >
                 <SelectTrigger>
                   <SelectValue placeholder='Select status' />
@@ -470,7 +510,24 @@ export function PositionForm({
               </Label>
               <Select
                 value={formData.marketId}
-                onValueChange={(value) => handleInputChange('marketId', value)}
+                onValueChange={(value) => {
+                  setFormData((prev) => {
+                    const selected = markets.find((m) => m.id === value);
+                    const last =
+                      selected != null &&
+                      typeof selected.lastPrice === 'number' &&
+                      Number.isFinite(selected.lastPrice)
+                        ? String(selected.lastPrice)
+                        : '';
+                    return {
+                      ...prev,
+                      marketId: value,
+                      ...(!position && last !== ''
+                        ? { executedPrice: last }
+                        : {})
+                    };
+                  });
+                }}
               >
                 <SelectTrigger id='marketId'>
                   <SelectValue
@@ -581,6 +638,24 @@ export function PositionForm({
                 }
               />
             </div>
+
+            {formData.status === 'CLOSED' ? (
+              <div className='space-y-2 md:col-span-2'>
+                <Label htmlFor='closedAt'>Closed at *</Label>
+                <Input
+                  id='closedAt'
+                  type='datetime-local'
+                  value={formData.closedAt}
+                  onChange={(e) =>
+                    handleInputChange('closedAt', e.target.value)
+                  }
+                />
+                <p className='text-muted-foreground text-xs'>
+                  Defaults to the current date and time when you set status to
+                  Closed.
+                </p>
+              </div>
+            ) : null}
           </div>
 
           {/* Description */}

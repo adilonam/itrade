@@ -46,7 +46,6 @@ import {
   IconChevronRight,
   IconRefresh
 } from '@tabler/icons-react';
-import { toast } from 'sonner';
 
 interface PaginationInfo {
   page: number;
@@ -188,31 +187,6 @@ export function UserPositionsViewRoomTrading() {
   // Handle pagination
   const handlePageChange = (newPage: number) => {
     loadPositions(newPage, currentFilters);
-  };
-
-  // Handle position close
-  const handleClosePosition = async (positionId: string) => {
-    try {
-      const response = await fetch(`/api/user/positions/${positionId}/close`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ status: 'CLOSED', balanceType: 'REAL' })
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to close position');
-      }
-
-      toast.success('Position closed successfully');
-      loadPositions(pagination.page, currentFilters);
-    } catch (err) {
-      toast.error(
-        err instanceof Error ? err.message : 'Failed to close position'
-      );
-    }
   };
 
   const handleRefresh = () => {
@@ -438,7 +412,6 @@ export function UserPositionsViewRoomTrading() {
       <UserPositionsTableRoomTrading
         positions={positions}
         loading={loading}
-        onClose={handleClosePosition}
         onUpdateRealTimePnL={updateRealTimePnL}
         realTimePnL={realTimePnL}
       />

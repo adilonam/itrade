@@ -175,6 +175,7 @@ model UserBalance {
   depositRequests          DepositRequest[]
   transferRequestsSent     TransferRequest[] @relation("TransferSenderBalance")
   transferRequestsReceived TransferRequest[] @relation("TransferRecipientBalance")
+  positions                Position[]
 
   @@unique([userId, type])
   @@map("user_balances")
@@ -262,6 +263,9 @@ model Position {
   status PositionStatus @default(PENDING)
   room   Room           @default(TRADING)
 
+  userBalanceId String      @map("user_balance_id")
+  userBalance   UserBalance @relation(fields: [userBalanceId], references: [id], onDelete: Restrict)
+
   // Market/Asset information
   marketId String @map("market_id")
 
@@ -293,6 +297,7 @@ model Position {
   market Market @relation(fields: [marketId], references: [id], onDelete: SetNull)
 
   // Indexes for better query performance
+  @@index([userBalanceId])
 
   @@map("positions")
 }

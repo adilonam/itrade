@@ -30,7 +30,8 @@ function TradingRoomShellInner({ children }: { children: React.ReactNode }) {
     advancedOrderMarket,
     noNavigation,
     symbolLinkBasePath,
-    signedIn
+    signedIn,
+    showMarketsOrderControls
   } = useTradingRoomShell();
 
   const leftPanelInitialSizeRef = useRef<number | null>(null);
@@ -41,9 +42,22 @@ function TradingRoomShellInner({ children }: { children: React.ReactNode }) {
     if (leftPanelInitialSizeRef.current != null) return;
     const initialLeftSize = sizes[0] ?? 20;
     leftPanelInitialSizeRef.current = initialLeftSize;
-    const computedMinSize = Math.max(1, Math.min(100, initialLeftSize * 0.61));
+    const computedMinSize = Math.max(1, Math.min(100, initialLeftSize * 0.3));
     setLeftPanelMinSize(computedMinSize);
     setLeftCollapseEnabled(true);
+  }, []);
+
+  const newsPanelInitialSizeRef = useRef<number | null>(null);
+  const [newsPanelMinSize, setNewsPanelMinSize] = useState(22);
+  const [newsCollapseEnabled, setNewsCollapseEnabled] = useState(false);
+
+  const handleLeftColumnVerticalLayout = useCallback((sizes: number[]) => {
+    if (newsPanelInitialSizeRef.current != null) return;
+    const initialNewsSize = sizes[1] ?? 0;
+    newsPanelInitialSizeRef.current = initialNewsSize;
+    const computedMinSize = Math.max(1, Math.min(100, initialNewsSize * 0.3));
+    setNewsPanelMinSize(computedMinSize);
+    setNewsCollapseEnabled(true);
   }, []);
 
   const selectedSymbol = symbols.find((s) => s.id === selectedSymbolId);
@@ -68,7 +82,7 @@ function TradingRoomShellInner({ children }: { children: React.ReactNode }) {
             collapsedSize={0}
             className="flex min-w-0 flex-col overflow-hidden"
           >
-            {advancedOrderOpen && advancedOrderMarket ? (
+            {advancedOrderOpen && advancedOrderMarket && showMarketsOrderControls ? (
               <TradingRoomAdvancedOrderPanel
                 key={
                   advancedOrderMarket && 'symbol' in advancedOrderMarket
@@ -82,7 +96,11 @@ function TradingRoomShellInner({ children }: { children: React.ReactNode }) {
               />
             ) : (
               <div className="flex h-full min-h-0 min-w-0 w-full flex-col overflow-hidden border-r border-[var(--trade-border)] bg-[var(--trade-panel)]">
-                <ResizablePanelGroup direction="vertical" className="h-full min-h-0 min-w-0 w-full flex-1">
+                <ResizablePanelGroup
+                  direction="vertical"
+                  className="h-full min-h-0 min-w-0 w-full flex-1"
+                  onLayout={handleLeftColumnVerticalLayout}
+                >
                   <ResizablePanel defaultSize={52} minSize={28} className="flex min-h-0 flex-col overflow-hidden">
                     <TradingRoomMarketsPanel
                       symbols={symbols}
@@ -94,10 +112,18 @@ function TradingRoomShellInner({ children }: { children: React.ReactNode }) {
                       tradingDisabled={!signedIn}
                       noNavigation={noNavigation}
                       symbolLinkBasePath={symbolLinkBasePath}
+                      showOrderControls={showMarketsOrderControls}
                     />
                   </ResizablePanel>
                   <ResizableHandle withHandle className="shrink-0 bg-[var(--trade-border)]" />
-                  <ResizablePanel defaultSize={48} minSize={22} maxSize={65} className="flex min-h-0 flex-col overflow-hidden">
+                  <ResizablePanel
+                    defaultSize={48}
+                    minSize={newsPanelMinSize}
+                    maxSize={65}
+                    collapsible={newsCollapseEnabled}
+                    collapsedSize={0}
+                    className="flex min-h-0 min-w-0 flex-col overflow-hidden"
+                  >
                     <TradingRoomNewsPanel
                       variant="underMarkets"
                       symbol={chartSymbol}

@@ -12,9 +12,6 @@ export const metadata: Metadata = {
 export default async function SignInViewPage() {
   const row = await getAppSettingsRow();
   const appName = row?.appName?.trim() || 'Trade Nova';
-  const googleSignInEnabled = !!(
-    row?.googleClientId?.trim() && row?.googleClientSecret?.trim()
-  );
 
   return (
     <div className='trade-room flex min-h-screen w-full bg-[var(--trade-dark)] text-[var(--trade-text)]'>
@@ -46,7 +43,7 @@ export default async function SignInViewPage() {
               Create account
             </Link>
           </div>
-          <SignInForm googleSignInEnabled={googleSignInEnabled} />
+          <SignInForm />
           <p className='px-4 text-center text-xs text-[var(--trade-text-muted)]'>
             By clicking continue, you agree to our{' '}
             <Link

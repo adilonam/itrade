@@ -7,6 +7,7 @@ import {
   calculatePositionPnL
 } from '@/lib/calculator-server';
 import { Market, Position } from '@/lib/prisma/generated/client';
+import { resolveUserBalanceForNewPosition } from '@/lib/balance';
 
 // Helper function to check seller permissions
 async function checkSellerPermission(session: any) {
@@ -162,7 +163,9 @@ const createPositionSchema = z.object({
   takeProfit: z.number().optional(),
   stopLoss: z.number().optional(),
   description: z.string().optional(),
-  status: z.enum(['PLACED', 'PENDING']).optional().default('PLACED')
+  status: z.enum(['PLACED', 'PENDING']).optional().default('PLACED'),
+  userBalanceId: z.string().optional(),
+  balanceType: z.enum(['REAL', 'DEMO', 'INSTITUTIONAL']).optional()
 });
 
 // POST - Create position for a linked user
@@ -198,7 +201,9 @@ export async function POST(request: NextRequest) {
       takeProfit,
       stopLoss,
       description,
-      status
+      status,
+      userBalanceId,
+      balanceType
     } = validation.data;
 
     const sellerId = session?.user.id;
@@ -231,6 +236,21 @@ export async function POST(request: NextRequest) {
     const finalExecutedPrice =
       executedPrice || (status === 'PLACED' ? market.lastPrice : null);
 
+    const walletResult = await prisma.$transaction((tx) =>
+      resolveUserBalanceForNewPosition(tx, userId, {
+        userBalanceId,
+        room,
+        balanceType
+      })
+    );
+
+    if (!walletResult.ok) {
+      return NextResponse.json(
+        { error: 'Invalid userBalanceId for this user' },
+        { status: 400 }
+      );
+    }
+
     // Create position
     const position = await prisma.position.create({
       data: {
@@ -238,6 +258,7 @@ export async function POST(request: NextRequest) {
         type,
         status: status || 'PLACED',
         room,
+        userBalanceId: walletResult.id,
         marketId,
         quantity,
         executedPrice: finalExecutedPrice,

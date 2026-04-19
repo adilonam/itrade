@@ -11,8 +11,6 @@ import {
   Position,
   TransactionType
 } from '@/lib/prisma/generated/client';
-import { getBalanceTypeForPositionRoom } from '@/lib/balance';
-
 export async function GET() {
   try {
     // eslint-disable-next-line no-console
@@ -115,25 +113,15 @@ export async function GET() {
                 const transactionType: TransactionType =
                   calculatedPnL > 0 ? 'GAIN' : 'LOSS';
                 const absoluteAmount = Math.abs(calculatedPnL);
-                const balanceType = getBalanceTypeForPositionRoom(position.room);
 
-                // Update user balance
-                const balanceRow = await tx.userBalance.upsert({
-                  where: {
-                    userId_type: { userId: position.userId, type: balanceType }
-                  },
-                  update: { amount: { increment: calculatedPnL } },
-                  create: {
-                    userId: position.userId,
-                    type: balanceType,
-                    amount: calculatedPnL
-                  }
+                await tx.userBalance.update({
+                  where: { id: position.userBalanceId },
+                  data: { amount: { increment: calculatedPnL } }
                 });
 
-                // Create transaction record
                 await tx.transaction.create({
                   data: {
-                    userBalanceId: balanceRow.id,
+                    userBalanceId: position.userBalanceId,
                     type: transactionType,
                     absoluteAmount: absoluteAmount,
                     description: `Position ${position.type} closed by MARGIN CALL - ${position.market?.symbol || 'Unknown'} (Margin Level: ${financialInfo.marginLevel?.toFixed(2)}%)`
@@ -317,25 +305,15 @@ export async function GET() {
               const transactionType: TransactionType =
                 calculatedPnL > 0 ? 'GAIN' : 'LOSS';
               const absoluteAmount = Math.abs(calculatedPnL);
-              const balanceType = getBalanceTypeForPositionRoom(position.room);
 
-              // Update user balance
-              const balanceRowTp = await tx.userBalance.upsert({
-                where: {
-                  userId_type: { userId: position.userId, type: balanceType }
-                },
-                update: { amount: { increment: calculatedPnL } },
-                create: {
-                  userId: position.userId,
-                  type: balanceType,
-                  amount: calculatedPnL
-                }
+              await tx.userBalance.update({
+                where: { id: position.userBalanceId },
+                data: { amount: { increment: calculatedPnL } }
               });
 
-              // Create transaction record
               await tx.transaction.create({
                 data: {
-                  userBalanceId: balanceRowTp.id,
+                  userBalanceId: position.userBalanceId,
                   type: transactionType,
                   absoluteAmount: absoluteAmount,
                   description: `Position ${position.type} auto-closed - ${position.market?.symbol || 'Unknown'} (${closeReason})`

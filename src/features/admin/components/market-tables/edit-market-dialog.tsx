@@ -176,7 +176,8 @@ export function EditMarketDialog({
           <DialogTitle>Edit Market</DialogTitle>
           <DialogDescription>
             Modify all fields for this market. Changing the symbol will be
-            validated against the TwelveData API.
+            validated against the TwelveData API for Stock and Trading room
+            markets only; Institutional room markets skip that check.
           </DialogDescription>
         </DialogHeader>
 

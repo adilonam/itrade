@@ -1,6 +1,8 @@
+/* eslint-disable no-console -- Scheduled job logging for serverless observability */
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { refreshSaveMarkets, couldOpenPosition } from '@/lib/calculator-server';
+import { getUserBalanceAmount } from '@/lib/balance';
 
 export async function GET() {
   try {
@@ -13,7 +15,8 @@ export async function GET() {
       },
       include: {
         user: true,
-        market: true
+        market: true,
+        userBalance: true
       }
     });
 
@@ -130,10 +133,23 @@ export async function GET() {
           continue;
         }
 
+        const walletBalance = await prisma.$transaction((tx) =>
+          getUserBalanceAmount(
+            tx,
+            position.userId,
+            position.userBalance.type
+          )
+        );
+
         // Update the position with current market data for validation
         const positionWithCurrentMarket = {
           ...position,
-          market: refreshedMarket
+          market: refreshedMarket,
+          user: {
+            id: position.user.id,
+            leverage: position.user.leverage,
+            balance: walletBalance
+          }
         };
 
         // Check if user can open this position (balance, margin, etc.)

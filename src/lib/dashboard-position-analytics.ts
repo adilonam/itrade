@@ -1,5 +1,7 @@
 /** Analytics over all trading positions (PLACED + CLOSED) for overview dashboard */
 
+export type DashboardWalletTab = 'REAL' | 'DEMO' | 'INSTITUTIONAL';
+
 export type DashboardPosition = {
   id: string;
   type: string;
@@ -9,7 +11,36 @@ export type DashboardPosition = {
   pnl: number | null;
   executedAt?: string | null;
   closedAt?: string | null;
+  /** Present on `/api/user/positions` — source of truth for wallet after `user_balance_id` migration */
+  userBalance?: { type: string } | null;
 };
+
+/**
+ * Whether a position belongs to the selected overview tab.
+ * Prefer wallet type from the API (`userBalance.type`); fall back to `room` for legacy rows.
+ */
+export function positionMatchesWalletTab(
+  p: DashboardPosition,
+  tab: DashboardWalletTab
+): boolean {
+  const explicit = (p as DashboardPosition & { balanceType?: string })
+    .balanceType;
+  const fromWallet = p.userBalance?.type;
+  const wallet =
+    explicit === 'REAL' || explicit === 'DEMO' || explicit === 'INSTITUTIONAL'
+      ? explicit
+      : fromWallet === 'REAL' ||
+          fromWallet === 'DEMO' ||
+          fromWallet === 'INSTITUTIONAL'
+        ? fromWallet
+        : null;
+
+  if (wallet) return wallet === tab;
+
+  if (tab === 'INSTITUTIONAL') return p.room === 'INSTITUTIONAL';
+  if (tab === 'DEMO') return p.room === 'TRADING';
+  return p.room === 'TRADING' || p.room === 'STOCK';
+}
 
 export function getPositionPnL(p: DashboardPosition): number {
   if (p.pnl == null || Number.isNaN(p.pnl)) return 0;

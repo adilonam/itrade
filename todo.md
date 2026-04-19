@@ -290,3 +290,29 @@ Example: from Trade → Institutional or Investment.
 bugs :
 - [ ] dashboard institutional on close pos
 - [ ] pos decrease balance on intitional 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## meet of 04 18
+- [x] change equity to balance display
+- [x] institunal dashboard
+- [x] remove google
+- [x] send link to sign up 
+- [x] fix kyc requrests
+- [x] number 3 in whatdsapp

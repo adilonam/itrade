@@ -3,7 +3,6 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
 import {
   Card,
   CardContent,
@@ -11,7 +10,6 @@ import {
   CardHeader,
   CardTitle
 } from '@/components/ui/card';
-import { IconBrandGoogle } from '@tabler/icons-react';
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
@@ -19,11 +17,7 @@ import { toast } from 'sonner';
 import Link from 'next/link';
 import MfaVerification from './mfa-verification';
 
-export function SignInForm({
-  googleSignInEnabled = true
-}: {
-  googleSignInEnabled?: boolean;
-}) {
+export function SignInForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -61,21 +55,6 @@ export function SignInForm({
       toast.error('An error occurred. Please try again.');
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handleGoogleSignIn = async () => {
-    try {
-      const result = await signIn('google', {
-        callbackUrl: '/',
-        redirect: false
-      });
-
-      if (result?.error) {
-        toast.error('Failed to sign in with Google');
-      }
-    } catch (error) {
-      toast.error('An error occurred. Please try again.');
     }
   };
 
@@ -122,35 +101,7 @@ export function SignInForm({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        {googleSignInEnabled ? (
-          <div className='space-y-4'>
-            <Button
-              type='button'
-              variant='outline'
-              className='w-full border-[var(--trade-border)] bg-[var(--trade-dark)] text-[var(--trade-text)] hover:bg-[var(--trade-border)]/40'
-              onClick={handleGoogleSignIn}
-            >
-              <IconBrandGoogle className='mr-2 h-4 w-4' />
-              Continue with Google
-            </Button>
-
-            <div className='relative'>
-              <div className='absolute inset-0 flex items-center'>
-                <Separator className='w-full bg-[var(--trade-border)]' />
-              </div>
-              <div className='relative flex justify-center text-xs uppercase'>
-                <span className='bg-[var(--trade-panel)] px-2 text-[var(--trade-text-muted)]'>
-                  Or continue with
-                </span>
-              </div>
-            </div>
-          </div>
-        ) : null}
-
-        <form
-          onSubmit={handleSubmit}
-          className={googleSignInEnabled ? 'mt-4 space-y-4' : 'space-y-4'}
-        >
+        <form onSubmit={handleSubmit} className='space-y-4'>
           <div className='space-y-2'>
             <Label htmlFor='email' className='text-[var(--trade-text-muted)]'>
               Email

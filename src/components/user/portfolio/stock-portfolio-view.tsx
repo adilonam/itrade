@@ -215,14 +215,23 @@ export function StockPortfolioView() {
   };
 
   // Handle position close
-  const handleClosePosition = async (positionId: string, amount?: number) => {
+  const handleClosePosition = async (
+    positionId: string,
+    amount?: number,
+    closedAt?: string
+  ) => {
     try {
       const response = await fetch(`/api/user/positions/${positionId}/close`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ status: 'CLOSED', amount, balanceType: 'REAL' })
+        body: JSON.stringify({
+          status: 'CLOSED',
+          amount,
+          balanceType: 'REAL',
+          ...(closedAt ? { closedAt } : {})
+        })
       });
 
       if (!response.ok) {

@@ -58,6 +58,8 @@ type TradingRoomShellContextValue = {
   noNavigation: boolean;
   symbolLinkBasePath: string;
   signedIn: boolean;
+  /** Quick buy/sell in the markets list; hidden on institutional room for non-admin users */
+  showMarketsOrderControls: boolean;
 };
 
 const TradingRoomShellContext = createContext<TradingRoomShellContextValue | null>(
@@ -88,10 +90,16 @@ export function TradingRoomShellProvider({ children }: { children: React.ReactNo
   const [advancedOrderOpen, setAdvancedOrderOpen] = useState(false);
   const [chartInterval, setChartInterval] = useState<ChartInterval>('60');
   const signedIn = Boolean(session?.user);
+  const role = session?.user?.role;
+  const canPlaceInstitutionalOrders =
+    role === 'ADMIN' || role === 'SUPERADMIN';
+  const showMarketsOrderControls =
+    tradeRoom !== 'INSTITUTIONAL' || canPlaceInstitutionalOrders;
 
   useEffect(() => {
     setSelectedSymbolId(null);
     setSelectedMarket(null);
+    setAdvancedOrderOpen(false);
   }, [tradeRoom]);
 
   const selectedSymbol = symbols.find((s) => s.id === selectedSymbolId);
@@ -221,7 +229,8 @@ export function TradingRoomShellProvider({ children }: { children: React.ReactNo
       tradeRoom,
       noNavigation,
       symbolLinkBasePath,
-      signedIn
+      signedIn,
+      showMarketsOrderControls
     }),
     [
       symbols,
@@ -237,7 +246,8 @@ export function TradingRoomShellProvider({ children }: { children: React.ReactNo
       tradeRoom,
       noNavigation,
       symbolLinkBasePath,
-      signedIn
+      signedIn,
+      showMarketsOrderControls
     ]
   );
 

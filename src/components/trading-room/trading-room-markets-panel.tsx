@@ -34,6 +34,8 @@ interface TradingRoomMarketsPanelProps {
   noNavigation?: boolean;
   /** Base path for symbol deep links (e.g. `/trading-view-room-trading`). */
   symbolLinkBasePath?: string;
+  /** When false, hides quick buy/sell (e.g. institutional room for non-admin users). */
+  showOrderControls?: boolean;
 }
 
 /** Symbol list + buy/sell (order) for the selected instrument */
@@ -46,7 +48,8 @@ export function TradingRoomMarketsPanel({
   onAdvancedOrderClick,
   tradingDisabled = false,
   noNavigation = false,
-  symbolLinkBasePath = '/trading-view-room-trading'
+  symbolLinkBasePath = '/trading-view-room-trading',
+  showOrderControls = true
 }: TradingRoomMarketsPanelProps) {
   void _selectedMarket; // Reserved for future use
   const [listTab, setListTab] = useState<'favorites' | 'movers'>('movers');
@@ -102,30 +105,38 @@ export function TradingRoomMarketsPanel({
               </div>
               <div className="text-sm font-mono font-bold">{formatPrice(price)}</div>
             </div>
-            <TradingRoomOrderPanel
-              market={market ?? { symbol, lastPrice: price, spread: 0.00002 }}
-              onMarketOrder={onMarketOrder}
-              disabled={tradingDisabled}
-              showAdvancedOrder={false}
-            />
-            <div className="mt-3 flex items-center justify-between text-[10px] text-[var(--trade-text-muted)] px-1">
-              <button
-                type="button"
-                onClick={() => onAdvancedOrderClick?.()}
-                className="flex items-center gap-1 hover:text-[var(--trade-text)]"
-              >
-                <IconSettings className="size-3" />
-                Advanced Order
-              </button>
-              <div className="flex gap-2">
-                <button type="button" className="hover:text-[var(--trade-text)]" aria-label="Info">
-                  <IconInfoCircle className="size-3" />
-                </button>
-                <button type="button" className="hover:text-[var(--trade-text)]" aria-label="Favorite">
-                  <IconStar className="size-3" />
-                </button>
-              </div>
-            </div>
+            {showOrderControls ? (
+              <>
+                <TradingRoomOrderPanel
+                  market={market ?? { symbol, lastPrice: price, spread: 0.00002 }}
+                  onMarketOrder={onMarketOrder}
+                  disabled={tradingDisabled}
+                  showAdvancedOrder={false}
+                />
+                <div className="mt-3 flex items-center justify-between text-[10px] text-[var(--trade-text-muted)] px-1">
+                  <button
+                    type="button"
+                    onClick={() => onAdvancedOrderClick?.()}
+                    className="flex items-center gap-1 hover:text-[var(--trade-text)]"
+                  >
+                    <IconSettings className="size-3" />
+                    Advanced Order
+                  </button>
+                  <div className="flex gap-2">
+                    <button type="button" className="hover:text-[var(--trade-text)]" aria-label="Info">
+                      <IconInfoCircle className="size-3" />
+                    </button>
+                    <button type="button" className="hover:text-[var(--trade-text)]" aria-label="Favorite">
+                      <IconStar className="size-3" />
+                    </button>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <p className="text-[10px] leading-snug text-[var(--trade-text-muted)]">
+                Institutional orders can only be placed by administrators.
+              </p>
+            )}
           </div>
         </div>
       );

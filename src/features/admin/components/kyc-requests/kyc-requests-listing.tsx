@@ -204,7 +204,7 @@ export default function KycRequestsListing() {
                           {request.documents.map((doc) => (
                             <a
                               key={doc.id}
-                              href={doc.fileUrl}
+                              href={`/api/admin/kyc-documents/${doc.id}`}
                               target='_blank'
                               rel='noreferrer'
                               className='text-xs text-blue-600 underline underline-offset-2'

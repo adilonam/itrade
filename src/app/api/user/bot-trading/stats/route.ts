@@ -1,3 +1,4 @@
+/* eslint-disable no-console -- Error path logging */
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { calculateUserFinancialInfo } from '@/lib/calculator-server';

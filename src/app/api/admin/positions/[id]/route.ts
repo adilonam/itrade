@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import type { Position } from '@/lib/prisma/generated/client';
-import { getBalanceTypeForPositionRoom } from '@/lib/balance';
 
 // Update position data type
 type UpdatePositionData = Partial<Position>;
@@ -114,6 +113,24 @@ export async function PUT(
     // Use transaction to ensure data consistency
     const result = await prisma.$transaction(async (tx) => {
       // Update the position
+      const nextStatus = body.status ?? existingPosition.status;
+      const resolvedClosedAt =
+        body.closedAt !== undefined
+          ? body.closedAt === null
+            ? null
+            : new Date(body.closedAt as string | Date)
+          : undefined;
+      const closedAt =
+        body.status !== undefined || body.closedAt !== undefined
+          ? nextStatus === 'CLOSED'
+            ? resolvedClosedAt !== undefined &&
+              resolvedClosedAt !== null &&
+              !Number.isNaN(resolvedClosedAt.getTime())
+              ? resolvedClosedAt
+              : new Date()
+            : null
+          : undefined;
+
       const updatedPosition = await tx.position.update({
         where: { id },
         data: {
@@ -124,6 +141,7 @@ export async function PUT(
           quantity: body.quantity,
           executedPrice: body.executedPrice,
           closedPrice: body.closedPrice,
+          closedAt,
           takeProfit: body.takeProfit,
           stopLoss: body.stopLoss,
           description: body.description,
@@ -153,27 +171,14 @@ export async function PUT(
 
       // Update user balance and create transaction if P&L changed
       if (shouldCreateTransaction && balanceChange !== 0) {
-        const balanceType = getBalanceTypeForPositionRoom(
-          updatedPosition.room ?? existingPosition.room
-        );
-
-        // Update user balance
-        const balanceRow = await tx.userBalance.upsert({
-          where: {
-            userId_type: { userId: existingPosition.userId, type: balanceType }
-          },
-          update: { amount: { increment: balanceChange } },
-          create: {
-            userId: existingPosition.userId,
-            type: balanceType,
-            amount: balanceChange
-          }
+        await tx.userBalance.update({
+          where: { id: existingPosition.userBalanceId },
+          data: { amount: { increment: balanceChange } }
         });
 
-        // Create transaction record for history
         await tx.transaction.create({
           data: {
-            userBalanceId: balanceRow.id,
+            userBalanceId: existingPosition.userBalanceId,
             type: balanceChange > 0 ? 'GAIN' : 'LOSS',
             absoluteAmount: Math.abs(balanceChange),
             description: `Admin P&L adjustment for position ${id.slice(0, 8)}... - Balance ${balanceChange > 0 ? '+' : ''}${balanceChange.toFixed(2)}`

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { marketGlobalSearchWhere } from '@/lib/admin/market-global-search';
 import { twelveDataService } from '@/lib/twelvedata';
 import { z } from 'zod';
 import { getAuthSession } from '@/lib/auth';
@@ -40,11 +41,9 @@ export async function GET(request: NextRequest) {
     // Build where clause
     const where: Record<string, unknown> = {};
 
-    if (search) {
-      where.OR = [
-        { symbol: { contains: search, mode: 'insensitive' } },
-        { name: { contains: search, mode: 'insensitive' } }
-      ];
+    const searchClause = search ? marketGlobalSearchWhere(search) : null;
+    if (searchClause) {
+      Object.assign(where, searchClause);
     }
 
     if (symbol) {
@@ -156,25 +155,36 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate symbol exists on TwelveData
-    const marketData = await twelveDataService.getCombinedData(upperSymbol);
+    const validateWithTwelveData =
+      room === 'TRADING' || room === 'STOCK';
 
-    if ('error' in marketData) {
-      return NextResponse.json(
-        {
-          error: 'Market validation failed',
-          message: `Symbol "${upperSymbol}" got error on TwelveData API`
-        },
-        { status: 400 }
+    let marketName: string;
+    let lastPrice: number;
+    let lastChange: number;
+
+    if (validateWithTwelveData) {
+      const marketData = await twelveDataService.getCombinedData(upperSymbol);
+
+      if ('error' in marketData) {
+        return NextResponse.json(
+          {
+            error: 'Market validation failed',
+            message: `Symbol "${upperSymbol}" got error on TwelveData API`
+          },
+          { status: 400 }
+        );
+      }
+
+      marketName = marketData.name || upperSymbol;
+      lastPrice = parseFloat(
+        marketData.current_price || marketData.close || '0'
       );
+      lastChange = parseFloat(marketData.change || '0');
+    } else {
+      marketName = upperSymbol;
+      lastPrice = 0;
+      lastChange = 0;
     }
-
-    // Extract market name from TwelveData response
-    const marketName = marketData.name || upperSymbol;
-    const lastPrice = parseFloat(
-      marketData.current_price || marketData.close || '0'
-    );
-    const lastChange = parseFloat(marketData.change || '0');
 
     // Create the market
     const newMarket = await prisma.market.create({

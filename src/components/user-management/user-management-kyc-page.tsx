@@ -156,7 +156,7 @@ export function UserManagementKycPage() {
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-auto">
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
       <header className="shrink-0 border-b border-[var(--trade-border)] bg-[var(--trade-panel)] px-6 py-4">
         <h1 className="text-base font-semibold text-[var(--trade-text)]">
           KYC verification
@@ -166,8 +166,9 @@ export function UserManagementKycPage() {
         </p>
       </header>
 
-      <div className="flex flex-1 flex-col gap-6 p-6">
-        <div className="mx-auto w-full max-w-3xl space-y-4">
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+        <div className="flex flex-1 flex-col gap-6 p-6">
+          <div className="mx-auto w-full max-w-3xl space-y-4">
           <div
             className={cn(
               'flex gap-3 rounded-lg border px-4 py-3 text-sm',
@@ -294,6 +295,7 @@ export function UserManagementKycPage() {
             </div>
           </section>
         </div>
+        </div>
       </div>
     </div>
   );
@@ -335,7 +337,10 @@ function KycDrop({
           accept="image/*,.pdf"
           disabled={disabled}
           className="sr-only"
-          onChange={(e) => onFile(e.target.files?.[0] ?? null)}
+          onChange={(e) => {
+            onFile(e.target.files?.[0] ?? null);
+            e.currentTarget.blur();
+          }}
         />
         <label
           htmlFor={id}

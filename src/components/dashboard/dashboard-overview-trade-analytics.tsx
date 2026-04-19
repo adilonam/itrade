@@ -23,6 +23,7 @@ import {
   buildMonthlySeries,
   cumulativeRoiFromSeries,
   dailyPerformanceFromClosed,
+  positionMatchesWalletTab,
   type DashboardPosition,
   type TimeRange
 } from '@/lib/dashboard-position-analytics';
@@ -158,22 +159,10 @@ export function DashboardOverviewTradeAnalytics({
     return financialReal;
   }, [selectedBalance, financialReal, financialDemo, financialInstitutional]);
 
-  const filteredPositions = useMemo(() => {
-    return positions.filter((p) => {
-      const balanceType = (p as DashboardPosition & { balanceType?: string }).balanceType;
-      if (balanceType) {
-        return balanceType === selectedBalance;
-      }
-
-      if (selectedBalance === 'INSTITUTIONAL') {
-        return p.room === 'INSTITUTIONAL';
-      }
-      if (selectedBalance === 'DEMO') {
-        return p.room === 'TRADING';
-      }
-      return p.room === 'TRADING' || p.room === 'STOCK';
-    });
-  }, [positions, selectedBalance]);
+  const filteredPositions = useMemo(
+    () => positions.filter((p) => positionMatchesWalletTab(p, selectedBalance)),
+    [positions, selectedBalance]
+  );
 
   const balanceBase = selectedFinancial.balance;
 

@@ -156,8 +156,9 @@ export function AddMarketDialog({
         <DialogHeader>
           <DialogTitle>Add New Market</DialogTitle>
           <DialogDescription>
-            Add a new market to the trading platform. The symbol will be
-            validated against the TwelveData API.
+            Add a new market to the trading platform. For Stock and Trading
+            rooms, the symbol is validated against the TwelveData API;
+            Institutional room markets are created without that check.
           </DialogDescription>
         </DialogHeader>
 

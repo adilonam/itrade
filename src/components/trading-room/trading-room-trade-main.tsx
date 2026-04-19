@@ -22,7 +22,7 @@ export function TradingRoomTradeMain() {
     if (bottomPanelInitialSizeRef.current != null) return;
     const initialBottomSize = sizes[1] ?? 0;
     bottomPanelInitialSizeRef.current = initialBottomSize;
-    const computedMinSize = Math.max(1, Math.min(100, initialBottomSize * 0.61));
+    const computedMinSize = Math.max(1, Math.min(100, initialBottomSize * 0.3));
     setBottomPanelMinSize(computedMinSize);
     setBottomCollapseEnabled(true);
   }, []);

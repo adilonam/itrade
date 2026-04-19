@@ -32,7 +32,7 @@ function utcClockString() {
 
 export function WatchTraderHeader() {
   type BalanceType = 'REAL' | 'DEMO' | 'INSTITUTIONAL';
-  type MarginDisplay = {
+  type BalanceAmountDisplay = {
     text: string;
     nonNegative: boolean;
   };
@@ -49,8 +49,8 @@ export function WatchTraderHeader() {
   const [time, setTime] = useState(utcClockString);
   const [selectedBalanceType, setSelectedBalanceType] = useState<BalanceType>('REAL');
   const [openBalanceDropdown, setOpenBalanceDropdown] = useState(false);
-  const [marginByBalanceType, setMarginByBalanceType] = useState<
-    Record<BalanceType, MarginDisplay | null>
+  const [balanceByBalanceType, setBalanceByBalanceType] = useState<
+    Record<BalanceType, BalanceAmountDisplay | null>
   >({
     REAL: null,
     DEMO: null,
@@ -58,9 +58,9 @@ export function WatchTraderHeader() {
   });
   const balanceDropdownRef = useRef<HTMLDivElement | null>(null);
 
-  const loadFinancialMargin = useCallback(async () => {
+  const loadFinancialBalance = useCallback(async () => {
     if (!session?.user) {
-      setMarginByBalanceType({
+      setBalanceByBalanceType({
         REAL: null,
         DEMO: null,
         INSTITUTIONAL: null
@@ -77,15 +77,16 @@ export function WatchTraderHeader() {
       if (responses.some((response) => !response.ok)) throw new Error('fail');
 
       const payloads = await Promise.all(responses.map((response) => response.json()));
-      const nextMarginByBalanceType = balanceTypes.reduce<
-        Record<BalanceType, MarginDisplay | null>
+      const nextBalanceByType = balanceTypes.reduce<
+        Record<BalanceType, BalanceAmountDisplay | null>
       >(
         (acc, balanceType, index) => {
-          const free = typeof payloads[index]?.freeMargin === 'number' ? payloads[index].freeMargin : 0;
-          const sign = free >= 0 ? '+' : '-';
+          const bal =
+            typeof payloads[index]?.balance === 'number' ? payloads[index].balance : 0;
+          const sign = bal >= 0 ? '+' : '-';
           acc[balanceType] = {
-            text: `${sign}$${Math.abs(free).toFixed(2)}`,
-            nonNegative: free >= 0
+            text: `${sign}$${Math.abs(bal).toFixed(2)}`,
+            nonNegative: bal >= 0
           };
           return acc;
         },
@@ -96,9 +97,9 @@ export function WatchTraderHeader() {
         }
       );
 
-      setMarginByBalanceType(nextMarginByBalanceType);
+      setBalanceByBalanceType(nextBalanceByType);
     } catch {
-      setMarginByBalanceType({
+      setBalanceByBalanceType({
         REAL: null,
         DEMO: null,
         INSTITUTIONAL: null
@@ -112,10 +113,11 @@ export function WatchTraderHeader() {
   }, []);
 
   useEffect(() => {
-    loadFinancialMargin();
-    const i = setInterval(loadFinancialMargin, 60_000);
+    loadFinancialBalance();
+    const i = setInterval(loadFinancialBalance, 50_000);
     return () => clearInterval(i);
-  }, [loadFinancialMargin]);
+  },
+   [loadFinancialBalance]);
 
   useEffect(() => {
     const onPointerDown = (event: MouseEvent) => {
@@ -148,7 +150,7 @@ export function WatchTraderHeader() {
     tenantNavItems['Room Trading']?.[userRole ?? 'USER'] ??
     tenantNavItems['Room Trading']?.USER ??
     [];
-  const selectedMargin = marginByBalanceType[selectedBalanceType];
+  const selectedBalanceAmount = balanceByBalanceType[selectedBalanceType];
 
   return (
     <header className="grid h-11 shrink-0 w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-2 border-b border-[var(--trade-border)] bg-[var(--trade-panel)] px-3 text-[var(--trade-text)]">
@@ -206,7 +208,7 @@ export function WatchTraderHeader() {
           <button
             type="button"
             className="flex items-center gap-1 rounded border border-[var(--trade-border)] bg-[var(--trade-dark)] px-2 py-1 font-mono text-[11px]"
-            title={`Free margin (TRADING · ${selectedBalanceType})`}
+            title={`Balance (TRADING · ${selectedBalanceType})`}
             aria-haspopup="menu"
             aria-expanded={openBalanceDropdown}
             onClick={() => setOpenBalanceDropdown((prev) => !prev)}
@@ -215,13 +217,15 @@ export function WatchTraderHeader() {
             <span className="text-[var(--trade-text-muted)]">
               {balanceLabel[selectedBalanceType]}:
             </span>
-            {selectedMargin ? (
+            {selectedBalanceAmount ? (
               <span
                 className={
-                  selectedMargin.nonNegative ? 'text-[var(--trade-green)]' : 'text-red-400'
+                  selectedBalanceAmount.nonNegative
+                    ? 'text-[var(--trade-green)]'
+                    : 'text-red-400'
                 }
               >
-                {selectedMargin.text}
+                {selectedBalanceAmount.text}
               </span>
             ) : (
               <span className="text-[var(--trade-text-muted)]">—</span>
@@ -241,7 +245,7 @@ export function WatchTraderHeader() {
               aria-label="Balance type selector"
             >
               {(['REAL', 'INSTITUTIONAL', 'DEMO'] as BalanceType[]).map((balanceType) => {
-                const margin = marginByBalanceType[balanceType];
+                const rowBalance = balanceByBalanceType[balanceType];
                 return (
                   <button
                     key={balanceType}
@@ -259,14 +263,14 @@ export function WatchTraderHeader() {
                     <span className="font-mono text-[var(--trade-text)]">
                       {balanceLabel[balanceType]}
                     </span>
-                    {margin ? (
+                    {rowBalance ? (
                       <span
                         className={cn(
                           'font-mono',
-                          margin.nonNegative ? 'text-[var(--trade-green)]' : 'text-red-400'
+                          rowBalance.nonNegative ? 'text-[var(--trade-green)]' : 'text-red-400'
                         )}
                       >
-                        {margin.text}
+                        {rowBalance.text}
                       </span>
                     ) : (
                       <span className="font-mono text-[var(--trade-text-muted)]">—</span>

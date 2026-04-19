@@ -6,7 +6,10 @@ import {
   calculatePositionPnL,
   couldOpenPosition
 } from '@/lib/calculator-server';
-import { getUserBalanceAmount, parseBalanceType } from '@/lib/balance';
+import {
+  getUserBalanceAmount,
+  resolveUserBalanceForNewPosition
+} from '@/lib/balance';
 // Create position data type
 type CreatePositionData = Position;
 import { Market, Position } from '@/lib/prisma/generated/client';
@@ -64,7 +67,8 @@ export async function GET(request: NextRequest) {
               email: true
             }
           },
-          market: true
+          market: true,
+          userBalance: true
         },
         orderBy: {
           executedAt: 'desc'
@@ -138,9 +142,39 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const body: Omit<CreatePositionData, 'userId'> & { balanceType?: unknown } =
-      await request.json();
-    const balanceType = parseBalanceType(body.balanceType);
+    const body: Omit<CreatePositionData, 'userId'> & {
+      balanceType?: unknown;
+      userBalanceId?: string | null;
+    } = await request.json();
+
+    const positionRoom = (body.room as string | undefined) ?? 'TRADING';
+    if (positionRoom === 'INSTITUTIONAL' && !canBypass) {
+      return NextResponse.json(
+        {
+          error: 'Only administrators can open institutional positions.',
+          message: 'Only administrators can open institutional positions.'
+        },
+        { status: 403 }
+      );
+    }
+
+    const walletResult = await prisma.$transaction((tx) =>
+      resolveUserBalanceForNewPosition(tx, session.user.id, {
+        userBalanceId: body.userBalanceId,
+        room: body.room ?? undefined,
+        balanceType: body.balanceType
+      })
+    );
+
+    if (!walletResult.ok) {
+      return NextResponse.json(
+        { error: 'Invalid userBalanceId for your account' },
+        { status: 400 }
+      );
+    }
+
+    const positionUserBalanceId = walletResult.id;
+    const balanceType = walletResult.type;
 
     // Validate required fields
     if (!body.type || body.quantity === undefined) {
@@ -363,6 +397,7 @@ export async function POST(request: NextRequest) {
           type: body.type,
           status: 'PLACED' as const,
           room: body.room || 'TRADING',
+          userBalanceId: positionUserBalanceId,
           marketId: body.marketId,
           quantity: body.quantity,
           executedPrice: executedPrice,
@@ -391,6 +426,7 @@ export async function POST(request: NextRequest) {
               type: body.type,
               status: 'FAILED',
               room: body.room || 'TRADING',
+              userBalanceId: positionUserBalanceId,
               marketId: body.marketId,
               quantity: body.quantity,
               executedPrice: executedPrice ?? undefined,
@@ -413,7 +449,8 @@ export async function POST(request: NextRequest) {
                   leverage: true
                 }
               },
-              market: true
+              market: true,
+              userBalance: true
             }
           });
 
@@ -439,6 +476,7 @@ export async function POST(request: NextRequest) {
         type: body.type,
         status: body.status || 'PENDING',
         room: body.room || 'TRADING',
+        userBalanceId: positionUserBalanceId,
         marketId: body.marketId,
         quantity: body.quantity,
         executedPrice: executedPrice ?? undefined,
@@ -459,7 +497,8 @@ export async function POST(request: NextRequest) {
             leverage: true
           }
         },
-        market: true
+        market: true,
+        userBalance: true
       }
     });
 
