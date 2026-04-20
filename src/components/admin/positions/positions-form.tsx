@@ -418,31 +418,37 @@ export function PositionForm({
             </div>
 
             {(realBalance !== null || institutionalBalance !== null) && (
-              <div className='bg-muted/40 md:col-span-2 grid grid-cols-1 gap-3 rounded-lg border p-3 sm:grid-cols-2'>
-                <div>
-                  <p className='text-muted-foreground text-xs'>
-                    REAL balance (margin)
-                  </p>
-                  <p className='text-lg font-semibold tabular-nums'>
-                    {loadingBalances
-                      ? '…'
-                      : (realBalance ?? 0).toLocaleString(undefined, {
-                          maximumFractionDigits: 2
-                        })}
-                  </p>
-                </div>
-                <div>
-                  <p className='text-muted-foreground text-xs'>
-                    INSTITUTIONAL balance (margin)
-                  </p>
-                  <p className='text-lg font-semibold tabular-nums'>
-                    {loadingBalances
-                      ? '…'
-                      : (institutionalBalance ?? 0).toLocaleString(undefined, {
-                          maximumFractionDigits: 2
-                        })}
-                  </p>
-                </div>
+              <div className='bg-muted/40 md:col-span-2 grid grid-cols-1 gap-3 rounded-lg border p-3'>
+                {formData.room === 'INSTITUTIONAL' ? (
+                  <div>
+                    <p className='text-muted-foreground text-xs'>
+                      INSTITUTIONAL balance (margin)
+                    </p>
+                    <p className='text-lg font-semibold tabular-nums'>
+                      {loadingBalances
+                        ? '…'
+                        : (institutionalBalance ?? 0).toLocaleString(
+                            undefined,
+                            {
+                              maximumFractionDigits: 2
+                            }
+                          )}
+                    </p>
+                  </div>
+                ) : (
+                  <div>
+                    <p className='text-muted-foreground text-xs'>
+                      REAL balance (margin)
+                    </p>
+                    <p className='text-lg font-semibold tabular-nums'>
+                      {loadingBalances
+                        ? '…'
+                        : (realBalance ?? 0).toLocaleString(undefined, {
+                            maximumFractionDigits: 2
+                          })}
+                    </p>
+                  </div>
+                )}
               </div>
             )}
 

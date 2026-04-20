@@ -35,13 +35,15 @@ import type {
   PositionStatus,
   Position,
   Market,
-  User
+  User,
+  UserBalance
 } from '@/lib/prisma/generated/client';
 
 // Extended position type with relations (admin list adds calculated PnL for open legs)
 export type PositionWithRelations = Position & {
   user: User | null;
   market: Market | null;
+  userBalance?: UserBalance | null;
   calculatedPnL?: number | null;
 };
 import {
@@ -226,6 +228,9 @@ export function PositionsTable({
                           </TableHead>
                         ) : null}
                         <TableHead className='text-xs font-medium text-[var(--trade-text-muted)]'>
+                          User balance
+                        </TableHead>
+                        <TableHead className='text-xs font-medium text-[var(--trade-text-muted)]'>
                           Type
                         </TableHead>
                         <TableHead className='text-xs font-medium text-[var(--trade-text-muted)]'>
@@ -289,6 +294,22 @@ export function PositionsTable({
                               </div>
                             </TableCell>
                           ) : null}
+                          <TableCell className='text-[var(--trade-text)]'>
+                            {position.userBalance ? (
+                              <div>
+                                <div className='font-mono text-xs font-medium'>
+                                  {formatCurrency(position.userBalance.amount)}
+                                </div>
+                                <div className='text-xs text-[var(--trade-text-muted)]'>
+                                  {position.userBalance.type}
+                                </div>
+                              </div>
+                            ) : (
+                              <span className='text-xs text-[var(--trade-text-muted)]'>
+                                N/A
+                              </span>
+                            )}
+                          </TableCell>
                           <TableCell>
                             <Badge className={getTypeColor(position.type)}>
                               {position.type}

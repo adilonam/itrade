@@ -22,7 +22,7 @@ import { PositionsTable } from './positions-table';
 import { PositionForm } from './positions-form';
 import { PositionStats, PositionEnums } from './positions-stats';
 import { TRADE_ROOM_CARD_CLASS } from '@/constants/trade-room-ui';
-import type { Position, Market, User } from '@/lib/prisma/generated/client';
+import type { Position, Market, User, UserBalance } from '@/lib/prisma/generated/client';
 import {
   IconPlus,
   IconSearch,
@@ -36,6 +36,8 @@ import {
 type PositionWithRelations = Position & {
   user: User | null;
   market: Market | null;
+  userBalance?: UserBalance | null;
+  calculatedPnL?: number | null;
 };
 
 // Position filters interface
@@ -223,6 +225,7 @@ export function PositionsView() {
 
   const handlePositionUpdated = () => {
     setEditingPosition(null);
+    setShowForm(false);
     loadPositions(pagination.page, currentFilters);
     loadStats();
   };

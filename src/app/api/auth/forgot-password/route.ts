@@ -19,17 +19,10 @@ export async function POST(request: NextRequest) {
 
     const user = await prisma.user.findUnique({
       where: { email: email.toLowerCase() },
-      select: { id: true, email: true, name: true, password: true }
+      select: { id: true, email: true, name: true }
     });
 
     if (!user) {
-      return NextResponse.json(
-        { message: 'If an account exists with this email, you will receive a reset link.' },
-        { status: 200 }
-      );
-    }
-
-    if (!user.password) {
       return NextResponse.json(
         { message: 'If an account exists with this email, you will receive a reset link.' },
         { status: 200 }

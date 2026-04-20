@@ -29,18 +29,12 @@ export default async function SignInViewPage() {
       </div>
       <div className='flex flex-1 items-center justify-center p-4 lg:p-10'>
         <div className='w-full max-w-md space-y-5'>
-          <div className='flex items-center justify-between text-sm'>
+          <div className='flex items-center text-sm'>
             <Link
               href='/'
               className='text-[var(--trade-text-muted)] hover:text-[var(--trade-text)]'
             >
               Back to home
-            </Link>
-            <Link
-              href='/auth/sign-up'
-              className='text-[var(--trade-accent-blue)] hover:underline'
-            >
-              Create account
             </Link>
           </div>
           <SignInForm />

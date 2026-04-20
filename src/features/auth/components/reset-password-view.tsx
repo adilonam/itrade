@@ -1,5 +1,6 @@
 'use client';
 
+import { AuthSidebarBrandLink } from '@/components/auth/auth-sidebar-brand-link';
 import { usePublicAppName } from '@/hooks/use-public-app-name';
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -15,8 +16,6 @@ import {
 } from '@/components/ui/card';
 import { toast } from 'sonner';
 import Link from 'next/link';
-import { buttonVariants } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
 
 export default function ResetPasswordView() {
   const appName = usePublicAppName();
@@ -81,9 +80,11 @@ export default function ResetPasswordView() {
         return;
       }
       setSuccess(true);
-      toast.success('Password updated. You can sign in with your new password.');
+      toast.success(
+        'Password updated. You can sign in with your new password.'
+      );
       setTimeout(() => router.replace('/auth/sign-in'), 2000);
-    } catch (error) {
+    } catch {
       toast.error('Something went wrong. Please try again.');
     } finally {
       setIsLoading(false);
@@ -92,8 +93,8 @@ export default function ResetPasswordView() {
 
   if (valid === null) {
     return (
-      <div className='flex min-h-screen items-center justify-center bg-zinc-900'>
-        <div className='text-zinc-400'>Checking link...</div>
+      <div className='trade-room flex min-h-screen w-full items-center justify-center bg-[var(--trade-dark)] text-[var(--trade-text-muted)]'>
+        <p className='text-sm'>Checking link...</p>
       </div>
     );
   }
@@ -103,95 +104,105 @@ export default function ResetPasswordView() {
   }
 
   return (
-    <div className='relative flex h-screen flex-col items-center justify-center bg-zinc-900 md:grid lg:max-w-none lg:grid-cols-2 lg:px-0'>
-      <Link
-        href='/auth/sign-in'
-        className={cn(
-          buttonVariants({ variant: 'ghost' }),
-          'absolute top-4 left-4 text-zinc-100 hover:bg-zinc-800 hover:text-white md:top-8 md:left-8'
-        )}
-      >
-        Back to Sign In
-      </Link>
-      <div className='bg-muted relative hidden h-full flex-col p-10 text-white lg:flex dark:border-r'>
-        <div className='absolute inset-0 bg-zinc-900' />
-        <div className='relative z-20 flex items-center text-lg font-medium'>
-          <svg
-            xmlns='http://www.w3.org/2000/svg'
-            viewBox='0 0 24 24'
-            fill='none'
-            stroke='currentColor'
-            strokeWidth='2'
-            strokeLinecap='round'
-            strokeLinejoin='round'
-            className='mr-2 h-6 w-6'
-          >
-            <path d='M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3' />
-          </svg>
-          {appName}
+    <div className='trade-room flex min-h-screen w-full bg-[var(--trade-dark)] text-[var(--trade-text)]'>
+      <div className='hidden w-full max-w-xl flex-col border-r border-[var(--trade-border)] bg-[var(--trade-panel)] p-10 lg:flex'>
+        <AuthSidebarBrandLink appName={appName} />
+        <div className='mt-8 rounded-xl border border-[var(--trade-border)] bg-[var(--trade-dark)]/70 p-5'>
+          <p className='text-sm text-[var(--trade-text-muted)]'>
+            Choose a strong password you have not used elsewhere. You will be
+            signed out of other sessions until you sign in again.
+          </p>
         </div>
-        <div className='relative z-20 mt-auto'>
-          <blockquote className='space-y-2'>
-            <p className='text-lg'>
-              &ldquo;This trading platform has revolutionized how I manage my
-              investments and analyze market trends.&rdquo;
-            </p>
-            <footer className='text-sm'>Satisfied Trader</footer>
-          </blockquote>
+        <div className='mt-auto text-sm text-[var(--trade-text-muted)]'>
+          Secure password update for your trader account.
         </div>
       </div>
-      <div className='dark flex h-full items-center justify-center bg-zinc-900 p-4 text-zinc-100 lg:p-8'>
-        <div className='flex w-full max-w-md flex-col items-center justify-center space-y-6'>
-          <Card className='w-full max-w-md'>
+      <div className='flex flex-1 items-center justify-center p-4 lg:p-10'>
+        <div className='w-full max-w-md space-y-5'>
+          <div className='flex items-center justify-between text-sm'>
+            <Link
+              href='/'
+              className='text-[var(--trade-text-muted)] hover:text-[var(--trade-text)]'
+            >
+              Back to home
+            </Link>
+            <Link
+              href='/auth/sign-in'
+              className='text-[var(--trade-accent-blue)] hover:underline'
+            >
+              Sign in
+            </Link>
+          </div>
+          <Card className='w-full max-w-md border-[var(--trade-border)] bg-[var(--trade-panel)] text-[var(--trade-text)] shadow-sm'>
             <CardHeader>
-              <CardTitle>Reset password</CardTitle>
-              <CardDescription>
-                {email
-                  ? `Set a new password for ${email}`
-                  : 'Enter your new password below'}
+              <CardTitle className='text-[var(--trade-text)]'>
+                {success ? 'Password updated' : 'Reset password'}
+              </CardTitle>
+              <CardDescription className='text-[var(--trade-text-muted)]'>
+                {success
+                  ? 'You can sign in with your new password.'
+                  : email
+                    ? `Set a new password for ${email}`
+                    : 'Enter your new password below'}
               </CardDescription>
             </CardHeader>
             <CardContent>
               {success ? (
-                <p className='text-muted-foreground text-sm'>
+                <p className='text-sm text-[var(--trade-text-muted)]'>
                   Redirecting you to sign in...
                 </p>
               ) : (
                 <form onSubmit={handleSubmit} className='space-y-4'>
                   <div className='space-y-2'>
-                    <Label htmlFor='newPassword'>New password</Label>
+                    <Label
+                      htmlFor='newPassword'
+                      className='text-[var(--trade-text-muted)]'
+                    >
+                      New password
+                    </Label>
                     <Input
                       id='newPassword'
                       type='password'
                       placeholder='At least 8 characters'
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
+                      className='border-[var(--trade-border)] bg-[var(--trade-dark)] text-[var(--trade-text)] placeholder:text-[var(--trade-text-muted)] focus-visible:ring-[var(--trade-accent-blue)]'
                       required
                       minLength={8}
                     />
                   </div>
                   <div className='space-y-2'>
-                    <Label htmlFor='confirmPassword'>Confirm password</Label>
+                    <Label
+                      htmlFor='confirmPassword'
+                      className='text-[var(--trade-text-muted)]'
+                    >
+                      Confirm password
+                    </Label>
                     <Input
                       id='confirmPassword'
                       type='password'
                       placeholder='Confirm your password'
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
+                      className='border-[var(--trade-border)] bg-[var(--trade-dark)] text-[var(--trade-text)] placeholder:text-[var(--trade-text-muted)] focus-visible:ring-[var(--trade-accent-blue)]'
                       required
                       minLength={8}
                     />
                   </div>
-                  <Button type='submit' className='w-full' disabled={isLoading}>
+                  <Button
+                    type='submit'
+                    className='w-full bg-[#45a29e] text-white hover:opacity-90'
+                    disabled={isLoading}
+                  >
                     {isLoading ? 'Updating...' : 'Update password'}
                   </Button>
                 </form>
               )}
               {!success && (
-                <p className='mt-4 text-center text-sm text-muted-foreground'>
+                <p className='mt-4 text-center text-sm text-[var(--trade-text-muted)]'>
                   <Link
                     href='/auth/sign-in'
-                    className='hover:text-primary underline underline-offset-4'
+                    className='text-[var(--trade-accent-blue)] underline underline-offset-4 hover:text-[var(--trade-text)]'
                   >
                     Back to sign in
                   </Link>
@@ -199,6 +210,23 @@ export default function ResetPasswordView() {
               )}
             </CardContent>
           </Card>
+          <p className='px-4 text-center text-xs text-[var(--trade-text-muted)]'>
+            By continuing, you agree to our{' '}
+            <Link
+              href='/terms'
+              className='text-[var(--trade-accent-blue)] hover:underline'
+            >
+              Terms of Service
+            </Link>{' '}
+            and{' '}
+            <Link
+              href='/privacy'
+              className='text-[var(--trade-accent-blue)] hover:underline'
+            >
+              Privacy Policy
+            </Link>
+            .
+          </p>
         </div>
       </div>
     </div>

@@ -316,3 +316,10 @@ bugs :
 - [x] send link to sign up 
 - [x] fix kyc requrests
 - [x] number 3 in whatdsapp
+
+
+
+- [x] fix pnl for instituianal
+- [?] large doc on kyc
+- [x] rmv create account
+- [x] check forgot password

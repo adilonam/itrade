@@ -1,7 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { calculatePositionPnL } from '@/lib/calculator-server';
-import type { Market, Position, PositionType, PositionStatus, Room } from '@/lib/prisma/generated/client';
+import type {
+  Market,
+  Position,
+  PositionType,
+  PositionStatus,
+  Room,
+  TransactionType
+} from '@/lib/prisma/generated/client';
 import { resolveUserBalanceForNewPosition } from '@/lib/balance';
 
 type CreatePositionBody = {
@@ -219,21 +226,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const walletResult = await prisma.$transaction((tx) =>
-      resolveUserBalanceForNewPosition(tx, body.userId, {
-        userBalanceId: body.userBalanceId,
-        room: body.room,
-        balanceType: body.balanceType
-      })
-    );
-
-    if (!walletResult.ok) {
-      return NextResponse.json(
-        { error: 'Invalid userBalanceId for this user' },
-        { status: 400 }
-      );
-    }
-
     const nextStatus = body.status || 'PLACED';
     const closedAt =
       nextStatus === 'CLOSED'
@@ -242,37 +234,78 @@ export async function POST(request: NextRequest) {
           : new Date()
         : null;
 
-    const position = await prisma.position.create({
-      data: {
-        userId: body.userId,
-        type: body.type,
-        status: nextStatus,
+    const rawPnl = body.pnl;
+    const settledPnl =
+      typeof rawPnl === 'number' && Number.isFinite(rawPnl) ? rawPnl : null;
+
+    const position = await prisma.$transaction(async (tx) => {
+      const walletResult = await resolveUserBalanceForNewPosition(tx, body.userId, {
+        userBalanceId: body.userBalanceId,
         room: body.room,
-        userBalanceId: walletResult.id,
-        marketId: body.marketId,
-        quantity: body.quantity,
-        executedPrice,
-        closedPrice: body.closedPrice,
-        closedAt,
-        takeProfit: body.takeProfit,
-        stopLoss: body.stopLoss,
-        description: body.description,
-        executedAt: body.executedAt
-          ? new Date(body.executedAt)
-          : undefined,
-        pnl: body.pnl
-      },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true
-          }
-        },
-        market: true,
-        userBalance: true
+        balanceType: body.balanceType
+      });
+
+      if (!walletResult.ok) {
+        throw new Error('INVALID_USER_BALANCE_ID');
       }
+
+      const created = await tx.position.create({
+        data: {
+          userId: body.userId,
+          type: body.type,
+          status: nextStatus,
+          room: body.room,
+          userBalanceId: walletResult.id,
+          marketId: body.marketId,
+          quantity: body.quantity,
+          executedPrice,
+          closedPrice: body.closedPrice,
+          closedAt,
+          takeProfit: body.takeProfit,
+          stopLoss: body.stopLoss,
+          description: body.description,
+          executedAt: body.executedAt
+            ? new Date(body.executedAt)
+            : undefined,
+          pnl: body.pnl
+        },
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true
+            }
+          },
+          market: true,
+          userBalance: true
+        }
+      });
+
+      if (
+        nextStatus === 'CLOSED' &&
+        settledPnl !== null &&
+        settledPnl !== 0
+      ) {
+        const transactionType: TransactionType =
+          settledPnl > 0 ? 'GAIN' : 'LOSS';
+
+        await tx.userBalance.update({
+          where: { id: walletResult.id },
+          data: { amount: { increment: settledPnl } }
+        });
+
+        await tx.transaction.create({
+          data: {
+            userBalanceId: walletResult.id,
+            type: transactionType,
+            absoluteAmount: Math.abs(settledPnl),
+            description: `Position ${body.type} closed (admin create) - ${market.symbol}`
+          }
+        });
+      }
+
+      return created;
     });
 
     // Calculate PnL for PLACED positions only
@@ -291,7 +324,13 @@ export async function POST(request: NextRequest) {
     };
 
     return NextResponse.json(response, { status: 201 });
-  } catch {
+  } catch (err) {
+    if (err instanceof Error && err.message === 'INVALID_USER_BALANCE_ID') {
+      return NextResponse.json(
+        { error: 'Invalid userBalanceId for this user' },
+        { status: 400 }
+      );
+    }
     return NextResponse.json(
       { error: 'Failed to create position' },
       { status: 500 }
