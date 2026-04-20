@@ -17,7 +17,10 @@ const META_THEME_COLORS = {
 
 export const metadata: Metadata = {
   title: 'Next Shadcn',
-  description: 'Basic dashboard with Next.js and Shadcn'
+  description: 'Basic dashboard with Next.js and Shadcn',
+  icons: {
+    apple: '/images/favico.png'
+  }
 };
 
 export const viewport: Viewport = {
