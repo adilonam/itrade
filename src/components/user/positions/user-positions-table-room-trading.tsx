@@ -13,6 +13,17 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger
+} from '@/components/ui/alert-dialog';
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -28,8 +39,10 @@ import {
   IconTrendingDown,
   IconMinus,
   IconChevronLeft,
-  IconChevronRight
+  IconChevronRight,
+  IconX
 } from '@tabler/icons-react';
+import { toast } from 'sonner';
 import type { Room } from '@/lib/prisma/generated/client';
 import { cn } from '@/lib/utils';
 import {
@@ -61,6 +74,9 @@ interface UserPositionsTableRoomTradingProps {
   panelVariant?: 'default' | 'trade';
   /** When true with `trade`, omit nested card chrome (trade room bottom tabs panel). */
   embeddedInTradePanel?: boolean;
+  /** Trade-room bottom panel: show close control for PLACED / PENDING rows. */
+  showCloseAction?: boolean;
+  onAfterClose?: () => void;
   pagination?: PositionsTablePagination;
 }
 export function UserPositionsTableRoomTrading({
@@ -69,10 +85,41 @@ export function UserPositionsTableRoomTrading({
   onUpdateRealTimePnL,
   panelVariant = 'default',
   embeddedInTradePanel = false,
+  showCloseAction = false,
+  onAfterClose,
   pagination
 }: UserPositionsTableRoomTradingProps) {
   const isTradePanel = panelVariant === 'trade';
   const isEmbeddedTrade = isTradePanel && embeddedInTradePanel;
+  const [closingId, setClosingId] = useState<string | null>(null);
+
+  const canCloseStatus = (status: string) =>
+    status === 'PLACED' || status === 'PENDING';
+
+  const handleClosePosition = async (positionId: string) => {
+    setClosingId(positionId);
+    try {
+      const res = await fetch(`/api/user/positions/${positionId}/close`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'CLOSED' })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(
+          typeof data?.error === 'string' ? data.error : 'Failed to close position'
+        );
+      }
+      toast.success('Position closed');
+      onAfterClose?.();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Failed to close position');
+    } finally {
+      setClosingId(null);
+    }
+  };
+
+  const colCount = showCloseAction ? 13 : 12;
   const { realTimePrices, isConnected, reset, subscribe } =
     useMarketsWebSocket();
 
@@ -305,6 +352,9 @@ export function UserPositionsTableRoomTrading({
                       <TableHead>Status</TableHead>
                       <TableHead>Date</TableHead>
                       <TableHead>Closed</TableHead>
+                      {showCloseAction ? (
+                        <TableHead className="text-right">Close</TableHead>
+                      ) : null}
                     </TableRow>
                   </TableHeader>
                   <TableBody
@@ -317,7 +367,7 @@ export function UserPositionsTableRoomTrading({
                     pagination.total > 0 ? (
                       <TableRow>
                         <TableCell
-                          colSpan={12}
+                          colSpan={colCount}
                           className={cn('py-8 text-center', mutedCell)}
                         >
                           No positions on this page.
@@ -475,6 +525,85 @@ export function UserPositionsTableRoomTrading({
                             ? formatDate(position.closedAt)
                             : '-'}
                         </TableCell>
+                        {showCloseAction ? (
+                          <TableCell className="p-1 text-right align-middle">
+                            {canCloseStatus(position.status) ? (
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    className={cn(
+                                      'h-7 gap-1 px-2 text-[10px]',
+                                      isTradePanel &&
+                                        'border-[var(--trade-border)] bg-transparent text-[var(--trade-text)] hover:bg-[var(--trade-dark)]/50'
+                                    )}
+                                    disabled={closingId === position.id}
+                                  >
+                                    {closingId === position.id ? (
+                                      <IconLoader2 className="size-3.5 animate-spin" />
+                                    ) : (
+                                      <IconX className="size-3.5" />
+                                    )}
+                                    Close
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent
+                                  className={
+                                    isTradePanel
+                                      ? 'border-[var(--trade-border)] bg-[var(--trade-panel)] text-[var(--trade-text)]'
+                                      : undefined
+                                  }
+                                >
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle
+                                      className={
+                                        isTradePanel
+                                          ? 'text-[var(--trade-text)]'
+                                          : undefined
+                                      }
+                                    >
+                                      Close position
+                                    </AlertDialogTitle>
+                                    <AlertDialogDescription
+                                      className={
+                                        isTradePanel
+                                          ? 'text-[var(--trade-text-muted)]'
+                                          : undefined
+                                      }
+                                    >
+                                      Close this {position.type} position for{' '}
+                                      {position.market?.symbol ?? 'this market'}?
+                                      This cannot be undone.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel
+                                      className={
+                                        isTradePanel
+                                          ? 'border-[var(--trade-border)] bg-transparent text-[var(--trade-text)] hover:bg-[var(--trade-dark)]/50'
+                                          : undefined
+                                      }
+                                    >
+                                      Cancel
+                                    </AlertDialogCancel>
+                                    <AlertDialogAction
+                                      className="bg-red-600 hover:bg-red-700"
+                                      onClick={() =>
+                                        handleClosePosition(position.id)
+                                      }
+                                    >
+                                      Close position
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            ) : (
+                              <span className={mutedCell}>—</span>
+                            )}
+                          </TableCell>
+                        ) : null}
                       </TableRow>
                       ))
                     )}
@@ -705,6 +834,11 @@ export function UserPositionsTableCardRoomTrading({
     setRealTimePnL((prev) => ({ ...prev, [positionId]: pnl }));
   }, []);
 
+  const handleAfterClose = useCallback(() => {
+    void loadPositions();
+    window.dispatchEvent(new CustomEvent(refreshEventName));
+  }, [loadPositions, refreshEventName]);
+
   if (error) {
     const isTrade = panelVariant === 'trade';
     const embedded = embeddedInTradePanel && isTrade;
@@ -751,6 +885,11 @@ export function UserPositionsTableCardRoomTrading({
         }
       : undefined;
 
+  const showCloseAction =
+    panelVariant === 'trade' &&
+    embeddedInTradePanel &&
+    (statusFilter === 'open' || statusFilter === 'pending');
+
   return (
     <UserPositionsTableRoomTrading
       positions={positions}
@@ -759,6 +898,8 @@ export function UserPositionsTableCardRoomTrading({
       realTimePnL={realTimePnL}
       panelVariant={panelVariant}
       embeddedInTradePanel={embeddedInTradePanel}
+      showCloseAction={showCloseAction}
+      onAfterClose={handleAfterClose}
       pagination={paginationProp}
     />
   );
