@@ -15,6 +15,7 @@ import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import Link from 'next/link';
+import { IconBrandGoogle } from '@tabler/icons-react';
 import MfaVerification from './mfa-verification';
 
 export function SignInForm() {
@@ -82,6 +83,18 @@ export function SignInForm() {
     setMfaToken('');
   };
 
+  const handleGoogleSignIn = async () => {
+    setIsLoading(true);
+    try {
+      await signIn('google', {
+        callbackUrl: '/',
+        redirect: true
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   if (showMfa) {
     return (
       <MfaVerification
@@ -101,6 +114,17 @@ export function SignInForm() {
         </CardDescription>
       </CardHeader>
       <CardContent>
+        <Button
+          type='button'
+          variant='outline'
+          className='mb-4 w-full border-[var(--trade-border)] bg-transparent text-[var(--trade-text)] hover:bg-[var(--trade-dark)]'
+          onClick={handleGoogleSignIn}
+          disabled={isLoading}
+        >
+          <IconBrandGoogle className='mr-2 h-4 w-4' />
+          Continue with Google
+        </Button>
+        <div className='mb-4 h-px bg-[var(--trade-border)]' />
         <form onSubmit={handleSubmit} className='space-y-4'>
           <div className='space-y-2'>
             <Label htmlFor='email' className='text-[var(--trade-text-muted)]'>
@@ -149,6 +173,15 @@ export function SignInForm() {
             {isLoading ? 'Signing in...' : 'Sign In'}
           </Button>
         </form>
+        <p className='mt-4 text-center text-sm text-[var(--trade-text-muted)]'>
+          Don&apos;t have an account?{' '}
+          <Link
+            href='/auth/sign-up'
+            className='text-[var(--trade-accent-blue)] hover:underline'
+          >
+            Sign up
+          </Link>
+        </p>
       </CardContent>
     </Card>
   );
