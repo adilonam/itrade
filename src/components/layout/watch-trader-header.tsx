@@ -214,9 +214,11 @@ export function WatchTraderHeader() {
             onClick={() => setOpenBalanceDropdown((prev) => !prev)}
           >
             <IconWallet className="size-3.5 shrink-0 text-[var(--trade-text-muted)] opacity-80" />
-            <span className="text-[var(--trade-text-muted)]">
-              {balanceLabel[selectedBalanceType]}:
-            </span>
+            {selectedBalanceType !== 'DEMO' ? (
+              <span className="text-[var(--trade-text-muted)]">
+                {balanceLabel[selectedBalanceType]}:
+              </span>
+            ) : null}
             {selectedBalanceAmount ? (
               <span
                 className={

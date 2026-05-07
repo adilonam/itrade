@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>xminvest | Trade with a Multi-Award Winning Broker</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Geist+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "inverse-surface": "#dce4e5",
+                    "on-surface": "#e6edf3",
+                    "on-secondary-container": "#006048",
+                    "surface-container-high": "#242b2c",
+                    "surface-dim": "#12151c",
+                    "on-tertiary-container": "#506075",
+                    "surface-bright": "#2a3441",
+                    "surface-container-low": "#151d1e",
+                    "error-container": "#93000a",
+                    "surface-container-lowest": "#05070b",
+                    "primary-fixed": "#7ef4ff",
+                    "on-primary-fixed": "#002022",
+                    "surface-container": "#161b22",
+                    "on-primary-fixed-variant": "#004f55",
+                    "inverse-primary": "#006970",
+                    "on-secondary": "#003829",
+                    "tertiary-fixed-dim": "#b7c8e0",
+                    "secondary-fixed-dim": "#00e1ad",
+                    "on-background": "#dce4e5",
+                    "surface-variant": "#2e3637",
+                    "on-error-container": "#ffdad6",
+                    "surface": "#161b22",
+                    "inverse-on-surface": "#2a3233",
+                    "on-surface-variant": "#b9c9cb",
+                    "on-secondary-fixed": "#002116",
+                    "primary-container": "#19f0ff",
+                    "secondary": "#62ffcc",
+                    "tertiary-container": "#cadbf4",
+                    "tertiary-fixed": "#d3e4fd",
+                    "on-tertiary-fixed-variant": "#38485c",
+                    "tertiary": "#8b9cb3",
+                    "error": "#ff6b8a",
+                    "outline-variant": "#3b494b",
+                    "on-secondary-fixed-variant": "#00513c",
+                    "surface-container-highest": "#334155",
+                    "primary": "#ddfcff",
+                    "on-primary": "#00363b",
+                    "on-error": "#690005",
+                    "on-tertiary": "#213245",
+                    "secondary-fixed": "#43fec7",
+                    "surface-tint": "#00dbe9",
+                    "on-tertiary-fixed": "#0b1d2f",
+                    "on-primary-container": "#006971",
+                    "secondary-container": "#00e4af",
+                    "outline": "#2a3441",
+                    "primary-fixed-dim": "#00dbe9",
+                    "background": "#12151c"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.625rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-xl": "64px",
+                    "stack-xs": "4px",
+                    "stack-sm": "8px",
+                    "unit": "4px",
+                    "stack-md": "16px",
+                    "stack-lg": "32px",
+                    "margin": "32px",
+                    "container-max": "1440px"
+            },
+            "fontFamily": {
+                    "body-lg": ["Inter"],
+                    "label-lg": ["Inter"],
+                    "body-md": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "headline-xl": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "data-mono": ["Geist Mono"]
+            },
+            "fontSize": {
+                    "body-lg": ["1.05rem", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "label-lg": ["0.8rem", {"lineHeight": "1.4", "fontWeight": "600"}],
+                    "body-md": ["0.85rem", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "label-sm": ["0.75rem", {"lineHeight": "1.4", "fontWeight": "500"}],
+                    "headline-md": ["1.5rem", {"lineHeight": "1.3", "fontWeight": "600"}],
+                    "headline-xl": ["2.5rem", {"lineHeight": "1.2", "fontWeight": "700"}],
+                    "headline-lg": ["2rem", {"lineHeight": "1.25", "fontWeight": "600"}],
+                    "data-mono": ["0.875rem", {"lineHeight": "1.5", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .ticker-gradient-fade {
+            mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar -->
+<header class="bg-surface sticky top-0 z-50 border-b border-outline-variant">
+<div class="flex justify-between items-center h-20 px-margin w-full max-w-container-max mx-auto">
+<div class="flex items-center gap-12">
+<a class="font-headline-lg text-headline-lg font-bold text-primary-container tracking-tighter" href="#">xminvest</a>
+<nav class="hidden md:flex gap-8">
+<a class="font-label-lg text-label-lg text-primary-container border-b-2 border-primary-container pb-1" href="#">Markets</a>
+<a class="font-label-lg text-label-lg text-on-surface-variant hover:text-primary-container transition-colors duration-200" href="#">Platforms</a>
+<a class="font-label-lg text-label-lg text-on-surface-variant hover:text-primary-container transition-colors duration-200" href="#">Research</a>
+<a class="font-label-lg text-label-lg text-on-surface-variant hover:text-primary-container transition-colors duration-200" href="#">Education</a>
+<a class="font-label-lg text-label-lg text-on-surface-variant hover:text-primary-container transition-colors duration-200" href="#">Promotions</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="hidden lg:block font-label-lg text-label-lg text-on-surface hover:text-primary-container transition-colors px-4 py-2">Member Login</button>
+<button class="bg-primary-container text-on-primary-container font-label-lg text-label-lg px-6 py-3 rounded hover:scale-105 active:scale-95 transition-all duration-200">Open Account</button>
+<button class="md:hidden text-on-surface">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+</div>
+</header>
+<main>
+<!-- Hero Section -->
+<section class="relative min-h-[600px] flex items-center overflow-hidden bg-surface-container-lowest">
+<div class="absolute inset-0 z-0 opacity-40">
+<img class="w-full h-full object-cover grayscale brightness-50" data-alt="A sophisticated wide shot of a futuristic dark trading floor with holographic stock market data visualizations. The environment is illuminated with a sharp clinical white light and accents of vibrant neon green. The atmosphere is professional and high-tech, reflecting an elite institutional financial environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDMuY7YxKWNuXN2jtqZa5XxgcYpSD23epDu4KG3XRuJaNzbGDae1oh4XAX53wQ4JirBn30-4tZnIvVkJMjU1fN27C7rRg-cTja12zDFU2M5dxrQMg-QSIUiT4Nc4-I48POWvXZu2sCKVRCltN6LL5l1PxX48F0N5Fa3NPC3e5ar2itvM3pVliEViR6x3WCstfKeVwJ2QSGbWt1AE-h6NqkZ7i1HpFEPLFAoSVoveJKJt3odlPxYThIp6Kj8xb6pDqWKPM3U_WG4b80q"/>
+</div>
+<div class="relative z-10 w-full max-w-container-max mx-auto px-margin py-stack-xl">
+<div class="max-w-2xl space-y-stack-md">
+<div class="inline-flex items-center gap-2 bg-primary-container/20 text-primary-container border border-primary-container/30 px-3 py-1 rounded-full">
+<span class="material-symbols-outlined text-[18px]">verified</span>
+<span class="font-label-sm text-label-sm uppercase tracking-wider">Multi-Award Winning Broker</span>
+</div>
+<h1 class="font-headline-xl text-headline-xl text-on-surface">
+                    0% Commission <br/>
+<span class="text-primary-container">on US Stocks</span>
+</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-lg">
+                    Trade the world's most popular instruments with industry-leading execution speeds and razor-sharp spreads. Join over 10 million traders globally.
+                </p>
+<div class="flex flex-wrap gap-4 pt-stack-sm">
+<button class="bg-primary-container text-on-primary-container font-label-lg text-label-lg px-8 py-4 rounded hover:scale-105 transition-transform">Open Account</button>
+<button class="border border-outline-variant text-on-surface font-label-lg text-label-lg px-8 py-4 rounded hover:bg-surface-container-high transition-colors">Try a Free Demo</button>
+</div>
+<div class="pt-stack-md flex items-center gap-4 text-on-surface-variant">
+<span class="font-label-sm text-label-sm">*Terms and Conditions apply. Trading involves risk.</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Ticker -->
+<div class="bg-surface-container border-y border-outline-variant overflow-hidden">
+<div class="ticker-gradient-fade flex whitespace-nowrap py-4 animate-ticker">
+<div class="flex items-center gap-12 px-8">
+<div class="flex items-center gap-2 font-data-mono text-data-mono">
+<span class="text-on-surface">AAPL</span>
+<span class="text-primary-container">+1.24%</span>
+<span class="text-on-surface-variant">189.43</span>
+</div>
+<div class="flex items-center gap-2 font-data-mono text-data-mono">
+<span class="text-on-surface">TSLA</span>
+<span class="text-error">-0.82%</span>
+<span class="text-on-surface-variant">242.11</span>
+</div>
+<div class="flex items-center gap-2 font-data-mono text-data-mono">
+<span class="text-on-surface">AMZN</span>
+<span class="text-primary-container">+0.45%</span>
+<span class="text-on-surface-variant">145.22</span>
+</div>
+<div class="flex items-center gap-2 font-data-mono text-data-mono">
+<span class="text-on-surface">NVDA</span>
+<span class="text-primary-container">+2.15%</span>
+<span class="text-on-surface-variant">482.30</span>
+</div>
+<div class="flex items-center gap-2 font-data-mono text-data-mono">
+<span class="text-on-surface">MSFT</span>
+<span class="text-on-surface-variant">+0.12%</span>
+<span class="text-on-surface-variant">374.58</span>
+</div>
+<div class="flex items-center gap-2 font-data-mono text-data-mono">
+<span class="text-on-surface">META</span>
+<span class="text-error">-1.44%</span>
+<span class="text-on-surface-variant">325.66</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Why Trade Stocks Section -->
+<section class="py-stack-xl bg-surface">
+<div class="max-w-container-max mx-auto px-margin">
+<div class="text-center mb-stack-xl">
+<h2 class="font-headline-lg text-headline-lg mb-4">Why Trade Stocks with xminvest?</h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-2xl mx-auto">Experience institutional-grade conditions designed for serious investors and active day traders alike.</p>
+</div>
+<div class="grid md:grid-cols-3 gap-gutter">
+<div class="bg-surface-container-low p-8 border border-outline-variant hover:border-primary-container transition-colors rounded group">
+<span class="material-symbols-outlined text-primary-container text-4xl mb-6">percent</span>
+<h3 class="font-headline-md text-headline-md mb-3">0 Commission</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Trade US stocks without any commission fees. Maximise your returns by keeping more of your capital.</p>
+</div>
+<div class="bg-surface-container-low p-8 border border-outline-variant hover:border-primary-container transition-colors rounded group">
+<span class="material-symbols-outlined text-primary-container text-4xl mb-6">bolt</span>
+<h3 class="font-headline-md text-headline-md mb-3">Instant Execution</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Over 99.35% of orders executed in under 1 second. No re-quotes or rejections on all orders.</p>
+</div>
+<div class="bg-surface-container-low p-8 border border-outline-variant hover:border-primary-container transition-colors rounded group">
+<span class="material-symbols-outlined text-primary-container text-4xl mb-6">monitoring</span>
+<h3 class="font-headline-md text-headline-md mb-3">Ultra-Low Spreads</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Deep liquidity from tier-1 institutions allows us to offer some of the tightest spreads in the industry.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Biggest Brands Section (Logos/Bento) -->
+<section class="py-stack-xl bg-surface-container-lowest">
+<div class="max-w-container-max mx-auto px-margin">
+<div class="flex flex-col md:flex-row justify-between items-end mb-stack-xl gap-stack-md">
+<div class="max-w-xl">
+<h2 class="font-headline-lg text-headline-lg mb-4">Trade the World's Biggest Brands</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Access 1,000+ CFDs on global stocks, commodities, and indices from a single interface.</p>
+</div>
+<a class="text-primary-container font-label-lg text-label-lg flex items-center gap-2 hover:underline" href="#">
+                    View All Assets <span class="material-symbols-outlined">arrow_forward</span>
+</a>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-gutter">
+<!-- Apple -->
+<div class="bg-surface-container h-48 flex flex-col items-center justify-center border border-outline-variant rounded p-6 group hover:bg-surface-container-high transition-all">
+<img alt="Apple logo" class="w-12 h-12 invert mb-4 opacity-70 group-hover:opacity-100 transition-opacity" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAhJ6cNC053huf90XE_nfqcqbyHiWSnf3L5QoFh5UeHWtUumK8MwkkwGt4v4ed4JC1T9CQvfgehhrBKu65X6NVnN2U9k9VQMgaQKFYKMHNs76oLblCfXztqhwYIsQ0LG3X707PLozsnb3EP8HyyoGW4iNIRDSbfbw1eLrDJO5BWnAwsAUk78S9dJXBe_QeyuIT4qUH8-BbwH6UxV0ZwxqzO0U8IE3dmA6fLAEeaGZtlJDX_AwNt89gjWAJx6GkREJyPFIPPGFZ_KMbx"/>
+<span class="font-headline-md text-headline-md">Apple</span>
+<span class="font-data-mono text-label-sm text-on-surface-variant">AAPL.US</span>
+</div>
+<!-- Tesla -->
+<div class="bg-surface-container h-48 flex flex-col items-center justify-center border border-outline-variant rounded p-6 group hover:bg-surface-container-high transition-all">
+<img alt="Tesla logo" class="w-12 h-12 invert mb-4 opacity-70 group-hover:opacity-100 transition-opacity" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDB_PhEKmBjuLw8xygPAUeSR4lNXziMmojN_ewEGM6ZCrbwpVvvJDeTEPm_Q4w1xdtxJSF7IdgSveYrYdUSp4wCaVXqRe_8rqsV6ul4hlzH7qqChFMtk_5PivX8WkMaZlhbNSrxYf9pv-2i1_nyeK698t2CW37rFXuBHvpLT38vaPaaEOvt9PeozVRIOgym1_93sUYzsPaNzhNXCSRAVZjngndGajd0er3rVo-i5aAuCBWtbV_cB0PpW8MLBsLH23pS-EombfI-VCAE"/>
+<span class="font-headline-md text-headline-md">Tesla</span>
+<span class="font-data-mono text-label-sm text-on-surface-variant">TSLA.US</span>
+</div>
+<!-- Amazon -->
+<div class="bg-surface-container h-48 flex flex-col items-center justify-center border border-outline-variant rounded p-6 group hover:bg-surface-container-high transition-all">
+<img alt="Amazon logo" class="w-16 h-8 invert mb-8 opacity-70 group-hover:opacity-100 transition-opacity" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-X3TMxE3hX6o3c-h4yjQxjUw_jqgEtLaFRqEkVjEqrvDj_6Asm25xwX1SS5eyD1ZL16kiZKes9JypR_QM-AgTtiiUkHwkUg8LtiwhjcBQNqJ7aHujUBLRn-Hx-vnRswr0RAViyVvCyvPo_nwuPGAe-ktE1LaiYu-9T1401tCDO__xNYydnp3D9t5CB7qpnqqV3Z0Y8-_nCRXlRzN5rOMXffDFveYdzp7Ga1-yq5LD4NF6bceh3XLa6RvbimAxAszGN2g-VmdZFuWx"/>
+<span class="font-headline-md text-headline-md">Amazon</span>
+<span class="font-data-mono text-label-sm text-on-surface-variant">AMZN.US</span>
+</div>
+<!-- Meta -->
+<div class="bg-surface-container h-48 flex flex-col items-center justify-center border border-outline-variant rounded p-6 group hover:bg-surface-container-high transition-all">
+<img alt="Meta logo" class="w-16 h-8 invert mb-8 opacity-70 group-hover:opacity-100 transition-opacity" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCNLI-b69XSxuRwHeZgRBnrKRwDMdvCg5LfTBdg9MZAGUfEMdZBuA9m_rp0Z5tTqvlnQdtQVHRRXoYhTg4EpbacJ-dcX1adxLBS_uVxEHloKOeJzyd8fr2lkq1p6lasDpsXxbHwz-h_ljI03tDJGEAjZ9ZfIus_6pu4Yp6Ozu02huRxYbyzW_WYyNvWjuZAPk8kmc0or2fe146-wP7ZOxWapeKCW8FfvlrQv4Gjf24GIFaPmmMDLCTzUHCISnGFeB61JIO9IDaGd6A-"/>
+<span class="font-headline-md text-headline-md">Meta</span>
+<span class="font-data-mono text-label-sm text-on-surface-variant">META.US</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Start Trading in 3 Steps -->
+<section class="py-stack-xl bg-surface border-t border-outline-variant">
+<div class="max-w-container-max mx-auto px-margin">
+<div class="text-center mb-stack-xl">
+<h2 class="font-headline-lg text-headline-lg mb-4">Start Trading in 3 Steps</h2>
+</div>
+<div class="relative flex flex-col md:flex-row gap-gutter">
+<!-- Step 1 -->
+<div class="flex-1 text-center relative">
+<div class="w-16 h-16 bg-primary-container rounded-full flex items-center justify-center mx-auto mb-6">
+<span class="material-symbols-outlined text-on-primary-container text-3xl">person_add</span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-2">Register</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Open a free demo or live account in minutes.</p>
+<div class="hidden md:block absolute top-8 -right-12 w-24 h-[1px] bg-outline-variant"></div>
+</div>
+<!-- Step 2 -->
+<div class="flex-1 text-center relative">
+<div class="w-16 h-16 bg-surface-container-highest rounded-full flex items-center justify-center mx-auto mb-6 border border-outline">
+<span class="material-symbols-outlined text-primary-container text-3xl">payments</span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-2">Fund</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Deposit funds using our secure and fast payment methods.</p>
+<div class="hidden md:block absolute top-8 -right-12 w-24 h-[1px] bg-outline-variant"></div>
+</div>
+<!-- Step 3 -->
+<div class="flex-1 text-center">
+<div class="w-16 h-16 bg-surface-container-highest rounded-full flex items-center justify-center mx-auto mb-6 border border-outline">
+<span class="material-symbols-outlined text-primary-container text-3xl">trending_up</span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-2">Trade</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Start trading your favorite instruments on our platforms.</p>
+</div>
+</div>
+<div class="mt-stack-xl text-center">
+<button class="bg-primary-container text-on-primary-container font-label-lg text-label-lg px-12 py-4 rounded-full hover:scale-105 transition-transform shadow-lg shadow-primary-container/20">Get Started Now</button>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest border-t border-outline-variant">
+<div class="flex flex-col gap-stack-lg py-stack-xl px-margin w-full max-w-container-max mx-auto">
+<div class="flex flex-col md:flex-row justify-between items-start gap-stack-lg">
+<div class="max-w-md">
+<span class="font-headline-md text-headline-md font-bold text-on-surface">xminvest</span>
+<p class="mt-4 font-body-md text-body-md text-on-surface-variant">
+                    Providing world-class trading services for over a decade. We are committed to transparency, reliability, and innovation in the global financial markets.
+                </p>
+</div>
+<div class="flex flex-wrap gap-x-12 gap-y-6">
+<div class="flex flex-col gap-2">
+<span class="font-label-lg text-label-lg text-on-surface">Legal</span>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">Terms of Service</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">Privacy Policy</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">Risk Warning</a>
+</div>
+<div class="flex flex-col gap-2">
+<span class="font-label-lg text-label-lg text-on-surface">Support</span>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">Contact Us</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">FAQ</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">Cookie Policy</a>
+</div>
+</div>
+</div>
+<div class="pt-stack-lg border-t border-outline-variant/30">
+<p class="font-label-sm text-label-sm text-on-surface-variant leading-relaxed opacity-60">
+                © 2024 xminvest. All rights reserved. Regulatory Disclosure: Trading financial instruments involves significant risk and can result in the loss of your invested capital. Please read our Risk Disclosure before trading. xminvest is regulated by the relevant financial authorities in all jurisdictions where it operates.
+            </p>
+</div>
+</div>
+</footer>
+</body></html>

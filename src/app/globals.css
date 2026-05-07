@@ -176,6 +176,34 @@ html:not(.dark) .watch-trader-shell {
   z-index: 1;
 }
 
+@keyframes market-tape-scroll {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+/* Landing live tape: continuous loop (Tailwind arbitrary animate-* does not always bind to custom keyframes). */
+.live-market-tape-marquee {
+  display: flex;
+  width: max-content;
+  animation: market-tape-scroll 55s linear infinite;
+  will-change: transform;
+}
+
+.live-market-tape-marquee:hover {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-market-tape-marquee {
+    animation: none;
+    will-change: auto;
+  }
+}
+
 @keyframes reveal {
   from {
     /* Use CSS variables for the origin, defaulting to center if not set */

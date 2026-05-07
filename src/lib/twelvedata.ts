@@ -107,6 +107,39 @@ class TwelveDataService {
   }
 
   /**
+   * REST quotes for landing / ticker UI (parallel /quote calls, one credit per symbol).
+   */
+  async getQuotesForTape(
+    symbols: string[]
+  ): Promise<Record<string, { price: number; percentChange: number }>> {
+    const unique = Array.from(
+      new Set(symbols.map((s) => s.trim().toUpperCase()))
+    ).filter(Boolean);
+    const entries = await Promise.all(
+      unique.map(async (symbol) => {
+        const quote = await this.getQuote(symbol);
+        if ('error' in quote) return null;
+        const price = parseFloat(quote.close);
+        const percentChange = parseFloat(quote.percent_change);
+        if (Number.isNaN(price)) return null;
+        return [
+          symbol,
+          {
+            price,
+            percentChange: Number.isNaN(percentChange) ? 0 : percentChange
+          }
+        ] as const;
+      })
+    );
+
+    const out: Record<string, { price: number; percentChange: number }> = {};
+    for (const row of entries) {
+      if (row) out[row[0]] = row[1];
+    }
+    return out;
+  }
+
+  /**
    * Get combined price and quote data for a symbol
    */
   async getCombinedData(

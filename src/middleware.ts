@@ -8,7 +8,7 @@ const isAuthPage = (pathname: string) =>
   pathname === '/auth/forgot-password' ||
   pathname === '/auth/reset-password';
 const isPublicPath = (pathname: string) =>
-  isAuthPage(pathname) || pathname.startsWith('/api/auth');
+  pathname === '/' || isAuthPage(pathname) || pathname.startsWith('/api/auth');
 
 export default withAuth(
   async function middleware(req) {
@@ -68,7 +68,7 @@ export default withAuth(
 export const config = {
   matcher: [
     // Skip Next.js internals and static files
-    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest|mp4|webm|m4v|mov)).*)',
     '/(api|trpc)(.*)'
   ]
 };

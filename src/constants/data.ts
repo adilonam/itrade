@@ -381,6 +381,32 @@ export const externalApiLinks = {
   nowPaymentsInvoiceApi: 'https://api.nowpayments.io/v1/invoice'
 } as const;
 
+export const landingPageLinks = {
+  signIn: '/auth/sign-in',
+  signUp: '/auth/sign-up',
+  trade: '/trade',
+  plans: '/investments',
+  dashboard: '/overview'
+} as const;
+
+/** Symbols shown on the public landing page market ticker (Twelve Data). */
+export const landingMarketTapeSymbols = [
+  'AAPL',
+  'MSFT',
+  'GOOGL',
+  'AMZN',
+  'META',
+  'NVDA',
+  'TSLA',
+  'JPM',
+  'V',
+  'WMT',
+  'AMD',
+  'NFLX',
+  'DIS',
+  'BA'
+] as const;
+
 export interface SaleUser {
   id: number;
   name: string;

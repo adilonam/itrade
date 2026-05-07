@@ -42,10 +42,12 @@ export interface EmailOptions {
   html?: string;
 }
 
+const getMailAppName = () => process.env.NEXT_PUBLIC_APP_NAME?.trim() || 'Trade Nova';
+
 export const sendEmail = async (options: EmailOptions) => {
   try {
     const s = await getAppSettingsRow();
-    const appName = s?.appName?.trim() || 'Trade Nova';
+    const appName = getMailAppName();
     const fromEmail = s?.smtpFromEmail?.trim();
     if (!fromEmail) {
       return { success: false, error: 'SMTP from email is not configured' };
@@ -88,8 +90,7 @@ export const sendMfaVerificationEmail = async (
   code: string,
   name?: string
 ) => {
-  const s = await getAppSettingsRow();
-  const appName = s?.appName?.trim() || 'Trade Nova';
+  const appName = getMailAppName();
   const subject = `Your Verification Code - ${appName}`;
 
   const text = `Hello ${name || 'User'},
@@ -143,8 +144,7 @@ export const sendPasswordResetEmail = async (
   resetLink: string,
   name?: string
 ) => {
-  const s = await getAppSettingsRow();
-  const appName = s?.appName?.trim() || 'Trade Nova';
+  const appName = getMailAppName();
   const subject = `Reset your password - ${appName}`;
 
   const text = `Hello ${name || 'User'},
