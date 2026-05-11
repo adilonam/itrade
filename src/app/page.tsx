@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import {
   IconArrowRight,
@@ -74,9 +75,25 @@ export default async function Page() {
           <div className="flex items-center gap-3">
             <Link
               href="/"
-              className="text-3xl font-bold tracking-tight text-[var(--trade-accent-blue)] md:text-4xl"
+              className="inline-flex items-center"
+              aria-label={appName}
             >
-              {appName}
+              <Image
+                src="/images/logo-light.png"
+                alt={`${appName} logo`}
+                width={160}
+                height={40}
+                className="h-8 w-auto dark:hidden"
+                priority
+              />
+              <Image
+                src="/images/logo-dark.png"
+                alt={`${appName} logo`}
+                width={160}
+                height={40}
+                className="hidden h-[50px] w-[50px] dark:block"
+                priority
+              />
             </Link>
           </div>
           <div className="flex items-center gap-2">
@@ -122,7 +139,7 @@ export default async function Page() {
           preload="auto"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-[#05070b] via-[#05070bdd] to-[#05070b80]" />
-        <div className="relative z-10 mx-auto w-full max-w-[1440px] px-6 py-20 md:px-8">
+        <div className="relative z-10 mx-auto mt-6 w-full max-w-[1440px] px-6 py-20 md:px-8">
           <div className="max-w-2xl space-y-5">
             <div className="inline-flex items-center gap-2 rounded-full border border-[var(--trade-accent-blue)]/40 bg-[var(--trade-accent-blue)]/15 px-3 py-1 text-[11px] uppercase tracking-wide text-[var(--trade-accent-blue)]">
               <IconCircleCheck className="size-3.5" />
@@ -152,7 +169,7 @@ export default async function Page() {
       </section>
 
       <section className="border-y border-[var(--trade-border)] bg-[var(--trade-panel)]">
-        <div className="mx-auto w-full max-w-[1440px] overflow-hidden px-6 py-4 motion-reduce:overflow-x-auto motion-reduce:overflow-y-hidden md:px-8">
+        <div className="w-full overflow-hidden py-4 motion-reduce:overflow-x-auto motion-reduce:overflow-y-hidden">
           <LiveMarketTape />
         </div>
       </section>
@@ -260,7 +277,16 @@ export default async function Page() {
         <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-8 px-6 py-16 md:px-8">
           <div className="flex flex-col justify-between gap-8 md:flex-row">
             <div className="max-w-md">
-              <p className="text-3xl font-bold">{appName}</p>
+              <div className="flex items-center gap-3">
+                <Image
+                  src="/images/logo-light.png"
+                  alt={`${appName} logo`}
+                  width={160}
+                  height={40}
+                  className="h-8 w-auto"
+                />
+                <p className="text-3xl font-bold">{appName}</p>
+              </div>
               <p className="mt-4 text-[15px] leading-7 text-[var(--trade-text-muted)]">
                 Providing world-class trading services for over a decade. We are committed to
                 transparency, reliability, and innovation in global financial markets.

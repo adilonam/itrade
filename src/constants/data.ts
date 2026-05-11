@@ -407,6 +407,24 @@ export const landingMarketTapeSymbols = [
   'BA'
 ] as const;
 
+/** Fallback values for landing tape when market data provider is unavailable. */
+export const landingMarketTapeDefaultQuotes = {
+  AAPL: { price: 190.5, percentChange: 0.42 },
+  MSFT: { price: 420.25, percentChange: 0.31 },
+  GOOGL: { price: 172.1, percentChange: -0.18 },
+  AMZN: { price: 186.4, percentChange: 0.27 },
+  META: { price: 492.3, percentChange: 0.54 },
+  NVDA: { price: 905.75, percentChange: 0.89 },
+  TSLA: { price: 177.8, percentChange: -0.63 },
+  JPM: { price: 198.6, percentChange: 0.15 },
+  V: { price: 274.15, percentChange: 0.22 },
+  WMT: { price: 63.9, percentChange: -0.11 },
+  AMD: { price: 166.2, percentChange: 0.76 },
+  NFLX: { price: 621.45, percentChange: 0.48 },
+  DIS: { price: 110.35, percentChange: -0.24 },
+  BA: { price: 181.7, percentChange: 0.09 }
+} as const;
+
 export interface SaleUser {
   id: number;
   name: string;
