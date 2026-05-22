@@ -389,6 +389,98 @@ export const landingPageLinks = {
   dashboard: '/overview'
 } as const;
 
+export const landingNavLinks = {
+  markets: '/trade',
+  learning: '/auth/sign-in',
+  account: '/auth/sign-in',
+  support: '/auth/sign-in'
+} as const;
+
+/** Landing placeholder links (replace with real routes when ready). */
+export const landingPlaceholderLink = '#' as const;
+
+export const colbariSiteLinks = {
+  base: landingPlaceholderLink,
+  legal: landingPlaceholderLink,
+  aboutUs: landingPlaceholderLink,
+  contactUs: landingPlaceholderLink,
+  liveChat: landingPlaceholderLink,
+  education: landingPlaceholderLink,
+  economicCalendar: landingPlaceholderLink,
+  accountTypes: landingPlaceholderLink,
+  faqs: landingPlaceholderLink,
+  marketsCryptocurrencies: landingPlaceholderLink,
+  marketsCurrencies: landingPlaceholderLink,
+  marketsStocks: landingPlaceholderLink,
+  marketsCommodities: landingPlaceholderLink,
+  marketsIndices: landingPlaceholderLink,
+  learningCfds: landingPlaceholderLink,
+  learningMarketMovers: landingPlaceholderLink,
+  learningTradingPitfalls: landingPlaceholderLink,
+  learningSmartTrading: landingPlaceholderLink,
+  learningTechnicalFundamental: landingPlaceholderLink,
+  learningGlossary: landingPlaceholderLink,
+  learningNfp: landingPlaceholderLink,
+  assetsCalculator: landingPlaceholderLink
+} as const;
+
+export const landingLanguages = [
+  { code: 'en', label: 'English', href: landingPlaceholderLink, flag: 'gb' },
+  { code: 'es', label: 'Español', href: landingPlaceholderLink, flag: 'es' },
+  { code: 'ar', label: 'العربية', href: landingPlaceholderLink, flag: 'sa' },
+  { code: 'fr', label: 'Français', href: landingPlaceholderLink, flag: 'fr' },
+  { code: 'de', label: 'Deutsch', href: landingPlaceholderLink, flag: 'de' },
+  { code: 'pt', label: 'Português', href: landingPlaceholderLink, flag: 'pt' }
+] as const;
+
+export const landingDefaultLanguage = landingLanguages[0];
+
+export type LandingHeaderMenuItem = {
+  label: string;
+  href: string;
+};
+
+export type LandingHeaderMenu = {
+  label: string;
+  items: LandingHeaderMenuItem[];
+};
+
+export const landingHeaderMenus: LandingHeaderMenu[] = [
+  {
+    label: 'Markets',
+    items: [
+      { label: 'Cryptocurrencies', href: landingPlaceholderLink },
+      { label: 'Currencies', href: landingPlaceholderLink },
+      { label: 'Stocks', href: landingPlaceholderLink },
+      { label: 'Commodities', href: landingPlaceholderLink },
+      { label: 'Indices', href: landingPlaceholderLink }
+    ]
+  },
+  {
+    label: 'Learning',
+    items: [
+      { label: 'Education', href: landingPlaceholderLink },
+      { label: 'Economic Calendar', href: landingPlaceholderLink },
+      { label: 'CFDs', href: landingPlaceholderLink },
+      { label: 'Market Movers', href: landingPlaceholderLink },
+      { label: 'Trading Pitfalls', href: landingPlaceholderLink },
+      { label: 'Smart Trading', href: landingPlaceholderLink },
+      { label: 'Technical and Fundamental', href: landingPlaceholderLink },
+      { label: 'Glossary', href: landingPlaceholderLink },
+      { label: 'NFP', href: landingPlaceholderLink }
+    ]
+  },
+  {
+    label: 'Account',
+    items: [
+      { label: 'Account Types', href: landingPlaceholderLink },
+      { label: 'Assets Calculator', href: landingPlaceholderLink },
+      { label: 'About Us', href: landingPlaceholderLink },
+      { label: 'FAQs – Trading Platform', href: landingPlaceholderLink }
+    ]
+  }
+];
+
 /** Symbols shown on the public landing page market ticker (Twelve Data). */
 export const landingMarketTapeSymbols = [
   'AAPL',

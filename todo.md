@@ -323,3 +323,9 @@ bugs :
 - [?] large doc on kyc
 - [x] rmv create account
 - [x] check forgot password
+
+
+
+
+- [ ] make it responsive 
+- [ ] make the new ui 
