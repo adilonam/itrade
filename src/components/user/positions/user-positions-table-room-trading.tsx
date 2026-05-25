@@ -49,6 +49,7 @@ import {
   TRADE_ROOM_CARD_CLASS,
   TRADE_ROOM_EMBEDDED_TABLE_CARD_CLASS
 } from '@/constants/trade-room-ui';
+import { useTranslations } from 'next-intl';
 
 type PositionWithMarket = Position & {
   market: Market | null;
@@ -90,8 +91,12 @@ export function UserPositionsTableRoomTrading({
   pagination
 }: UserPositionsTableRoomTradingProps) {
   const isTradePanel = panelVariant === 'trade';
+  const t = useTranslations('Trade.positions');
   const isEmbeddedTrade = isTradePanel && embeddedInTradePanel;
   const [closingId, setClosingId] = useState<string | null>(null);
+
+  const col = (key: Parameters<typeof t>[0], fallback: string) =>
+    isTradePanel ? t(key) : fallback;
 
   const canCloseStatus = (status: string) =>
     status === 'PLACED' || status === 'PENDING';
@@ -241,7 +246,9 @@ export function UserPositionsTableRoomTrading({
                 : 'text-muted-foreground'
             )}
           />
-          <p className='text-center'>Loading room trading positions...</p>
+          <p className='text-center'>
+            {col('loading', 'Loading room trading positions...')}
+          </p>
         </CardContent>
       </Card>
     );
@@ -267,8 +274,10 @@ export function UserPositionsTableRoomTrading({
           )}
         >
           <p className='text-center'>
-            No room trading positions found. Positions will appear here once you
-            start trading.
+            {col(
+              'empty',
+              'No room trading positions found. Positions will appear here once you start trading.'
+            )}
           </p>
         </CardContent>
       </Card>
@@ -340,20 +349,20 @@ export function UserPositionsTableRoomTrading({
                           'border-[var(--trade-border)] hover:bg-transparent'
                       )}
                     >
-                      <TableHead>Type</TableHead>
-                      <TableHead>Market</TableHead>
-                      <TableHead>Quantity</TableHead>
-                      <TableHead>Exec Price</TableHead>
-                      <TableHead>Closed Price</TableHead>
-                      <TableHead>Take Profit</TableHead>
-                      <TableHead>Stop Loss</TableHead>
-                      <TableHead>Value</TableHead>
-                      <TableHead>P&L</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Closed</TableHead>
+                      <TableHead>{col('type', 'Type')}</TableHead>
+                      <TableHead>{col('market', 'Market')}</TableHead>
+                      <TableHead>{col('quantity', 'Quantity')}</TableHead>
+                      <TableHead>{col('execPrice', 'Exec Price')}</TableHead>
+                      <TableHead>{col('closedPrice', 'Closed Price')}</TableHead>
+                      <TableHead>{col('takeProfit', 'Take Profit')}</TableHead>
+                      <TableHead>{col('stopLoss', 'Stop Loss')}</TableHead>
+                      <TableHead>{col('value', 'Value')}</TableHead>
+                      <TableHead>{col('pnl', 'P&L')}</TableHead>
+                      <TableHead>{col('status', 'Status')}</TableHead>
+                      <TableHead>{col('date', 'Date')}</TableHead>
+                      <TableHead>{col('closed', 'Closed')}</TableHead>
                       {showCloseAction ? (
-                        <TableHead className="text-right">Close</TableHead>
+                        <TableHead className="text-right">{col('close', 'Close')}</TableHead>
                       ) : null}
                     </TableRow>
                   </TableHeader>
@@ -370,7 +379,7 @@ export function UserPositionsTableRoomTrading({
                           colSpan={colCount}
                           className={cn('py-8 text-center', mutedCell)}
                         >
-                          No positions on this page.
+                          {col('emptyPage', 'No positions on this page.')}
                         </TableCell>
                       </TableRow>
                     ) : (
@@ -546,7 +555,7 @@ export function UserPositionsTableRoomTrading({
                                     ) : (
                                       <IconX className="size-3.5" />
                                     )}
-                                    Close
+                                    {col('close', 'Close')}
                                   </Button>
                                 </AlertDialogTrigger>
                                 <AlertDialogContent
@@ -564,7 +573,7 @@ export function UserPositionsTableRoomTrading({
                                           : undefined
                                       }
                                     >
-                                      Close position
+                                      {col('closePosition', 'Close position')}
                                     </AlertDialogTitle>
                                     <AlertDialogDescription
                                       className={
@@ -573,9 +582,13 @@ export function UserPositionsTableRoomTrading({
                                           : undefined
                                       }
                                     >
-                                      Close this {position.type} position for{' '}
-                                      {position.market?.symbol ?? 'this market'}?
-                                      This cannot be undone.
+                                      {isTradePanel
+                                        ? t('closePositionConfirm', {
+                                            type: position.type,
+                                            symbol:
+                                              position.market?.symbol ?? 'this market'
+                                          })
+                                        : `Close this ${position.type} position for ${position.market?.symbol ?? 'this market'}? This cannot be undone.`}
                                     </AlertDialogDescription>
                                   </AlertDialogHeader>
                                   <AlertDialogFooter>
@@ -586,7 +599,7 @@ export function UserPositionsTableRoomTrading({
                                           : undefined
                                       }
                                     >
-                                      Cancel
+                                      {col('cancel', 'Cancel')}
                                     </AlertDialogCancel>
                                     <AlertDialogAction
                                       className="bg-red-600 hover:bg-red-700"
@@ -594,7 +607,7 @@ export function UserPositionsTableRoomTrading({
                                         handleClosePosition(position.id)
                                       }
                                     >
-                                      Close position
+                                      {col('closePositionAction', 'Close position')}
                                     </AlertDialogAction>
                                   </AlertDialogFooter>
                                 </AlertDialogContent>

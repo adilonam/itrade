@@ -6,8 +6,10 @@ import { useSession } from 'next-auth/react';
 import * as React from 'react';
 
 import { Button } from '@/components/ui/button';
+import { useTranslations } from 'next-intl';
 
 export function ModeToggle() {
+  const t = useTranslations('Common');
   const { setTheme, resolvedTheme } = useTheme();
   const { data: session } = useSession();
 
@@ -57,7 +59,7 @@ export function ModeToggle() {
       onClick={handleThemeToggle}
     >
       <IconBrightness />
-      <span className='sr-only'>Toggle theme</span>
+      <span className='sr-only'>{t('toggleTheme')}</span>
     </Button>
   );
 }

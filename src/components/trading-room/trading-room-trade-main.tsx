@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useRef, useState } from 'react';
+import { useIsMobile } from '@/hooks/use-mobile';
 import {
   ResizablePanelGroup,
   ResizablePanel,
@@ -12,6 +13,7 @@ import { useTradingRoomShell } from './trading-room-shell-context';
 
 /** Chart + positions column for `/trade` and `/trading-view-room-trading` (main area next to persistent market/news palette). */
 export function TradingRoomTradeMain() {
+  const isMobile = useIsMobile();
   const { chartSymbol, headerLastPrice, chartInterval } = useTradingRoomShell();
 
   const bottomPanelInitialSizeRef = useRef<number | null>(null);
@@ -26,6 +28,18 @@ export function TradingRoomTradeMain() {
     setBottomPanelMinSize(computedMinSize);
     setBottomCollapseEnabled(true);
   }, []);
+
+  if (isMobile) {
+    return (
+      <div className="flex h-full min-h-0 min-w-0 w-full flex-1 flex-col overflow-hidden">
+        <TradingRoomChart
+          symbol={chartSymbol}
+          interval={chartInterval}
+          lastPrice={headerLastPrice}
+        />
+      </div>
+    );
+  }
 
   return (
     <ResizablePanelGroup

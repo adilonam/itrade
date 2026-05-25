@@ -3,10 +3,15 @@ import PageContainer from '@/components/layout/page-container';
 import { DashboardOverview } from '@/components/dashboard/dashboard-overview';
 import { getAuthSession } from '@/lib/auth';
 
-export const metadata = {
-  title: 'Dashboard: Overview',
-  description: 'View your comprehensive trading and investment portfolio'
-};
+import { getTranslations } from 'next-intl/server';
+
+export async function generateMetadata() {
+  const t = await getTranslations('Overview');
+  return {
+    title: t('title'),
+    description: t('welcome', { name: '' })
+  };
+}
 
 export default async function Dashboard() {
   const session = await getAuthSession();

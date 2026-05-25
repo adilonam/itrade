@@ -8,7 +8,10 @@ import { useSession } from 'next-auth/react';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { tenantNavItems } from '@/constants/data';
+import { LanguageMenu } from '@/components/i18n/language-menu';
+import { tradeNavTitleKey } from '@/lib/trade-nav-i18n';
 import { ModeToggle } from '@/components/layout/ThemeToggle/theme-toggle';
+import { useTranslations } from 'next-intl';
 import { UserNav } from './user-nav';
 import { IconWifi, IconWallet, IconChevronDown } from '@tabler/icons-react';
 
@@ -37,10 +40,13 @@ export function WatchTraderHeader() {
     nonNegative: boolean;
   };
 
+  const t = useTranslations('Trade.header');
+  const tNav = useTranslations('Trade.nav');
+
   const balanceLabel: Record<BalanceType, string> = {
-    REAL: 'Real',
-    DEMO: 'Demo',
-    INSTITUTIONAL: 'Institutional'
+    REAL: t('balanceReal'),
+    DEMO: t('balanceDemo'),
+    INSTITUTIONAL: t('balanceInstitutional')
   };
 
   const appName = usePublicAppName();
@@ -180,11 +186,13 @@ export function WatchTraderHeader() {
       </div>
       <nav
         className="w-full min-w-0 overflow-x-auto overflow-y-hidden overscroll-x-contain scroll-smooth touch-pan-x py-0.5 text-[var(--trade-text-muted)] [scrollbar-width:thin] [scrollbar-color:var(--trade-border)_transparent] [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[var(--trade-border)]"
-        aria-label="Trade room"
+        aria-label={t('tradeRoom')}
       >
         <div className="flex w-max min-w-full flex-nowrap items-center justify-center gap-1">
           {roomNav.map((item) => {
             const active = isRoomTradingNavActive(pathname, item.url);
+            const navKey = tradeNavTitleKey(item.title);
+            const navLabel = navKey ? tNav(navKey) : item.title;
             return (
               <Link
                 key={`${item.url}-${item.title}`}
@@ -196,7 +204,7 @@ export function WatchTraderHeader() {
                     : 'hover:text-[var(--trade-text)]'
                 )}
               >
-                {item.title}
+                {navLabel}
               </Link>
             );
           })}
@@ -208,7 +216,7 @@ export function WatchTraderHeader() {
           <button
             type="button"
             className="flex items-center gap-1 rounded border border-[var(--trade-border)] bg-[var(--trade-dark)] px-2 py-1 font-mono text-[11px]"
-            title={`Balance (TRADING · ${selectedBalanceType})`}
+            title={t('balanceTitle', { type: selectedBalanceType })}
             aria-haspopup="menu"
             aria-expanded={openBalanceDropdown}
             onClick={() => setOpenBalanceDropdown((prev) => !prev)}
@@ -244,7 +252,7 @@ export function WatchTraderHeader() {
             <div
               className="absolute right-0 top-[calc(100%+6px)] z-30 min-w-[180px] rounded border border-[var(--trade-border)] bg-[var(--trade-panel)] p-1 shadow-lg"
               role="menu"
-              aria-label="Balance type selector"
+              aria-label={t('balanceTypeSelector')}
             >
               {(['REAL', 'INSTITUTIONAL', 'DEMO'] as BalanceType[]).map((balanceType) => {
                 const rowBalance = balanceByBalanceType[balanceType];
@@ -283,9 +291,10 @@ export function WatchTraderHeader() {
             </div>
           ) : null}
         </div>
-        <span className="flex items-center text-[var(--trade-green)]" title="Connected">
+        <span className="flex items-center text-[var(--trade-green)]" title={t('connected')}>
           <IconWifi className="size-4" />
         </span>
+        <LanguageMenu variant="trade" />
         <ModeToggle />
         <UserNav variant="trade" />
         <time

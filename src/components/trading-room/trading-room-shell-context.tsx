@@ -6,8 +6,11 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useState
+  useRef,
+  useState,
+  type MutableRefObject
 } from 'react';
+import type { ImperativePanelHandle } from 'react-resizable-panels';
 import { useSession } from 'next-auth/react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import type { Market } from '@/lib/prisma/generated/client';
@@ -37,6 +40,8 @@ function isMarketItem(item: SymbolItem): item is Market {
   return 'room' in item && typeof (item as Market).room === 'string';
 }
 
+export const MOBILE_TRADING_PANEL_SIZE = 48;
+
 type TradingRoomShellContextValue = {
   symbols: SymbolItem[];
   selectedSymbolId: string | null;
@@ -60,6 +65,11 @@ type TradingRoomShellContextValue = {
   signedIn: boolean;
   /** Quick buy/sell in the markets list; hidden on institutional room for non-admin users */
   showMarketsOrderControls: boolean;
+  /** Mobile: trading palette visible (chart-only when false). */
+  mobileTradingOpen: boolean;
+  openMobileTrading: () => void;
+  closeMobileTrading: () => void;
+  onMobileTradingPanelCollapse: () => void;
 };
 
 const TradingRoomShellContext = createContext<TradingRoomShellContextValue | null>(
@@ -89,12 +99,39 @@ export function TradingRoomShellProvider({ children }: { children: React.ReactNo
   const [selectedMarket, setSelectedMarket] = useState<Market | null>(null);
   const [advancedOrderOpen, setAdvancedOrderOpen] = useState(false);
   const [chartInterval, setChartInterval] = useState<ChartInterval>('60');
+  const [mobileTradingOpen, setMobileTradingOpen] = useState(false);
+  const mobileTradingPanelRef = useRef<ImperativePanelHandle | null>(null);
   const signedIn = Boolean(session?.user);
   const role = session?.user?.role;
   const canPlaceInstitutionalOrders =
     role === 'ADMIN' || role === 'SUPERADMIN';
   const showMarketsOrderControls =
     tradeRoom !== 'INSTITUTIONAL' || canPlaceInstitutionalOrders;
+
+  const openMobileTrading = useCallback(() => {
+    mobileTradingPanelRef.current?.resize(MOBILE_TRADING_PANEL_SIZE);
+    setMobileTradingOpen(true);
+  }, []);
+
+  const closeMobileTrading = useCallback(() => {
+    const panel = mobileTradingPanelRef.current;
+    if (panel && !panel.isCollapsed()) {
+      panel.collapse();
+    }
+    setMobileTradingOpen(false);
+  }, []);
+
+  const onMobileTradingPanelCollapse = useCallback(() => {
+    setMobileTradingOpen(false);
+  }, []);
+
+  useEffect(() => {
+    const panel = mobileTradingPanelRef.current;
+    if (panel && !panel.isCollapsed()) {
+      panel.collapse();
+    }
+    setMobileTradingOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     setSelectedSymbolId(null);
@@ -230,7 +267,11 @@ export function TradingRoomShellProvider({ children }: { children: React.ReactNo
       noNavigation,
       symbolLinkBasePath,
       signedIn,
-      showMarketsOrderControls
+      showMarketsOrderControls,
+      mobileTradingOpen,
+      openMobileTrading,
+      closeMobileTrading,
+      onMobileTradingPanelCollapse
     }),
     [
       symbols,
@@ -247,13 +288,45 @@ export function TradingRoomShellProvider({ children }: { children: React.ReactNo
       noNavigation,
       symbolLinkBasePath,
       signedIn,
-      showMarketsOrderControls
+      showMarketsOrderControls,
+      mobileTradingOpen,
+      openMobileTrading,
+      closeMobileTrading,
+      onMobileTradingPanelCollapse
     ]
   );
 
   return (
     <TradingRoomShellContext.Provider value={value}>
-      {children}
+      <TradingRoomShellPanelRefBridge panelRef={mobileTradingPanelRef}>
+        {children}
+      </TradingRoomShellPanelRefBridge>
     </TradingRoomShellContext.Provider>
+  );
+}
+
+const TradingRoomShellPanelRefContext = createContext<MutableRefObject<ImperativePanelHandle | null> | null>(
+  null
+);
+
+export function useMobileTradingPanelRef() {
+  const ref = useContext(TradingRoomShellPanelRefContext);
+  if (!ref) {
+    throw new Error('useMobileTradingPanelRef must be used within TradingRoomShellProvider');
+  }
+  return ref;
+}
+
+function TradingRoomShellPanelRefBridge({
+  panelRef,
+  children
+}: {
+  panelRef: MutableRefObject<ImperativePanelHandle | null>;
+  children: React.ReactNode;
+}) {
+  return (
+    <TradingRoomShellPanelRefContext.Provider value={panelRef}>
+      {children}
+    </TradingRoomShellPanelRefContext.Provider>
   );
 }

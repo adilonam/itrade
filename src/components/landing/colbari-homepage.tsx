@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { getLocale, getTranslations } from 'next-intl/server';
 import { EB_Garamond, Inter } from 'next/font/google';
 import { IconChartLine, IconSchool } from '@tabler/icons-react';
 import { colbariSiteLinks, landingPageLinks } from '@/constants/data';
@@ -8,10 +9,6 @@ import {
   LandingHeaderUtilities
 } from '@/components/landing/landing-header-nav';
 
-/**
- * Colbari Homepage — adapted from Stitch + https://www.colbari.com/en/
- * Project: 1995405182261882782 | Screen: be0be8bfdee846698a681d98be79d863
- */
 const ebGaramond = EB_Garamond({
   subsets: ['latin'],
   weight: ['400', '500'],
@@ -24,55 +21,53 @@ const inter = Inter({
   variable: '--font-colbari-body'
 });
 
-const marketCards = [
+const marketCardKeys = [
+  'currencies',
+  'stocks',
+  'commodities',
+  'crypto',
+  'indices'
+] as const;
+
+const marketCardLayout = [
   {
-    title: 'Currencies',
-    category: 'Foreign Exchange',
+    key: 'currencies' as const,
     image: '/images/landing/colbari/currencies.jpg',
-    alt: 'International currency symbols in a sleek metallic finish',
     className: 'md:col-span-7',
     aspect: 'relative aspect-[16/9]'
   },
   {
-    title: 'Stocks',
-    category: 'Equities',
+    key: 'stocks' as const,
     image: '/images/landing/colbari/stocks.jpg',
-    alt: 'Conceptual representation of global stock markets',
     className: 'md:col-span-5',
     aspect: 'relative min-h-[300px] md:min-h-[360px]'
   },
   {
-    title: 'Commodities',
-    category: 'Hard Assets',
+    key: 'commodities' as const,
     image: '/images/landing/colbari/commodities.jpg',
-    alt: 'Gold bars and oil in a curated museum-like setting',
     className: 'md:col-span-4',
     aspect: 'relative aspect-square'
   },
   {
-    title: 'Cryptocurrencies',
-    category: 'Digital Assets',
+    key: 'crypto' as const,
     image: '/images/landing/colbari/crypto.jpg',
-    alt: 'Futuristic digital coin representations in a virtual space',
     className: 'md:col-span-4',
     aspect: 'relative aspect-square'
   },
   {
-    title: 'Indices',
-    category: 'Market Baskets',
+    key: 'indices' as const,
     image: '/images/landing/colbari/indices.jpg',
-    alt: 'Minimalist visualization of global economic indices',
     className: 'md:col-span-4',
     aspect: 'relative aspect-square'
   }
 ] as const;
 
-const marketCardLinks: Record<(typeof marketCards)[number]['title'], string> = {
-  Currencies: colbariSiteLinks.marketsCurrencies,
-  Stocks: colbariSiteLinks.marketsStocks,
-  Commodities: colbariSiteLinks.marketsCommodities,
-  Cryptocurrencies: colbariSiteLinks.marketsCryptocurrencies,
-  Indices: colbariSiteLinks.marketsIndices
+const marketCardLinks: Record<(typeof marketCardKeys)[number], string> = {
+  currencies: colbariSiteLinks.marketsCurrencies,
+  stocks: colbariSiteLinks.marketsStocks,
+  commodities: colbariSiteLinks.marketsCommodities,
+  crypto: colbariSiteLinks.marketsCryptocurrencies,
+  indices: colbariSiteLinks.marketsIndices
 };
 
 type ColbariHomepageProps = {
@@ -81,13 +76,16 @@ type ColbariHomepageProps = {
   supportEmail: string;
 };
 
-export function ColbariHomepage({ appName, session, supportEmail }: ColbariHomepageProps) {
+export async function ColbariHomepage({ appName, session, supportEmail }: ColbariHomepageProps) {
+  const locale = await getLocale();
+  const t = await getTranslations('Landing');
   const createAccountHref = session ? landingPageLinks.trade : landingPageLinks.signUp;
   const tradeHref = session ? landingPageLinks.trade : landingPageLinks.signIn;
   const joinHref = session ? landingPageLinks.trade : landingPageLinks.signUp;
 
   return (
     <main
+      dir={locale === 'ar' ? 'rtl' : 'ltr'}
       className={`${ebGaramond.variable} ${inter.className} h-dvh overflow-y-auto scroll-smooth bg-white text-[#1a1c1c] antialiased`}
     >
       <header className="fixed top-0 left-0 z-50 flex h-20 w-full items-center border-b border-white/10 bg-[#141414] px-5 md:px-16">
@@ -131,25 +129,21 @@ export function ColbariHomepage({ appName, session, supportEmail }: ColbariHomep
             <h1
               className={`${ebGaramond.className} mb-8 text-[40px] leading-[48px] tracking-[-0.01em] text-white md:text-[64px] md:leading-[72px] md:tracking-[-0.02em]`}
             >
-              Redefining the Way <br className="hidden md:block" /> You Trade
+              {t('hero.titleLine1')} <br className="hidden md:block" /> {t('hero.titleLine2')}
             </h1>
-            <p className="mb-12 max-w-2xl text-lg leading-7 text-white/80">
-              Step into the world of global trading with access to CFDs on leading asset classes.
-              Enjoy 0% commission trading, fast execution, and an intuitive interface designed for
-              every level of trader.
-            </p>
+            <p className="mb-12 max-w-2xl text-lg leading-7 text-white/80">{t('hero.description')}</p>
             <div className="flex flex-col gap-4 sm:flex-row">
               <Link
                 href={createAccountHref}
                 className="bg-white px-10 py-5 text-center text-sm font-medium tracking-[0.15em] text-black uppercase transition-colors duration-500 hover:bg-[#C0A678]"
               >
-                Create Account
+                {t('hero.createAccount')}
               </Link>
               <Link
                 href={tradeHref}
                 className="border border-white/30 px-10 py-5 text-center text-sm font-medium tracking-[0.15em] text-white uppercase transition-colors duration-500 hover:bg-white/10"
               >
-                Trade
+                {t('hero.trade')}
               </Link>
             </div>
           </div>
@@ -162,67 +156,65 @@ export function ColbariHomepage({ appName, session, supportEmail }: ColbariHomep
             <h2
               className={`${ebGaramond.className} mb-6 text-[40px] leading-[48px] text-black italic md:text-[32px] md:leading-[40px]`}
             >
-              Why Choose Us?
+              {t('whyChooseUs.title')}
             </h2>
-            <p className="text-base leading-7 text-[#444748] md:text-lg">
-              From entry-level traders to seasoned experienced traders, our platform delivers the
-              flexibility and power you need. Access hundreds of CFD instruments with conditions
-              designed to maximize your trading experience.
-            </p>
+            <p className="text-base leading-7 text-[#444748] md:text-lg">{t('whyChooseUs.description')}</p>
           </div>
           <div className="grid grid-cols-1 gap-16 md:grid-cols-2 md:gap-12">
             <div className="space-y-6 border border-[#c4c7c7]/20 bg-[#F9F9F9] p-8 md:p-10">
               <div className="flex items-center gap-4">
                 <IconSchool className="size-8 text-[#C0A678]" stroke={1.5} />
-                <h3 className={`${ebGaramond.className} text-2xl leading-8 font-medium`}>Beginners</h3>
+                <h3 className={`${ebGaramond.className} text-2xl leading-8 font-medium`}>
+                  {t('beginners.title')}
+                </h3>
               </div>
               <ul className="space-y-4 text-base leading-6 text-[#444748]">
                 <li className="flex items-center gap-3">
                   <span className="size-1.5 shrink-0 rounded-full bg-black" />
-                  Demo Account with virtual money
+                  {t('beginners.bullet1')}
                 </li>
                 <li className="flex items-center gap-3">
                   <span className="size-1.5 shrink-0 rounded-full bg-black" />
-                  Educational resources and e-books
+                  {t('beginners.bullet2')}
                 </li>
                 <li className="flex items-center gap-3">
                   <span className="size-1.5 shrink-0 rounded-full bg-black" />
-                  Assistance from your account manager
+                  {t('beginners.bullet3')}
                 </li>
               </ul>
               <Link
                 href={colbariSiteLinks.education}
                 className="inline-block border-b border-black pt-2 text-xs font-semibold tracking-[0.1em] text-black uppercase"
               >
-                Start Learning
+                {t('beginners.cta')}
               </Link>
             </div>
             <div className="space-y-6 border border-[#c4c7c7]/20 bg-[#F9F9F9] p-8 md:p-10">
               <div className="flex items-center gap-4">
                 <IconChartLine className="size-8 text-[#C0A678]" stroke={1.5} />
                 <h3 className={`${ebGaramond.className} text-2xl leading-8 font-medium`}>
-                  Experienced traders
+                  {t('experienced.title')}
                 </h3>
               </div>
               <ul className="space-y-4 text-base leading-6 text-[#444748]">
                 <li className="flex items-center gap-3">
                   <span className="size-1.5 shrink-0 rounded-full bg-black" />
-                  Access to advanced platform features
+                  {t('experienced.bullet1')}
                 </li>
                 <li className="flex items-center gap-3">
                   <span className="size-1.5 shrink-0 rounded-full bg-black" />
-                  Tools for technical and fundamental analysis
+                  {t('experienced.bullet2')}
                 </li>
                 <li className="flex items-center gap-3">
                   <span className="size-1.5 shrink-0 rounded-full bg-black" />
-                  Analyze charts and monitor market trends
+                  {t('experienced.bullet3')}
                 </li>
               </ul>
               <Link
                 href={tradeHref}
                 className="inline-block border-b border-black pt-2 text-xs font-semibold tracking-[0.1em] text-black uppercase"
               >
-                Upgrade Tools
+                {t('experienced.cta')}
               </Link>
             </div>
           </div>
@@ -234,21 +226,21 @@ export function ColbariHomepage({ appName, session, supportEmail }: ColbariHomep
           <h2
             className={`${ebGaramond.className} mb-4 text-[40px] leading-[48px] text-black italic md:text-[32px] md:leading-[40px]`}
           >
-            Explore Global Markets
+            {t('markets.title')}
           </h2>
           <div className="mx-auto h-px w-24 bg-[#C0A678]" />
         </div>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-12">
-          {marketCards.map((card) => (
+          {marketCardLayout.map((card) => (
             <Link
-              key={card.title}
-              href={marketCardLinks[card.title]}
+              key={card.key}
+              href={marketCardLinks[card.key]}
               className={`group overflow-hidden border border-[#c4c7c7]/20 ${card.className}`}
             >
               <div className={`overflow-hidden ${card.aspect}`}>
                 <Image
                   src={card.image}
-                  alt={card.alt}
+                  alt={t(`markets.${card.key}.alt`)}
                   fill
                   className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                   sizes="(max-width: 768px) 100vw, 33vw"
@@ -256,10 +248,10 @@ export function ColbariHomepage({ appName, session, supportEmail }: ColbariHomep
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                 <div className="absolute bottom-8 left-8">
                   <p className="mb-2 text-xs font-semibold tracking-[0.1em] text-white/70 uppercase">
-                    {card.category}
+                    {t(`markets.${card.key}.category`)}
                   </p>
                   <h3 className={`${ebGaramond.className} text-2xl leading-8 font-medium text-white`}>
-                    {card.title}
+                    {t(`markets.${card.key}.title`)}
                   </h3>
                 </div>
               </div>
@@ -287,18 +279,16 @@ export function ColbariHomepage({ appName, session, supportEmail }: ColbariHomep
               <h2
                 className={`${ebGaramond.className} mb-8 text-[40px] leading-[48px] text-black md:text-[48px] md:leading-[56px]`}
               >
-                Trade on Your Terms
+                {t('tradeOnYourTerms.title')}
               </h2>
               <p className="mb-10 text-base leading-7 text-[#444748] md:text-lg">
-                Our next-generation platform gives you full control across desktop, tablet, and
-                mobile. Experience real-time market connectivity, rapid order execution, and advanced
-                tools that keep you one step ahead.
+                {t('tradeOnYourTerms.description')}
               </p>
               <Link
                 href={joinHref}
                 className="inline-block bg-[#181818] px-12 py-5 text-sm font-medium tracking-[0.2em] text-white uppercase transition active:scale-95"
               >
-                Join {appName}
+                {t('tradeOnYourTerms.join', { appName })}
               </Link>
             </div>
           </div>
@@ -309,13 +299,13 @@ export function ColbariHomepage({ appName, session, supportEmail }: ColbariHomep
         <h2
           className={`${ebGaramond.className} mb-12 text-[40px] leading-[48px] md:text-[64px] md:leading-[72px] md:tracking-[-0.02em]`}
         >
-          Where Confidence Meets Clarity
+          {t('confidence.title')}
         </h2>
         <Link
           href={joinHref}
           className="inline-block bg-[#181818] px-12 py-5 text-sm font-medium tracking-[0.2em] text-white uppercase transition active:scale-95"
         >
-          Join {appName}
+          {t('confidence.join', { appName })}
         </Link>
       </section>
 
@@ -326,19 +316,19 @@ export function ColbariHomepage({ appName, session, supportEmail }: ColbariHomep
               href={colbariSiteLinks.legal}
               className="text-sm text-[#444748] transition-colors hover:text-[#C0A678]"
             >
-              Legal
+              {t('footer.legal')}
             </Link>
             <Link
               href={colbariSiteLinks.aboutUs}
               className="text-sm text-[#444748] transition-colors hover:text-[#C0A678]"
             >
-              About Us
+              {t('footer.aboutUs')}
             </Link>
             <Link
               href={colbariSiteLinks.contactUs}
               className="text-sm text-[#444748] transition-colors hover:text-[#C0A678]"
             >
-              Contact Us
+              {t('footer.contactUs')}
             </Link>
           </div>
 
@@ -353,7 +343,7 @@ export function ColbariHomepage({ appName, session, supportEmail }: ColbariHomep
               />
             </Link>
             <div className="text-sm text-[#444748]">
-              <p className="mb-1 font-medium text-black">Customer service</p>
+              <p className="mb-1 font-medium text-black">{t('footer.customerService')}</p>
               <p>+27 21 891 1885</p>
               <p>
                 <a
@@ -368,63 +358,29 @@ export function ColbariHomepage({ appName, session, supportEmail }: ColbariHomep
 
           <div className="space-y-4 text-[11px] leading-relaxed text-[#444748]/80">
             <p>
-              <strong>Company Information:</strong> This website &apos;Colbari&apos; is operated by
-              Valor Capital (PTY) Ltd, a South African investment firm, authorized and regulated by
-              the Financial Sector Conduct Authority of South Africa with Financial Service Provider
-              (FSP) license number 51822 to provide intermediary service. Valor Capital (PTY) Ltd is
-              registered in South Africa, with registration number 2021/547363/07. Valor Capital (PTY)
-              Ltd registered office is located at 1 Edgemere Road Elfindale, Cape Town, 7945, South
-              Africa. Valor Capital (PTY) Ltd owns and operates the &quot;Colbari&quot; brand.
+              <strong>{t('footer.companyInfo')}</strong> {t('footer.companyInfoBody')}
+            </p>
+            <p>{t('footer.valorValueBridge')}</p>
+            <p>{t('footer.dunfield')}</p>
+            <p>
+              <strong>{t('footer.riskWarningLabel')}</strong> {t('footer.riskWarningBody')}
+            </p>
+            <p>{t('footer.antiSpam')}</p>
+            <p>
+              <strong>{t('footer.regionalRestrictionsLabel')}</strong>{' '}
+              {t('footer.regionalRestrictionsBody')}
             </p>
             <p>
-              Valor (PTY) Limited and Value Bridge Single Member Investment Services S.A have a
-              common shareholder. Value Bridge Single Member Investment Services S.A, registered at
-              43 Aiolou str., 3rd floor, 10551, Athens, Greece, is regulated by the Hellenic Capital
-              Market Commission with license number 6/927/31-8-2021.
+              <strong>{t('footer.adviserNotice')}</strong>
             </p>
             <p>
-              Dunfield Ltd with register address at Office No. 45, 9.17 Capital Tower, 91 Waterloo
-              Road, London, United Kingdom SE1 8RT is the paying agent of Valor Capital Ltd.
-            </p>
-            <p>
-              <strong>Risk warning:</strong> Contracts for difference (&apos;CFDs&apos;) is a complex
-              financial product, with speculative character, the trading of which involves significant
-              risks of loss of capital. Trading CFDs, which is a marginal product, may result in the
-              loss of your entire balance. Remember that leverage in CFDs can work both to your
-              advantage and disadvantage. CFDs traders do not own, or have any rights to, the underlying
-              assets. Trading CFDs is not appropriate for all investors. Past performance does not
-              constitute a reliable indicator of future results. Future forecasts do not constitute a
-              reliable indicator of future performance. Before deciding to trade, you should carefully
-              consider your investment objectives, level of experience and risk tolerance. You should
-              not deposit more than you are prepared to lose. Please ensure you fully understand the
-              risk associated with the product envisaged and seek independent advice, if necessary.
-            </p>
-            <p>
-              Valor Capital (PTY) Ltd applies strict measures in line with anti-spam regulations by
-              avoiding unsolicited advertising.
-            </p>
-            <p>
-              <strong>Regional Restrictions:</strong> Valor Capital (PTY) Ltd does not offer services
-              within the European Economic Area as well as in certain other jurisdictions such as the
-              USA, British Columbia, Canada, Iran, North Korea, Myanmar, Russia and some other regions.
-            </p>
-            <p>
-              <strong>
-                Valor Capital (PTY) Ltd does not issue advice, recommendations or opinions in relation
-                to acquiring, holding or disposing of any financial product. Valor Capital (PTY) Ltd is
-                not a financial adviser.
-              </strong>
-            </p>
-            <p>
-              <strong>Risk Warning</strong> — Trading in CFDs carry a high level of risk to your
-              capital due to the volatility of the underlying market. These products may not be
-              suitable for all investors. Therefore, you should ensure that you understand the risks
-              and seek advice from an independent and suitably licensed financial advisor.
+              <strong>{t('footer.riskWarningShortLabel')}</strong> —{' '}
+              {t('footer.riskWarningShortBody')}
             </p>
           </div>
 
           <p className="mt-10 text-[10px] tracking-widest text-[#444748] uppercase">
-            © 2026 {appName.toUpperCase()}. ALL RIGHTS RESERVED.
+            {t('footer.copyright', { appName: appName.toUpperCase() })}
           </p>
         </div>
       </footer>

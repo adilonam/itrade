@@ -2,7 +2,13 @@
 
 import { useCallback, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { TradingRoomShellProvider, useTradingRoomShell } from './trading-room-shell-context';
+import { useIsMobile } from '@/hooks/use-mobile';
+import {
+  MOBILE_TRADING_PANEL_SIZE,
+  TradingRoomShellProvider,
+  useMobileTradingPanelRef,
+  useTradingRoomShell
+} from './trading-room-shell-context';
 import {
   ResizablePanelGroup,
   ResizablePanel,
@@ -14,6 +20,8 @@ import { TradingRoomAdvancedOrderPanel } from './trading-room-advanced-order-pan
 import { cn } from '@/lib/utils';
 
 function TradingRoomShellInner({ children }: { children: React.ReactNode }) {
+  const isMobile = useIsMobile();
+  const mobileTradingPanelRef = useMobileTradingPanelRef();
   const pathname = usePathname() ?? '';
   const isTradeChartRoute =
     pathname === '/trade' || pathname.startsWith('/trading-view-room-trading');
@@ -31,7 +39,9 @@ function TradingRoomShellInner({ children }: { children: React.ReactNode }) {
     noNavigation,
     symbolLinkBasePath,
     signedIn,
-    showMarketsOrderControls
+    showMarketsOrderControls,
+    mobileTradingOpen,
+    onMobileTradingPanelCollapse
   } = useTradingRoomShell();
 
   const leftPanelInitialSizeRef = useRef<number | null>(null);
@@ -66,20 +76,32 @@ function TradingRoomShellInner({ children }: { children: React.ReactNode }) {
       ? (item as { name: string }).name
       : (item as { name: string }).name;
 
+  const leftPanelMaxSize = isMobile ? MOBILE_TRADING_PANEL_SIZE : 32;
+  const leftPanelDefaultSize = isMobile ? 0 : 20;
+  const leftPanelMinSizeResolved = isMobile ? 20 : leftPanelMinSize;
+  const chartPanelDefaultSize = isMobile ? 100 : 80;
+
   return (
     <div className="trade-room flex h-[calc(100dvh-2.75rem)] max-h-[calc(100dvh-2.75rem)] min-h-0 w-full min-w-0 flex-col overflow-hidden bg-[var(--trade-dark)] text-[var(--trade-text)]">
       <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
         <ResizablePanelGroup
+          key={isMobile ? 'trade-shell-mobile' : 'trade-shell-desktop'}
           direction="horizontal"
           className="min-h-0 min-w-0 flex-1"
           onLayout={handleHorizontalLayout}
         >
           <ResizablePanel
-            defaultSize={20}
-            minSize={leftPanelMinSize}
-            maxSize={32}
-            collapsible={leftCollapseEnabled}
+            ref={(panel) => {
+              mobileTradingPanelRef.current = panel;
+            }}
+            defaultSize={leftPanelDefaultSize}
+            minSize={leftPanelMinSizeResolved}
+            maxSize={leftPanelMaxSize}
+            collapsible={isMobile || leftCollapseEnabled}
             collapsedSize={0}
+            onCollapse={() => {
+              if (isMobile) onMobileTradingPanelCollapse();
+            }}
             className="flex min-w-0 flex-col overflow-hidden"
           >
             {advancedOrderOpen && advancedOrderMarket && showMarketsOrderControls ? (
@@ -96,48 +118,66 @@ function TradingRoomShellInner({ children }: { children: React.ReactNode }) {
               />
             ) : (
               <div className="flex h-full min-h-0 min-w-0 w-full flex-col overflow-hidden border-r border-[var(--trade-border)] bg-[var(--trade-panel)]">
-                <ResizablePanelGroup
-                  direction="vertical"
-                  className="h-full min-h-0 min-w-0 w-full flex-1"
-                  onLayout={handleLeftColumnVerticalLayout}
-                >
-                  <ResizablePanel defaultSize={52} minSize={28} className="flex min-h-0 flex-col overflow-hidden">
-                    <TradingRoomMarketsPanel
-                      symbols={symbols}
-                      selectedSymbolId={selectedSymbolId}
-                      selectedMarket={selectedMarket}
-                      onSelectSymbol={handleSelectSymbol}
-                      onMarketOrder={handleMarketOrder}
-                      onAdvancedOrderClick={() => setAdvancedOrderOpen(true)}
-                      tradingDisabled={!signedIn}
-                      noNavigation={noNavigation}
-                      symbolLinkBasePath={symbolLinkBasePath}
-                      showOrderControls={showMarketsOrderControls}
-                    />
-                  </ResizablePanel>
-                  <ResizableHandle withHandle className="shrink-0 bg-[var(--trade-border)]" />
-                  <ResizablePanel
-                    defaultSize={48}
-                    minSize={newsPanelMinSize}
-                    maxSize={65}
-                    collapsible={newsCollapseEnabled}
-                    collapsedSize={0}
-                    className="flex min-h-0 min-w-0 flex-col overflow-hidden"
+                {isMobile ? (
+                  <TradingRoomMarketsPanel
+                    compact
+                    symbols={symbols}
+                    selectedSymbolId={selectedSymbolId}
+                    selectedMarket={selectedMarket}
+                    onSelectSymbol={handleSelectSymbol}
+                    onMarketOrder={handleMarketOrder}
+                    onAdvancedOrderClick={() => setAdvancedOrderOpen(true)}
+                    tradingDisabled={!signedIn}
+                    noNavigation={noNavigation}
+                    symbolLinkBasePath={symbolLinkBasePath}
+                    showOrderControls={showMarketsOrderControls}
+                  />
+                ) : (
+                  <ResizablePanelGroup
+                    direction="vertical"
+                    className="h-full min-h-0 min-w-0 w-full flex-1"
+                    onLayout={handleLeftColumnVerticalLayout}
                   >
-                    <TradingRoomNewsPanel
-                      variant="underMarkets"
-                      symbol={chartSymbol}
-                      symbolFullName={selectedSymbol ? getName(selectedSymbol) : ''}
-                    />
-                  </ResizablePanel>
-                </ResizablePanelGroup>
+                    <ResizablePanel defaultSize={52} minSize={28} className="flex min-h-0 flex-col overflow-hidden">
+                      <TradingRoomMarketsPanel
+                        symbols={symbols}
+                        selectedSymbolId={selectedSymbolId}
+                        selectedMarket={selectedMarket}
+                        onSelectSymbol={handleSelectSymbol}
+                        onMarketOrder={handleMarketOrder}
+                        onAdvancedOrderClick={() => setAdvancedOrderOpen(true)}
+                        tradingDisabled={!signedIn}
+                        noNavigation={noNavigation}
+                        symbolLinkBasePath={symbolLinkBasePath}
+                        showOrderControls={showMarketsOrderControls}
+                      />
+                    </ResizablePanel>
+                    <ResizableHandle withHandle className="shrink-0 bg-[var(--trade-border)]" />
+                    <ResizablePanel
+                      defaultSize={48}
+                      minSize={newsPanelMinSize}
+                      maxSize={65}
+                      collapsible={newsCollapseEnabled}
+                      collapsedSize={0}
+                      className="flex min-h-0 min-w-0 flex-col overflow-hidden"
+                    >
+                      <TradingRoomNewsPanel
+                        variant="underMarkets"
+                        symbol={chartSymbol}
+                        symbolFullName={selectedSymbol ? getName(selectedSymbol) : ''}
+                      />
+                    </ResizablePanel>
+                  </ResizablePanelGroup>
+                )}
               </div>
             )}
           </ResizablePanel>
-          <ResizableHandle withHandle className="shrink-0 bg-[var(--trade-border)]" />
+          {(!isMobile || mobileTradingOpen) && (
+            <ResizableHandle withHandle className="shrink-0 bg-[var(--trade-border)]" />
+          )}
           <ResizablePanel
-            defaultSize={80}
-            minSize={50}
+            defaultSize={chartPanelDefaultSize}
+            minSize={isMobile ? 35 : 50}
             className="flex min-h-0 min-w-0 flex-col overflow-hidden"
           >
             <div

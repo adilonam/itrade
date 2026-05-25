@@ -425,12 +425,8 @@ export const colbariSiteLinks = {
 } as const;
 
 export const landingLanguages = [
-  { code: 'en', label: 'English', href: landingPlaceholderLink, flag: 'gb' },
-  { code: 'es', label: 'Español', href: landingPlaceholderLink, flag: 'es' },
-  { code: 'ar', label: 'العربية', href: landingPlaceholderLink, flag: 'sa' },
-  { code: 'fr', label: 'Français', href: landingPlaceholderLink, flag: 'fr' },
-  { code: 'de', label: 'Deutsch', href: landingPlaceholderLink, flag: 'de' },
-  { code: 'pt', label: 'Português', href: landingPlaceholderLink, flag: 'pt' }
+  { code: 'en', label: 'English', flag: 'gb' },
+  { code: 'ar', label: 'العربية', flag: 'sa' }
 ] as const;
 
 export const landingDefaultLanguage = landingLanguages[0];

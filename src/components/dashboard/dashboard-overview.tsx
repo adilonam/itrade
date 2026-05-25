@@ -9,6 +9,7 @@ import {
   type FinancialSnapshot
 } from '@/components/dashboard/dashboard-overview-trade-analytics';
 import type { DashboardPosition } from '@/lib/dashboard-position-analytics';
+import { useTranslations } from 'next-intl';
 
 interface UserLite {
   name: string | null;
@@ -24,6 +25,7 @@ interface DashboardData {
 }
 
 export function DashboardOverview() {
+  const t = useTranslations('Overview');
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -84,13 +86,11 @@ export function DashboardOverview() {
         positions: raw
       });
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : 'Failed to load dashboard data'
-      );
+      setError(err instanceof Error ? err.message : t('loadError'));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     loadDashboardData();
@@ -117,11 +117,10 @@ export function DashboardOverview() {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="text-xl font-bold tracking-tight text-[var(--trade-text)]">
-            Overview
+            {t('title')}
           </h2>
           <p className="text-sm text-[var(--trade-text-muted)]">
-            Welcome back, {data.user.name || data.user.email}. Portfolio and
-            margins across all accounts.
+            {t('welcome', { name: data.user.name || data.user.email })}
           </p>
         </div>
         <Button
@@ -134,7 +133,7 @@ export function DashboardOverview() {
           <IconRefresh
             className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`}
           />
-          Refresh
+          {t('refresh')}
         </Button>
       </div>
 

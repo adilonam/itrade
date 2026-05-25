@@ -11,10 +11,12 @@ import {
 } from '@tabler/icons-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
+import { UserManagementPageHeader } from '@/components/user-management/user-management-page-header';
 import type { FinancialSnapshot } from '@/components/dashboard/dashboard-overview-trade-analytics';
 import type { BalanceType } from '@/lib/prisma/generated/client';
 
-const STEPS = ['Amount', 'Payment method', 'Review'] as const;
+const DEPOSIT_STEP_KEYS = ['stepAmount', 'stepPayment', 'stepReview'] as const;
 
 /** User-management deposits credit the live (real) balance only. */
 const REAL_BALANCE_TYPE = 'REAL' satisfies BalanceType;
@@ -59,6 +61,9 @@ type UserManagementDepositPageProps = {
 export function UserManagementDepositPage({
   paymentReturnStatus = null
 }: UserManagementDepositPageProps) {
+  const t = useTranslations('UserManagement.deposit');
+  const tShared = useTranslations('UserManagement.shared');
+  const depositSteps = DEPOSIT_STEP_KEYS.map((key) => t(key));
   const urlRefreshPart =
     paymentReturnStatus === 'success' || paymentReturnStatus === 'cancelled'
       ? 1
@@ -166,22 +171,14 @@ export function UserManagementDepositPage({
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-auto">
-      <header className="shrink-0 border-b border-[var(--trade-border)] bg-[var(--trade-panel)] px-6 py-4">
-        <h1 className="text-base font-semibold text-[var(--trade-text)]">
-          Deposit
-        </h1>
-        <p className="mt-1 text-sm text-[var(--trade-text-muted)]">
-          Add funds via NOWPayments or a manual USDT transfer. Amounts credit
-          your real (live) balance in USD after confirmation.
-        </p>
-      </header>
+      <UserManagementPageHeader title={t('title')} description={t('description')} />
 
       <div className="flex flex-1 flex-col gap-6 p-6">
         <div className="mx-auto w-full max-w-3xl space-y-8">
           {/* Stepper */}
-          <nav aria-label="Progress" className="w-full">
+          <nav aria-label={tShared('progress')} className="w-full">
             <ol className="flex flex-wrap items-center gap-2 sm:gap-0">
-              {STEPS.map((label, i) => {
+              {depositSteps.map((label, i) => {
                 const active = step === i;
                 const done = step > i;
                 return (
@@ -300,7 +297,7 @@ export function UserManagementDepositPage({
                       'disabled:pointer-events-none disabled:opacity-40'
                     )}
                   >
-                    Next
+                    {tShared('next')}
                     <IconChevronRight className="size-4" stroke={2} />
                   </button>
                 </div>
@@ -364,7 +361,7 @@ export function UserManagementDepositPage({
                     className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)] px-4 py-2.5 text-sm font-medium text-[var(--trade-text)] hover:bg-[var(--trade-border)]/40"
                   >
                     <IconChevronLeft className="size-4" stroke={2} />
-                    Back
+                    {tShared('back')}
                   </button>
                   <button
                     type="button"
@@ -376,7 +373,7 @@ export function UserManagementDepositPage({
                       'disabled:pointer-events-none disabled:opacity-40'
                     )}
                   >
-                    Next
+                    {tShared('next')}
                     <IconChevronRight className="size-4" stroke={2} />
                   </button>
                 </div>
@@ -436,7 +433,7 @@ export function UserManagementDepositPage({
                     className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)] px-4 py-2.5 text-sm font-medium text-[var(--trade-text)] hover:bg-[var(--trade-border)]/40 disabled:opacity-50"
                   >
                     <IconChevronLeft className="size-4" stroke={2} />
-                    Back
+                    {tShared('back')}
                   </button>
                   <button
                     type="button"

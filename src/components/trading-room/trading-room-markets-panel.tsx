@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { TradingRoomOrderPanel } from './trading-room-order-panel';
@@ -36,6 +37,8 @@ interface TradingRoomMarketsPanelProps {
   symbolLinkBasePath?: string;
   /** When false, hides quick buy/sell (e.g. institutional room for non-admin users). */
   showOrderControls?: boolean;
+  /** Narrow layout for small screens (chart + buy/sell only). */
+  compact?: boolean;
 }
 
 /** Symbol list + buy/sell (order) for the selected instrument */
@@ -49,9 +52,11 @@ export function TradingRoomMarketsPanel({
   tradingDisabled = false,
   noNavigation = false,
   symbolLinkBasePath = '/trading-view-room-trading',
-  showOrderControls = true
+  showOrderControls = true,
+  compact = false
 }: TradingRoomMarketsPanelProps) {
   void _selectedMarket; // Reserved for future use
+  const t = useTranslations('Trade.markets');
   const [listTab, setListTab] = useState<'favorites' | 'movers'>('movers');
 
   const getPrice = (item: SymbolItem) =>
@@ -83,8 +88,8 @@ export function TradingRoomMarketsPanel({
           className="border-b border-[var(--trade-border)] bg-[var(--trade-dark)]/20"
           data-purpose="asset-item-active"
         >
-          <div className="p-3">
-            <div className="flex justify-between items-start mb-2">
+          <div className={compact ? 'p-2' : 'p-3'}>
+            <div className={`flex items-start justify-between ${compact ? 'mb-1.5' : 'mb-2'}`}>
               <div className="flex items-center gap-2">
                 <div className="flex -space-x-1">
                   <span
@@ -113,20 +118,22 @@ export function TradingRoomMarketsPanel({
                   disabled={tradingDisabled}
                   showAdvancedOrder={false}
                 />
-                <div className="mt-3 flex items-center justify-between text-[10px] text-[var(--trade-text-muted)] px-1">
+                <div
+                  className={`flex items-center justify-between px-1 text-[10px] text-[var(--trade-text-muted)] ${compact ? 'mt-2' : 'mt-3'}`}
+                >
                   <button
                     type="button"
                     onClick={() => onAdvancedOrderClick?.()}
                     className="flex items-center gap-1 hover:text-[var(--trade-text)]"
                   >
                     <IconSettings className="size-3" />
-                    Advanced Order
+                    {t('advancedOrder')}
                   </button>
                   <div className="flex gap-2">
-                    <button type="button" className="hover:text-[var(--trade-text)]" aria-label="Info">
+                    <button type="button" className="hover:text-[var(--trade-text)]" aria-label={t('info')}>
                       <IconInfoCircle className="size-3" />
                     </button>
-                    <button type="button" className="hover:text-[var(--trade-text)]" aria-label="Favorite">
+                    <button type="button" className="hover:text-[var(--trade-text)]" aria-label={t('favorite')}>
                       <IconStar className="size-3" />
                     </button>
                   </div>
@@ -134,7 +141,7 @@ export function TradingRoomMarketsPanel({
               </>
             ) : (
               <p className="text-[10px] leading-snug text-[var(--trade-text-muted)]">
-                Institutional orders can only be placed by administrators.
+                {t('institutionalOrdersNote')}
               </p>
             )}
           </div>
@@ -196,8 +203,10 @@ export function TradingRoomMarketsPanel({
 
   return (
     <div className="flex h-full w-full flex-col">
-      <div className="shrink-0 border-b border-[var(--trade-border)] p-3">
-        <div className="mb-3 flex items-center justify-between">
+      <div
+        className={`shrink-0 border-b border-[var(--trade-border)] ${compact ? 'p-2' : 'p-3'}`}
+      >
+        <div className={`flex items-center justify-between ${compact ? 'mb-2' : 'mb-3'}`}>
           <div className="flex gap-4">
             <button
               type="button"
@@ -209,7 +218,7 @@ export function TradingRoomMarketsPanel({
               }`}
             >
               <IconStar className="size-3" />
-              Favorites
+              {t('favorites')}
             </button>
             <button
               type="button"
@@ -221,17 +230,17 @@ export function TradingRoomMarketsPanel({
               }`}
             >
               <IconTrendingUp className="size-3" />
-              Top Movers
+              {t('topMovers')}
             </button>
           </div>
-          <button type="button" className="text-[var(--trade-text-muted)] hover:text-[var(--trade-text)]" aria-label="Search">
+          <button type="button" className="text-[var(--trade-text-muted)] hover:text-[var(--trade-text)]" aria-label={t('search')}>
             <IconSearch className="size-4" />
           </button>
         </div>
         <div className="relative">
           <input
             type="text"
-            placeholder="Symbol"
+            placeholder={t('symbolPlaceholder')}
             className="w-full rounded border border-[var(--trade-border)] bg-[var(--trade-dark)] px-3 py-1.5 text-sm text-[var(--trade-text)] placeholder:text-[var(--trade-text-muted)] focus:border-[var(--trade-accent-blue)] focus:outline-none focus:ring-1 focus:ring-[var(--trade-accent-blue)]"
           />
         </div>
@@ -241,11 +250,11 @@ export function TradingRoomMarketsPanel({
         <div className="flex shrink-0 items-center justify-between border-b border-[var(--trade-border)] bg-[var(--trade-dark)]/40 px-3 py-2">
           <div className="flex items-center gap-2">
             <IconTrendingUp className="size-4 text-[var(--trade-accent-blue)]" />
-            <span className="text-xs font-bold uppercase tracking-wider">Popular</span>
+            <span className="text-xs font-bold uppercase tracking-wider">{t('popular')}</span>
             <span className="rounded bg-[var(--trade-border)] px-1.5 py-0.5 text-[10px]">{symbols.length}</span>
           </div>
         </div>
-        <ScrollArea className="min-h-0 flex-1">
+        <ScrollArea className={compact ? 'min-h-0 max-h-[28vh] flex-1' : 'min-h-0 flex-1'}>
           <div className="space-y-0">
             {symbols.map((item) => {
               const id = getId(item);

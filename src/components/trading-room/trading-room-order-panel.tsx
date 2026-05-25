@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import type { Market } from '@/lib/prisma/generated/client';
 import { useMarketsWebSocket } from '@/contexts/markets-websocket-context';
@@ -21,6 +22,7 @@ export function TradingRoomOrderPanel({
   disabled = false,
   showAdvancedOrder = true
 }: TradingRoomOrderPanelProps) {
+  const t = useTranslations('Trade.order');
   const [lotSize, setLotSize] = useState('0.01');
   const { realTimePrices, isConnected, subscribe } = useMarketsWebSocket();
 
@@ -79,7 +81,7 @@ export function TradingRoomOrderPanel({
   if (!market) {
     return (
       <div className="rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)]/40 p-4 text-center text-sm text-[var(--trade-text-muted)]">
-        Select a symbol to trade
+        {t('selectSymbol')}
       </div>
     );
   }
@@ -91,32 +93,38 @@ export function TradingRoomOrderPanel({
     n.toLocaleString('en-US', { maximumFractionDigits: 0 });
 
   return (
-    <div className="space-y-3">
-      {/* Stitch layout: 2-col Buy/Sell grid */}
-      <div className="grid grid-cols-2 gap-2">
+    <div className="space-y-2 max-md:space-y-1.5 md:space-y-3">
+      <div className="grid grid-cols-1 gap-1.5 max-md:gap-1.5 md:grid-cols-2 md:gap-2">
         <button
           type="button"
           disabled={disabled}
           onClick={() => onMarketOrder?.('SELL', parseFloat(lotSize) || 0.01)}
-          title={`SELL at ${displayBidFull} (bid)`}
-          className="flex min-w-0 flex-col items-center justify-center rounded bg-[var(--trade-red)]/90 p-2 text-white transition-colors hover:bg-[var(--trade-red)] disabled:opacity-50"
+          title={t('sellTitle', { price: displayBidFull })}
+          className="flex min-w-0 flex-col items-center justify-center rounded bg-[var(--trade-red)]/90 p-1.5 text-white transition-colors hover:bg-[var(--trade-red)] disabled:opacity-50 max-md:py-1.5 md:p-2"
         >
-          <span className="text-[10px] font-bold uppercase opacity-80">Sell</span>
-          <span className="truncate w-full text-center text-sm font-bold">{displayBid}</span>
+          <span className="text-[9px] font-bold uppercase opacity-80 max-md:text-[9px] md:text-[10px]">
+            {t('sell')}
+          </span>
+          <span className="w-full truncate text-center text-xs font-bold max-md:text-xs md:text-sm">
+            {displayBid}
+          </span>
         </button>
         <button
           type="button"
           disabled={disabled}
           onClick={() => onMarketOrder?.('BUY', parseFloat(lotSize) || 0.01)}
-          title={`BUY at ${displayAskFull} (ask)`}
-          className="flex min-w-0 flex-col items-center justify-center rounded bg-[var(--trade-green)]/90 p-2 text-white transition-colors hover:bg-[var(--trade-green)] disabled:opacity-50"
+          title={t('buyTitle', { price: displayAskFull })}
+          className="flex min-w-0 flex-col items-center justify-center rounded bg-[var(--trade-green)]/90 p-1.5 text-white transition-colors hover:bg-[var(--trade-green)] disabled:opacity-50 max-md:py-1.5 md:p-2"
         >
-          <span className="text-[10px] font-bold uppercase opacity-80">Buy</span>
-          <span className="truncate w-full text-center text-sm font-bold">{displayAsk}</span>
+          <span className="text-[9px] font-bold uppercase opacity-80 max-md:text-[9px] md:text-[10px]">
+            {t('buy')}
+          </span>
+          <span className="w-full truncate text-center text-xs font-bold max-md:text-xs md:text-sm">
+            {displayAsk}
+          </span>
         </button>
       </div>
-      {/* Quantity row */}
-      <div className="flex items-center justify-center gap-4 rounded border border-[var(--trade-border)]/30 bg-[var(--trade-dark)] py-1">
+      <div className="flex items-center justify-center gap-2 rounded border border-[var(--trade-border)]/30 bg-[var(--trade-dark)] py-0.5 max-md:gap-2 max-md:py-0.5 md:gap-4 md:py-1">
         <button
           type="button"
           onClick={decrementLot}
@@ -136,7 +144,7 @@ export function TradingRoomOrderPanel({
               disabled={disabled}
               className="w-12 bg-transparent text-center text-xs font-bold text-[var(--trade-text)] outline-none focus:ring-0 disabled:opacity-50 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
             />
-            <span className="text-[9px] font-medium text-[var(--trade-text-muted)]">lots</span>
+            <span className="text-[9px] font-medium text-[var(--trade-text-muted)]">{t('lots')}</span>
           </div>
           <div className="text-[9px] text-[var(--trade-text-muted)]">
             ≈ {(parseFloat(lotSize) || 0.01) * price < 1000
@@ -156,7 +164,7 @@ export function TradingRoomOrderPanel({
       {showAdvancedOrder && (
         <div className="flex items-center justify-between px-1 text-[10px] text-[var(--trade-text-muted)]">
           <Link href="#" className="flex items-center gap-1 hover:text-[var(--trade-text)]">
-            Advanced Order
+            {t('advancedOrder')}
           </Link>
         </div>
       )}

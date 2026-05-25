@@ -1,0 +1,371 @@
+{
+  "Landing": {
+    "hero": {
+      "titleLine1": "Redefining the Way",
+      "titleLine2": "You Trade",
+      "description": "Step into the world of global trading with access to CFDs on leading asset classes. Enjoy 0% commission trading, fast execution, and an intuitive interface designed for every level of trader.",
+      "createAccount": "Create Account",
+      "trade": "Trade"
+    },
+    "whyChooseUs": {
+      "title": "Why Choose Us?",
+      "description": "From entry-level traders to seasoned experienced traders, our platform delivers the flexibility and power you need. Access hundreds of CFD instruments with conditions designed to maximize your trading experience."
+    },
+    "beginners": {
+      "title": "Beginners",
+      "bullet1": "Demo Account with virtual money",
+      "bullet2": "Educational resources and e-books",
+      "bullet3": "Assistance from your account manager",
+      "cta": "Start Learning"
+    },
+    "experienced": {
+      "title": "Experienced traders",
+      "bullet1": "Access to advanced platform features",
+      "bullet2": "Tools for technical and fundamental analysis",
+      "bullet3": "Analyze charts and monitor market trends",
+      "cta": "Upgrade Tools"
+    },
+    "markets": {
+      "title": "Explore Global Markets",
+      "currencies": {
+        "title": "Currencies",
+        "category": "Foreign Exchange",
+        "alt": "International currency symbols in a sleek metallic finish"
+      },
+      "stocks": {
+        "title": "Stocks",
+        "category": "Equities",
+        "alt": "Conceptual representation of global stock markets"
+      },
+      "commodities": {
+        "title": "Commodities",
+        "category": "Hard Assets",
+        "alt": "Gold bars and oil in a curated museum-like setting"
+      },
+      "crypto": {
+        "title": "Cryptocurrencies",
+        "category": "Digital Assets",
+        "alt": "Futuristic digital coin representations in a virtual space"
+      },
+      "indices": {
+        "title": "Indices",
+        "category": "Market Baskets",
+        "alt": "Minimalist visualization of global economic indices"
+      }
+    },
+    "tradeOnYourTerms": {
+      "title": "Trade on Your Terms",
+      "description": "Our next-generation platform gives you full control across desktop, tablet, and mobile. Experience real-time market connectivity, rapid order execution, and advanced tools that keep you one step ahead.",
+      "join": "Join {appName}"
+    },
+    "confidence": {
+      "title": "Where Confidence Meets Clarity",
+      "join": "Join {appName}"
+    },
+    "footer": {
+      "legal": "Legal",
+      "aboutUs": "About Us",
+      "contactUs": "Contact Us",
+      "customerService": "Customer service",
+      "companyInfo": "Company Information:",
+      "companyInfoBody": "This website 'Colbari' is operated by Valor Capital (PTY) Ltd, a South African investment firm, authorized and regulated by the Financial Sector Conduct Authority of South Africa with Financial Service Provider (FSP) license number 51822 to provide intermediary service. Valor Capital (PTY) Ltd is registered in South Africa, with registration number 2021/547363/07. Valor Capital (PTY) Ltd registered office is located at 1 Edgemere Road Elfindale, Cape Town, 7945, South Africa. Valor Capital (PTY) Ltd owns and operates the \"Colbari\" brand.",
+      "valorValueBridge": "Valor (PTY) Limited and Value Bridge Single Member Investment Services S.A have a common shareholder. Value Bridge Single Member Investment Services S.A, registered at 43 Aiolou str., 3rd floor, 10551, Athens, Greece, is regulated by the Hellenic Capital Market Commission with license number 6/927/31-8-2021.",
+      "dunfield": "Dunfield Ltd with register address at Office No. 45, 9.17 Capital Tower, 91 Waterloo Road, London, United Kingdom SE1 8RT is the paying agent of Valor Capital Ltd.",
+      "riskWarningLabel": "Risk warning:",
+      "riskWarningBody": "Contracts for difference ('CFDs') is a complex financial product, with speculative character, the trading of which involves significant risks of loss of capital. Trading CFDs, which is a marginal product, may result in the loss of your entire balance. Remember that leverage in CFDs can work both to your advantage and disadvantage. CFDs traders do not own, or have any rights to, the underlying assets. Trading CFDs is not appropriate for all investors. Past performance does not constitute a reliable indicator of future results. Future forecasts do not constitute a reliable indicator of future performance. Before deciding to trade, you should carefully consider your investment objectives, level of experience and risk tolerance. You should not deposit more than you are prepared to lose. Please ensure you fully understand the risk associated with the product envisaged and seek independent advice, if necessary.",
+      "antiSpam": "Valor Capital (PTY) Ltd applies strict measures in line with anti-spam regulations by avoiding unsolicited advertising.",
+      "regionalRestrictionsLabel": "Regional Restrictions:",
+      "regionalRestrictionsBody": "Valor Capital (PTY) Ltd does not offer services within the European Economic Area as well as in certain other jurisdictions such as the USA, British Columbia, Canada, Iran, North Korea, Myanmar, Russia and some other regions.",
+      "adviserNotice": "Valor Capital (PTY) Ltd does not issue advice, recommendations or opinions in relation to acquiring, holding or disposing of any financial product. Valor Capital (PTY) Ltd is not a financial adviser.",
+      "riskWarningShortLabel": "Risk Warning",
+      "riskWarningShortBody": "Trading in CFDs carry a high level of risk to your capital due to the volatility of the underlying market. These products may not be suitable for all investors. Therefore, you should ensure that you understand the risks and seek advice from an independent and suitably licensed financial advisor.",
+      "copyright": "© 2026 {appName}. ALL RIGHTS RESERVED."
+    }
+  },
+  "LandingHeader": {
+    "signUp": "Sign Up",
+    "logIn": "Log In",
+    "trade": "Trade",
+    "selectLanguage": "Select language",
+    "menus": {
+      "markets": "Markets",
+      "learning": "Learning",
+      "account": "Account",
+      "cryptocurrencies": "Cryptocurrencies",
+      "currencies": "Currencies",
+      "stocks": "Stocks",
+      "commodities": "Commodities",
+      "indices": "Indices",
+      "education": "Education",
+      "economicCalendar": "Economic Calendar",
+      "cfds": "CFDs",
+      "marketMovers": "Market Movers",
+      "tradingPitfalls": "Trading Pitfalls",
+      "smartTrading": "Smart Trading",
+      "technicalFundamental": "Technical and Fundamental",
+      "glossary": "Glossary",
+      "nfp": "NFP",
+      "accountTypes": "Account Types",
+      "assetsCalculator": "Assets Calculator",
+      "aboutUs": "About Us",
+      "faqs": "FAQs – Trading Platform"
+    }
+  },
+  "Language": {
+    "en": "English",
+    "ar": "العربية"
+  },
+  "Common": {
+    "selectLanguage": "Select language",
+    "toggleTheme": "Toggle theme",
+    "loading": "Loading…"
+  },
+  "Trade": {
+    "metadataTitle": "Trade",
+    "nav": {
+      "trade": "Trade",
+      "institutional": "Institutional",
+      "plans": "Plans",
+      "props": "Props",
+      "dashboard": "Dashboard",
+      "account": "Account",
+      "overview": "Overview",
+      "institutionalAdmin": "Institutional-admin",
+      "users": "Users",
+      "markets": "Markets",
+      "investmentsAdmin": "Investments-admin",
+      "kycRequests": "KYC Requests",
+      "depositRequest": "Deposit request",
+      "settings": "Settings",
+      "withdrawals": "Withdrawals"
+    },
+    "header": {
+      "tradeRoom": "Trade room",
+      "balanceTitle": "Balance (TRADING · {type})",
+      "balanceTypeSelector": "Balance type selector",
+      "connected": "Connected",
+      "balanceReal": "Real",
+      "balanceDemo": "Demo",
+      "balanceInstitutional": "Institutional"
+    },
+    "markets": {
+      "favorites": "Favorites",
+      "topMovers": "Top Movers",
+      "search": "Search",
+      "symbolPlaceholder": "Symbol",
+      "popular": "Popular",
+      "advancedOrder": "Advanced Order",
+      "info": "Info",
+      "favorite": "Favorite",
+      "institutionalOrdersNote": "Institutional orders can only be placed by administrators."
+    },
+    "order": {
+      "selectSymbol": "Select a symbol to trade",
+      "sell": "Sell",
+      "buy": "Buy",
+      "sellTitle": "SELL at {price} (bid)",
+      "buyTitle": "BUY at {price} (ask)",
+      "lots": "lots",
+      "advancedOrder": "Advanced Order"
+    },
+    "chart": {
+      "trade": "Trade"
+    },
+    "positions": {
+      "open": "Open Positions",
+      "pending": "Pending Orders",
+      "closed": "Closed Positions",
+      "finance": "Finance",
+      "loading": "Loading room trading positions...",
+      "empty": "No room trading positions found. Positions will appear here once you start trading.",
+      "emptyPage": "No positions on this page.",
+      "type": "Type",
+      "market": "Market",
+      "quantity": "Quantity",
+      "execPrice": "Exec Price",
+      "closedPrice": "Closed Price",
+      "takeProfit": "Take Profit",
+      "stopLoss": "Stop Loss",
+      "value": "Value",
+      "pnl": "P&L",
+      "status": "Status",
+      "date": "Date",
+      "closed": "Closed",
+      "close": "Close",
+      "closePosition": "Close position",
+      "closePositionConfirm": "Close this {type} position for {symbol}? This cannot be undone.",
+      "closePositionAction": "Close position",
+      "cancel": "Cancel"
+    },
+    "finance": {
+      "title": "Account Overview",
+      "description": "Your current financial status and margin information",
+      "balance": "Balance",
+      "usedMargin": "Used Margin",
+      "equity": "Equity",
+      "freeMargin": "Free Margin",
+      "marginLevel": "Margin Level"
+    },
+    "news": {
+      "news": "News",
+      "calendar": "Calendar",
+      "market": "Market",
+      "info": "Info",
+      "symbolInfo": "Symbol info",
+      "sessionOverview": "Session overview (mock)",
+      "sessionBody": "Forex volatility index neutral. Equities futures slightly green. Crypto bid firm.",
+      "digits": "Digits",
+      "contract": "Contract",
+      "spreadTyp": "Spread (typ.)",
+      "swapLong": "Swap long",
+      "swapShort": "Swap short",
+      "margin": "Margin",
+      "mockSpecs": "Mock contract specs for UI preview.",
+      "impactHigh": "high",
+      "impactMedium": "medium",
+      "impactLow": "low"
+    }
+  },
+  "Investments": {
+    "title": "Investments",
+    "subtitle": "Discover and manage your investment opportunities",
+    "realBalanceLabel": "Real balance · free margin",
+    "totalInvested": "Total Invested",
+    "expectedReturns": "Expected Returns",
+    "activeInvestments": "Active Investments",
+    "acrossInvestments": "Across {count} investments",
+    "acrossOneInvestment": "Across 1 investment",
+    "noActiveInvestments": "No active investments",
+    "projectedAtMaturity": "Projected at maturity",
+    "projectedEarnings": "Projected earnings",
+    "currentlyRunning": "Currently running",
+    "tabAvailable": "Available Investments",
+    "tabMyInvestments": "My Investments",
+    "tabTransactions": "Transactions",
+    "searchPlaceholder": "Search investments...",
+    "riskLevel": "Risk Level",
+    "allRiskLevels": "All Risk Levels",
+    "lowRisk": "Low Risk",
+    "mediumRisk": "Medium Risk",
+    "highRisk": "High Risk",
+    "country": "Country",
+    "allCountries": "All Countries",
+    "noInvestmentsAvailable": "No investments available",
+    "checkBackLater": "Check back later for new investment opportunities.",
+    "noInvestmentsYet": "No investments yet",
+    "startInvesting": "Start investing to see your portfolio here.",
+    "browseInvestments": "Browse Investments",
+    "tryAgain": "Try again",
+    "loadError": "Failed to load investment data"
+  },
+  "Overview": {
+    "title": "Overview",
+    "welcome": "Welcome back, {name}. Portfolio and margins across all accounts.",
+    "refresh": "Refresh",
+    "loadError": "Failed to load dashboard data"
+  },
+  "Institutional": {
+    "title": "Institutional",
+    "subtitleWithMarket": "Institutional charting and execution for {symbol} - {name}",
+    "subtitleDefault": "Institutional room with INSTITUTIONAL balance and positions."
+  },
+  "UserManagement": {
+    "nav": {
+      "dashboard": "Dashboard",
+      "deposit": "Deposit",
+      "transfer": "Transfer",
+      "withdrawal": "Withdrawal",
+      "settings": "Settings",
+      "kyc": "KYC verification"
+    },
+    "sidebar": {
+      "ariaLabel": "User management"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "accountSettings": "Account settings >",
+      "transactionHistory": "Transaction history",
+      "viewAll": "View all >",
+      "signInBalances": "Sign in to view balances.",
+      "signInTransactions": "Sign in to view transactions.",
+      "loadBalancesError": "Could not load account balances.",
+      "loadTransactionsError": "Could not load transactions.",
+      "loadingTransactions": "Loading transactions…",
+      "noTransactions": "No recent deposits or withdrawals on your real wallet.",
+      "balance": "Balance",
+      "equity": "Equity",
+      "freeMargin": "Free margin",
+      "leverage": "Lev",
+      "tableType": "Type",
+      "tableDescription": "Description",
+      "tableAmount": "Amount",
+      "tableWallet": "Wallet",
+      "tableDate": "Date",
+      "txGain": "Gain",
+      "txInvestmentGain": "Investment gain",
+      "txLoss": "Loss",
+      "txDeposit": "Deposit",
+      "txWithdraw": "Withdraw",
+      "txTransferIn": "Transfer in",
+      "txTransferOut": "Transfer out",
+      "walletReal": "Real",
+      "walletDemo": "Demo",
+      "walletInstitutional": "Institutional"
+    },
+    "deposit": {
+      "title": "Deposit",
+      "description": "Add funds via NOWPayments or a manual USDT transfer. Amounts credit your real (live) balance in USD after confirmation.",
+      "stepAmount": "Amount",
+      "stepPayment": "Payment method",
+      "stepReview": "Review"
+    },
+    "withdrawal": {
+      "title": "Withdraw",
+      "description": "Send funds from your real balance as BTC, USDC, or USDT to an external address. Amounts are expressed in USD equivalent.",
+      "stepAmount": "Amount",
+      "stepCrypto": "Crypto & address",
+      "stepReview": "Review"
+    },
+    "transfer": {
+      "title": "Transfer",
+      "description": "Move funds between your REAL and INSTITUTIONAL balances on your account.",
+      "betweenBalances": "Between your balances",
+      "betweenBalancesHint": "Transfer instantly between REAL and INSTITUTIONAL wallets on your account.",
+      "transferActivity": "Transfer activity",
+      "transferActivityHint": "Transfer in and transfer out entries for your REAL and INSTITUTIONAL wallets.",
+      "signInTransfers": "Sign in to view transfer activity.",
+      "loadTransfersError": "Could not load transfer transactions.",
+      "refresh": "Refresh",
+      "noTransfers": "No transfer transactions yet.",
+      "tableType": "Type",
+      "tableDescription": "Description",
+      "tableAmount": "Amount",
+      "tableWallet": "Wallet",
+      "tableDate": "Date",
+      "tableNote": "Note",
+      "transferIn": "Transfer in",
+      "transferOut": "Transfer out"
+    },
+    "settings": {
+      "title": "Settings",
+      "description": "Manage your profile, address, and security settings.",
+      "loading": "Loading settings…"
+    },
+    "kyc": {
+      "title": "KYC verification",
+      "description": "Submit identity documents for account verification.",
+      "loading": "Loading KYC…"
+    },
+    "section": {
+      "comingSoon": "Content coming soon."
+    },
+    "shared": {
+      "next": "Next",
+      "back": "Back",
+      "submit": "Submit",
+      "cancel": "Cancel",
+      "real": "Real",
+      "progress": "Progress"
+    }
+  }
+}

@@ -6,6 +6,8 @@ import { cn } from '@/lib/utils';
 import type { Metadata, Viewport } from 'next';
 import NextTopLoader from 'nextjs-toploader';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
+import { NextIntlClientProvider } from 'next-intl';
+import { getLocale, getMessages } from 'next-intl/server';
 import './globals.css';
 import './theme.css';
 import { DEFAULT_ACTIVE_THEME } from '@/constants/theme';
@@ -32,11 +34,13 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const locale = await getLocale();
+  const messages = await getMessages();
   const activeThemeValue = DEFAULT_ACTIVE_THEME;
   const isScaled = activeThemeValue.endsWith('-scaled');
 
   return (
-    <html lang='en' suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning>
       <head>
         <script
           dangerouslySetInnerHTML={{
@@ -68,8 +72,10 @@ export default async function RootLayout({
             enableColorScheme
           >
             <Providers activeThemeValue={activeThemeValue}>
-              <Toaster />
-              {children}
+              <NextIntlClientProvider messages={messages}>
+                <Toaster />
+                {children}
+              </NextIntlClientProvider>
             </Providers>
           </ThemeProvider>
         </NuqsAdapter>

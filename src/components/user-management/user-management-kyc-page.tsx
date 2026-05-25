@@ -4,6 +4,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { IconLoader2, IconShield, IconUpload } from '@tabler/icons-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
+import { UserManagementPageHeader } from '@/components/user-management/user-management-page-header';
 import type { KycStatus } from '@/lib/prisma/generated/client';
 
 const DOC_OPTIONS = [
@@ -21,6 +23,7 @@ type KycRequestHistoryItem = {
 };
 
 export function UserManagementKycPage() {
+  const t = useTranslations('UserManagement.kyc');
   const [loading, setLoading] = useState(true);
   const [kycStatus, setKycStatus] = useState<KycStatus | null>(null);
   const [kycDocType, setKycDocType] = useState('');
@@ -150,21 +153,14 @@ export function UserManagementKycPage() {
     return (
       <div className="flex flex-1 items-center justify-center gap-2 p-12 text-[var(--trade-text-muted)]">
         <IconLoader2 className="size-6 animate-spin" />
-        Loading KYC…
+        {t('loading')}
       </div>
     );
   }
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-      <header className="shrink-0 border-b border-[var(--trade-border)] bg-[var(--trade-panel)] px-6 py-4">
-        <h1 className="text-base font-semibold text-[var(--trade-text)]">
-          KYC verification
-        </h1>
-        <p className="mt-1 text-sm text-[var(--trade-text-muted)]">
-          Submit identity documents for account verification.
-        </p>
-      </header>
+      <UserManagementPageHeader title={t('title')} description={t('description')} />
 
       <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
         <div className="flex flex-1 flex-col gap-6 p-6">

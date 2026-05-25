@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { IconRefresh } from '@tabler/icons-react';
 import { cn } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
 import type { BalanceType } from '@/lib/prisma/generated/client';
 
 type TransferTxType = 'TRANSFER_IN' | 'TRANSFER_OUT';
@@ -30,6 +31,7 @@ type Props = {
 };
 
 export function BalanceTransferTransactionsList({ refreshKey = 0 }: Props) {
+  const t = useTranslations('UserManagement.transfer');
   const [rows, setRows] = useState<TransferTransactionRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -47,7 +49,7 @@ export function BalanceTransferTransactionsList({ refreshKey = 0 }: Props) {
       const res = await fetch(`/api/user/transactions?${params.toString()}`);
       if (res.status === 401) {
         setRows([]);
-        setError('Sign in to view transfer activity.');
+        setError(t('signInTransfers'));
         return;
       }
       if (!res.ok) {
@@ -58,12 +60,12 @@ export function BalanceTransferTransactionsList({ refreshKey = 0 }: Props) {
       };
       setRows(json.transactions ?? []);
     } catch {
-      setError('Could not load transfer transactions.');
+      setError(t('loadTransfersError'));
       setRows([]);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     void load();
@@ -74,11 +76,10 @@ export function BalanceTransferTransactionsList({ refreshKey = 0 }: Props) {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="text-sm font-semibold text-[var(--trade-text)]">
-            Transfer activity
+            {t('transferActivity')}
           </h2>
           <p className="mt-1 text-xs text-[var(--trade-text-muted)]">
-            Transfer in and transfer out entries for your REAL and INSTITUTIONAL
-            balances.
+            {t('transferActivityHint')}
           </p>
         </div>
         <button
@@ -91,7 +92,7 @@ export function BalanceTransferTransactionsList({ refreshKey = 0 }: Props) {
             className={cn('size-3.5', loading && 'animate-spin')}
             stroke={2}
           />
-          Refresh
+          {t('refresh')}
         </button>
       </div>
 
@@ -103,18 +104,18 @@ export function BalanceTransferTransactionsList({ refreshKey = 0 }: Props) {
         <div className="mt-4 h-[72px] animate-pulse rounded-lg bg-[var(--trade-border)]/60" />
       ) : rows.length === 0 && !error ? (
         <p className="mt-4 rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)] px-4 py-3 text-sm text-[var(--trade-text-muted)]">
-          No transfer transactions yet.
+          {t('noTransfers')}
         </p>
       ) : rows.length > 0 ? (
         <div className="mt-4 overflow-hidden rounded-lg border border-[var(--trade-border)]">
           <table className="w-full text-left text-sm">
             <thead className="bg-[var(--trade-dark)] text-[var(--trade-text-muted)]">
               <tr>
-                <th className="px-4 py-2.5 font-medium">Date</th>
-                <th className="px-4 py-2.5 font-medium">Type</th>
-                <th className="px-4 py-2.5 font-medium">Wallet</th>
-                <th className="px-4 py-2.5 font-medium">Amount</th>
-                <th className="px-4 py-2.5 font-medium">Note</th>
+                <th className="px-4 py-2.5 font-medium">{t('tableDate')}</th>
+                <th className="px-4 py-2.5 font-medium">{t('tableType')}</th>
+                <th className="px-4 py-2.5 font-medium">{t('tableWallet')}</th>
+                <th className="px-4 py-2.5 font-medium">{t('tableAmount')}</th>
+                <th className="px-4 py-2.5 font-medium">{t('tableNote')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--trade-border)] bg-[var(--trade-panel)]">
@@ -132,9 +133,7 @@ export function BalanceTransferTransactionsList({ refreshKey = 0 }: Props) {
                           : 'text-amber-600 dark:text-amber-400'
                       )}
                     >
-                      {tx.type === 'TRANSFER_IN'
-                        ? 'Transfer in'
-                        : 'Transfer out'}
+                      {tx.type === 'TRANSFER_IN' ? t('transferIn') : t('transferOut')}
                     </span>
                   </td>
                   <td className="px-4 py-2.5 font-mono text-xs text-[var(--trade-text)]">

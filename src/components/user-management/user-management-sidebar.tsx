@@ -18,6 +18,8 @@ import {
   userManagementNavSecondary,
   type UserManagementNavItem
 } from '@/constants/data';
+import { useTranslations } from 'next-intl';
+import { userManagementNavTitleKey } from '@/lib/user-management-nav-i18n';
 
 const iconByUrl: Record<
   string,
@@ -42,10 +44,12 @@ function isActive(pathname: string): (item: UserManagementNavItem) => boolean {
 
 function NavRow({
   item,
-  active
+  active,
+  label
 }: {
   item: UserManagementNavItem;
   active: boolean;
+  label: string;
 }) {
   const Icon = iconByUrl[item.url] ?? IconLayoutGrid;
   return (
@@ -59,7 +63,7 @@ function NavRow({
       )}
     >
       <Icon className="size-5 shrink-0 stroke-[1.75]" stroke={1.75} />
-      <span className="truncate">{item.title}</span>
+      <span className="truncate">{label}</span>
     </Link>
   );
 }
@@ -68,6 +72,13 @@ export function UserManagementSidebar() {
   const pathname = usePathname() ?? '';
   const checkActive = isActive(pathname);
   const appName = usePublicAppName();
+  const tNav = useTranslations('UserManagement.nav');
+  const tSidebar = useTranslations('UserManagement.sidebar');
+
+  const navLabel = (title: string) => {
+    const key = userManagementNavTitleKey(title);
+    return key ? tNav(key) : title;
+  };
 
   return (
     <aside className="flex min-h-0 w-[260px] shrink-0 flex-col self-stretch border-r border-[var(--trade-border)] bg-[var(--trade-panel)]">
@@ -97,11 +108,16 @@ export function UserManagementSidebar() {
       </Link>
       <nav
         className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto px-2 py-3 text-[var(--trade-text)]"
-        aria-label="User management"
+        aria-label={tSidebar('ariaLabel')}
       >
         <div className="flex flex-col gap-0.5">
           {userManagementNavPrimary.map((item) => (
-            <NavRow key={item.url} item={item} active={checkActive(item)} />
+            <NavRow
+              key={item.url}
+              item={item}
+              active={checkActive(item)}
+              label={navLabel(item.title)}
+            />
           ))}
         </div>
         {userManagementNavSecondary.length > 0 ? (
@@ -112,7 +128,12 @@ export function UserManagementSidebar() {
             />
             <div className="flex flex-col gap-0.5">
               {userManagementNavSecondary.map((item) => (
-                <NavRow key={item.url} item={item} active={checkActive(item)} />
+                <NavRow
+                  key={item.url}
+                  item={item}
+                  active={checkActive(item)}
+                  label={navLabel(item.title)}
+                />
               ))}
             </div>
           </>

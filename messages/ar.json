@@ -1,0 +1,371 @@
+{
+  "Landing": {
+    "hero": {
+      "titleLine1": "إعادة تعريف",
+      "titleLine2": "طريقة تداولك",
+      "description": "ادخل عالم التداول العالمي مع إمكانية الوصول إلى عقود الفروقات على فئات الأصول الرائدة. استمتع بتداول بدون عمولة، وتنفيذ سريع، وواجهة بديهية مصممة لكل مستوى من المتداولين.",
+      "createAccount": "إنشاء حساب",
+      "trade": "تداول"
+    },
+    "whyChooseUs": {
+      "title": "لماذا تختارنا؟",
+      "description": "من المتداولين المبتدئين إلى المتداولين ذوي الخبرة، توفر منصتنا المرونة والقوة التي تحتاجها. احصل على مئات أدوات عقود الفروقات بشروط مصممة لتعظيم تجربة التداول الخاصة بك."
+    },
+    "beginners": {
+      "title": "المبتدئون",
+      "bullet1": "حساب تجريبي بأموال افتراضية",
+      "bullet2": "موارد تعليمية وكتب إلكترونية",
+      "bullet3": "مساعدة من مدير حسابك",
+      "cta": "ابدأ التعلم"
+    },
+    "experienced": {
+      "title": "المتداولون ذوو الخبرة",
+      "bullet1": "الوصول إلى ميزات المنصة المتقدمة",
+      "bullet2": "أدوات للتحليل الفني والأساسي",
+      "bullet3": "تحليل الرسوم البيانية ومراقبة اتجاهات السوق",
+      "cta": "ترقية الأدوات"
+    },
+    "markets": {
+      "title": "استكشف الأسواق العالمية",
+      "currencies": {
+        "title": "العملات",
+        "category": "صرف أجنبي",
+        "alt": "رموز عملات دولية بلمسة معدنية أنيقة"
+      },
+      "stocks": {
+        "title": "الأسهم",
+        "category": "أسهم",
+        "alt": "تمثيل مفاهيمي لأسواق الأسهم العالمية"
+      },
+      "commodities": {
+        "title": "السلع",
+        "category": "أصول ملموسة",
+        "alt": "سبائك ذهب ونفط في إعداد يشبه المتحف"
+      },
+      "crypto": {
+        "title": "العملات المشفرة",
+        "category": "أصول رقمية",
+        "alt": "تمثيلات عملات رقمية مستقبلية في فضاء افتراضي"
+      },
+      "indices": {
+        "title": "المؤشرات",
+        "category": "سلال السوق",
+        "alt": "تصور بسيط للمؤشرات الاقتصادية العالمية"
+      }
+    },
+    "tradeOnYourTerms": {
+      "title": "تداول وفق شروطك",
+      "description": "منصتنا الجديدة تمنحك تحكماً كاملاً عبر سطح المكتب والجهاز اللوحي والهاتف. استمتع باتصال فوري بالسوق، وتنفيذ سريع للأوامر، وأدوات متقدمة تبقيك خطوة إلى الأمام.",
+      "join": "انضم إلى {appName}"
+    },
+    "confidence": {
+      "title": "حيث تلتقي الثقة بالوضوح",
+      "join": "انضم إلى {appName}"
+    },
+    "footer": {
+      "legal": "قانوني",
+      "aboutUs": "من نحن",
+      "contactUs": "اتصل بنا",
+      "customerService": "خدمة العملاء",
+      "companyInfo": "معلومات الشركة:",
+      "companyInfoBody": "يعمل موقع «كولباري» هذا بواسطة Valor Capital (PTY) Ltd، وهي شركة استثمار جنوب أفريقية مرخصة ومنظمة من قبل هيئة سلوك القطاع المالي في جنوب أفريقيا برخصة مزود خدمات مالية (FSP) رقم 51822 لتقديم خدمات الوساطة. Valor Capital (PTY) Ltd مسجلة في جنوب أفريقيا برقم التسجيل 2021/547363/07. المكتب المسجل لـ Valor Capital (PTY) Ltd يقع في 1 Edgemere Road Elfindale، كيب تاون، 7945، جنوب أفريقيا. Valor Capital (PTY) Ltd تملك وتشغل علامة «كولباري».",
+      "valorValueBridge": "Valor (PTY) Limited و Value Bridge Single Member Investment Services S.A لهما مساهم مشترك. Value Bridge Single Member Investment Services S.A، مسجلة في 43 Aiolou str.، الطابق الثالث، 10551، أثينا، اليونان، منظمة من قبل لجنة سوق رأس المال اليونانية برخصة رقم 6/927/31-8-2021.",
+      "dunfield": "Dunfield Ltd بعنوان مسجل Office No. 45, 9.17 Capital Tower, 91 Waterloo Road، لندن، المملكة المتحدة SE1 8RT هي وكيل الدفع لـ Valor Capital Ltd.",
+      "riskWarningLabel": "تحذير المخاطر:",
+      "riskWarningBody": "عقود الفروقات («CFDs») منتج مالي معقد بطابع مضاربي، وتداوله ينطوي على مخاطر كبيرة لخسارة رأس المال. قد يؤدي تداول عقود الفروقات، وهو منتج هامشي، إلى خسارة رصيدك بالكامل. تذكر أن الرافعة المالية في عقود الفروقات قد تعمل لصالحك وضدك. متداولو عقود الفروقات لا يملكون الأصول الأساسية ولا حقوقاً فيها. التداول غير مناسب لجميع المستثمرين. الأداء السابق لا يشكل مؤشراً موثوقاً على النتائج المستقبلية. قبل التداول، راجع أهدافك ومستوى خبرتك وتحملك للمخاطر ولا تودع أكثر مما أنت مستعد لخسارته.",
+      "antiSpam": "تطبق Valor Capital (PTY) Ltd تدابير صارمة وفق لوائح مكافحة البريد العشوائي وتتجنب الإعلانات غير المرغوب فيها.",
+      "regionalRestrictionsLabel": "قيود إقليمية:",
+      "regionalRestrictionsBody": "لا تقدم Valor Capital (PTY) Ltd خدماتها داخل المنطقة الاقتصادية الأوروبية وفي بعض الولايات القضائية الأخرى مثل الولايات المتحدة وكولومبيا البريطانية وكندا وإيران وكوريا الشمالية وميانمار وروسيا ومناطق أخرى.",
+      "adviserNotice": "لا تصدر Valor Capital (PTY) Ltd نصائح أو توصيات أو آراءً بشأن اقتناء أو الاحتفاظ أو التخلص من أي منتج مالي. Valor Capital (PTY) Ltd ليست مستشاراً مالياً.",
+      "riskWarningShortLabel": "تحذير المخاطر",
+      "riskWarningShortBody": "ينطوي تداول عقود الفروقات على مستوى عالٍ من المخاطر على رأس مالك بسبب تقلبات السوق الأساسي. قد لا تكون هذه المنتجات مناسبة لجميع المستثمرين. تأكد من فهم المخاطر واطلب المشورة من مستشار مالي مستقل ومرخص.",
+      "copyright": "© 2026 {appName}. جميع الحقوق محفوظة."
+    }
+  },
+  "LandingHeader": {
+    "signUp": "التسجيل",
+    "logIn": "تسجيل الدخول",
+    "trade": "تداول",
+    "selectLanguage": "اختر اللغة",
+    "menus": {
+      "markets": "الأسواق",
+      "learning": "التعلم",
+      "account": "الحساب",
+      "cryptocurrencies": "العملات المشفرة",
+      "currencies": "العملات",
+      "stocks": "الأسهم",
+      "commodities": "السلع",
+      "indices": "المؤشرات",
+      "education": "التعليم",
+      "economicCalendar": "التقويم الاقتصادي",
+      "cfds": "عقود الفروقات",
+      "marketMovers": "محركو السوق",
+      "tradingPitfalls": "مخاطر التداول",
+      "smartTrading": "التداول الذكي",
+      "technicalFundamental": "التحليل الفني والأساسي",
+      "glossary": "المعجم",
+      "nfp": "NFP",
+      "accountTypes": "أنواع الحسابات",
+      "assetsCalculator": "حاسبة الأصول",
+      "aboutUs": "من نحن",
+      "faqs": "الأسئلة الشائعة – منصة التداول"
+    }
+  },
+  "Language": {
+    "en": "English",
+    "ar": "العربية"
+  },
+  "Common": {
+    "selectLanguage": "اختر اللغة",
+    "toggleTheme": "تبديل السمة",
+    "loading": "جاري التحميل…"
+  },
+  "Trade": {
+    "metadataTitle": "تداول",
+    "nav": {
+      "trade": "تداول",
+      "institutional": "مؤسسي",
+      "plans": "الخطط",
+      "props": "التحديات",
+      "dashboard": "لوحة التحكم",
+      "account": "الحساب",
+      "overview": "نظرة عامة",
+      "institutionalAdmin": "مؤسسي - إدارة",
+      "users": "المستخدمون",
+      "markets": "الأسواق",
+      "investmentsAdmin": "الاستثمارات - إدارة",
+      "kycRequests": "طلبات KYC",
+      "depositRequest": "طلب إيداع",
+      "settings": "الإعدادات",
+      "withdrawals": "السحوبات"
+    },
+    "header": {
+      "tradeRoom": "غرفة التداول",
+      "balanceTitle": "الرصيد (تداول · {type})",
+      "balanceTypeSelector": "اختيار نوع الرصيد",
+      "connected": "متصل",
+      "balanceReal": "حقيقي",
+      "balanceDemo": "تجريبي",
+      "balanceInstitutional": "مؤسسي"
+    },
+    "markets": {
+      "favorites": "المفضلة",
+      "topMovers": "الأكثر تحركاً",
+      "search": "بحث",
+      "symbolPlaceholder": "الرمز",
+      "popular": "شائع",
+      "advancedOrder": "أمر متقدم",
+      "info": "معلومات",
+      "favorite": "مفضلة",
+      "institutionalOrdersNote": "يمكن للمسؤولين فقط وضع أوامر مؤسسية."
+    },
+    "order": {
+      "selectSymbol": "اختر رمزاً للتداول",
+      "sell": "بيع",
+      "buy": "شراء",
+      "sellTitle": "بيع عند {price} (عرض)",
+      "buyTitle": "شراء عند {price} (طلب)",
+      "lots": "لوت",
+      "advancedOrder": "أمر متقدم"
+    },
+    "chart": {
+      "trade": "تداول"
+    },
+    "positions": {
+      "open": "الصفقات المفتوحة",
+      "pending": "الأوامر المعلقة",
+      "closed": "الصفقات المغلقة",
+      "finance": "المالية",
+      "loading": "جاري تحميل صفقات غرفة التداول...",
+      "empty": "لا توجد صفقات. ستظهر هنا عند بدء التداول.",
+      "emptyPage": "لا توجد صفقات في هذه الصفحة.",
+      "type": "النوع",
+      "market": "السوق",
+      "quantity": "الكمية",
+      "execPrice": "سعر التنفيذ",
+      "closedPrice": "سعر الإغلاق",
+      "takeProfit": "جني الأرباح",
+      "stopLoss": "وقف الخسارة",
+      "value": "القيمة",
+      "pnl": "الربح/الخسارة",
+      "status": "الحالة",
+      "date": "التاريخ",
+      "closed": "مغلق",
+      "close": "إغلاق",
+      "closePosition": "إغلاق الصفقة",
+      "closePositionConfirm": "إغلاق صفقة {type} لـ {symbol}؟ لا يمكن التراجع عن هذا الإجراء.",
+      "closePositionAction": "إغلاق الصفقة",
+      "cancel": "إلغاء"
+    },
+    "finance": {
+      "title": "نظرة على الحساب",
+      "description": "وضعك المالي الحالي ومعلومات الهامش",
+      "balance": "الرصيد",
+      "usedMargin": "الهامش المستخدم",
+      "equity": "حقوق الملكية",
+      "freeMargin": "الهامش الحر",
+      "marginLevel": "مستوى الهامش"
+    },
+    "news": {
+      "news": "الأخبار",
+      "calendar": "التقويم",
+      "market": "السوق",
+      "info": "معلومات",
+      "symbolInfo": "معلومات الرمز",
+      "sessionOverview": "نظرة على الجلسة (تجريبي)",
+      "sessionBody": "مؤشر تقلب الفوركس محايد. العقود الآجلة للأسهم خضراء قليلاً. العملات المشفرة ثابتة.",
+      "digits": "الخانات",
+      "contract": "العقد",
+      "spreadTyp": "السبريد (تقريبي)",
+      "swapLong": "سواب شراء",
+      "swapShort": "سواب بيع",
+      "margin": "الهامش",
+      "mockSpecs": "مواصفات عقد تجريبية للمعاينة.",
+      "impactHigh": "عالي",
+      "impactMedium": "متوسط",
+      "impactLow": "منخفض"
+    }
+  },
+  "Investments": {
+    "title": "الاستثمارات",
+    "subtitle": "اكتشف وأدر فرص الاستثمار الخاصة بك",
+    "realBalanceLabel": "الرصيد الحقيقي · الهامش الحر",
+    "totalInvested": "إجمالي المستثمر",
+    "expectedReturns": "العوائد المتوقعة",
+    "activeInvestments": "الاستثمارات النشطة",
+    "acrossInvestments": "عبر {count} استثمارات",
+    "acrossOneInvestment": "استثمار واحد",
+    "noActiveInvestments": "لا توجد استثمارات نشطة",
+    "projectedAtMaturity": "متوقع عند الاستحقاق",
+    "projectedEarnings": "أرباح متوقعة",
+    "currentlyRunning": "قيد التشغيل حالياً",
+    "tabAvailable": "الاستثمارات المتاحة",
+    "tabMyInvestments": "استثماراتي",
+    "tabTransactions": "المعاملات",
+    "searchPlaceholder": "البحث في الاستثمارات...",
+    "riskLevel": "مستوى المخاطر",
+    "allRiskLevels": "جميع مستويات المخاطر",
+    "lowRisk": "مخاطر منخفضة",
+    "mediumRisk": "مخاطر متوسطة",
+    "highRisk": "مخاطر عالية",
+    "country": "البلد",
+    "allCountries": "جميع البلدان",
+    "noInvestmentsAvailable": "لا توجد استثمارات متاحة",
+    "checkBackLater": "تحقق لاحقاً من فرص استثمار جديدة.",
+    "noInvestmentsYet": "لا توجد استثمارات بعد",
+    "startInvesting": "ابدأ الاستثمار لرؤية محفظتك هنا.",
+    "browseInvestments": "تصفح الاستثمارات",
+    "tryAgain": "حاول مرة أخرى",
+    "loadError": "فشل تحميل بيانات الاستثمار"
+  },
+  "Overview": {
+    "title": "نظرة عامة",
+    "welcome": "مرحباً بعودتك، {name}. المحفظة والهوامش عبر جميع الحسابات.",
+    "refresh": "تحديث",
+    "loadError": "فشل تحميل بيانات لوحة التحكم"
+  },
+  "Institutional": {
+    "title": "مؤسسي",
+    "subtitleWithMarket": "رسم بياني وتنفيذ مؤسسي لـ {symbol} - {name}",
+    "subtitleDefault": "غرفة مؤسسية برصيد مؤسسي وصفقات."
+  },
+  "UserManagement": {
+    "nav": {
+      "dashboard": "لوحة التحكم",
+      "deposit": "إيداع",
+      "transfer": "تحويل",
+      "withdrawal": "سحب",
+      "settings": "الإعدادات",
+      "kyc": "التحقق من الهوية"
+    },
+    "sidebar": {
+      "ariaLabel": "إدارة المستخدم"
+    },
+    "dashboard": {
+      "title": "لوحة التحكم",
+      "accountSettings": "إعدادات الحساب >",
+      "transactionHistory": "سجل المعاملات",
+      "viewAll": "عرض الكل >",
+      "signInBalances": "سجّل الدخول لعرض الأرصدة.",
+      "signInTransactions": "سجّل الدخول لعرض المعاملات.",
+      "loadBalancesError": "تعذر تحميل أرصدة الحساب.",
+      "loadTransactionsError": "تعذر تحميل المعاملات.",
+      "loadingTransactions": "جاري تحميل المعاملات…",
+      "noTransactions": "لا توجد إيداعات أو سحوبات حديثة على محفظتك الحقيقية.",
+      "balance": "الرصيد",
+      "equity": "حقوق الملكية",
+      "freeMargin": "الهامش الحر",
+      "leverage": "رافعة",
+      "tableType": "النوع",
+      "tableDescription": "الوصف",
+      "tableAmount": "المبلغ",
+      "tableWallet": "المحفظة",
+      "tableDate": "التاريخ",
+      "txGain": "ربح",
+      "txInvestmentGain": "ربح استثمار",
+      "txLoss": "خسارة",
+      "txDeposit": "إيداع",
+      "txWithdraw": "سحب",
+      "txTransferIn": "تحويل وارد",
+      "txTransferOut": "تحويل صادر",
+      "walletReal": "حقيقي",
+      "walletDemo": "تجريبي",
+      "walletInstitutional": "مؤسسي"
+    },
+    "deposit": {
+      "title": "إيداع",
+      "description": "أضف أموالاً عبر NOWPayments أو تحويل USDT يدوي. تُضاف المبالغ إلى رصيدك الحقيقي بالدولار بعد التأكيد.",
+      "stepAmount": "المبلغ",
+      "stepPayment": "طريقة الدفع",
+      "stepReview": "مراجعة"
+    },
+    "withdrawal": {
+      "title": "سحب",
+      "description": "أرسل الأموال من رصيدك الحقيقي كـ BTC أو USDC أو USDT إلى عنوان خارجي. المبالغ بالدولار الأمريكي.",
+      "stepAmount": "المبلغ",
+      "stepCrypto": "العملة والعنوان",
+      "stepReview": "مراجعة"
+    },
+    "transfer": {
+      "title": "تحويل",
+      "description": "انقل الأموال بين أرصدة REAL و INSTITUTIONAL في حسابك.",
+      "betweenBalances": "بين أرصدتك",
+      "betweenBalancesHint": "حوّل فوراً بين محافظ REAL و INSTITUTIONAL في حسابك.",
+      "transferActivity": "نشاط التحويل",
+      "transferActivityHint": "إدخالات التحويل الوارد والصادر لمحافظ REAL و INSTITUTIONAL.",
+      "signInTransfers": "سجّل الدخول لعرض نشاط التحويل.",
+      "loadTransfersError": "تعذر تحميل معاملات التحويل.",
+      "refresh": "تحديث",
+      "noTransfers": "لا توجد معاملات تحويل بعد.",
+      "tableType": "النوع",
+      "tableDescription": "الوصف",
+      "tableAmount": "المبلغ",
+      "tableWallet": "المحفظة",
+      "tableDate": "التاريخ",
+      "tableNote": "ملاحظة",
+      "transferIn": "تحويل وارد",
+      "transferOut": "تحويل صادر"
+    },
+    "settings": {
+      "title": "الإعدادات",
+      "description": "إدارة ملفك الشخصي والعنوان وإعدادات الأمان.",
+      "loading": "جاري تحميل الإعدادات…"
+    },
+    "kyc": {
+      "title": "التحقق من الهوية",
+      "description": "قدّم وثائق الهوية للتحقق من حسابك.",
+      "loading": "جاري تحميل KYC…"
+    },
+    "section": {
+      "comingSoon": "المحتوى قريباً."
+    },
+    "shared": {
+      "next": "التالي",
+      "back": "رجوع",
+      "submit": "إرسال",
+      "cancel": "إلغاء",
+      "real": "حقيقي",
+      "progress": "التقدم"
+    }
+  }
+}

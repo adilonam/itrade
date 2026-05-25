@@ -12,6 +12,8 @@ import {
 } from '@tabler/icons-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
+import { UserManagementPageHeader } from '@/components/user-management/user-management-page-header';
 import {
   Collapsible,
   CollapsibleContent,
@@ -66,6 +68,7 @@ type ProfileUser = {
 };
 
 export function UserManagementSettingsPage() {
+  const t = useTranslations('UserManagement.settings');
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<ProfileUser | null>(null);
 
@@ -238,21 +241,14 @@ export function UserManagementSettingsPage() {
     return (
       <div className="flex flex-1 items-center justify-center gap-2 p-12 text-[var(--trade-text-muted)]">
         <IconLoader2 className="size-6 animate-spin" />
-        Loading settings…
+        {t('loading')}
       </div>
     );
   }
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-auto">
-      <header className="shrink-0 border-b border-[var(--trade-border)] bg-[var(--trade-panel)] px-6 py-4">
-        <h1 className="text-base font-semibold text-[var(--trade-text)]">
-          Settings
-        </h1>
-        <p className="mt-1 text-sm text-[var(--trade-text-muted)]">
-          Manage your profile, address, and security settings.
-        </p>
-      </header>
+      <UserManagementPageHeader title={t('title')} description={t('description')} />
 
       <div className="flex flex-1 flex-col gap-6 p-6">
         <div className="mx-auto w-full max-w-3xl space-y-4">

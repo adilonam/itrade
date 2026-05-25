@@ -12,15 +12,17 @@ const WatchTraderPortalContext = createContext<HTMLDivElement | null>(null);
 
 export function WatchTraderShellWithPortal({
   children,
-  className
+  className,
+  dir
 }: {
   children: ReactNode;
   className?: string;
+  dir?: 'ltr' | 'rtl';
 }) {
   const [shell, setShell] = useState<HTMLDivElement | null>(null);
   return (
     <WatchTraderPortalContext.Provider value={shell}>
-      <div ref={setShell} className={cn(className)}>
+      <div ref={setShell} className={cn(className)} dir={dir}>
         {children}
       </div>
     </WatchTraderPortalContext.Provider>

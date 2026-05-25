@@ -3,7 +3,8 @@
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { IconLoader2 } from '@tabler/icons-react';
-import { ModeToggle } from '@/components/layout/ThemeToggle/theme-toggle';
+import { useTranslations } from 'next-intl';
+import { UserManagementPageHeader } from '@/components/user-management/user-management-page-header';
 import { cn } from '@/lib/utils';
 import type { FinancialSnapshot } from '@/components/dashboard/dashboard-overview-trade-analytics';
 
@@ -31,35 +32,41 @@ const fmtUsd = (n: number) =>
     maximumFractionDigits: 2
   }).format(n);
 
-function txTypeLabel(type: ApiTransaction['type']) {
+function txTypeLabel(
+  type: ApiTransaction['type'],
+  t: ReturnType<typeof useTranslations<'UserManagement.dashboard'>>
+) {
   switch (type) {
     case 'GAIN':
-      return 'Gain';
+      return t('txGain');
     case 'INVESTMENT_GAIN':
-      return 'Investment gain';
+      return t('txInvestmentGain');
     case 'LOSS':
-      return 'Loss';
+      return t('txLoss');
     case 'DEPOSIT':
-      return 'Deposit';
+      return t('txDeposit');
     case 'WITHDRAW':
-      return 'Withdraw';
+      return t('txWithdraw');
     case 'TRANSFER_IN':
-      return 'Transfer in';
+      return t('txTransferIn');
     case 'TRANSFER_OUT':
-      return 'Transfer out';
+      return t('txTransferOut');
     default:
       return type;
   }
 }
 
-function walletLabel(balanceType: ApiTransaction['balanceType']) {
+function walletLabel(
+  balanceType: ApiTransaction['balanceType'],
+  t: ReturnType<typeof useTranslations<'UserManagement.dashboard'>>
+) {
   switch (balanceType) {
     case 'REAL':
-      return 'Real';
+      return t('walletReal');
     case 'DEMO':
-      return 'Demo';
+      return t('walletDemo');
     case 'INSTITUTIONAL':
-      return 'Institutional';
+      return t('walletInstitutional');
     default:
       return balanceType;
   }
@@ -155,23 +162,28 @@ function BalanceCardsSkeleton() {
 function AccountBalanceRow({
   financial,
   accountLabel,
-  ghost
+  ghost,
+  t
 }: {
   financial: FinancialSnapshot;
   accountLabel: string;
   ghost: string;
+  t: ReturnType<typeof useTranslations<'UserManagement.dashboard'>>;
 }) {
   return (
     <BalanceCard
       accountLabel={accountLabel}
-      balanceLabel="Balance"
+      balanceLabel={t('balance')}
       balanceFormatted={fmtUsd(financial.balance)}
       ghost={ghost}
       footer={
         <div className="flex flex-col gap-1">
-          <span>Equity {fmtUsd(financial.equity)}</span>
+          <span>
+            {t('equity')} {fmtUsd(financial.equity)}
+          </span>
           <span className="opacity-90">
-            Free margin {fmtUsd(financial.freeMargin)} · Lev {financial.leverage}×
+            {t('freeMargin')} {fmtUsd(financial.freeMargin)} · {t('leverage')}{' '}
+            {financial.leverage}×
           </span>
         </div>
       }
@@ -180,6 +192,7 @@ function AccountBalanceRow({
 }
 
 export function UserManagementPanelControl() {
+  const t = useTranslations('UserManagement.dashboard');
   const [financialReal, setFinancialReal] = useState<FinancialSnapshot | null>(
     null
   );
@@ -202,7 +215,7 @@ export function UserManagementPanelControl() {
         '/api/user/transactions?limit=8&page=1&balanceType=REAL&types=DEPOSIT,WITHDRAW'
       );
       if (res.status === 401) {
-        setTxError('Sign in to view transactions.');
+        setTxError(t('signInTransactions'));
         setTransactions([]);
         return;
       }
@@ -212,12 +225,12 @@ export function UserManagementPanelControl() {
       const data = (await res.json()) as { transactions?: ApiTransaction[] };
       setTransactions(data.transactions ?? []);
     } catch {
-      setTxError('Could not load transactions.');
+      setTxError(t('loadTransactionsError'));
       setTransactions([]);
     } finally {
       setTxLoading(false);
     }
-  }, []);
+  }, [t]);
 
   const loadBalances = useCallback(async () => {
     try {
@@ -231,7 +244,7 @@ export function UserManagementPanelControl() {
       ]);
 
       if (realRes.status === 401 || demoRes.status === 401 || institutionalRes.status === 401) {
-        setError('Sign in to view balances.');
+        setError(t('signInBalances'));
         setFinancialReal(null);
         setFinancialDemo(null);
         setFinancialInstitutional(null);
@@ -252,14 +265,14 @@ export function UserManagementPanelControl() {
       setFinancialDemo(demo);
       setFinancialInstitutional(institutional);
     } catch {
-      setError('Could not load account balances.');
+      setError(t('loadBalancesError'));
       setFinancialReal(null);
       setFinancialDemo(null);
       setFinancialInstitutional(null);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     void loadBalances();
@@ -274,12 +287,7 @@ export function UserManagementPanelControl() {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-auto">
-      <header className="flex h-14 shrink-0 items-center justify-between gap-3 border-b border-[var(--trade-border)] bg-[var(--trade-panel)] px-6">
-        <h1 className="text-base font-semibold text-[var(--trade-text)]">
-          Dashboard
-        </h1>
-        <ModeToggle />
-      </header>
+      <UserManagementPageHeader title={t('title')} compact />
 
       <div className="flex flex-1 flex-col gap-6 p-6">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
@@ -293,18 +301,21 @@ export function UserManagementPanelControl() {
               <div className="grid min-w-0 flex-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 <AccountBalanceRow
                   financial={financialReal}
-                  accountLabel="Real"
+                  accountLabel={t('walletReal')}
                   ghost="REAL"
+                  t={t}
                 />
                 <AccountBalanceRow
                   financial={financialDemo}
-                  accountLabel="Demo"
+                  accountLabel={t('walletDemo')}
                   ghost="DEMO"
+                  t={t}
                 />
                 <AccountBalanceRow
                   financial={financialInstitutional}
-                  accountLabel="Institutional"
+                  accountLabel={t('walletInstitutional')}
                   ghost="INST"
+                  t={t}
                 />
               </div>
             ) : null}
@@ -313,20 +324,20 @@ export function UserManagementPanelControl() {
             href="/user-management/settings"
             className="shrink-0 text-sm font-medium text-[var(--trade-accent-blue)] hover:underline"
           >
-            Account settings &gt;
+            {t('accountSettings')}
           </Link>
         </div>
 
         <section className="rounded-xl border border-[var(--trade-border)] bg-[var(--trade-panel)]">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--trade-border)] px-4 py-3">
             <h2 className="text-sm font-semibold text-[var(--trade-text)]">
-              Transaction history
+              {t('transactionHistory')}
             </h2>
             <Link
               href="/user-management/transaction-history"
               className="rounded-full bg-[var(--trade-border)]/50 px-3 py-1 text-xs font-medium text-[var(--trade-text)] hover:bg-[var(--trade-border)]"
             >
-              View all &gt;
+              {t('viewAll')}
             </Link>
           </div>
           {txError && (
@@ -338,11 +349,11 @@ export function UserManagementPanelControl() {
             <table className="w-full min-w-[640px] text-left text-sm">
               <thead>
                 <tr className="border-b border-[var(--trade-border)] text-xs text-[var(--trade-text-muted)]">
-                  <th className="px-4 py-3 font-medium">Type</th>
-                  <th className="px-4 py-3 font-medium">Description</th>
-                  <th className="px-4 py-3 font-medium">Amount</th>
-                  <th className="px-4 py-3 font-medium">Wallet</th>
-                  <th className="px-4 py-3 font-medium">Date</th>
+                  <th className="px-4 py-3 font-medium">{t('tableType')}</th>
+                  <th className="px-4 py-3 font-medium">{t('tableDescription')}</th>
+                  <th className="px-4 py-3 font-medium">{t('tableAmount')}</th>
+                  <th className="px-4 py-3 font-medium">{t('tableWallet')}</th>
+                  <th className="px-4 py-3 font-medium">{t('tableDate')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -357,7 +368,7 @@ export function UserManagementPanelControl() {
                           className="size-5 shrink-0 animate-spin"
                           aria-hidden
                         />
-                        Loading transactions…
+                        {t('loadingTransactions')}
                       </span>
                     </td>
                   </tr>
@@ -367,7 +378,7 @@ export function UserManagementPanelControl() {
                       colSpan={5}
                       className="px-4 py-8 text-center text-[var(--trade-text-muted)]"
                     >
-                      No recent deposits or withdrawals on your real wallet.
+                      {t('noTransactions')}
                     </td>
                   </tr>
                 ) : (
@@ -377,7 +388,7 @@ export function UserManagementPanelControl() {
                       className="border-b border-[var(--trade-border)]/80 last:border-0"
                     >
                       <td className="px-4 py-3 text-[var(--trade-text)]">
-                        {txTypeLabel(row.type)}
+                        {txTypeLabel(row.type, t)}
                       </td>
                       <td className="max-w-[220px] truncate px-4 py-3 text-[var(--trade-text)]">
                         {row.description?.trim() || '—'}
@@ -391,7 +402,7 @@ export function UserManagementPanelControl() {
                         {formatTxAmount(row.absoluteAmount, row.type)}
                       </td>
                       <td className="px-4 py-3 text-[var(--trade-text-muted)]">
-                        {walletLabel(row.balanceType)}
+                        {walletLabel(row.balanceType, t)}
                       </td>
                       <td className="whitespace-nowrap px-4 py-3 text-xs text-[var(--trade-text-muted)]">
                         {formatTxDate(row.createdAt)}

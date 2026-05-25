@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Card } from '@/components/ui/card';
 import { UserPositionsTableCardRoomTrading } from '@/components/user/positions/user-positions-table-room-trading';
@@ -17,6 +18,7 @@ type PanelLayout = 'trade-panel' | 'standalone-card';
 type FinancialRoomParam = 'TRADING' | 'INSTITUTIONAL' | 'STOCK';
 
 function RoomFinanceTabContent({ room }: { room: FinancialRoomParam }) {
+  const t = useTranslations('Common');
   const [data, setData] = useState<{
     balance: number;
     usedMargin: number;
@@ -49,7 +51,7 @@ function RoomFinanceTabContent({ room }: { room: FinancialRoomParam }) {
 
   if (!hydrated) {
     return (
-      <p className="p-4 text-sm text-[var(--trade-text-muted)]">Loading…</p>
+      <p className="p-4 text-sm text-[var(--trade-text-muted)]">{t('loading')}</p>
     );
   }
   const effective = data ?? {
@@ -90,6 +92,7 @@ export function UserRoomPositionsTabsPanel({
   className,
   showFinanceTab = true
 }: UserRoomPositionsTabsPanelProps) {
+  const t = useTranslations('Trade.positions');
   const [activeTab, setActiveTab] = useState<
     'open' | 'pending' | 'closed' | 'finance'
   >('open');
@@ -110,17 +113,17 @@ export function UserRoomPositionsTabsPanel({
       <div className="flex shrink-0 items-center border-b border-[var(--trade-border)] px-4 py-2">
         <TabsList className="h-10 gap-0 rounded-none border-0 bg-transparent p-0">
           <TabsTrigger value="open" className={TAB_TRIGGER_CLASS}>
-            Open Positions
+            {t('open')}
           </TabsTrigger>
           <TabsTrigger value="pending" className={TAB_TRIGGER_CLASS}>
-            Pending Orders
+            {t('pending')}
           </TabsTrigger>
           <TabsTrigger value="closed" className={TAB_TRIGGER_CLASS}>
-            Closed Positions
+            {t('closed')}
           </TabsTrigger>
           {showFinanceTab ? (
             <TabsTrigger value="finance" className={TAB_TRIGGER_CLASS}>
-              Finance
+              {t('finance')}
             </TabsTrigger>
           ) : null}
         </TabsList>

@@ -1,3 +1,5 @@
+'use client';
+
 import {
   Card,
   CardContent,
@@ -7,6 +9,7 @@ import {
 } from '@/components/ui/card';
 import { TRADE_ROOM_CARD_CLASS } from '@/constants/trade-room-ui';
 import { cn } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
 
 interface UserFinanceCardProps {
   balance: number;
@@ -24,6 +27,7 @@ export function UserFinanceCard({
   showMarginLevel = true,
   variant = 'default'
 }: UserFinanceCardProps) {
+  const t = useTranslations('Trade.finance');
   const calculatedEquity = equity ?? balance;
   const freeMargin = calculatedEquity - usedMargin;
   const marginLevel =
@@ -65,7 +69,7 @@ export function UserFinanceCard({
             isTrade && 'text-xs font-semibold leading-tight text-[var(--trade-text)] sm:text-sm'
           )}
         >
-          Account Overview
+          {isTrade ? t('title') : 'Account Overview'}
         </CardTitle>
         <CardDescription
           className={cn(
@@ -73,7 +77,9 @@ export function UserFinanceCard({
               'text-[11px] leading-snug text-[var(--trade-text-muted)] sm:text-xs'
           )}
         >
-          Your current financial status and margin information
+          {isTrade
+            ? t('description')
+            : 'Your current financial status and margin information'}
         </CardDescription>
       </CardHeader>
       <CardContent className={cn(isTrade && 'px-3 pb-0 pt-2')}>
@@ -92,7 +98,7 @@ export function UserFinanceCard({
           )}
         >
           <div className={metricCellClass}>
-            <div className={labelClass}>Balance</div>
+            <div className={labelClass}>{isTrade ? t('balance') : 'Balance'}</div>
             <div
               className={cn(
                 valueBase,
@@ -104,7 +110,7 @@ export function UserFinanceCard({
           </div>
 
           <div className={metricCellClass}>
-            <div className={labelClass}>Used Margin</div>
+            <div className={labelClass}>{isTrade ? t('usedMargin') : 'Used Margin'}</div>
             <div
               className={cn(
                 valueBase,
@@ -116,7 +122,7 @@ export function UserFinanceCard({
           </div>
 
           <div className={metricCellClass}>
-            <div className={labelClass}>Equity</div>
+            <div className={labelClass}>{isTrade ? t('equity') : 'Equity'}</div>
             <div
               className={cn(
                 valueBase,
@@ -130,7 +136,7 @@ export function UserFinanceCard({
           </div>
 
           <div className={metricCellClass}>
-            <div className={labelClass}>Free Margin</div>
+            <div className={labelClass}>{isTrade ? t('freeMargin') : 'Free Margin'}</div>
             <div
               className={cn(
                 valueBase,
@@ -149,7 +155,7 @@ export function UserFinanceCard({
 
           {showMarginLevel && (
             <div className={cn('col-span-2 sm:col-span-1', metricCellClass)}>
-              <div className={labelClass}>Margin Level</div>
+              <div className={labelClass}>{isTrade ? t('marginLevel') : 'Margin Level'}</div>
               <div
                 className={cn(
                   valueBase,

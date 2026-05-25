@@ -30,6 +30,7 @@ import type {
   Investment,
   UserInvestment
 } from '@/lib/prisma/generated/client';
+import { useTranslations } from 'next-intl';
 
 type InvestmentFromApi = Investment & {
   _count?: { userInvestments: number };
@@ -82,6 +83,7 @@ function InvestmentsSkeleton() {
 }
 
 export default function InvestmentsPage() {
+  const t = useTranslations('Investments');
   const { data: session, status } = useSession();
   const router = useRouter();
   const [investments, setInvestments] = useState<InvestmentFromApi[]>([]);
@@ -120,13 +122,11 @@ export default function InvestmentsPage() {
       setUserInvestments(userInvestmentsData.userInvestments ?? []);
       setFinancial(financialData);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : 'Failed to load investment data'
-      );
+      setError(err instanceof Error ? err.message : t('loadError'));
     } finally {
       setLoading(false);
     }
-  }, [session?.user?.id]);
+  }, [session?.user?.id, t]);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -169,7 +169,7 @@ export default function InvestmentsPage() {
           <CardContent className='flex flex-col items-center justify-center py-12 text-center'>
             <p className='text-destructive text-sm font-medium'>{error}</p>
             <Button className='mt-4' onClick={() => loadData()}>
-              Try again
+              {t('tryAgain')}
             </Button>
           </CardContent>
         </Card>
@@ -184,16 +184,16 @@ export default function InvestmentsPage() {
         <div className='flex items-start justify-between gap-4'>
           <div>
             <h1 className='text-2xl font-bold tracking-tight text-[var(--trade-text)]'>
-              Investments
+              {t('title')}
             </h1>
             <p className='text-xs text-[var(--trade-text-muted)]'>
-              Discover and manage your investment opportunities
+              {t('subtitle')}
             </p>
           </div>
           <div className='flex items-start space-x-3'>
             <div className='text-right'>
               <p className='text-xs text-[var(--trade-text-muted)]'>
-                Real balance · free margin
+                {t('realBalanceLabel')}
               </p>
               <p className='font-mono text-sm font-bold text-[var(--trade-green)]'>
                 {currencyFormatter.format(realFreeMargin)}
@@ -210,7 +210,7 @@ export default function InvestmentsPage() {
           <Card className={tradeRoomCardClass}>
             <CardHeader className='flex flex-row items-center justify-between space-y-0 px-4 pb-2 pt-0'>
               <CardTitle className='text-sm font-semibold'>
-                Total Invested
+                {t('totalInvested')}
               </CardTitle>
               <div className='rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)]/40 p-2'>
                 <IconPigMoney className='h-4 w-4 text-[var(--trade-accent-blue)]' />
@@ -222,15 +222,17 @@ export default function InvestmentsPage() {
               </p>
               <p className='text-xs text-[var(--trade-text-muted)]'>
                 {userStats.activeInvestments > 0
-                  ? `Across ${userStats.activeInvestments} investment${userStats.activeInvestments > 1 ? 's' : ''}`
-                  : 'No active investments'}
+                  ? userStats.activeInvestments > 1
+                    ? t('acrossInvestments', { count: userStats.activeInvestments })
+                    : t('acrossOneInvestment')
+                  : t('noActiveInvestments')}
               </p>
             </CardContent>
           </Card>
           <Card className={tradeRoomCardClass}>
             <CardHeader className='flex flex-row items-center justify-between space-y-0 px-4 pb-2 pt-0'>
               <CardTitle className='text-sm font-semibold'>
-                Expected Returns
+                {t('expectedReturns')}
               </CardTitle>
               <div className='rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)]/40 p-2'>
                 <IconTrendingUp className='h-4 w-4 text-[var(--trade-green)]' />
@@ -249,15 +251,15 @@ export default function InvestmentsPage() {
               </p>
               <p className='text-xs text-[var(--trade-text-muted)]'>
                 {userStats.totalInvested > 0
-                  ? 'Projected at maturity'
-                  : 'Projected earnings'}
+                  ? t('projectedAtMaturity')
+                  : t('projectedEarnings')}
               </p>
             </CardContent>
           </Card>
           <Card className={tradeRoomCardClass}>
             <CardHeader className='flex flex-row items-center justify-between space-y-0 px-4 pb-2 pt-0'>
               <CardTitle className='text-sm font-semibold'>
-                Active Investments
+                {t('activeInvestments')}
               </CardTitle>
               <div className='rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)]/40 p-2'>
                 <IconCalendar className='h-4 w-4 text-[var(--trade-text-muted)]' />
@@ -268,11 +270,9 @@ export default function InvestmentsPage() {
                 {userStats.activeInvestments}
               </p>
               <p className='text-xs text-[var(--trade-text-muted)]'>
-                {userStats.activeInvestments === 1
-                  ? 'Currently running'
-                  : userStats.activeInvestments > 1
-                    ? 'Currently running'
-                    : 'No active investments'}
+                {userStats.activeInvestments > 0
+                  ? t('currentlyRunning')
+                  : t('noActiveInvestments')}
               </p>
             </CardContent>
           </Card>
@@ -284,19 +284,19 @@ export default function InvestmentsPage() {
               value='available'
               className='data-[state=active]:bg-[var(--trade-dark)]/40 data-[state=active]:text-[var(--trade-text)]'
             >
-              Available Investments
+              {t('tabAvailable')}
             </TabsTrigger>
             <TabsTrigger
               value='my-investments'
               className='data-[state=active]:bg-[var(--trade-dark)]/40 data-[state=active]:text-[var(--trade-text)]'
             >
-              My Investments
+              {t('tabMyInvestments')}
             </TabsTrigger>
             <TabsTrigger
               value='transactions'
               className='data-[state=active]:bg-[var(--trade-dark)]/40 data-[state=active]:text-[var(--trade-text)]'
             >
-              Transactions
+              {t('tabTransactions')}
             </TabsTrigger>
           </TabsList>
 
@@ -309,7 +309,7 @@ export default function InvestmentsPage() {
                     <div className='relative'>
                       <IconSearch className='absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-[var(--trade-text-muted)]' />
                       <Input
-                        placeholder='Search investments...'
+                        placeholder={t('searchPlaceholder')}
                         className='border-[var(--trade-border)] bg-[var(--trade-dark)]/40 pl-10 text-sm text-[var(--trade-text)] placeholder:text-[var(--trade-text-muted)]'
                       />
                     </div>
@@ -317,21 +317,21 @@ export default function InvestmentsPage() {
                   <Select>
                     <SelectTrigger className='w-full border-[var(--trade-border)] bg-[var(--trade-dark)]/40 text-sm text-[var(--trade-text)] md:w-[180px]'>
                       <IconFilter className='mr-2 h-4 w-4 text-[var(--trade-text-muted)]' />
-                      <SelectValue placeholder='Risk Level' />
+                      <SelectValue placeholder={t('riskLevel')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value='all'>All Risk Levels</SelectItem>
-                      <SelectItem value='LOW'>Low Risk</SelectItem>
-                      <SelectItem value='MEDIUM'>Medium Risk</SelectItem>
-                      <SelectItem value='HIGH'>High Risk</SelectItem>
+                      <SelectItem value='all'>{t('allRiskLevels')}</SelectItem>
+                      <SelectItem value='LOW'>{t('lowRisk')}</SelectItem>
+                      <SelectItem value='MEDIUM'>{t('mediumRisk')}</SelectItem>
+                      <SelectItem value='HIGH'>{t('highRisk')}</SelectItem>
                     </SelectContent>
                   </Select>
                   <Select>
                     <SelectTrigger className='w-full border-[var(--trade-border)] bg-[var(--trade-dark)]/40 text-sm text-[var(--trade-text)] md:w-[180px]'>
-                      <SelectValue placeholder='Country' />
+                      <SelectValue placeholder={t('country')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value='all'>All Countries</SelectItem>
+                      <SelectItem value='all'>{t('allCountries')}</SelectItem>
                       <SelectItem value='luxembourg'>Luxembourg</SelectItem>
                       <SelectItem value='switzerland'>Switzerland</SelectItem>
                       <SelectItem value='germany'>Germany</SelectItem>
@@ -358,10 +358,10 @@ export default function InvestmentsPage() {
                 <CardContent className='px-4 text-center'>
                   <IconPigMoney className='mx-auto mb-4 h-12 w-12 text-[var(--trade-text-muted)]/50' />
                   <h3 className='mb-2 text-sm font-semibold text-[var(--trade-text)]'>
-                    No investments available
+                    {t('noInvestmentsAvailable')}
                   </h3>
                   <p className='text-xs text-[var(--trade-text-muted)]'>
-                    Check back later for new investment opportunities.
+                    {t('checkBackLater')}
                   </p>
                 </CardContent>
               </Card>
@@ -385,13 +385,13 @@ export default function InvestmentsPage() {
                 <CardContent className='px-4 text-center'>
                   <IconCalendar className='mx-auto mb-4 h-12 w-12 text-[var(--trade-text-muted)]/50' />
                   <h3 className='mb-2 text-sm font-semibold text-[var(--trade-text)]'>
-                    No investments yet
+                    {t('noInvestmentsYet')}
                   </h3>
                   <p className='mb-4 text-xs text-[var(--trade-text-muted)]'>
-                    Start investing to see your portfolio here.
+                    {t('startInvesting')}
                   </p>
                   <Button onClick={() => router.push('/investments')}>
-                    Browse Investments
+                    {t('browseInvestments')}
                   </Button>
                 </CardContent>
               </Card>

@@ -1,6 +1,8 @@
 'use client';
 
+import Image from 'next/image';
 import { useState } from 'react';
+import { cn } from '@/lib/utils';
 
 type BrandLogoImageProps = {
   src: string;
@@ -13,14 +15,16 @@ export function BrandLogoImage({ src, alt, fallback, wrapperClassName }: BrandLo
   const [failed, setFailed] = useState(false);
 
   return (
-    <div className={wrapperClassName}>
+    <div className={cn('relative', wrapperClassName)}>
       {failed ? (
         <span className="font-mono text-xs text-[var(--trade-text-muted)]">{fallback}</span>
       ) : (
-        <img
+        <Image
           src={src}
           alt={alt}
-          className="absolute inset-0 box-border h-full w-full bg-white object-contain p-1.5"
+          fill
+          unoptimized
+          className="box-border bg-white object-contain p-1.5"
           onError={() => setFailed(true)}
         />
       )}

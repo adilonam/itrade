@@ -1,33 +1,28 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { BalanceTransferTransactionsList } from '@/components/user-management/balance-transfer-transactions-list';
 import { InstitutionalBalanceTransferCard } from '@/components/trading-view/institutional-balance-transfer-card';
+import { UserManagementPageHeader } from '@/components/user-management/user-management-page-header';
 
 export function UserManagementTransferPage() {
+  const t = useTranslations('UserManagement.transfer');
   const [transferHistoryKey, setTransferHistoryKey] = useState(0);
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-auto">
-      <header className="shrink-0 border-b border-[var(--trade-border)] bg-[var(--trade-panel)] px-6 py-4">
-        <h1 className="text-base font-semibold text-[var(--trade-text)]">
-          Transfer
-        </h1>
-        <p className="mt-1 text-sm text-[var(--trade-text-muted)]">
-          Move funds between your REAL and INSTITUTIONAL balances on your account.
-        </p>
-      </header>
+      <UserManagementPageHeader title={t('title')} description={t('description')} />
 
       <div className="flex flex-1 flex-col gap-6 p-6">
         <div className="mx-auto w-full max-w-3xl space-y-8">
           <section className="space-y-3">
             <div>
               <h2 className="text-sm font-semibold text-[var(--trade-text)]">
-                Between your balances
+                {t('betweenBalances')}
               </h2>
               <p className="mt-1 text-xs text-[var(--trade-text-muted)]">
-                Transfer instantly between REAL and INSTITUTIONAL wallets on your
-                account.
+                {t('betweenBalancesHint')}
               </p>
             </div>
             <InstitutionalBalanceTransferCard

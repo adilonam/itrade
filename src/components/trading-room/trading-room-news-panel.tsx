@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { MOCK_CALENDAR, MOCK_NEWS } from './mock-data';
@@ -21,6 +22,7 @@ export function TradingRoomNewsPanel({
   symbol = 'EURUSD',
   symbolFullName = 'Euro vs US Dollar'
 }: TradingRoomNewsPanelProps) {
+  const t = useTranslations('Trade.news');
   const [activeTab, setActiveTab] = useState<'news' | 'calendar' | 'market' | 'symbol'>('news');
 
   const shell =
@@ -50,39 +52,39 @@ export function TradingRoomNewsPanel({
           <TabsList className="h-full min-w-0 w-full justify-stretch gap-0 rounded-none border-0 bg-transparent p-0">
             <TabsTrigger
               value="news"
-              aria-label="News"
-              title="News"
+              aria-label={t('news')}
+              title={t('news')}
               className={tabTriggerClass}
             >
               <IconNews className="size-3.5 shrink-0 @[300px]/news-tabs:size-3" />
-              <span className={tabLabelClass}>News</span>
+              <span className={tabLabelClass}>{t('news')}</span>
             </TabsTrigger>
             <TabsTrigger
               value="calendar"
-              aria-label="Calendar"
-              title="Calendar"
+              aria-label={t('calendar')}
+              title={t('calendar')}
               className={tabTriggerClass}
             >
               <IconCalendar className="size-3.5 shrink-0 @[300px]/news-tabs:size-3" />
-              <span className={tabLabelClass}>Calendar</span>
+              <span className={tabLabelClass}>{t('calendar')}</span>
             </TabsTrigger>
             <TabsTrigger
               value="market"
-              aria-label="Market"
-              title="Market"
+              aria-label={t('market')}
+              title={t('market')}
               className={tabTriggerClass}
             >
               <IconChartBar className="size-3.5 shrink-0 @[300px]/news-tabs:size-3" />
-              <span className={tabLabelClass}>Market</span>
+              <span className={tabLabelClass}>{t('market')}</span>
             </TabsTrigger>
             <TabsTrigger
               value="symbol"
-              aria-label="Symbol info"
-              title="Info"
+              aria-label={t('symbolInfo')}
+              title={t('info')}
               className={tabTriggerClass}
             >
               <IconInfoCircle className="size-3.5 shrink-0 @[300px]/news-tabs:size-3" />
-              <span className={tabLabelClass}>Info</span>
+              <span className={tabLabelClass}>{t('info')}</span>
             </TabsTrigger>
           </TabsList>
         </div>
@@ -150,7 +152,13 @@ export function TradingRoomNewsPanel({
                       ev.impact === 'low' && 'bg-[var(--trade-border)] text-[var(--trade-text-muted)]'
                     )}
                   >
-                    {ev.impact}
+                    {t(
+                      ev.impact === 'high'
+                        ? 'impactHigh'
+                        : ev.impact === 'medium'
+                          ? 'impactMedium'
+                          : 'impactLow'
+                    )}
                   </span>
                 </li>
               ))}
@@ -163,8 +171,8 @@ export function TradingRoomNewsPanel({
         >
           <ScrollArea className="min-h-0 flex-1">
             <div className="space-y-2 p-3 text-[10px] text-[var(--trade-text-muted)]">
-              <p className="font-semibold text-[var(--trade-text)]">Session overview (mock)</p>
-              <p>Forex volatility index neutral. Equities futures slightly green. Crypto bid firm.</p>
+              <p className="font-semibold text-[var(--trade-text)]">{t('sessionOverview')}</p>
+              <p>{t('sessionBody')}</p>
               <div className="grid grid-cols-2 gap-2 pt-2 font-mono">
                 <div className="rounded border border-[var(--trade-border)] p-2">
                   <div className="text-[9px] uppercase">VIX</div>
@@ -187,21 +195,21 @@ export function TradingRoomNewsPanel({
               <div className="text-xs font-bold text-[var(--trade-text)]">{symbol}</div>
               <p className="text-[var(--trade-text-muted)]">{symbolFullName}</p>
               <dl className="grid grid-cols-2 gap-x-2 gap-y-1.5 font-mono">
-                <dt className="text-[var(--trade-text-muted)]">Digits</dt>
+                <dt className="text-[var(--trade-text-muted)]">{t('digits')}</dt>
                 <dd className="text-right text-[var(--trade-text)]">5</dd>
-                <dt className="text-[var(--trade-text-muted)]">Contract</dt>
+                <dt className="text-[var(--trade-text-muted)]">{t('contract')}</dt>
                 <dd className="text-right text-[var(--trade-text)]">100k</dd>
-                <dt className="text-[var(--trade-text-muted)]">Spread (typ.)</dt>
+                <dt className="text-[var(--trade-text-muted)]">{t('spreadTyp')}</dt>
                 <dd className="text-right text-[var(--trade-green)]">0.1</dd>
-                <dt className="text-[var(--trade-text-muted)]">Swap long</dt>
+                <dt className="text-[var(--trade-text-muted)]">{t('swapLong')}</dt>
                 <dd className="text-right text-[var(--trade-text)]">-4.2</dd>
-                <dt className="text-[var(--trade-text-muted)]">Swap short</dt>
+                <dt className="text-[var(--trade-text-muted)]">{t('swapShort')}</dt>
                 <dd className="text-right text-[var(--trade-text)]">+1.1</dd>
-                <dt className="text-[var(--trade-text-muted)]">Margin</dt>
+                <dt className="text-[var(--trade-text-muted)]">{t('margin')}</dt>
                 <dd className="text-right text-[var(--trade-text)]">3.33%</dd>
               </dl>
               <p className="pt-2 text-[9px] italic text-[var(--trade-text-muted)]">
-                Mock contract specs for UI preview.
+                {t('mockSpecs')}
               </p>
             </div>
           </ScrollArea>
