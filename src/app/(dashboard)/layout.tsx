@@ -1,8 +1,10 @@
 import { DashboardLayoutClient } from '@/components/layout/dashboard-layout-client';
 import type { Metadata } from 'next';
 
+const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME?.trim() || 'Next Shadcn';
+
 export const metadata: Metadata = {
-  title: 'Next Shadcn Dashboard Starter',
+  title: `${APP_NAME} Dashboard`,
   description: 'Basic dashboard with Next.js and Shadcn'
 };
 

@@ -17,8 +17,10 @@ const META_THEME_COLORS = {
   dark: '#09090b'
 };
 
+const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME?.trim() || 'Next Shadcn';
+
 export const metadata: Metadata = {
-  title: 'Next Shadcn',
+  title: APP_NAME,
   description: 'Basic dashboard with Next.js and Shadcn',
   icons: {
     apple: '/images/favico.png'

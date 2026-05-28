@@ -59,15 +59,15 @@ const formSchema = z
       .max(100, 'Rentability cannot exceed 100%'),
     minInvestment: z.coerce
       .number()
-      .min(1, 'Minimum investment must be at least €1'),
+      .min(1, 'Minimum investment must be at least $1'),
     maxInvestment: z.coerce
       .number()
-      .min(1, 'Maximum investment must be at least €1')
+      .min(1, 'Maximum investment must be at least $1')
       .optional(),
     autoReinvestment: z.boolean().default(false),
     totalCapacity: z.coerce
       .number()
-      .min(1, 'Total capacity must be at least €1')
+      .min(1, 'Total capacity must be at least $1')
       .optional(),
     riskLevel: z.enum(['LOW', 'MEDIUM', 'HIGH'], {
       required_error: 'Please select a risk level'
@@ -269,7 +269,7 @@ export function AddInvestmentDialog({
                 name='minInvestment'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Min Investment (€) *</FormLabel>
+                    <FormLabel>Min Investment (USD) *</FormLabel>
                     <FormControl>
                       <Input type='number' placeholder='1000' {...field} />
                     </FormControl>
@@ -283,7 +283,7 @@ export function AddInvestmentDialog({
                 name='maxInvestment'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Max Investment (€)</FormLabel>
+                    <FormLabel>Max Investment (USD)</FormLabel>
                     <FormControl>
                       <Input
                         type='number'
@@ -302,7 +302,7 @@ export function AddInvestmentDialog({
                 name='totalCapacity'
                 render={({ field }) => (
                   <FormItem className='col-span-2'>
-                    <FormLabel>Total Capacity (€)</FormLabel>
+                    <FormLabel>Total Capacity (USD)</FormLabel>
                     <FormControl>
                       <Input
                         type='number'

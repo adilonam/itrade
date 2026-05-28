@@ -33,11 +33,11 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'Institutional',
-        url: '/trading-view-room-institutional',
-        icon: 'market',
+        title: 'Portfolio',
+        url: '/portfolio',
+        icon: 'dashboard',
         isActive: false,
-        shortcut: ['d', 'd'],
+        shortcut: ['p', 'o'],
         items: []
       },
       {
@@ -46,14 +46,6 @@ export const tenantNavItems: TenantNavItems = {
         icon: 'pigMoney',
         isActive: false,
         shortcut: ['m', 'p'],
-        items: []
-      },
-      {
-        title: 'Props',
-        url: '/challenges',
-        icon: 'transaction',
-        isActive: false,
-        shortcut: ['t', 'r'],
         items: []
       },
       {
@@ -84,19 +76,19 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
+        title: 'Portfolio',
+        url: '/portfolio',
+        icon: 'dashboard',
+        isActive: false,
+        shortcut: ['p', 'o'],
+        items: []
+      },
+      {
         title: 'Plans',
         url: '/investments',
         icon: 'pigMoney',
         isActive: false,
         shortcut: ['m', 'p'],
-        items: []
-      },
-      {
-        title: 'Props',
-        url: '/challenges',
-        icon: 'transaction',
-        isActive: false,
-        shortcut: ['t', 'r'],
         items: []
       },
       {
@@ -126,19 +118,11 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'Institutional',
-        url: '/trading-view-room-institutional',
-        icon: 'market',
+        title: 'Portfolio',
+        url: '/portfolio',
+        icon: 'dashboard',
         isActive: false,
-        shortcut: ['d', 'd'],
-        items: []
-      },
-      {
-        title: 'Institutional-admin',
-        url: '/admin/positions',
-        icon: 'market',
-        isActive: false,
-        shortcut: ['m', 'm'],
+        shortcut: ['p', 'o'],
         items: []
       },
       {
@@ -147,14 +131,6 @@ export const tenantNavItems: TenantNavItems = {
         icon: 'pigMoney',
         isActive: false,
         shortcut: ['m', 'p'],
-        items: []
-      },
-      {
-        title: 'Props',
-        url: '/challenges',
-        icon: 'transaction',
-        isActive: false,
-        shortcut: ['t', 'r'],
         items: []
       },
       {
@@ -232,19 +208,11 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'Institutional',
-        url: '/trading-view-room-institutional',
-        icon: 'market',
+        title: 'Portfolio',
+        url: '/portfolio',
+        icon: 'dashboard',
         isActive: false,
-        shortcut: ['d', 'd'],
-        items: []
-      },
-      {
-        title: 'Institutional-admin',
-        url: '/admin/positions',
-        icon: 'market',
-        isActive: false,
-        shortcut: ['m', 'm'],
+        shortcut: ['p', 'o'],
         items: []
       },
       {
@@ -253,14 +221,6 @@ export const tenantNavItems: TenantNavItems = {
         icon: 'pigMoney',
         isActive: false,
         shortcut: ['m', 'p'],
-        items: []
-      },
-      {
-        title: 'Props',
-        url: '/challenges',
-        icon: 'transaction',
-        isActive: false,
-        shortcut: ['t', 'r'],
         items: []
       },
       {

@@ -327,5 +327,21 @@ bugs :
 
 
 
+
+
+
 - [ ] make it responsive 
 - [ ] make the new ui 
+
+
+
+
+
+
+
+
+- [x] title change 
+- [x] change / details 
+- [ ] GET BACK MONEY ON DEACTIVATE 
+- [ ] CLICK LOGO GO TRADE
+- [ ] CREATE PAGES FROM LANGIND PAGE 100 USD 

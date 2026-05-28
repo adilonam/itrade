@@ -137,7 +137,8 @@
       "kycRequests": "طلبات KYC",
       "depositRequest": "طلب إيداع",
       "settings": "الإعدادات",
-      "withdrawals": "السحوبات"
+      "withdrawals": "السحوبات",
+      "portfolio": "المحفظة"
     },
     "header": {
       "tradeRoom": "غرفة التداول",
@@ -205,6 +206,19 @@
       "equity": "حقوق الملكية",
       "freeMargin": "الهامش الحر",
       "marginLevel": "مستوى الهامش"
+    },
+    "portfolioPage": {
+      "metaTitle": "المحفظة",
+      "title": "نظرة عامة على المحفظة",
+      "description": "راجع نظرة الحساب وكل مراكز التداول في مكان واحد.",
+      "positionsTitle": "كل المراكز",
+      "signInRequired": "يرجى تسجيل الدخول لعرض محفظتك.",
+      "closeSuccess": "تم إغلاق الصفقة بنجاح",
+      "errors": {
+        "loadPositions": "فشل تحميل المراكز",
+        "loadFinancial": "فشل تحميل البيانات المالية",
+        "closePosition": "فشل إغلاق الصفقة"
+      }
     },
     "news": {
       "news": "الأخبار",

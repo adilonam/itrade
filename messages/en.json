@@ -137,7 +137,8 @@
       "kycRequests": "KYC Requests",
       "depositRequest": "Deposit request",
       "settings": "Settings",
-      "withdrawals": "Withdrawals"
+      "withdrawals": "Withdrawals",
+      "portfolio": "Portfolio"
     },
     "header": {
       "tradeRoom": "Trade room",
@@ -205,6 +206,19 @@
       "equity": "Equity",
       "freeMargin": "Free Margin",
       "marginLevel": "Margin Level"
+    },
+    "portfolioPage": {
+      "metaTitle": "Portfolio",
+      "title": "Portfolio Overview",
+      "description": "Review your account overview and all trading positions in one place.",
+      "positionsTitle": "All Positions",
+      "signInRequired": "Please sign in to view your portfolio.",
+      "closeSuccess": "Position closed successfully",
+      "errors": {
+        "loadPositions": "Failed to load positions",
+        "loadFinancial": "Failed to load financial data",
+        "closePosition": "Failed to close position"
+      }
     },
     "news": {
       "news": "News",
