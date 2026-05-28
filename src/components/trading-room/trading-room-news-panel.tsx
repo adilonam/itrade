@@ -107,9 +107,20 @@ export function TradingRoomNewsPanel({
                       {item.flag ?? item.title.slice(0, 2)}
                     </span>
                     <div className="min-w-0 flex-1">
-                      <div className="text-[11px] font-bold leading-snug text-[var(--trade-text)]">
-                        {item.title}
-                      </div>
+                      {item.url ? (
+                        <a
+                          href={item.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[11px] font-bold leading-snug text-[var(--trade-text)] hover:text-[var(--trade-accent-blue)]"
+                        >
+                          {item.title}
+                        </a>
+                      ) : (
+                        <div className="text-[11px] font-bold leading-snug text-[var(--trade-text)]">
+                          {item.title}
+                        </div>
+                      )}
                       {item.source ? (
                         <div className="mt-0.5 truncate text-[9px] text-[var(--trade-text-muted)]">
                           {item.source}

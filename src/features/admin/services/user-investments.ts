@@ -73,3 +73,17 @@ export async function fetchAdminUserInvestments(
 
   return response.json();
 }
+
+export async function revokeAdminUserInvestment(id: string): Promise<void> {
+  const response = await fetch(`/api/admin/user-investments/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+
+  if (!response.ok) {
+    const body = await response.json().catch(() => null);
+    throw new Error(body?.error || 'Failed to revoke user investment');
+  }
+}

@@ -220,6 +220,7 @@ enum Room {
   STOCK
   TRADING
   INSTITUTIONAL
+  DEMO
 }
 
 model Market {

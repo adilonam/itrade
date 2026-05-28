@@ -9,6 +9,7 @@ import {
 import { InvestmentTable } from './investment-tables';
 import { columns } from './investment-tables/columns';
 import { AddInvestmentDialog } from './add-investment-dialog';
+import UserInvestmentListing from './user-investment-listing';
 import { Button } from '@/components/ui/button';
 import {
   parseAsInteger,
@@ -107,6 +108,8 @@ export default function InvestmentListingPage({}: InvestmentListingPageProps) {
         totalItems={totalInvestments}
         onRefresh={fetchInvestmentsData}
       />
+
+      <UserInvestmentListing />
 
       <AddInvestmentDialog
         open={isAddDialogOpen}

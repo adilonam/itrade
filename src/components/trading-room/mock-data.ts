@@ -14,6 +14,7 @@ export interface MockNewsItem {
   snippet: string;
   flag?: string;
   source?: string;
+  url?: string;
 }
 
 export interface MockCalendarItem {
@@ -41,57 +42,55 @@ export const MOCK_SYMBOLS: MockSymbol[] = [
 export const MOCK_NEWS: MockNewsItem[] = [
   {
     id: 'n1',
-    title: 'US–Iran tensions flare after Strait incident; oil spikes in late trade',
-    time: '23:18',
+    title: 'Wall Street futures trim some losses after key inflation data',
+    time: '08:36',
     snippet:
-      'Markets price higher geopolitical risk as officials trade warnings and energy routes come under scrutiny. Safe-haven flows into USD and gold intensify.',
+      'U.S. stock futures trimmed losses as traders digested broad economic releases, including a slightly soft to in-line inflation print, while renewed Gulf strikes kept geopolitical risk elevated.',
     flag: '🇺🇸',
-    source: 'Desk wire (mock)'
+    source: 'Investing.com',
+    url: 'https://www.investing.com/news/stock-market-news/us-stock-futures-steady-post-record-wall-st-close-iran-strikes-pce-data-in-focus-4713535'
   },
   {
     id: 'n2',
-    title: 'Pentagon confirms expanded carrier presence; Tehran vows proportional response',
-    time: '22:55',
+    title: 'U.S., Iran exchange strikes dampening hopes for imminent peace deal',
+    time: '08:30',
     snippet:
-      'Defense channels report additional naval assets; diplomatic channels remain open but fragile. Volatility in crude and regional FX expected overnight.',
+      'Fresh military action between Washington and Tehran reduced confidence in a near-term diplomatic breakthrough and kept cross-asset volatility elevated.',
     flag: '🇮🇷',
-    source: 'Desk wire (mock)'
+    source: 'Investing.com',
+    url: 'https://www.investing.com/news/economy-news/us-military-carries-out-more-strikes-on-iran-as-trump-signals-no-deal-in-sight-4713450'
   },
   {
     id: 'n3',
-    title: 'Japan–US trade officials meet ahead of tariff review; yen whipsaws',
-    time: '22:40',
+    title: 'Oil prices tick higher amid renewed U.S.-Iran hostilities',
+    time: '08:24',
     snippet:
-      'Tokyo and Washington discuss industrial policy and supply chains. USD/JPY swings on headline risk as traders reposition into the Tokyo open.',
-    flag: '🇯🇵',
-    source: 'Desk wire (mock)'
+      'Crude prices moved higher as risk premiums returned to energy markets following another escalation in U.S.-Iran tensions.',
+    flag: '🛢️',
+    source: 'Investing.com',
+    url: 'https://www.investing.com/news/commodities-news/oil-prices-jump-nearly-2-after-us-attacks-iran-again-4713494'
   },
   {
     id: 'n4',
-    title: 'White House: “All options on table” re Iran; allies urge de-escalation',
-    time: '22:12',
+    title:
+      'UBS flags weather-driven headwinds for this European company despite stable soft commodity prices',
+    time: '08:18',
     snippet:
-      'European and Gulf partners call for restraint; risk assets pare gains while energy complex leads sector moves.',
-    flag: '🇺🇸',
-    source: 'Desk wire (mock)'
+      'Analysts highlighted weather-related operational pressure as a near-term concern, even with softer commodity inputs remaining broadly stable.',
+    flag: '🇪🇺',
+    source: 'Investing.com',
+    url: 'https://www.investing.com/news/pro/ubs-flags-weatherdriven-headwinds-for-this-european-company-despite-stable-soft-commodity-prices-432SI-4713865'
   },
   {
     id: 'n5',
-    title: 'BoJ watchers eye yield curve after US–Japan joint statement on stability',
-    time: '21:50',
+    title:
+      'Gold prices slide as U.S.-Iran hostilities keep inflation, rate hike fears in focus',
+    time: '08:10',
     snippet:
-      'Fixed-income desks parse language on FX and financial stability; JGB futures tick higher as curve flattens.',
-    flag: '🇯🇵',
-    source: 'Desk wire (mock)'
-  },
-  {
-    id: 'n6',
-    title: 'UN Security Council session requested on US–Iran standoff',
-    time: '21:22',
-    snippet:
-      'Diplomatic calendar fills up; emerging-market FX shows cautious bid as liquidity thins into the New York close.',
-    flag: '🇺🇳',
-    source: 'Desk wire (mock)'
+      'Bullion eased as higher oil and geopolitical stress reinforced uncertainty around inflation and potential policy tightening paths.',
+    flag: '🥇',
+    source: 'Investing.com',
+    url: 'https://www.investing.com/news/commodities-news/gold-prices-dip-as-fresh-usiran-attacks-boost-oil-dollar-4713551'
   }
 ];
 
