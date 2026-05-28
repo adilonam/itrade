@@ -9,7 +9,10 @@ export type OrderPanelMarket = Market | { symbol: string; lastPrice: number; spr
 
 interface TradingRoomOrderPanelProps {
   market: OrderPanelMarket;
-  onMarketOrder?: (type: 'BUY' | 'SELL', quantity: number) => void;
+  onMarketOrder?: (
+    type: 'BUY' | 'SELL',
+    quantity: number
+  ) => Promise<void> | void;
   disabled?: boolean;
   /** When false, hides the Advanced Order link (parent renders it) */
   showAdvancedOrder?: boolean;
@@ -22,6 +25,7 @@ export function TradingRoomOrderPanel({
   showAdvancedOrder = true
 }: TradingRoomOrderPanelProps) {
   const [lotSize, setLotSize] = useState('0.01');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { realTimePrices, isConnected, subscribe } = useMarketsWebSocket();
 
   // Subscribe to live price for selected market
@@ -89,6 +93,17 @@ export function TradingRoomOrderPanel({
   );
   const formatUsd = (n: number) =>
     n.toLocaleString('en-US', { maximumFractionDigits: 0 });
+  const controlsDisabled = disabled || isSubmitting;
+
+  const handleSubmitOrder = async (type: 'BUY' | 'SELL') => {
+    if (controlsDisabled) return;
+    try {
+      setIsSubmitting(true);
+      await onMarketOrder?.(type, parseFloat(lotSize) || 0.01);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="space-y-3">
@@ -96,23 +111,41 @@ export function TradingRoomOrderPanel({
       <div className="grid grid-cols-2 gap-2">
         <button
           type="button"
-          disabled={disabled}
-          onClick={() => onMarketOrder?.('SELL', parseFloat(lotSize) || 0.01)}
+          disabled={controlsDisabled}
+          onClick={() => void handleSubmitOrder('SELL')}
           title={`SELL at ${displayBidFull} (bid)`}
           className="flex min-w-0 flex-col items-center justify-center rounded bg-[var(--trade-red)]/90 p-2 text-white transition-colors hover:bg-[var(--trade-red)] disabled:opacity-50"
         >
-          <span className="text-[10px] font-bold uppercase opacity-80">Sell</span>
-          <span className="truncate w-full text-center text-sm font-bold">{displayBid}</span>
+          {isSubmitting ? (
+            <span className="flex items-center gap-1 text-[10px] font-bold uppercase opacity-90">
+              <span className="size-3 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+              Executing...
+            </span>
+          ) : (
+            <>
+              <span className="text-[10px] font-bold uppercase opacity-80">Sell</span>
+              <span className="truncate w-full text-center text-sm font-bold">{displayBid}</span>
+            </>
+          )}
         </button>
         <button
           type="button"
-          disabled={disabled}
-          onClick={() => onMarketOrder?.('BUY', parseFloat(lotSize) || 0.01)}
+          disabled={controlsDisabled}
+          onClick={() => void handleSubmitOrder('BUY')}
           title={`BUY at ${displayAskFull} (ask)`}
           className="flex min-w-0 flex-col items-center justify-center rounded bg-[var(--trade-green)]/90 p-2 text-white transition-colors hover:bg-[var(--trade-green)] disabled:opacity-50"
         >
-          <span className="text-[10px] font-bold uppercase opacity-80">Buy</span>
-          <span className="truncate w-full text-center text-sm font-bold">{displayAsk}</span>
+          {isSubmitting ? (
+            <span className="flex items-center gap-1 text-[10px] font-bold uppercase opacity-90">
+              <span className="size-3 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+              Executing...
+            </span>
+          ) : (
+            <>
+              <span className="text-[10px] font-bold uppercase opacity-80">Buy</span>
+              <span className="truncate w-full text-center text-sm font-bold">{displayAsk}</span>
+            </>
+          )}
         </button>
       </div>
       {/* Quantity row */}
@@ -120,7 +153,7 @@ export function TradingRoomOrderPanel({
         <button
           type="button"
           onClick={decrementLot}
-          disabled={disabled}
+          disabled={controlsDisabled}
           className="px-2 text-[var(--trade-text-muted)] hover:text-[var(--trade-text)] disabled:opacity-50"
         >
           −
@@ -133,7 +166,7 @@ export function TradingRoomOrderPanel({
               value={lotSize}
               onChange={handleLotChange}
               onBlur={handleLotBlur}
-              disabled={disabled}
+              disabled={controlsDisabled}
               className="w-12 bg-transparent text-center text-xs font-bold text-[var(--trade-text)] outline-none focus:ring-0 disabled:opacity-50 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
             />
             <span className="text-[9px] font-medium text-[var(--trade-text-muted)]">lots</span>
@@ -147,7 +180,7 @@ export function TradingRoomOrderPanel({
         <button
           type="button"
           onClick={incrementLot}
-          disabled={disabled}
+          disabled={controlsDisabled}
           className="px-2 text-[var(--trade-text-muted)] hover:text-[var(--trade-text)] disabled:opacity-50"
         >
           +
