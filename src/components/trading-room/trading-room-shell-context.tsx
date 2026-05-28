@@ -19,6 +19,7 @@ import { toast } from 'sonner';
 import type { SymbolItem } from './trading-room-markets-panel';
 import type { AdvancedOrderMarket } from './trading-room-advanced-order-panel';
 import type { ChartInterval } from './trading-room-chart-header';
+import { useTradeBalanceSelection } from '@/hooks/use-trade-balance-selection';
 
 export function getTradeRoomFromPath(pathname: string): 'TRADING' | 'INSTITUTIONAL' | 'STOCK' {
   if (pathname.startsWith('/trading-view-room-institutional')) return 'INSTITUTIONAL';
@@ -91,6 +92,7 @@ export function TradingRoomShellProvider({ children }: { children: React.ReactNo
   const searchParams = useSearchParams();
   const pk = searchParams.get('pk');
   const { data: session } = useSession();
+  const { selectedBalanceType } = useTradeBalanceSelection();
 
   const tradeRoom = useMemo(() => getTradeRoomFromPath(pathname), [pathname]);
   const noNavigation = pathname === '/trade';
@@ -230,6 +232,8 @@ export function TradingRoomShellProvider({ children }: { children: React.ReactNo
           type,
           status: isPending ? 'PENDING' : 'PLACED',
           room: tradeRoom,
+          balanceType:
+            tradeRoom === 'INSTITUTIONAL' ? 'INSTITUTIONAL' : selectedBalanceType,
           marketId: selectedMarket.id,
           quantity,
           description: isPending
@@ -256,7 +260,7 @@ export function TradingRoomShellProvider({ children }: { children: React.ReactNo
         toast.error(e instanceof Error ? e.message : 'Order failed');
       }
     },
-    [session?.user?.id, selectedMarket, tradeRoom]
+    [session?.user?.id, selectedMarket, tradeRoom, selectedBalanceType]
   );
 
   const value = useMemo(

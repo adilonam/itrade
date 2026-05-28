@@ -7,6 +7,7 @@ import {
   couldOpenPosition
 } from '@/lib/calculator-server';
 import {
+  parseBalanceType,
   getUserBalanceAmount,
   resolveUserBalanceForNewPosition
 } from '@/lib/balance';
@@ -30,6 +31,7 @@ export async function GET(request: NextRequest) {
     const marketId = searchParams.get('marketId');
     const search = searchParams.get('search');
     const room = searchParams.get('room');
+    const balanceType = parseBalanceType(searchParams.get('balanceType'));
 
     const skip = (page - 1) * limit;
 
@@ -49,6 +51,7 @@ export async function GET(request: NextRequest) {
     }
     if (marketId) where.marketId = marketId;
     if (room) where.room = room;
+    where.userBalance = { is: { type: balanceType } };
     if (search) {
       where.description = {
         contains: search,

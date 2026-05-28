@@ -42,10 +42,9 @@ type Props = {
   positions: DashboardPosition[];
   financialReal: FinancialSnapshot;
   financialDemo: FinancialSnapshot;
-  financialInstitutional: FinancialSnapshot;
 };
 
-type BalanceType = 'REAL' | 'INSTITUTIONAL' | 'DEMO';
+type BalanceType = 'REAL' | 'DEMO';
 
 const fmtUsd = (n: number) =>
   new Intl.NumberFormat('en-US', {
@@ -59,11 +58,10 @@ function MarginsStrip({
   selectedBalance,
   onSelectBalance,
   financialReal,
-  financialDemo,
-  financialInstitutional
+  financialDemo
 }: Pick<
   Props,
-  'financialReal' | 'financialDemo' | 'financialInstitutional'
+  'financialReal' | 'financialDemo'
 > & {
   selectedBalance: BalanceType;
   onSelectBalance: (balance: BalanceType) => void;
@@ -76,12 +74,6 @@ function MarginsStrip({
       accent: 'text-[var(--trade-green)]'
     },
     {
-      key: 'INSTITUTIONAL' as const,
-      label: 'Institutional',
-      f: financialInstitutional,
-      accent: 'text-[var(--trade-accent-blue)]'
-    },
-    {
       key: 'DEMO' as const,
       label: 'Demo',
       f: financialDemo,
@@ -90,7 +82,7 @@ function MarginsStrip({
   ];
 
   return (
-    <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
       {rows.map(({ key, label, f, accent }) => (
         <div
           key={key}
@@ -147,17 +139,15 @@ function MarginsStrip({
 export function DashboardOverviewTradeAnalytics({
   positions,
   financialReal,
-  financialDemo,
-  financialInstitutional
+  financialDemo
 }: Props) {
   const [range, setRange] = useState<TimeRange>('1y');
   const [selectedBalance, setSelectedBalance] = useState<BalanceType>('REAL');
 
   const selectedFinancial = useMemo(() => {
-    if (selectedBalance === 'INSTITUTIONAL') return financialInstitutional;
     if (selectedBalance === 'DEMO') return financialDemo;
     return financialReal;
-  }, [selectedBalance, financialReal, financialDemo, financialInstitutional]);
+  }, [selectedBalance, financialReal, financialDemo]);
 
   const filteredPositions = useMemo(
     () => positions.filter((p) => positionMatchesWalletTab(p, selectedBalance)),
@@ -213,7 +203,6 @@ export function DashboardOverviewTradeAnalytics({
         onSelectBalance={setSelectedBalance}
         financialReal={financialReal}
         financialDemo={financialDemo}
-        financialInstitutional={financialInstitutional}
       />
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">

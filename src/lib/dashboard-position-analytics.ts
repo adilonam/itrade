@@ -17,25 +17,20 @@ export type DashboardPosition = {
 
 /**
  * Whether a position belongs to the selected overview tab.
- * Prefer wallet type from the API (`userBalance.type`); fall back to `room` for legacy rows.
+ * Prefer wallet type from the API (`userBalance.type`); fall back to `room` only for legacy rows.
  */
 export function positionMatchesWalletTab(
   p: DashboardPosition,
   tab: DashboardWalletTab
 ): boolean {
-  const explicit = (p as DashboardPosition & { balanceType?: string })
-    .balanceType;
   const fromWallet = p.userBalance?.type;
-  const wallet =
-    explicit === 'REAL' || explicit === 'DEMO' || explicit === 'INSTITUTIONAL'
-      ? explicit
-      : fromWallet === 'REAL' ||
-          fromWallet === 'DEMO' ||
-          fromWallet === 'INSTITUTIONAL'
-        ? fromWallet
-        : null;
-
-  if (wallet) return wallet === tab;
+  if (
+    fromWallet === 'REAL' ||
+    fromWallet === 'DEMO' ||
+    fromWallet === 'INSTITUTIONAL'
+  ) {
+    return fromWallet === tab;
+  }
 
   if (tab === 'INSTITUTIONAL') return p.room === 'INSTITUTIONAL';
   if (tab === 'DEMO') return p.room === 'TRADING';

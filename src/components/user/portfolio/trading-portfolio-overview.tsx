@@ -9,6 +9,7 @@ import {
   type PositionsTablePagination
 } from '@/components/user/positions/user-positions-table-room-trading';
 import type { Market, Position } from '@/lib/prisma/generated/client';
+import { useTradeBalanceSelection } from '@/hooks/use-trade-balance-selection';
 
 type PositionWithMarket = Position & {
   market: Market | null;
@@ -22,6 +23,7 @@ type FinancialData = {
 
 export function TradingPortfolioOverview() {
   const t = useTranslations('Trade.portfolioPage');
+  const { selectedBalanceType } = useTradeBalanceSelection();
   const [positions, setPositions] = useState<PositionWithMarket[]>([]);
   const [loading, setLoading] = useState(true);
   const [financial, setFinancial] = useState<FinancialData | null>(null);
@@ -46,7 +48,7 @@ export function TradingPortfolioOverview() {
         page: String(page),
         limit: String(pageSize),
         room: 'TRADING',
-        balanceType: 'REAL'
+        balanceType: selectedBalanceType
       });
 
       const response = await fetch(`/api/user/positions?${params}`);
@@ -69,11 +71,13 @@ export function TradingPortfolioOverview() {
     } finally {
       setLoading(false);
     }
-  }, [page, pageSize, t]);
+  }, [page, pageSize, selectedBalanceType, t]);
 
   const loadFinancial = useCallback(async () => {
     try {
-      const response = await fetch('/api/user/financial?room=TRADING&balanceType=REAL');
+      const response = await fetch(
+        `/api/user/financial?room=TRADING&balanceType=${selectedBalanceType}`
+      );
       if (!response.ok) throw new Error(t('errors.loadFinancial'));
 
       const data = await response.json();
@@ -86,7 +90,7 @@ export function TradingPortfolioOverview() {
       // Keep UI usable when finance endpoint is temporarily unavailable.
       setFinancial(null);
     }
-  }, [t]);
+  }, [selectedBalanceType, t]);
 
   useEffect(() => {
     void loadPositions();
@@ -117,7 +121,8 @@ export function TradingPortfolioOverview() {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            status: 'CLOSED'
+            status: 'CLOSED',
+            balanceType: selectedBalanceType
           })
         });
 
@@ -144,7 +149,7 @@ export function TradingPortfolioOverview() {
         });
       }
     },
-    [loadFinancial, loadPositions, t]
+    [loadFinancial, loadPositions, selectedBalanceType, t]
   );
 
   const updateRealTimePnL = useCallback((positionId: string, pnl: number) => {

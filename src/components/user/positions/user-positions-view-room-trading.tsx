@@ -46,6 +46,7 @@ import {
   IconChevronRight,
   IconRefresh
 } from '@tabler/icons-react';
+import { useTradeBalanceSelection } from '@/hooks/use-trade-balance-selection';
 
 interface PaginationInfo {
   page: number;
@@ -65,6 +66,7 @@ interface FinancialData {
 }
 
 export function UserPositionsViewRoomTrading() {
+  const { selectedBalanceType } = useTradeBalanceSelection();
   const [positions, setPositions] = useState<PositionWithRelations[]>([]);
   const [realTimePnL, setRealTimePnL] = useState<Record<string, number>>({});
   const [financialData, setFinancialData] = useState<FinancialData | null>(
@@ -99,7 +101,7 @@ export function UserPositionsViewRoomTrading() {
           page: page.toString(),
           limit: pagination.limit.toString(),
           room: 'TRADING',
-          balanceType: 'REAL'
+          balanceType: selectedBalanceType
         });
 
         // Add filter values, handling Date objects and undefined values
@@ -129,13 +131,15 @@ export function UserPositionsViewRoomTrading() {
         setLoading(false);
       }
     },
-    [pagination.limit]
+    [pagination.limit, selectedBalanceType]
   );
 
   // Load financial data from API
   const loadFinancialData = useCallback(async () => {
     try {
-      const response = await fetch('/api/user/financial?room=TRADING&balanceType=REAL');
+      const response = await fetch(
+        `/api/user/financial?room=TRADING&balanceType=${selectedBalanceType}`
+      );
       if (!response.ok) {
         throw new Error('Failed to fetch financial data');
       }
@@ -145,7 +149,7 @@ export function UserPositionsViewRoomTrading() {
       // eslint-disable-next-line no-console
       console.error('Failed to load financial data:', err);
     }
-  }, []);
+  }, [selectedBalanceType]);
 
   // Load data on mount and when filters change
   useEffect(() => {

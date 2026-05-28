@@ -20,7 +20,6 @@ interface DashboardData {
   user: UserLite;
   financialReal: FinancialSnapshot;
   financialDemo: FinancialSnapshot;
-  financialInstitutional: FinancialSnapshot;
   positions: DashboardPosition[];
 }
 
@@ -38,13 +37,11 @@ export function DashboardOverview() {
       const [
         financialRealRes,
         financialDemoRes,
-        financialInstitutionalRes,
         positionsRes,
         userRes
       ] = await Promise.all([
         fetch('/api/user/financial?balanceType=REAL'),
         fetch('/api/user/financial?balanceType=DEMO'),
-        fetch('/api/user/financial?balanceType=INSTITUTIONAL'),
         fetch('/api/user/positions?limit=5000&status=PLACED,CLOSED'),
         fetch('/api/user/profile?balanceType=REAL')
       ]);
@@ -52,7 +49,6 @@ export function DashboardOverview() {
       if (
         !financialRealRes.ok ||
         !financialDemoRes.ok ||
-        !financialInstitutionalRes.ok ||
         !positionsRes.ok ||
         !userRes.ok
       ) {
@@ -62,13 +58,11 @@ export function DashboardOverview() {
       const [
         financialReal,
         financialDemo,
-        financialInstitutional,
         positionsJson,
         userResponse
       ] = await Promise.all([
         financialRealRes.json(),
         financialDemoRes.json(),
-        financialInstitutionalRes.json(),
         positionsRes.json(),
         userRes.json()
       ]);
@@ -82,7 +76,6 @@ export function DashboardOverview() {
         },
         financialReal,
         financialDemo,
-        financialInstitutional,
         positions: raw
       });
     } catch (err) {
@@ -141,7 +134,6 @@ export function DashboardOverview() {
         positions={data.positions}
         financialReal={data.financialReal}
         financialDemo={data.financialDemo}
-        financialInstitutional={data.financialInstitutional}
       />
     </div>
   );

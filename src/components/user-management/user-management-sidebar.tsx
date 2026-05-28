@@ -83,9 +83,9 @@ export function UserManagementSidebar() {
   return (
     <aside className="flex min-h-0 w-[260px] shrink-0 flex-col self-stretch border-r border-[var(--trade-border)] bg-[var(--trade-panel)]">
       <Link
-        href="/"
+        href="/trade"
         className="flex h-14 shrink-0 items-center border-b border-[var(--trade-border)] px-4 transition-colors hover:bg-[var(--trade-border)]/30"
-        aria-label={`Go to home, ${appName}`}
+        aria-label={`Go to trade, ${appName}`}
       >
         <span className="relative flex h-10 shrink-0 items-center">
           <Image

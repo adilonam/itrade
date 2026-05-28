@@ -50,6 +50,7 @@ import {
   TRADE_ROOM_EMBEDDED_TABLE_CARD_CLASS
 } from '@/constants/trade-room-ui';
 import { useTranslations } from 'next-intl';
+import { useTradeBalanceSelection } from '@/hooks/use-trade-balance-selection';
 
 type PositionWithMarket = Position & {
   market: Market | null;
@@ -98,6 +99,11 @@ export function UserPositionsTableRoomTrading({
   const t = useTranslations('Trade.positions');
   const isEmbeddedTrade = isTradePanel && embeddedInTradePanel;
   const [closingId, setClosingId] = useState<string | null>(null);
+  const pageSizeForHeight = pagination?.pageSize ?? positions.length ?? 10;
+  const shouldExpandForPageSize = !isTradePanel && Boolean(pagination);
+  const dynamicMinHeight = shouldExpandForPageSize
+    ? `${Math.max(320, pageSizeForHeight * 48 + 176)}px`
+    : undefined;
 
   const col = (key: Parameters<typeof t>[0], fallback: string) =>
     isTradePanel ? t(key) : fallback;
@@ -235,6 +241,7 @@ export function UserPositionsTableRoomTrading({
             ),
           isTradePanel && !isEmbeddedTrade && TRADE_ROOM_CARD_CLASS
         )}
+        style={dynamicMinHeight ? { minHeight: dynamicMinHeight } : undefined}
       >
         <CardContent
           className={cn(
@@ -270,6 +277,7 @@ export function UserPositionsTableRoomTrading({
             ),
           isTradePanel && !isEmbeddedTrade && TRADE_ROOM_CARD_CLASS
         )}
+        style={dynamicMinHeight ? { minHeight: dynamicMinHeight } : undefined}
       >
         <CardContent
           className={cn(
@@ -297,13 +305,14 @@ export function UserPositionsTableRoomTrading({
               TRADE_ROOM_EMBEDDED_TABLE_CARD_CLASS,
               'h-full min-h-0 min-w-0 flex-1'
             )
-          : 'max-h-[min(70vh,520px)]',
+          : 'min-w-0',
         isTradePanel && !isEmbeddedTrade && TRADE_ROOM_CARD_CLASS
       )}
+      style={dynamicMinHeight ? { minHeight: dynamicMinHeight } : undefined}
     >
       <CardContent
         className={cn(
-          'flex min-h-[240px] min-w-0 flex-1 flex-col overflow-hidden',
+          'flex min-w-0 flex-1 flex-col overflow-hidden',
           isEmbeddedTrade
             ? cn(
                 'px-4 pt-0',
@@ -320,8 +329,9 @@ export function UserPositionsTableRoomTrading({
         <div
           className={cn(
             'relative flex min-h-0 flex-1 flex-col',
-            isEmbeddedTrade ? 'min-w-0' : 'min-h-[200px]'
+            isEmbeddedTrade ? 'min-w-0' : 'min-h-0'
           )}
+          style={dynamicMinHeight ? { minHeight: dynamicMinHeight } : undefined}
         >
           <div className='relative flex min-h-0 min-w-0 flex-1'>
             <div
@@ -785,7 +795,9 @@ export function UserPositionsTableCardRoomTrading({
   panelVariant = 'default',
   embeddedInTradePanel = false
 }: UserPositionsTableCardRoomTradingProps) {
-  const balanceType = room === 'INSTITUTIONAL' ? 'INSTITUTIONAL' : 'REAL';
+  const { selectedBalanceType } = useTradeBalanceSelection();
+  const balanceType =
+    room === 'INSTITUTIONAL' ? 'INSTITUTIONAL' : selectedBalanceType;
   const [positions, setPositions] = useState<PositionWithMarket[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -802,7 +814,7 @@ export function UserPositionsTableCardRoomTrading({
 
   useEffect(() => {
     setPage(1);
-  }, [pageSize, statusFilter, room]);
+  }, [pageSize, statusFilter, room, balanceType]);
 
   const loadPositions = useCallback(async () => {
     try {

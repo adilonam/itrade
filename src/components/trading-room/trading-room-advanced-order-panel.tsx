@@ -9,6 +9,7 @@ import { useMarketsWebSocket } from '@/contexts/markets-websocket-context';
 import { getLotSize } from '@/lib/calculator-client';
 import type { Market } from '@/lib/prisma/generated/client';
 import type { MarketType } from '@/lib/prisma/generated/client';
+import { useTradeBalanceSelection } from '@/hooks/use-trade-balance-selection';
 
 export type AdvancedOrderMarket =
   | (Market & { lastPrice: number })
@@ -49,6 +50,7 @@ export function TradingRoomAdvancedOrderPanel({
   onMarketOrder,
   disabled = false
 }: TradingRoomAdvancedOrderPanelProps) {
+  const { selectedBalanceType } = useTradeBalanceSelection();
   const [orderTab, setOrderTab] = useState<'market' | 'pending'>('market');
   const [volume, setVolume] = useState('0.01');
   const [price, setPrice] = useState('');
@@ -101,13 +103,13 @@ export function TradingRoomAdvancedOrderPanel({
   }, [market, midPrice]);
 
   useEffect(() => {
-    fetch('/api/user/financial?room=TRADING')
+    fetch(`/api/user/financial?room=TRADING&balanceType=${selectedBalanceType}`)
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
         if (data) setFinancial({ freeMargin: data.freeMargin ?? 0 });
       })
       .catch(() => setFinancial({ freeMargin: 0 }));
-  }, []);
+  }, [selectedBalanceType]);
 
   const notionalUsd = Math.round(vol * lotSizeMultiplier * execPrice);
   const [flagBase, flagQuote] = getCurrencyFlags(market?.symbol ?? '');

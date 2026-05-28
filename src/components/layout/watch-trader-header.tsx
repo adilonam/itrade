@@ -14,6 +14,7 @@ import { ModeToggle } from '@/components/layout/ThemeToggle/theme-toggle';
 import { useTranslations } from 'next-intl';
 import { UserNav } from './user-nav';
 import { IconWifi, IconWallet, IconChevronDown } from '@tabler/icons-react';
+import { useTradeBalanceSelection } from '@/hooks/use-trade-balance-selection';
 
 /** Active state for Room Trading nav items (aligned with room-trading-top-nav + TradingView embed route). */
 function isRoomTradingNavActive(pathname: string | null, url: string): boolean {
@@ -52,8 +53,8 @@ export function WatchTraderHeader() {
   const appName = usePublicAppName();
   const pathname = usePathname() ?? '';
   const { data: session } = useSession();
+  const { selectedBalanceType, setTradeBalanceType } = useTradeBalanceSelection();
   const [time, setTime] = useState(utcClockString);
-  const [selectedBalanceType, setSelectedBalanceType] = useState<BalanceType>('REAL');
   const [openBalanceDropdown, setOpenBalanceDropdown] = useState(false);
   const [balanceByBalanceType, setBalanceByBalanceType] = useState<
     Record<BalanceType, BalanceAmountDisplay | null>
@@ -222,11 +223,9 @@ export function WatchTraderHeader() {
             onClick={() => setOpenBalanceDropdown((prev) => !prev)}
           >
             <IconWallet className="size-3.5 shrink-0 text-[var(--trade-text-muted)] opacity-80" />
-            {selectedBalanceType !== 'DEMO' ? (
-              <span className="text-[var(--trade-text-muted)]">
-                {balanceLabel[selectedBalanceType]}:
-              </span>
-            ) : null}
+            <span className="text-[var(--trade-text-muted)]">
+              {balanceLabel[selectedBalanceType]}:
+            </span>
             {selectedBalanceAmount ? (
               <span
                 className={
@@ -266,7 +265,7 @@ export function WatchTraderHeader() {
                     )}
                     role="menuitem"
                     onClick={() => {
-                      setSelectedBalanceType(balanceType);
+                      void setTradeBalanceType(balanceType);
                       setOpenBalanceDropdown(false);
                     }}
                   >

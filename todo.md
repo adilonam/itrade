@@ -342,6 +342,8 @@ bugs :
 
 - [x] title change 
 - [x] change / details 
-- [ ] GET BACK MONEY ON DEACTIVATE 
-- [ ] CLICK LOGO GO TRADE
+- [x] GET BACK MONEY ON DEACTIVATE 
+- [x] CLICK LOGO GO TRADE
 - [ ] CREATE PAGES FROM LANGIND PAGE 100 USD 
+- [ ] demo account 
+- [ ] news management
