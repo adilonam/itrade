@@ -149,11 +149,10 @@ export async function GET() {
       }
     }
 
-    // Step 2: Check all PLACED positions that have take profit or stop loss set
+    // Step 2: Load all PLACED positions, then evaluate TP/SL per position
     const positionsToCheck = await prisma.position.findMany({
       where: {
-        status: 'PLACED',
-        OR: [{ takeProfit: { not: null } }, { stopLoss: { not: null } }]
+        status: 'PLACED'
       },
       include: {
         user: true,
@@ -161,12 +160,29 @@ export async function GET() {
       }
     });
 
+    const positionsWithConditions = positionsToCheck.filter(
+      (position) =>
+        position.takeProfit !== null || position.stopLoss !== null
+    );
+
     // eslint-disable-next-line no-console
-    console.log(`Found ${positionsToCheck.length} positions to check`);
+    console.log(
+      `Found ${positionsToCheck.length} PLACED positions (${positionsWithConditions.length} with TP/SL conditions)`
+    );
 
     if (positionsToCheck.length === 0) {
       return NextResponse.json({
-        message: 'No positions to check',
+        message: 'No placed positions to check',
+        placed: 0,
+        processed: 0,
+        closed: 0
+      });
+    }
+
+    if (positionsWithConditions.length === 0) {
+      return NextResponse.json({
+        message: 'No placed positions with TP/SL conditions',
+        placed: positionsToCheck.length,
         processed: 0,
         closed: 0
       });
@@ -174,7 +190,7 @@ export async function GET() {
 
     // Get all unique markets to refresh their data
     const marketMap = new Map();
-    positionsToCheck.forEach((pos) => {
+    positionsWithConditions.forEach((pos) => {
       if (pos.market) {
         marketMap.set(pos.market.id, pos.market);
       }
@@ -203,7 +219,7 @@ export async function GET() {
     const closedPositions = [];
 
     // Check each position for take profit/stop loss conditions
-    for (const position of positionsToCheck) {
+    for (const position of positionsWithConditions) {
       try {
         processedCount++;
 

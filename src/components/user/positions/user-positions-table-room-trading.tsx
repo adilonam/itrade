@@ -71,6 +71,8 @@ interface UserPositionsTableRoomTradingProps {
   loading: boolean;
   onUpdateRealTimePnL?: (positionId: string, pnl: number) => void;
   realTimePnL?: Record<string, number>;
+  onClosePosition?: (positionId: string) => void | Promise<void>;
+  closingPositionIds?: Record<string, boolean>;
   /** Match `/trade` trade-room panel typography and colors */
   panelVariant?: 'default' | 'trade';
   /** When true with `trade`, omit nested card chrome (trade room bottom tabs panel). */
@@ -84,6 +86,8 @@ export function UserPositionsTableRoomTrading({
   positions,
   loading,
   onUpdateRealTimePnL,
+  onClosePosition,
+  closingPositionIds,
   panelVariant = 'default',
   embeddedInTradePanel = false,
   showCloseAction = false,
@@ -424,7 +428,7 @@ export function UserPositionsTableRoomTrading({
                           className={cn('text-xs', tradeNumericCell)}
                         >
                           {position.executedPrice
-                            ? `$${position.executedPrice.toFixed(2)}`
+                            ? position.executedPrice.toFixed(2)
                             : '-'}
                         </TableCell>
                         <TableCell
@@ -438,14 +442,14 @@ export function UserPositionsTableRoomTrading({
                           className={cn('text-xs', tradeNumericCell)}
                         >
                           {position.takeProfit
-                            ? `$${position.takeProfit.toFixed(2)}`
+                            ? position.takeProfit.toFixed(2)
                             : '-'}
                         </TableCell>
                         <TableCell
                           className={cn('text-xs', tradeNumericCell)}
                         >
                           {position.stopLoss
-                            ? `$${position.stopLoss.toFixed(2)}`
+                            ? position.stopLoss.toFixed(2)
                             : '-'}
                         </TableCell>
                         <TableCell
@@ -548,14 +552,21 @@ export function UserPositionsTableRoomTrading({
                                       isTradePanel &&
                                         'border-[var(--trade-border)] bg-transparent text-[var(--trade-text)] hover:bg-[var(--trade-dark)]/50'
                                     )}
-                                    disabled={closingId === position.id}
+                                    disabled={
+                                      closingId === position.id ||
+                                      Boolean(closingPositionIds?.[position.id])
+                                    }
                                   >
-                                    {closingId === position.id ? (
+                                    {closingId === position.id ||
+                                    Boolean(closingPositionIds?.[position.id]) ? (
                                       <IconLoader2 className="size-3.5 animate-spin" />
                                     ) : (
                                       <IconX className="size-3.5" />
                                     )}
-                                    {col('close', 'Close')}
+                                    {closingId === position.id ||
+                                    Boolean(closingPositionIds?.[position.id])
+                                      ? col('closing', 'Closing...')
+                                      : col('close', 'Close')}
                                   </Button>
                                 </AlertDialogTrigger>
                                 <AlertDialogContent
@@ -603,9 +614,15 @@ export function UserPositionsTableRoomTrading({
                                     </AlertDialogCancel>
                                     <AlertDialogAction
                                       className="bg-red-600 hover:bg-red-700"
-                                      onClick={() =>
-                                        handleClosePosition(position.id)
-                                      }
+                                      onClick={() => {
+                                        if (onClosePosition) {
+                                          void Promise.resolve(
+                                            onClosePosition(position.id)
+                                          );
+                                          return;
+                                        }
+                                        void handleClosePosition(position.id);
+                                      }}
                                     >
                                       {col('closePositionAction', 'Close position')}
                                     </AlertDialogAction>
@@ -779,6 +796,9 @@ export function UserPositionsTableCardRoomTrading({
     total: number;
     pages: number;
   } | null>(null);
+  const [closingPositionIds, setClosingPositionIds] = useState<
+    Record<string, boolean>
+  >({});
 
   useEffect(() => {
     setPage(1);
@@ -847,6 +867,43 @@ export function UserPositionsTableCardRoomTrading({
     setRealTimePnL((prev) => ({ ...prev, [positionId]: pnl }));
   }, []);
 
+  const handleClosePosition = useCallback(
+    async (positionId: string) => {
+      try {
+        setClosingPositionIds((prev) => ({ ...prev, [positionId]: true }));
+        const response = await fetch(`/api/user/positions/${positionId}/close`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            status: 'CLOSED'
+          })
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.error || 'Failed to close position');
+        }
+
+        toast.success('Position closed successfully');
+        await loadPositions();
+        window.dispatchEvent(new CustomEvent(refreshEventName));
+      } catch (error) {
+        toast.error(
+          error instanceof Error ? error.message : 'Failed to close position'
+        );
+      } finally {
+        setClosingPositionIds((prev) => {
+          const next = { ...prev };
+          delete next[positionId];
+          return next;
+        });
+      }
+    },
+    [loadPositions, refreshEventName]
+  );
+
   const handleAfterClose = useCallback(() => {
     void loadPositions();
     window.dispatchEvent(new CustomEvent(refreshEventName));
@@ -909,6 +966,8 @@ export function UserPositionsTableCardRoomTrading({
       loading={loading}
       onUpdateRealTimePnL={updateRealTimePnL}
       realTimePnL={realTimePnL}
+      onClosePosition={handleClosePosition}
+      closingPositionIds={closingPositionIds}
       panelVariant={panelVariant}
       embeddedInTradePanel={embeddedInTradePanel}
       showCloseAction={showCloseAction}

@@ -18,7 +18,13 @@ export type AdvancedOrderMarket =
 interface TradingRoomAdvancedOrderPanelProps {
   market: AdvancedOrderMarket;
   onClose: () => void;
-  onMarketOrder?: (type: 'BUY' | 'SELL', quantity: number, price?: number) => void;
+  onMarketOrder?: (
+    type: 'BUY' | 'SELL',
+    quantity: number,
+    price?: number,
+    takeProfit?: number,
+    stopLoss?: number
+  ) => Promise<void> | void;
   disabled?: boolean;
 }
 
@@ -54,6 +60,7 @@ export function TradingRoomAdvancedOrderPanel({
     freeMargin: number;
     requiredMargin?: number;
   } | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const initializedRef = useRef(false);
 
   const { realTimePrices, isConnected, subscribe } = useMarketsWebSocket();
@@ -164,6 +171,35 @@ export function TradingRoomAdvancedOrderPanel({
   const tpUsd = (tpPriceVal - ask) * vol * lotSizeMultiplier;
   const slPct = midPrice ? ((slPriceVal - midPrice) / midPrice) * 100 : 0;
   const tpPct = midPrice ? ((tpPriceVal - midPrice) / midPrice) * 100 : 0;
+  const controlsDisabled = disabled || isSubmitting;
+
+  const submitOrder = async (
+    type: 'BUY' | 'SELL',
+    quantity: number,
+    submitPrice?: number
+  ) => {
+    if (controlsDisabled) return;
+    const takeProfitValue = parseFloat(takeProfitPrice);
+    const stopLossValue = parseFloat(stopLossPrice);
+    const normalizedTakeProfit =
+      takeProfit && Number.isFinite(takeProfitValue)
+        ? takeProfitValue
+        : undefined;
+    const normalizedStopLoss =
+      stopLoss && Number.isFinite(stopLossValue) ? stopLossValue : undefined;
+    try {
+      setIsSubmitting(true);
+      await onMarketOrder?.(
+        type,
+        quantity,
+        submitPrice,
+        normalizedTakeProfit,
+        normalizedStopLoss
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   if (!market) return null;
 
@@ -511,62 +547,98 @@ export function TradingRoomAdvancedOrderPanel({
               <>
                 <Button
                   type="button"
-                  disabled={disabled}
-                  onClick={() => onMarketOrder?.('SELL', vol)}
+                  disabled={controlsDisabled}
+                  onClick={() => void submitOrder('SELL', vol)}
                   className="flex min-w-0 flex-col items-center justify-center rounded-lg bg-[var(--trade-red)]/90 py-3 text-white hover:bg-[var(--trade-red)] disabled:opacity-50"
                 >
-                  <span className="text-[10px] font-bold uppercase opacity-80">
-                    Sell
-                  </span>
-                  <span className="block w-full shrink-0 overflow-hidden text-ellipsis whitespace-nowrap px-1 text-center text-xs font-bold">
-                    {formatPrice(bid)}
-                  </span>
+                  {isSubmitting ? (
+                    <span className="flex items-center gap-1 text-[10px] font-bold uppercase opacity-90">
+                      <span className="size-3 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+                      Executing...
+                    </span>
+                  ) : (
+                    <>
+                      <span className="text-[10px] font-bold uppercase opacity-80">
+                        Sell
+                      </span>
+                      <span className="block w-full shrink-0 overflow-hidden text-ellipsis whitespace-nowrap px-1 text-center text-xs font-bold">
+                        {formatPrice(bid)}
+                      </span>
+                    </>
+                  )}
                 </Button>
                 <Button
                   type="button"
-                  disabled={disabled}
-                  onClick={() => onMarketOrder?.('BUY', vol)}
+                  disabled={controlsDisabled}
+                  onClick={() => void submitOrder('BUY', vol)}
                   className="flex min-w-0 flex-col items-center justify-center rounded-lg bg-[var(--trade-green)]/90 py-3 text-white hover:bg-[var(--trade-green)] disabled:opacity-50"
                 >
-                  <span className="text-[10px] font-bold uppercase opacity-80">
-                    Buy
-                  </span>
-                  <span className="block w-full shrink-0 overflow-hidden text-ellipsis whitespace-nowrap px-1 text-center text-xs font-bold">
-                    {formatPrice(ask)}
-                  </span>
+                  {isSubmitting ? (
+                    <span className="flex items-center gap-1 text-[10px] font-bold uppercase opacity-90">
+                      <span className="size-3 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+                      Executing...
+                    </span>
+                  ) : (
+                    <>
+                      <span className="text-[10px] font-bold uppercase opacity-80">
+                        Buy
+                      </span>
+                      <span className="block w-full shrink-0 overflow-hidden text-ellipsis whitespace-nowrap px-1 text-center text-xs font-bold">
+                        {formatPrice(ask)}
+                      </span>
+                    </>
+                  )}
                 </Button>
               </>
             ) : (
               <>
                 <Button
                   type="button"
-                  disabled={disabled}
+                  disabled={controlsDisabled}
                   onClick={() =>
-                    onMarketOrder?.('SELL', vol, parseFloat(displayPrice))
+                    void submitOrder('SELL', vol, parseFloat(displayPrice))
                   }
                   className="flex min-w-0 flex-col items-center justify-center rounded-lg bg-[var(--trade-red)]/90 py-3 text-white hover:bg-[var(--trade-red)] disabled:opacity-50"
                 >
-                  <span className="text-[10px] font-bold uppercase opacity-80">
-                    Sell Stop
-                  </span>
-                  <span className="block w-full shrink-0 overflow-hidden text-ellipsis whitespace-nowrap px-1 text-center text-xs font-bold">
-                    {formatPrice(parseFloat(displayPrice) || bid)}
-                  </span>
+                  {isSubmitting ? (
+                    <span className="flex items-center gap-1 text-[10px] font-bold uppercase opacity-90">
+                      <span className="size-3 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+                      Executing...
+                    </span>
+                  ) : (
+                    <>
+                      <span className="text-[10px] font-bold uppercase opacity-80">
+                        Sell Stop
+                      </span>
+                      <span className="block w-full shrink-0 overflow-hidden text-ellipsis whitespace-nowrap px-1 text-center text-xs font-bold">
+                        {formatPrice(parseFloat(displayPrice) || bid)}
+                      </span>
+                    </>
+                  )}
                 </Button>
                 <Button
                   type="button"
-                  disabled={disabled}
+                  disabled={controlsDisabled}
                   onClick={() =>
-                    onMarketOrder?.('BUY', vol, parseFloat(displayPrice))
+                    void submitOrder('BUY', vol, parseFloat(displayPrice))
                   }
                   className="flex min-w-0 flex-col items-center justify-center rounded-lg bg-[var(--trade-green)]/90 py-3 text-white hover:bg-[var(--trade-green)] disabled:opacity-50"
                 >
-                  <span className="text-[10px] font-bold uppercase opacity-80">
-                    Buy Limit
-                  </span>
-                  <span className="block w-full shrink-0 overflow-hidden text-ellipsis whitespace-nowrap px-1 text-center text-xs font-bold">
-                    {formatPrice(parseFloat(displayPrice) || ask)}
-                  </span>
+                  {isSubmitting ? (
+                    <span className="flex items-center gap-1 text-[10px] font-bold uppercase opacity-90">
+                      <span className="size-3 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+                      Executing...
+                    </span>
+                  ) : (
+                    <>
+                      <span className="text-[10px] font-bold uppercase opacity-80">
+                        Buy Limit
+                      </span>
+                      <span className="block w-full shrink-0 overflow-hidden text-ellipsis whitespace-nowrap px-1 text-center text-xs font-bold">
+                        {formatPrice(parseFloat(displayPrice) || ask)}
+                      </span>
+                    </>
+                  )}
                 </Button>
               </>
             )}

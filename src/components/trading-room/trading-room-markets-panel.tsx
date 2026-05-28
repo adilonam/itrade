@@ -27,7 +27,10 @@ interface TradingRoomMarketsPanelProps {
   selectedSymbolId: string | null;
   selectedMarket: Market | null;
   onSelectSymbol: (id: string, market: Market | null) => void;
-  onMarketOrder?: (type: 'BUY' | 'SELL', quantity: number) => void;
+  onMarketOrder?: (
+    type: 'BUY' | 'SELL',
+    quantity: number
+  ) => Promise<void> | void;
   onAdvancedOrderClick?: () => void;
   /** When true, buy/sell controls are inactive (e.g. user not signed in). */
   tradingDisabled?: boolean;
@@ -58,6 +61,7 @@ export function TradingRoomMarketsPanel({
   void _selectedMarket; // Reserved for future use
   const t = useTranslations('Trade.markets');
   const [listTab, setListTab] = useState<'favorites' | 'movers'>('movers');
+  const [symbolQuery, setSymbolQuery] = useState('');
 
   const getPrice = (item: SymbolItem) =>
     isMarket(item) ? item.lastPrice : (item as MockSymbol).price;
@@ -65,6 +69,17 @@ export function TradingRoomMarketsPanel({
   const getName = (item: SymbolItem) =>
     isMarket(item) ? (item as Market).name : (item as MockSymbol).name;
   const getId = (item: SymbolItem) => item.id;
+  const normalize = (value: string) =>
+    value.toLowerCase().replace(/[^a-z0-9]/g, '');
+  const query = normalize(symbolQuery.trim());
+  const filteredSymbols =
+    query.length === 0
+      ? symbols
+      : symbols.filter((item) => {
+          const symbol = normalize(getSymbol(item));
+          const name = normalize(getName(item));
+          return symbol.includes(query) || name.includes(query);
+        });
 
   const formatPrice = (price: number) => {
     const s = price >= 1 ? price.toFixed(5) : price.toFixed(3);
@@ -240,7 +255,9 @@ export function TradingRoomMarketsPanel({
         <div className="relative">
           <input
             type="text"
-            placeholder={t('symbolPlaceholder')}
+            placeholder="Symbol"
+            value={symbolQuery}
+            onChange={(e) => setSymbolQuery(e.target.value)}
             className="w-full rounded border border-[var(--trade-border)] bg-[var(--trade-dark)] px-3 py-1.5 text-sm text-[var(--trade-text)] placeholder:text-[var(--trade-text-muted)] focus:border-[var(--trade-accent-blue)] focus:outline-none focus:ring-1 focus:ring-[var(--trade-accent-blue)]"
           />
         </div>
@@ -250,13 +267,13 @@ export function TradingRoomMarketsPanel({
         <div className="flex shrink-0 items-center justify-between border-b border-[var(--trade-border)] bg-[var(--trade-dark)]/40 px-3 py-2">
           <div className="flex items-center gap-2">
             <IconTrendingUp className="size-4 text-[var(--trade-accent-blue)]" />
-            <span className="text-xs font-bold uppercase tracking-wider">{t('popular')}</span>
+            <span className="text-xs font-bold uppercase tracking-wider">Popular</span>
             <span className="rounded bg-[var(--trade-border)] px-1.5 py-0.5 text-[10px]">{symbols.length}</span>
           </div>
         </div>
         <ScrollArea className={compact ? 'min-h-0 max-h-[28vh] flex-1' : 'min-h-0 flex-1'}>
           <div className="space-y-0">
-            {symbols.map((item) => {
+            {filteredSymbols.map((item) => {
               const id = getId(item);
               const isSelected = selectedSymbolId === id;
               return <div key={id}>{rowContent(item, isSelected)}</div>;

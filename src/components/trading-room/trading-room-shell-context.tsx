@@ -56,7 +56,9 @@ type TradingRoomShellContextValue = {
   handleMarketOrder: (
     type: 'BUY' | 'SELL',
     quantity: number,
-    limitPrice?: number
+    limitPrice?: number,
+    takeProfit?: number,
+    stopLoss?: number
   ) => Promise<void>;
   advancedOrderMarket: AdvancedOrderMarket;
   tradeRoom: 'TRADING' | 'INSTITUTIONAL' | 'STOCK';
@@ -211,7 +213,13 @@ export function TradingRoomShellProvider({ children }: { children: React.ReactNo
   }, []);
 
   const handleMarketOrder = useCallback(
-    async (type: 'BUY' | 'SELL', quantity: number, limitPrice?: number) => {
+    async (
+      type: 'BUY' | 'SELL',
+      quantity: number,
+      limitPrice?: number,
+      takeProfit?: number,
+      stopLoss?: number
+    ) => {
       if (!session?.user?.id || !selectedMarket) {
         toast.error('Sign in and select a market to trade');
         return;
@@ -229,6 +237,8 @@ export function TradingRoomShellProvider({ children }: { children: React.ReactNo
             : `${type} ${quantity} lots`
         };
         if (isPending) body.executedPrice = limitPrice;
+        if (takeProfit !== undefined) body.takeProfit = takeProfit;
+        if (stopLoss !== undefined) body.stopLoss = stopLoss;
         const res = await fetch('/api/user/positions', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
