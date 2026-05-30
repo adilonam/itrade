@@ -62,6 +62,64 @@
       "title": "Where Confidence Meets Clarity",
       "join": "Join {appName}"
     },
+    "cryptoPage": {
+      "breadcrumb": {
+        "markets": "Markets",
+        "current": "Cryptocurrencies"
+      },
+      "title": "Cryptocurrencies",
+      "introHeading": "The Global Rise of Cryptocurrencies",
+      "paragraph1": "Cryptocurrencies have become a key component of today's trading environment, offering a decentralized and technology-driven alternative to traditional assets. Built on blockchain networks, digital currencies provide transparency and security while creating new avenues for global participation. Their volatility and continuous development make them a distinct asset class for traders seeking diversification and exposure to fast-moving markets.",
+      "paragraph2": "With crypto CFDs, traders can speculate on price movements without directly holding digital coins. This allows flexibility to trade in both rising and falling conditions while using advanced tools to manage risk. From well-known assets like Bitcoin and Ethereum to emerging altcoins, our platform delivers access to a market that operates without interruption, 24 hours a day.",
+      "highlights": {
+        "wideCoverage": {
+          "title": "Wide Asset Coverage",
+          "description": "Access major and alternative cryptocurrencies in one place."
+        },
+        "alwaysOpen": {
+          "title": "24/7 Availability",
+          "description": "Engage in markets that remain open around the clock."
+        },
+        "execution": {
+          "title": "Reliable Execution",
+          "description": "Execute trades quickly and efficiently."
+        },
+        "versatile": {
+          "title": "Versatile Trading",
+          "description": "Trade long or short with the flexibility of CFDs."
+        }
+      },
+      "tagline": "Innovation in Motion. Markets Without Borders."
+    },
+    "currenciesPage": {
+      "breadcrumb": {
+        "markets": "Markets",
+        "current": "Currencies"
+      },
+      "title": "Currencies",
+      "introHeading": "Currencies in Focus",
+      "paragraph1": "Currencies remain the foundation of international trade and finance, serving as the official units of value across global economies. Their prices fluctuate daily, influenced by supply and demand, interest rate decisions, inflation, and geopolitical developments. The foreign exchange (forex) market is the world's largest financial marketplace, operating five days a week with unmatched liquidity and trading volume.",
+      "paragraph2": "Forex trading often takes place through Contracts for Difference (CFDs), allowing traders to speculate on price movements without owning the underlying currencies. Trading is conducted in pairs, reflecting the strength of one currency relative to another. Well-known majors like EUR/USD and GBP/USD dominate market activity, while minor and exotic pairs provide additional opportunities for diversification. With constant price movements and round-the-clock access, currencies and CFD trading remain at the core of global financial markets.",
+      "highlights": {
+        "pairs": {
+          "title": "40+ Currency Pairs",
+          "description": "Access a wide range of major, minor, and exotic pairs."
+        },
+        "liquidity": {
+          "title": "Liquidity & Speed",
+          "description": "Trade in the world's most liquid market."
+        },
+        "global": {
+          "title": "Global Opportunities",
+          "description": "React to shifting economic and political events worldwide."
+        },
+        "flexible": {
+          "title": "Flexible Strategies",
+          "description": "Speculate on both rising and falling exchange rates."
+        }
+      },
+      "tagline": "Innovation in Motion. Markets Without Borders."
+    },
     "footer": {
       "legal": "Legal",
       "aboutUs": "About Us",

@@ -8,7 +8,11 @@ const isAuthPage = (pathname: string) =>
   pathname === '/auth/forgot-password' ||
   pathname === '/auth/reset-password';
 const isPublicPath = (pathname: string) =>
-  pathname === '/' || isAuthPage(pathname) || pathname.startsWith('/api/auth');
+  pathname === '/' ||
+  pathname === '/cryptocurrencies' ||
+  pathname === '/currencies' ||
+  isAuthPage(pathname) ||
+  pathname.startsWith('/api/auth');
 
 export default withAuth(
   async function middleware(req) {
