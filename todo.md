@@ -330,10 +330,6 @@ bugs :
 
 
 
-- [ ] make it responsive 
-- [ ] make the new ui 
-
-
 
 
 
@@ -344,6 +340,6 @@ bugs :
 - [x] change / details 
 - [x] GET BACK MONEY ON DEACTIVATE 
 - [x] CLICK LOGO GO TRADE
-- [ ] CREATE PAGES FROM LANGIND PAGE 100 USD 
-- [ ] demo account 
+- [x] CREATE PAGES FROM LANGIND PAGE 100 USD 
+- [x] demo account 
 - [ ] news management

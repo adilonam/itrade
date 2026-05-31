@@ -120,6 +120,108 @@
       },
       "tagline": "Innovation in Motion. Markets Without Borders."
     },
+    "stocksPage": {
+      "breadcrumb": {
+        "markets": "Markets",
+        "current": "Stocks"
+      },
+      "title": "Stocks",
+      "introHeading": "Trade the World's Leading Companies",
+      "paragraph1": "Stocks provide direct exposure to the performance of leading companies across industries and regions. Trading stock CFDs allows participants to engage with some of the world's most recognized businesses, from technology innovators to financial institutions. Driven by corporate earnings, sector growth, and macroeconomic factors, stock markets offer traders diverse opportunities to react to both long-term trends and short-term market movements. With flexible access and efficient execution, stocks remain a central choice for portfolio diversification.",
+      "highlights": {
+        "stockCfds": {
+          "title": "200+ Stock CFDs",
+          "description": "Trade shares of companies across multiple global exchanges."
+        },
+        "leaders": {
+          "title": "Leaders in Every Sector",
+          "description": "Access technology, finance, energy, and more."
+        },
+        "flexible": {
+          "title": "Flexible Trading",
+          "description": "Speculate on price changes without direct ownership."
+        },
+        "insights": {
+          "title": "Market Insights",
+          "description": "React to earnings releases and breaking news."
+        }
+      },
+      "tagline": "Innovation in Motion. Markets Without Borders."
+    },
+    "commoditiesPage": {
+      "breadcrumb": {
+        "markets": "Markets",
+        "current": "Commodities"
+      },
+      "title": "Commodities",
+      "introHeading": "Commodities as the Building Blocks of Global Markets",
+      "paragraph1": "Commodities have always been central to trade, representing the raw materials that power industries and support economic growth. Energy, metals, and agricultural products influence not only global supply chains but also financial markets, where shifts in production and demand drive constant price changes.",
+      "paragraph2": "For traders, commodities are often accessed through Contracts for Difference (CFDs), which make it possible to speculate on price movements without taking physical delivery of the underlying assets. This allows participation in markets ranging from the safe-haven appeal of gold and silver to the volatility of crude oil and natural gas. Commodities traded via CFDs remain a diverse and dynamic market, offering both defensive positions and speculative opportunities tied to real-world economic forces.",
+      "highlights": {
+        "metals": {
+          "title": "Metals with Enduring Value",
+          "description": "Gold, silver, platinum, and palladium used for both investment and industry."
+        },
+        "energy": {
+          "title": "Energy as a Market Driver",
+          "description": "Crude oil, Brent, and natural gas reflecting global demand and supply."
+        },
+        "agriculture": {
+          "title": "Agricultural Influence",
+          "description": "Coffee, wheat, sugar, and other staples shaped by seasonality and consumption."
+        },
+        "industrial": {
+          "title": "Industrial Inputs",
+          "description": "Copper, aluminum, and nickel essential for infrastructure and manufacturing."
+        }
+      },
+      "tagline": "Innovation in Motion. Markets Without Borders."
+    },
+    "indicesPage": {
+      "breadcrumb": {
+        "markets": "Markets",
+        "current": "Indices"
+      },
+      "title": "Indices",
+      "introHeading": "Indices as Benchmarks of Global Markets",
+      "paragraph1": "Stock indices are among the most widely followed measures of economic performance, representing groups of leading companies within a region or sector. By trading indices, participants gain exposure to broader market movements rather than focusing on individual stocks.",
+      "paragraph2": "Well-known benchmarks such as the S&P 500, Dow Jones, and NASDAQ 100 reflect developments in the United States, while the DAX 40, FTSE 100, and Nikkei 225 provide insight into European and Asian economies. Index CFDs allow traders to respond efficiently to global economic shifts, corporate earnings, and geopolitical events, offering a practical way to follow the pulse of international markets.",
+      "highlights": {
+        "globalBenchmarks": {
+          "title": "Global Benchmarks",
+          "description": "Access leading indices including S&P 500, NASDAQ 100, and DAX 40."
+        },
+        "broadMarketExposure": {
+          "title": "Broad Market Exposure",
+          "description": "Trade trends that capture the movement of entire economies."
+        },
+        "regionalCoverage": {
+          "title": "Regional Coverage",
+          "description": "Engage with indices from Europe, Asia, and beyond."
+        },
+        "flexibleTradingApproach": {
+          "title": "Flexible Trading Approach",
+          "description": "Speculate on overall market direction through CFDs."
+        }
+      },
+      "tagline": "Innovation in Motion. Markets Without Borders."
+    },
+    "cfdsPage": {
+      "breadcrumb": {
+        "learning": "Learning",
+        "current": "Cfds"
+      },
+      "title": "CFDs",
+      "introHeading": "Why Traders Choose CFDs",
+      "paragraph1": "CFDs have become a central instrument in modern trading, valued for their adaptability and market reach. Rather than buying and holding assets, traders speculate on price differences, creating opportunities in fast-moving markets without the requirement of ownership. This makes CFDs an efficient way to diversify strategies and react to market shifts.",
+      "paragraph2": "With CFDs, traders can access global stocks, indices, commodities, cryptos and currencies within a single account. The ability to go long or short provides flexibility across different conditions, while leverage magnifies both potential returns and risks. As such, CFDs are best approached with structured strategies and consistent risk management, balancing opportunity with responsibility.",
+      "bullets": {
+        "one": "Engage with global markets through one account",
+        "two": "Trade long or short depending on market conditions",
+        "three": "Access a wide range of instruments across asset classes",
+        "four": "Manage risk effectively to maintain trading discipline"
+      }
+    },
     "footer": {
       "legal": "Legal",
       "aboutUs": "About Us",
@@ -163,8 +265,6 @@
       "technicalFundamental": "Technical and Fundamental",
       "glossary": "Glossary",
       "nfp": "NFP",
-      "accountTypes": "Account Types",
-      "assetsCalculator": "Assets Calculator",
       "aboutUs": "About Us",
       "faqs": "FAQs – Trading Platform"
     }

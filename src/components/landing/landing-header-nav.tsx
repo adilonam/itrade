@@ -26,7 +26,6 @@ const landingHeaderMenuConfig = [
   {
     labelKey: 'learning' as const,
     items: [
-      { labelKey: 'education' as const, href: colbariSiteLinks.education },
       { labelKey: 'economicCalendar' as const, href: colbariSiteLinks.economicCalendar },
       { labelKey: 'cfds' as const, href: colbariSiteLinks.learningCfds },
       { labelKey: 'marketMovers' as const, href: colbariSiteLinks.learningMarketMovers },
@@ -43,8 +42,6 @@ const landingHeaderMenuConfig = [
   {
     labelKey: 'account' as const,
     items: [
-      { labelKey: 'accountTypes' as const, href: colbariSiteLinks.accountTypes },
-      { labelKey: 'assetsCalculator' as const, href: colbariSiteLinks.assetsCalculator },
       { labelKey: 'aboutUs' as const, href: colbariSiteLinks.aboutUs },
       { labelKey: 'faqs' as const, href: colbariSiteLinks.faqs }
     ]

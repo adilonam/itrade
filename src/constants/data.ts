@@ -361,27 +361,25 @@ export const landingPlaceholderLink = '#' as const;
 
 export const colbariSiteLinks = {
   base: landingPlaceholderLink,
-  legal: landingPlaceholderLink,
-  aboutUs: landingPlaceholderLink,
-  contactUs: landingPlaceholderLink,
+  legal: '/legal',
+  aboutUs: '/about-us',
+  contactUs: '/contact-us',
   liveChat: landingPlaceholderLink,
   education: landingPlaceholderLink,
-  economicCalendar: landingPlaceholderLink,
-  accountTypes: landingPlaceholderLink,
-  faqs: landingPlaceholderLink,
+  economicCalendar: '/economic-calendar',
+  faqs: '/faqs-trading-platform',
   marketsCryptocurrencies: '/cryptocurrencies',
   marketsCurrencies: '/currencies',
-  marketsStocks: landingPlaceholderLink,
-  marketsCommodities: landingPlaceholderLink,
-  marketsIndices: landingPlaceholderLink,
-  learningCfds: landingPlaceholderLink,
-  learningMarketMovers: landingPlaceholderLink,
-  learningTradingPitfalls: landingPlaceholderLink,
-  learningSmartTrading: landingPlaceholderLink,
-  learningTechnicalFundamental: landingPlaceholderLink,
-  learningGlossary: landingPlaceholderLink,
-  learningNfp: landingPlaceholderLink,
-  assetsCalculator: landingPlaceholderLink
+  marketsStocks: '/stocks',
+  marketsCommodities: '/commodities',
+  marketsIndices: '/indices',
+  learningCfds: '/cfds',
+  learningMarketMovers: '/market-movers',
+  learningTradingPitfalls: '/trading-pitfalls',
+  learningSmartTrading: '/smart-trading',
+  learningTechnicalFundamental: '/technical-fundamental',
+  learningGlossary: '/glossary',
+  learningNfp: '/nfp'
 } as const;
 
 export const landingLanguages = [
@@ -416,23 +414,24 @@ export const landingHeaderMenus: LandingHeaderMenu[] = [
     label: 'Learning',
     items: [
       { label: 'Education', href: landingPlaceholderLink },
-      { label: 'Economic Calendar', href: landingPlaceholderLink },
-      { label: 'CFDs', href: landingPlaceholderLink },
-      { label: 'Market Movers', href: landingPlaceholderLink },
-      { label: 'Trading Pitfalls', href: landingPlaceholderLink },
-      { label: 'Smart Trading', href: landingPlaceholderLink },
-      { label: 'Technical and Fundamental', href: landingPlaceholderLink },
-      { label: 'Glossary', href: landingPlaceholderLink },
-      { label: 'NFP', href: landingPlaceholderLink }
+      { label: 'Economic Calendar', href: colbariSiteLinks.economicCalendar },
+      { label: 'CFDs', href: colbariSiteLinks.learningCfds },
+      { label: 'Market Movers', href: colbariSiteLinks.learningMarketMovers },
+      { label: 'Trading Pitfalls', href: colbariSiteLinks.learningTradingPitfalls },
+      { label: 'Smart Trading', href: colbariSiteLinks.learningSmartTrading },
+      {
+        label: 'Technical and Fundamental',
+        href: colbariSiteLinks.learningTechnicalFundamental
+      },
+      { label: 'Glossary', href: colbariSiteLinks.learningGlossary },
+      { label: 'NFP', href: colbariSiteLinks.learningNfp }
     ]
   },
   {
     label: 'Account',
     items: [
-      { label: 'Account Types', href: landingPlaceholderLink },
-      { label: 'Assets Calculator', href: landingPlaceholderLink },
-      { label: 'About Us', href: landingPlaceholderLink },
-      { label: 'FAQs – Trading Platform', href: landingPlaceholderLink }
+      { label: 'About Us', href: colbariSiteLinks.aboutUs },
+      { label: 'FAQs – Trading Platform', href: colbariSiteLinks.faqs }
     ]
   }
 ];

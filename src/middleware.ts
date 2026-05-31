@@ -11,6 +11,10 @@ const isPublicPath = (pathname: string) =>
   pathname === '/' ||
   pathname === '/cryptocurrencies' ||
   pathname === '/currencies' ||
+  pathname === '/cfds' ||
+  pathname === '/indices' ||
+  pathname === '/stocks' ||
+  pathname === '/commodities' ||
   isAuthPage(pathname) ||
   pathname.startsWith('/api/auth');
 
