@@ -1,8 +1,8 @@
 {
-  "name": "NexAsTrade",
+  "name": "law-advise",
   "dockerComposeFile": "docker-compose.yml",
   "service": "app",
-  "workspaceFolder": "/workspaces",
+  "workspaceFolder": "/workspace/law-advise",
 
   // Configure tool-specific properties
   "customizations": {
@@ -72,7 +72,7 @@
   "postCreateCommand": "echo 'Container created successfully!'",
 
   // Use 'initializeCommand' to run commands before the container is created
-  "initializeCommand": "echo 'Initializing dev container for NexAsTrade...'",
+  "initializeCommand": "echo 'Initializing dev container for law-advise...'",
 
   // Use 'postStartCommand' to run commands after the container starts
   "postStartCommand": "echo 'Dev container is ready! Run pnpm dev to start the development server.'",
