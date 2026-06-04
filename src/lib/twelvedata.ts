@@ -6,15 +6,13 @@ import type {
   TwelveDataRsiResponse,
   TwelveDataEmaResponse
 } from '@/types/twelvedata';
-import { getAppSettingsRow } from '@/lib/app-settings';
 import { prisma } from '@/lib/prisma';
 
 class TwelveDataService {
   private readonly baseUrl = 'https://api.twelvedata.com';
 
   private async apiKey(): Promise<string> {
-    const s = await getAppSettingsRow();
-    const k = s?.twelveDataApiKey?.trim();
+    const k = process.env.TWELVE_DATA_API_KEY?.trim();
     return k && k.length > 0 ? k : 'demo';
   }
 

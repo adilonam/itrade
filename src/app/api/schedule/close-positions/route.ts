@@ -1,4 +1,3 @@
-import { getAppSettingsRow } from '@/lib/app-settings';
 import { prisma } from '@/lib/prisma';
 import { NextResponse } from 'next/server';
 import {
@@ -16,10 +15,13 @@ export async function GET() {
     // eslint-disable-next-line no-console
     console.log('Starting scheduled position closing process...');
 
-    const appSettings = await getAppSettingsRow();
+    const minMarginLevelEnv = Number.parseInt(
+      process.env.MIN_MARGIN_LEVEL || '100',
+      10
+    );
     const MIN_MARGIN_LEVEL =
-      appSettings?.minMarginLevel && appSettings.minMarginLevel > 0
-        ? appSettings.minMarginLevel
+      Number.isFinite(minMarginLevelEnv) && minMarginLevelEnv > 0
+        ? minMarginLevelEnv
         : 100;
 
     // Step 1: Check all users with PLACED positions for margin calls

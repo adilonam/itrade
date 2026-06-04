@@ -342,4 +342,12 @@ bugs :
 - [x] CLICK LOGO GO TRADE
 - [x] CREATE PAGES FROM LANGIND PAGE 100 USD 
 - [x] demo account 
+
+
+
 - [ ] news management
+- [x] links on navbar / must go without auth
+- [x] sign up add google 
+- [x] devcontinaer add rg and make devcotianer open on dir name
+- [ ] remove curosr/mcp secret key 
+- [x] remove the env var from admin 

@@ -9,12 +9,23 @@ const isAuthPage = (pathname: string) =>
   pathname === '/auth/reset-password';
 const isPublicPath = (pathname: string) =>
   pathname === '/' ||
+  pathname === '/about-us' ||
+  pathname === '/contact-us' ||
+  pathname === '/legal' ||
   pathname === '/cryptocurrencies' ||
   pathname === '/currencies' ||
-  pathname === '/cfds' ||
+  pathname === '/commodities' ||
   pathname === '/indices' ||
   pathname === '/stocks' ||
-  pathname === '/commodities' ||
+  pathname === '/cfds' ||
+  pathname === '/economic-calendar' ||
+  pathname === '/market-movers' ||
+  pathname === '/trading-pitfalls' ||
+  pathname === '/smart-trading' ||
+  pathname === '/technical-fundamental' ||
+  pathname === '/glossary' ||
+  pathname === '/nfp' ||
+  pathname === '/faqs-trading-platform' ||
   isAuthPage(pathname) ||
   pathname.startsWith('/api/auth');
 

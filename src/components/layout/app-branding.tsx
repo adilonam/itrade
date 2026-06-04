@@ -1,7 +1,5 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import Image from 'next/image';
 import { IconPhotoUp } from '@tabler/icons-react';
 
 interface AppBrandingProps {
@@ -9,46 +7,12 @@ interface AppBrandingProps {
 }
 
 export function AppBranding({ className }: AppBrandingProps) {
-  const [appName, setAppName] = useState('Trade Nova');
-  const [appIcon, setAppIcon] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchAppSettings = async () => {
-      try {
-        const response = await fetch('/api/app-settings');
-        if (response.ok) {
-          const contentType = response.headers.get('content-type');
-          if (contentType?.includes('application/json')) {
-            const data = await response.json();
-            if (typeof data.appName === 'string' && data.appName.trim()) {
-              setAppName(data.appName.trim());
-            }
-            setAppIcon(data.appIcon ?? null);
-          }
-        }
-      } catch (error) {
-        // Use defaults on error
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchAppSettings();
-  }, []);
+  const appName = process.env.NEXT_PUBLIC_APP_NAME?.trim() || 'Trade Nova';
 
   return (
     <div className={`flex items-center gap-3 ${className}`}>
       <div className='flex h-10 w-10 items-center justify-center overflow-hidden rounded-lg'>
-        {isLoading ? (
-          <div className='bg-muted flex h-full w-full animate-pulse items-center justify-center'>
-            <IconPhotoUp className='text-muted-foreground h-5 w-5' />
-          </div>
-        ) : appIcon ? (
-          <Image src={appIcon} alt={`${appName} logo`} width={40} height={40} />
-        ) : (
-          <IconPhotoUp className='text-primary-foreground h-5 w-5' />
-        )}
+        <IconPhotoUp className='text-primary-foreground h-5 w-5' />
       </div>
       <div className='flex flex-col group-data-[collapsible=icon]:hidden'>
         <span className='text-sm font-semibold'>{appName}</span>

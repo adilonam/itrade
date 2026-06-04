@@ -1,4 +1,3 @@
-import { getAppSettingsRow } from '@/lib/app-settings';
 import { getAuthSession } from '@/lib/auth';
 import { ensureUserBalance, parseBalanceType } from '@/lib/balance';
 import { prisma } from '@/lib/prisma';
@@ -47,8 +46,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const appSettings = await getAppSettingsRow();
-    const nowPaymentsApiKey = appSettings?.nowpaymentsApiKey?.trim();
+    const nowPaymentsApiKey = process.env.NOWPAYMENTS_API_KEY?.trim();
     if (!nowPaymentsApiKey) {
       return NextResponse.json(
         { error: 'NOWPayments is not configured on the server.' },

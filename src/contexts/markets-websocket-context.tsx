@@ -43,23 +43,7 @@ export function MarketsWebSocketProvider({
   initialMarkets = []
 }: MarketsWebSocketProviderProps) {
   const [markets, setMarkets] = useState<Market[]>(initialMarkets);
-  const [apiKey, setApiKey] = useState('');
-
-  useEffect(() => {
-    let cancelled = false;
-    fetch('/api/app-settings?label=twelveDataApiKeyPublic')
-      .then((r) => r.json())
-      .then((data: { value?: unknown }) => {
-        if (cancelled) return;
-        if (typeof data.value === 'string') {
-          setApiKey(data.value);
-        }
-      })
-      .catch(() => {});
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  const apiKey = process.env.NEXT_PUBLIC_TWELVE_DATA_API_KEY_PUBLIC || 'demo';
 
   const {
     isConnected,

@@ -22,63 +22,11 @@ function parseBoolEnv(key: string): boolean | undefined {
   return undefined;
 }
 
-function parseMarginLevel(): number | undefined {
-  const raw = pick('MIN_MARGIN_LEVEL');
-  if (raw === undefined) return undefined;
-  const n = parseFloat(raw);
-  if (Number.isFinite(n) && n > 0) return Math.floor(n);
-  return undefined;
-}
-
 function buildPatch(): Prisma.AppSettingsUpdateInput {
   const data: Prisma.AppSettingsUpdateInput = {};
 
-  const appName = pick('NEXT_PUBLIC_APP_NAME');
-  if (appName !== undefined) data.appName = appName;
-
-  const googleClientId = pick('GOOGLE_CLIENT_ID');
-  if (googleClientId !== undefined) data.googleClientId = googleClientId;
-
-  const googleClientSecret = pick('GOOGLE_CLIENT_SECRET');
-  if (googleClientSecret !== undefined) {
-    data.googleClientSecret = googleClientSecret;
-  }
-
-  const twelvePub = pick('NEXT_PUBLIC_TWELVE_DATA_API_KEY');
-  if (twelvePub !== undefined) data.twelveDataApiKeyPublic = twelvePub;
-
-  const twelveSrv = pick('TWELVE_DATA_API_KEY');
-  if (twelveSrv !== undefined) data.twelveDataApiKey = twelveSrv;
-
-  const smtpHost = pick('SMTP_HOST');
-  if (smtpHost !== undefined) data.smtpHost = smtpHost;
-
-  const smtpPort = pick('SMTP_PORT');
-  if (smtpPort !== undefined) data.smtpPort = smtpPort;
-
-  const smtpSecure = parseBoolEnv('SMTP_SECURE');
-  if (smtpSecure !== undefined) data.smtpSecure = smtpSecure;
-
-  const smtpUser = pick('SMTP_USER');
-  if (smtpUser !== undefined) data.smtpUser = smtpUser;
-
-  const smtpPassword = pick('SMTP_PASSWORD');
-  if (smtpPassword !== undefined) data.smtpPassword = smtpPassword;
-
-  const smtpFrom = pick('SMTP_FROM_EMAIL');
-  if (smtpFrom !== undefined) data.smtpFromEmail = smtpFrom;
-
-  const minMargin = parseMarginLevel();
-  if (minMargin !== undefined) data.minMarginLevel = minMargin;
-
-  const av = pick('ALPHAVANTAGE_API_KEY');
-  if (av !== undefined) data.alphaVantageApiKey = av;
-
-  const npKey = pick('NOWPAYMENTS_API_KEY');
-  if (npKey !== undefined) data.nowpaymentsApiKey = npKey;
-
-  const npIpn = pick('NOWPAYMENTS_IPN_SECRET');
-  if (npIpn !== undefined) data.nowpaymentsIpnSecret = npIpn;
+  const openMarket = parseBoolEnv('OPEN_MARKET');
+  if (openMarket !== undefined) data.openMarket = openMarket;
 
   const manualWallet = pick('MANUAL_USDT_DEPOSIT_WALLET_ADDRESS');
   if (manualWallet !== undefined) {
@@ -126,19 +74,10 @@ async function main() {
       await prisma.appSettings.create({
         data: {
           id: 'default',
-          appName: 'Trade Nova',
           openMarket: true,
-          smtpPort: '587',
-          smtpSecure: false,
-          minMarginLevel: 100,
           ...((data as unknown) as Omit<
             Prisma.AppSettingsUncheckedCreateInput,
-            | 'id'
-            | 'appName'
-            | 'openMarket'
-            | 'smtpPort'
-            | 'smtpSecure'
-            | 'minMarginLevel'
+            'id' | 'openMarket'
           >)
         }
       });

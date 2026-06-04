@@ -1,4 +1,3 @@
-import { getAppSettingsRow } from '@/lib/app-settings';
 import { getAuthSession } from '@/lib/auth';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -11,8 +10,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const settings = await getAppSettingsRow();
-    const key = settings?.alphaVantageApiKey?.trim();
+    const key = process.env.ALPHA_VANTAGE_API_KEY?.trim();
     if (!key) {
       return NextResponse.json(
         { error: 'Alpha Vantage API key not configured' },

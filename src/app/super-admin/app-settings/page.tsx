@@ -20,9 +20,8 @@ export default async function AppSettingsPage() {
             App settings
           </h2>
           <p className='mt-1 text-sm text-[var(--trade-text-muted)]'>
-            Branding, integrations, and limits. Database-stored values; public
-            fields are available via GET /api/app-settings with an optional
-            label query.
+            Database-stored operational values. Public fields are available via
+            GET /api/app-settings with an optional label query.
           </p>
         </div>
         <Separator className='bg-[var(--trade-border)]' />

@@ -22,10 +22,7 @@ export async function getAppSettingsRow(): Promise<AppSettings | null> {
 
 /** Public API / client–safe field names (camelCase, Prisma-aligned or derived). */
 export const PUBLIC_APP_SETTING_LABELS = [
-  'appName',
-  'appIcon',
   'openMarket',
-  'twelveDataApiKeyPublic',
   'manualUsdtDepositWalletAddress',
   'googleSignInEnabled'
 ] as const;
@@ -44,13 +41,11 @@ export function pickPublicAppSettings(
 ): Record<PublicAppSettingLabel, string | boolean | null> {
   const r = row;
   const googleSignInEnabled = !!(
-    r?.googleClientId?.trim() && r?.googleClientSecret?.trim()
+    process.env.GOOGLE_CLIENT_ID?.trim() &&
+    process.env.GOOGLE_CLIENT_SECRET?.trim()
   );
   return {
-    appName: r?.appName ?? 'Trade Nova',
-    appIcon: r?.appIcon ?? null,
     openMarket: r?.openMarket ?? true,
-    twelveDataApiKeyPublic: r?.twelveDataApiKeyPublic ?? null,
     manualUsdtDepositWalletAddress: r?.manualUsdtDepositWalletAddress ?? null,
     googleSignInEnabled
   };

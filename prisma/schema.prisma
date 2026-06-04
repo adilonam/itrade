@@ -298,7 +298,6 @@ model Position {
 
   // Indexes for better query performance
   @@index([userBalanceId])
-
   @@map("positions")
 }
 
@@ -393,30 +392,8 @@ enum TransactionType {
 // App Settings model for global configuration
 model AppSettings {
   id         String  @id @default("default")
-  appIcon    String? @map("app_icon") // Path to uploaded icon
-  appName    String  @default("Trade Nova") @map("app_name")
   // When true, users can create/update/close positions; when false, only admin/superadmin can
   openMarket Boolean @default(true) @map("open_market")
-
-  googleClientId     String? @map("google_client_id")
-  googleClientSecret String? @map("google_client_secret") @db.Text
-
-  twelveDataApiKeyPublic String? @map("twelve_data_api_key_public") @db.Text
-  twelveDataApiKey       String? @map("twelve_data_api_key") @db.Text
-
-  smtpHost      String? @map("smtp_host")
-  smtpPort      String  @default("587") @map("smtp_port")
-  smtpSecure    Boolean @default(false) @map("smtp_secure")
-  smtpUser      String? @map("smtp_user")
-  smtpPassword  String? @map("smtp_password") @db.Text
-  smtpFromEmail String? @map("smtp_from_email")
-
-  minMarginLevel Int @default(100) @map("min_margin_level")
-
-  alphaVantageApiKey String? @map("alpha_vantage_api_key") @db.Text
-
-  nowpaymentsApiKey    String? @map("nowpayments_api_key") @db.Text
-  nowpaymentsIpnSecret String? @map("nowpayments_ipn_secret") @db.Text
 
   manualUsdtDepositWalletAddress String? @map("manual_usdt_deposit_wallet_address") @db.Text
 

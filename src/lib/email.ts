@@ -1,16 +1,20 @@
 import nodemailer from 'nodemailer';
-import { getAppSettingsRow } from '@/lib/app-settings';
 import { prisma } from './prisma';
 
 const createTransporter = async () => {
-  const s = await getAppSettingsRow();
+  const host = process.env.SMTP_HOST?.trim();
+  const port = parseInt(process.env.SMTP_PORT?.trim() || '587', 10);
+  const secure = (process.env.SMTP_SECURE?.trim() || '').toLowerCase() === 'true';
+  const user = process.env.SMTP_USER?.trim();
+  const pass = process.env.SMTP_PASSWORD?.trim();
+
   return nodemailer.createTransport({
-    host: s?.smtpHost ?? undefined,
-    port: parseInt(s?.smtpPort || '587', 10),
-    secure: s?.smtpSecure === true,
+    host: host || undefined,
+    port,
+    secure,
     auth: {
-      user: s?.smtpUser ?? undefined,
-      pass: s?.smtpPassword ?? undefined
+      user: user || undefined,
+      pass: pass || undefined
     }
   });
 };
@@ -20,8 +24,7 @@ export async function verifySmtpConnection(): Promise<
   { ok: true } | { ok: false; error: string }
 > {
   try {
-    const s = await getAppSettingsRow();
-    if (!s?.smtpHost?.trim()) {
+    if (!process.env.SMTP_HOST?.trim()) {
       return { ok: false, error: 'SMTP host is not configured' };
     }
     const transporter = await createTransporter();
@@ -46,9 +49,8 @@ const getMailAppName = () => process.env.NEXT_PUBLIC_APP_NAME?.trim() || 'Trade 
 
 export const sendEmail = async (options: EmailOptions) => {
   try {
-    const s = await getAppSettingsRow();
     const appName = getMailAppName();
-    const fromEmail = s?.smtpFromEmail?.trim();
+    const fromEmail = process.env.SMTP_FROM_EMAIL?.trim();
     if (!fromEmail) {
       return { success: false, error: 'SMTP from email is not configured' };
     }

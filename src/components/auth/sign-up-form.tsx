@@ -14,6 +14,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import Link from 'next/link';
+import { signIn } from 'next-auth/react';
+import { IconBrandGoogle } from '@tabler/icons-react';
 
 export function SignUpForm() {
   const [name, setName] = useState('');
@@ -22,6 +24,18 @@ export function SignUpForm() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+
+  const handleGoogleSignIn = async () => {
+    setIsLoading(true);
+    try {
+      await signIn('google', {
+        callbackUrl: '/',
+        redirect: true
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,6 +90,17 @@ export function SignUpForm() {
         </CardDescription>
       </CardHeader>
       <CardContent>
+        <Button
+          type='button'
+          variant='outline'
+          className='mb-4 w-full border-[var(--trade-border)] bg-transparent text-[var(--trade-text)] hover:bg-[var(--trade-dark)]'
+          onClick={handleGoogleSignIn}
+          disabled={isLoading}
+        >
+          <IconBrandGoogle className='mr-2 h-4 w-4' />
+          Continue with Google
+        </Button>
+        <div className='mb-4 h-px bg-[var(--trade-border)]' />
         <form onSubmit={handleSubmit} className='space-y-4'>
           <div className='space-y-2'>
             <Label htmlFor='name' className='text-[var(--trade-text-muted)]'>

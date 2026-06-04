@@ -53,11 +53,7 @@ async function ensureAppSettings(prisma: PrismaClient) {
     where: { id: 'default' },
     create: {
       id: 'default',
-      appName: 'Trade Nova',
-      openMarket: true,
-      smtpPort: '587',
-      smtpSecure: false,
-      minMarginLevel: 100
+      openMarket: true
     },
     update: {}
   });

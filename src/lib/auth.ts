@@ -3,7 +3,6 @@ import { getServerSession } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
-import { getAppSettingsRow } from '@/lib/app-settings';
 import { prisma } from './prisma';
 
 const sharedCallbacks: NextAuthOptions['callbacks'] = {
@@ -52,7 +51,6 @@ const sharedCallbacks: NextAuthOptions['callbacks'] = {
 };
 
 export async function buildAuthOptions(): Promise<NextAuthOptions> {
-  const settings = await getAppSettingsRow();
   const providers: NextAuthOptions['providers'] = [
     CredentialsProvider({
       id: 'mfa',
@@ -109,8 +107,8 @@ export async function buildAuthOptions(): Promise<NextAuthOptions> {
     })
   ];
 
-  const gid = settings?.googleClientId?.trim();
-  const gsec = settings?.googleClientSecret?.trim();
+  const gid = process.env.GOOGLE_CLIENT_ID?.trim();
+  const gsec = process.env.GOOGLE_CLIENT_SECRET?.trim();
   if (gid && gsec) {
     providers.unshift(
       GoogleProvider({

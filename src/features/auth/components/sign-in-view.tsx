@@ -1,6 +1,5 @@
 import { AuthSidebarBrandLink } from '@/components/auth/auth-sidebar-brand-link';
 import { SignInForm } from '@/components/auth/sign-in-form';
-import { getAppSettingsRow } from '@/lib/app-settings';
 import { Metadata } from 'next';
 import Link from 'next/link';
 
@@ -10,8 +9,7 @@ export const metadata: Metadata = {
 };
 
 export default async function SignInViewPage() {
-  const row = await getAppSettingsRow();
-  const appName = row?.appName?.trim() || 'Trade Nova';
+  const appName = process.env.NEXT_PUBLIC_APP_NAME?.trim() || 'Trade Nova';
 
   return (
     <div className='trade-room flex min-h-screen w-full bg-[var(--trade-dark)] text-[var(--trade-text)]'>

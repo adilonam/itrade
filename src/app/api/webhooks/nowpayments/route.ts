@@ -1,5 +1,4 @@
 import crypto from 'crypto';
-import { getAppSettingsRow } from '@/lib/app-settings';
 import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 import {
@@ -46,8 +45,7 @@ function safeEquals(a: string, b: string): boolean {
 }
 
 export async function POST(request: NextRequest) {
-  const row = await getAppSettingsRow();
-  const ipnSecret = row?.nowpaymentsIpnSecret?.trim();
+  const ipnSecret = process.env.NOWPAYMENTS_IPN_SECRET?.trim();
   if (!ipnSecret) {
     return NextResponse.json(
       { error: 'NOWPayments webhook secret is not configured.' },
