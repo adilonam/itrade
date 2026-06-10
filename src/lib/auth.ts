@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
+import { DEFAULT_USER_BALANCE_SEED } from './balance';
 import { prisma } from './prisma';
 
 const sharedCallbacks: NextAuthOptions['callbacks'] = {
@@ -133,11 +134,10 @@ export async function buildAuthOptions(): Promise<NextAuthOptions> {
         if (!user?.id) return;
 
         await prisma.userBalance.createMany({
-          data: [
-            { userId: user.id, type: 'REAL', amount: 0 },
-            { userId: user.id, type: 'DEMO', amount: 10000 },
-            { userId: user.id, type: 'INSTITUTIONAL', amount: 0 }
-          ],
+          data: DEFAULT_USER_BALANCE_SEED.map((balance) => ({
+            userId: user.id,
+            ...balance
+          })),
           skipDuplicates: true
         });
       }

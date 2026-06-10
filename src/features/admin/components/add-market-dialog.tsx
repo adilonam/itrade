@@ -49,7 +49,7 @@ const formSchema = z.object({
   type: z.enum(['FOREX', 'CRYPTO', 'STOCKS', 'COMMODITIES', 'INDICES'], {
     required_error: 'Please select a market type'
   }),
-  room: z.enum(['STOCK', 'TRADING', 'INSTITUTIONAL'], {
+  room: z.enum(['STOCK', 'TRADING'], {
     required_error: 'Please select a market room'
   }),
   spread: z.coerce.number().min(0, 'Spread must be non-negative').optional(),
@@ -156,9 +156,8 @@ export function AddMarketDialog({
         <DialogHeader>
           <DialogTitle>Add New Market</DialogTitle>
           <DialogDescription>
-            Add a new market to the trading platform. For Stock and Trading
-            rooms, the symbol is validated against the TwelveData API;
-            Institutional room markets are created without that check.
+            Add a new market to the trading platform. The symbol is validated
+            against the TwelveData API.
           </DialogDescription>
         </DialogHeader>
 
@@ -233,9 +232,6 @@ export function AddMarketDialog({
                     <SelectContent>
                       <SelectItem value='TRADING'>Trading Only</SelectItem>
                       <SelectItem value='STOCK'>Stock Only</SelectItem>
-                      <SelectItem value='INSTITUTIONAL'>
-                        Institutional Only
-                      </SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />

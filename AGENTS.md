@@ -15,5 +15,4 @@ This project uses:
 - Use **next-auth** for authentication
 - Always import types/interfaces from the Prisma schema using: `import type { ... } from '@/lib/prisma/generated/client';`
 - Decompose code for good architecture: use components and functions for reusability and clarity
-- Positions with room type STOCK or TRADING use balance type REAL, while positions with room type INSTITUTIONAL use balance type INSTITUTIONAL.
 - The trade header balance dropdown selection must be persisted and applied globally across user-facing trade data components; position/financial components must refresh immediately when it changes, and the change must emit a webhook event. see src/lib/balance-selection.ts

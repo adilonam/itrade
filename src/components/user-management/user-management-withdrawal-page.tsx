@@ -240,15 +240,15 @@ export function UserManagementWithdrawalPage() {
       <div className="flex flex-1 flex-col gap-6 p-6">
         <div className="mx-auto w-full max-w-3xl space-y-8">
           <nav aria-label={tShared('progress')} className="w-full">
-            <ol className="flex flex-wrap items-center gap-2 sm:gap-0">
+            <ol className="flex w-full items-stretch">
               {withdrawalSteps.map((label, i) => {
                 const active = step === i;
                 const done = step > i;
                 return (
-                  <li key={label} className="flex min-w-0 flex-1 items-center">
+                  <li key={label} className="flex min-w-0 flex-1">
                     <div
                       className={cn(
-                        'flex w-full flex-col border-b-2 pb-3 transition-colors',
+                        'flex w-full flex-col items-center border-b-2 pb-3 text-center transition-colors',
                         active || done
                           ? 'border-[var(--trade-accent-blue)]'
                           : 'border-[var(--trade-border)]'
@@ -256,7 +256,7 @@ export function UserManagementWithdrawalPage() {
                     >
                       <span
                         className={cn(
-                          'text-xs font-medium uppercase tracking-wide',
+                          'flex min-h-8 items-center justify-center px-1 text-xs font-medium uppercase leading-tight tracking-wide',
                           active
                             ? 'text-[var(--trade-accent-blue)]'
                             : 'text-[var(--trade-text-muted)]'
@@ -264,7 +264,7 @@ export function UserManagementWithdrawalPage() {
                       >
                         {label}
                       </span>
-                      <span className="mt-1 flex min-h-6 items-center gap-1.5 text-sm font-semibold text-[var(--trade-text)]">
+                      <span className="mt-1 flex size-6 items-center justify-center text-sm font-semibold text-[var(--trade-text)]">
                         {done ? (
                           <span className="flex size-6 items-center justify-center rounded-full bg-[var(--trade-accent-blue)]/20 text-[var(--trade-accent-blue)]">
                             <IconCheck className="size-3.5" stroke={2.5} />

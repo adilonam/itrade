@@ -289,7 +289,7 @@ export function UserManagementPanelControl() {
     <div className="flex min-h-0 flex-1 flex-col overflow-auto">
       <UserManagementPageHeader title={t('title')} compact />
 
-      <div className="flex flex-1 flex-col gap-6 p-6">
+      <div className="flex flex-1 flex-col gap-6 p-4 md:p-6">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
           <div className="min-w-0 flex-1 space-y-3">
             {error && (

@@ -2,19 +2,27 @@ import type { BalanceType, Prisma, Room } from '@/lib/prisma/generated/client';
 
 const DEFAULT_BALANCE_TYPE: BalanceType = 'REAL';
 
+export const DEFAULT_REAL_BALANCE_AMOUNT = 0;
+export const DEFAULT_DEMO_BALANCE_AMOUNT = 10_000;
+
+export const DEFAULT_USER_BALANCE_SEED = [
+  { type: 'REAL' as const, amount: DEFAULT_REAL_BALANCE_AMOUNT },
+  { type: 'DEMO' as const, amount: DEFAULT_DEMO_BALANCE_AMOUNT }
+] as const;
+
 export type ResolveUserBalanceResult =
   | { ok: true; id: string; type: BalanceType }
   | { ok: false; error: 'INVALID_USER_BALANCE_ID' };
 
 export function parseBalanceType(input: unknown): BalanceType {
-  if (input === 'DEMO' || input === 'INSTITUTIONAL' || input === 'REAL') {
+  if (input === 'DEMO' || input === 'REAL') {
     return input;
   }
   return DEFAULT_BALANCE_TYPE;
 }
 
-export function getBalanceTypeForPositionRoom(room: unknown): BalanceType {
-  return room === 'INSTITUTIONAL' ? 'INSTITUTIONAL' : 'REAL';
+export function getBalanceTypeForPositionRoom(): BalanceType {
+  return 'REAL';
 }
 
 export async function getUserBalanceAmount(
@@ -44,7 +52,7 @@ export async function ensureUserBalance(
 /**
  * Resolve which UserBalance row funds a new position.
  * Prefer explicit `userBalanceId` when provided; otherwise derive from `room`
- * (TRADING/STOCK → REAL, INSTITUTIONAL → INSTITUTIONAL) or explicit `balanceType`.
+ * (TRADING/STOCK → REAL) or explicit `balanceType`.
  */
 export async function resolveUserBalanceForNewPosition(
   tx: Prisma.TransactionClient,
@@ -69,7 +77,7 @@ export async function resolveUserBalanceForNewPosition(
     return { ok: true, id: row.id, type: row.type };
   }
 
-  const explicitTypes: BalanceType[] = ['DEMO', 'REAL', 'INSTITUTIONAL'];
+  const explicitTypes: BalanceType[] = ['DEMO', 'REAL'];
   const hasExplicitBalanceType =
     input.balanceType !== undefined &&
     input.balanceType !== null &&
@@ -78,7 +86,7 @@ export async function resolveUserBalanceForNewPosition(
 
   const balanceType = hasExplicitBalanceType
     ? parseBalanceType(input.balanceType)
-    : getBalanceTypeForPositionRoom(input.room ?? 'TRADING');
+    : getBalanceTypeForPositionRoom();
 
   const row = await ensureUserBalance(tx, userId, balanceType);
   return { ok: true, id: row.id, type: row.type };

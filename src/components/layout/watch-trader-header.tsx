@@ -15,6 +15,10 @@ import { useTranslations } from 'next-intl';
 import { UserNav } from './user-nav';
 import { IconWifi, IconWallet, IconChevronDown } from '@tabler/icons-react';
 import { useTradeBalanceSelection } from '@/hooks/use-trade-balance-selection';
+import {
+  TRADE_BALANCE_TYPES,
+  type TradeBalanceType
+} from '@/lib/balance-selection';
 
 /** Active state for Room Trading nav items (aligned with room-trading-top-nav + TradingView embed route). */
 function isRoomTradingNavActive(pathname: string | null, url: string): boolean {
@@ -34,20 +38,23 @@ function utcClockString() {
   return now.toISOString().slice(11, 19);
 }
 
-export function WatchTraderHeader() {
-  type BalanceType = 'REAL' | 'DEMO' | 'INSTITUTIONAL';
-  type BalanceAmountDisplay = {
-    text: string;
-    nonNegative: boolean;
-  };
+type BalanceAmountDisplay = {
+  text: string;
+  nonNegative: boolean;
+};
 
+const emptyBalanceByType = (): Record<TradeBalanceType, BalanceAmountDisplay | null> => ({
+  REAL: null,
+  DEMO: null
+});
+
+export function WatchTraderHeader() {
   const t = useTranslations('Trade.header');
   const tNav = useTranslations('Trade.nav');
 
-  const balanceLabel: Record<BalanceType, string> = {
+  const balanceLabel: Record<TradeBalanceType, string> = {
     REAL: t('balanceReal'),
-    DEMO: t('balanceDemo'),
-    INSTITUTIONAL: t('balanceInstitutional')
+    DEMO: t('balanceDemo')
   };
 
   const appName = usePublicAppName();
@@ -57,35 +64,26 @@ export function WatchTraderHeader() {
   const [time, setTime] = useState(utcClockString);
   const [openBalanceDropdown, setOpenBalanceDropdown] = useState(false);
   const [balanceByBalanceType, setBalanceByBalanceType] = useState<
-    Record<BalanceType, BalanceAmountDisplay | null>
-  >({
-    REAL: null,
-    DEMO: null,
-    INSTITUTIONAL: null
-  });
+    Record<TradeBalanceType, BalanceAmountDisplay | null>
+  >(emptyBalanceByType);
   const balanceDropdownRef = useRef<HTMLDivElement | null>(null);
 
   const loadFinancialBalance = useCallback(async () => {
     if (!session?.user) {
-      setBalanceByBalanceType({
-        REAL: null,
-        DEMO: null,
-        INSTITUTIONAL: null
-      });
+      setBalanceByBalanceType(emptyBalanceByType());
       return;
     }
     try {
-      const balanceTypes: BalanceType[] = ['REAL', 'DEMO', 'INSTITUTIONAL'];
       const responses = await Promise.all(
-        balanceTypes.map((balanceType) =>
+        TRADE_BALANCE_TYPES.map((balanceType) =>
           fetch(`/api/user/financial?room=TRADING&balanceType=${balanceType}`)
         )
       );
       if (responses.some((response) => !response.ok)) throw new Error('fail');
 
       const payloads = await Promise.all(responses.map((response) => response.json()));
-      const nextBalanceByType = balanceTypes.reduce<
-        Record<BalanceType, BalanceAmountDisplay | null>
+      const nextBalanceByType = TRADE_BALANCE_TYPES.reduce<
+        Record<TradeBalanceType, BalanceAmountDisplay | null>
       >(
         (acc, balanceType, index) => {
           const bal =
@@ -97,20 +95,12 @@ export function WatchTraderHeader() {
           };
           return acc;
         },
-        {
-          REAL: null,
-          DEMO: null,
-          INSTITUTIONAL: null
-        }
+        emptyBalanceByType()
       );
 
       setBalanceByBalanceType(nextBalanceByType);
     } catch {
-      setBalanceByBalanceType({
-        REAL: null,
-        DEMO: null,
-        INSTITUTIONAL: null
-      });
+      setBalanceByBalanceType(emptyBalanceByType());
     }
   }, [session?.user]);
 
@@ -213,35 +203,42 @@ export function WatchTraderHeader() {
       </nav>
 
       <div className="flex shrink-0 items-center justify-self-end gap-2">
-        <div className="relative hidden sm:block" ref={balanceDropdownRef}>
+        <div className="relative" ref={balanceDropdownRef}>
           <button
             type="button"
-            className="flex items-center gap-1 rounded border border-[var(--trade-border)] bg-[var(--trade-dark)] px-2 py-1 font-mono text-[11px]"
+            className="flex max-w-[5.5rem] items-center gap-0.5 rounded border border-[var(--trade-border)] bg-[var(--trade-dark)] px-1.5 py-0.5 font-mono text-[10px] sm:max-w-none sm:gap-1 sm:px-2 sm:py-1 sm:text-[11px]"
             title={t('balanceTitle', { type: selectedBalanceType })}
             aria-haspopup="menu"
             aria-expanded={openBalanceDropdown}
+            aria-label={t('balanceTypeSelector')}
             onClick={() => setOpenBalanceDropdown((prev) => !prev)}
           >
-            <IconWallet className="size-3.5 shrink-0 text-[var(--trade-text-muted)] opacity-80" />
-            <span className="text-[var(--trade-text-muted)]">
-              {balanceLabel[selectedBalanceType]}:
+            <IconWallet className="size-3 shrink-0 text-[var(--trade-text-muted)] opacity-80 sm:size-3.5" />
+            <span className="truncate text-[var(--trade-text)] sm:text-[var(--trade-text-muted)]">
+              <span className="sm:hidden">{balanceLabel[selectedBalanceType]}</span>
+              <span className="hidden sm:inline">
+                {balanceLabel[selectedBalanceType]}:
+              </span>
             </span>
             {selectedBalanceAmount ? (
               <span
-                className={
+                className={cn(
+                  'hidden sm:inline',
                   selectedBalanceAmount.nonNegative
                     ? 'text-[var(--trade-green)]'
                     : 'text-red-400'
-                }
+                )}
               >
                 {selectedBalanceAmount.text}
               </span>
             ) : (
-              <span className="text-[var(--trade-text-muted)]">—</span>
+              <span className="hidden text-[var(--trade-text-muted)] sm:inline">
+                —
+              </span>
             )}
             <IconChevronDown
               className={cn(
-                'size-3 text-[var(--trade-text-muted)] transition-transform',
+                'size-2.5 shrink-0 text-[var(--trade-text-muted)] transition-transform sm:size-3',
                 openBalanceDropdown && 'rotate-180'
               )}
             />
@@ -253,7 +250,7 @@ export function WatchTraderHeader() {
               role="menu"
               aria-label={t('balanceTypeSelector')}
             >
-              {(['REAL', 'INSTITUTIONAL', 'DEMO'] as BalanceType[]).map((balanceType) => {
+              {TRADE_BALANCE_TYPES.map((balanceType) => {
                 const rowBalance = balanceByBalanceType[balanceType];
                 return (
                   <button

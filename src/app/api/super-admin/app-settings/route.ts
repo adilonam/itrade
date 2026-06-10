@@ -10,14 +10,6 @@ function isAllowed(role: string | undefined) {
   return !!role && ALLOWED_ROLES.includes(role);
 }
 
-function strOrNull(v: unknown): string | null | undefined {
-  if (v === undefined) return undefined;
-  if (v === null) return null;
-  if (typeof v !== 'string') return undefined;
-  const t = v.trim();
-  return t.length === 0 ? null : t;
-}
-
 export async function GET() {
   try {
     const session = await getAuthSession();
@@ -49,13 +41,6 @@ export async function PATCH(request: NextRequest) {
 
     const body = (await request.json()) as Record<string, unknown>;
     const data: Prisma.AppSettingsUpdateInput = {};
-
-    const maybeStr = (key: keyof typeof body) => strOrNull(body[key]);
-
-    const manualWallet = maybeStr('manualUsdtDepositWalletAddress');
-    if (manualWallet !== undefined) {
-      data.manualUsdtDepositWalletAddress = manualWallet;
-    }
 
     if (typeof body.openMarket === 'boolean') {
       data.openMarket = body.openMarket;

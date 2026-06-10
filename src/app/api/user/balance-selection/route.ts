@@ -8,7 +8,7 @@ import {
 } from '@/lib/balance-selection';
 
 const BalanceSelectionSchema = z.object({
-  balanceType: z.enum(['REAL', 'DEMO', 'INSTITUTIONAL'])
+  balanceType: z.enum(['REAL', 'DEMO'])
 });
 
 async function sendBalanceSelectionWebhook(payload: {

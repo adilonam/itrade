@@ -9,7 +9,6 @@ import type { Market } from '@/lib/prisma/generated/client';
 import type { MockSymbol } from './mock-data';
 import { getCurrencyFlags } from '@/lib/currency-flags';
 import {
-  IconSearch,
   IconStar,
   IconTrendingUp,
   IconInfoCircle,
@@ -60,7 +59,6 @@ export function TradingRoomMarketsPanel({
 }: TradingRoomMarketsPanelProps) {
   void _selectedMarket; // Reserved for future use
   const t = useTranslations('Trade.markets');
-  const [listTab, setListTab] = useState<'favorites' | 'movers'>('movers');
   const [symbolQuery, setSymbolQuery] = useState('');
 
   const getPrice = (item: SymbolItem) =>
@@ -221,46 +219,13 @@ export function TradingRoomMarketsPanel({
       <div
         className={`shrink-0 border-b border-[var(--trade-border)] ${compact ? 'p-2' : 'p-3'}`}
       >
-        <div className={`flex items-center justify-between ${compact ? 'mb-2' : 'mb-3'}`}>
-          <div className="flex gap-4">
-            <button
-              type="button"
-              onClick={() => setListTab('favorites')}
-              className={`flex items-center gap-1 border-b-2 px-0 py-1 text-xs ${
-                listTab === 'favorites'
-                  ? 'border-[var(--trade-accent-blue)] font-bold text-[var(--trade-text)]'
-                  : 'border-transparent text-[var(--trade-text-muted)] hover:text-[var(--trade-text)]'
-              }`}
-            >
-              <IconStar className="size-3" />
-              {t('favorites')}
-            </button>
-            <button
-              type="button"
-              onClick={() => setListTab('movers')}
-              className={`flex items-center gap-1 border-b-2 px-0 py-1 text-xs ${
-                listTab === 'movers'
-                  ? 'border-[var(--trade-accent-blue)] font-bold text-[var(--trade-text)]'
-                  : 'border-transparent text-[var(--trade-text-muted)] hover:text-[var(--trade-text)]'
-              }`}
-            >
-              <IconTrendingUp className="size-3" />
-              {t('topMovers')}
-            </button>
-          </div>
-          <button type="button" className="text-[var(--trade-text-muted)] hover:text-[var(--trade-text)]" aria-label={t('search')}>
-            <IconSearch className="size-4" />
-          </button>
-        </div>
-        <div className="relative">
-          <input
-            type="text"
-            placeholder="Symbol"
-            value={symbolQuery}
-            onChange={(e) => setSymbolQuery(e.target.value)}
-            className="w-full rounded border border-[var(--trade-border)] bg-[var(--trade-dark)] px-3 py-1.5 text-sm text-[var(--trade-text)] placeholder:text-[var(--trade-text-muted)] focus:border-[var(--trade-accent-blue)] focus:outline-none focus:ring-1 focus:ring-[var(--trade-accent-blue)]"
-          />
-        </div>
+        <input
+          type="text"
+          placeholder="Symbol"
+          value={symbolQuery}
+          onChange={(e) => setSymbolQuery(e.target.value)}
+          className="w-full rounded border border-[var(--trade-border)] bg-[var(--trade-dark)] px-3 py-1.5 text-sm text-[var(--trade-text)] placeholder:text-[var(--trade-text-muted)] focus:border-[var(--trade-accent-blue)] focus:outline-none focus:ring-1 focus:ring-[var(--trade-accent-blue)]"
+        />
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden">

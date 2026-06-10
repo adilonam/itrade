@@ -451,7 +451,9 @@
       "kyc": "التحقق من الهوية"
     },
     "sidebar": {
-      "ariaLabel": "إدارة المستخدم"
+      "ariaLabel": "إدارة المستخدم",
+      "toggle": "فتح القائمة",
+      "mobileDescription": "تنقل إدارة المستخدم"
     },
     "dashboard": {
       "title": "لوحة التحكم",

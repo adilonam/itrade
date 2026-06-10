@@ -34,12 +34,6 @@ const CRYPTOS = [
     symbol: 'USDC',
     name: 'USD Coin',
     hint: 'ERC-20 / supported networks'
-  },
-  {
-    id: 'usdt' as const,
-    symbol: 'USDT',
-    name: 'Tether',
-    hint: 'ERC-20 / TRC-20'
   }
 ];
 
@@ -56,10 +50,12 @@ type StepIndex = 0 | 1 | 2;
 
 type UserManagementDepositPageProps = {
   paymentReturnStatus?: string | null;
+  manualUsdtWalletAddress?: string;
 };
 
 export function UserManagementDepositPage({
-  paymentReturnStatus = null
+  paymentReturnStatus = null,
+  manualUsdtWalletAddress = ''
 }: UserManagementDepositPageProps) {
   const t = useTranslations('UserManagement.deposit');
   const tShared = useTranslations('UserManagement.shared');
@@ -177,15 +173,15 @@ export function UserManagementDepositPage({
         <div className="mx-auto w-full max-w-3xl space-y-8">
           {/* Stepper */}
           <nav aria-label={tShared('progress')} className="w-full">
-            <ol className="flex flex-wrap items-center gap-2 sm:gap-0">
+            <ol className="flex w-full items-stretch">
               {depositSteps.map((label, i) => {
                 const active = step === i;
                 const done = step > i;
                 return (
-                  <li key={label} className="flex min-w-0 flex-1 items-center">
+                  <li key={label} className="flex min-w-0 flex-1">
                     <div
                       className={cn(
-                        'flex w-full flex-col border-b-2 pb-3 transition-colors',
+                        'flex w-full flex-col items-center border-b-2 pb-3 text-center transition-colors',
                         active || done
                           ? 'border-[var(--trade-accent-blue)]'
                           : 'border-[var(--trade-border)]'
@@ -193,7 +189,7 @@ export function UserManagementDepositPage({
                     >
                       <span
                         className={cn(
-                          'text-xs font-medium uppercase tracking-wide',
+                          'flex min-h-8 items-center justify-center px-1 text-xs font-medium uppercase leading-tight tracking-wide',
                           active
                             ? 'text-[var(--trade-accent-blue)]'
                             : 'text-[var(--trade-text-muted)]'
@@ -201,7 +197,7 @@ export function UserManagementDepositPage({
                       >
                         {label}
                       </span>
-                      <span className="mt-1 flex min-h-6 items-center gap-1.5 text-sm font-semibold text-[var(--trade-text)]">
+                      <span className="mt-1 flex size-6 items-center justify-center text-sm font-semibold text-[var(--trade-text)]">
                         {done ? (
                           <span className="flex size-6 items-center justify-center rounded-full bg-[var(--trade-accent-blue)]/20 text-[var(--trade-accent-blue)]">
                             <IconCheck className="size-3.5" stroke={2.5} />
@@ -325,7 +321,7 @@ export function UserManagementDepositPage({
                   </div>
                 </div>
 
-                <div className="grid gap-3 sm:grid-cols-3">
+                <div className="grid gap-3 sm:grid-cols-2">
                   {CRYPTOS.map((c) => {
                     const selected = crypto === c.id;
                     return (
@@ -460,6 +456,7 @@ export function UserManagementDepositPage({
           </section>
 
           <UserManagementManualDepositSection
+            walletAddress={manualUsdtWalletAddress}
             onRequestCreated={() =>
               setDepositListExtraRefresh((n) => n + 1)
             }
@@ -481,8 +478,10 @@ type ManualDepositResult = {
 };
 
 function UserManagementManualDepositSection({
+  walletAddress,
   onRequestCreated
 }: {
+  walletAddress: string;
   onRequestCreated?: () => void;
 }) {
   const [amountRaw, setAmountRaw] = useState('');
@@ -541,15 +540,19 @@ function UserManagementManualDepositSection({
     }
   };
 
+  const displayWalletAddress = result?.walletAddress ?? walletAddress;
+
   const copyAddress = async () => {
-    if (!result?.walletAddress) return;
+    if (!displayWalletAddress) return;
     try {
-      await navigator.clipboard.writeText(result.walletAddress);
+      await navigator.clipboard.writeText(displayWalletAddress);
       toast.success('Address copied');
     } catch {
       toast.error('Could not copy');
     }
   };
+
+  const walletConfigured = walletAddress.trim().length > 0;
 
   return (
     <section
@@ -563,10 +566,36 @@ function UserManagementManualDepositSection({
         Manual USDT deposit
       </h2>
       <p className="mt-1 text-xs text-[var(--trade-text-muted)]">
-        USDT only. Enter the USD amount you will send. After you create the
-        request, you will see the platform wallet address. Your balance is
+        USDT only. Send funds to the platform wallet below, then create a
+        deposit request with the USD amount you transferred. Your balance is
         updated after an administrator verifies your transfer.
       </p>
+
+      {walletConfigured ? (
+        <div className="mt-4">
+          <div className="text-xs font-medium uppercase tracking-wide text-[var(--trade-text-muted)]">
+            USDT deposit address
+          </div>
+          <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-stretch">
+            <div className="min-w-0 flex-1 break-all rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)] px-4 py-3 font-mono text-xs text-[var(--trade-text)]">
+              {walletAddress}
+            </div>
+            <button
+              type="button"
+              onClick={() => void copyAddress()}
+              className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)] px-4 py-3 text-sm font-medium text-[var(--trade-text)] hover:bg-[var(--trade-border)]/40"
+            >
+              <IconCopy className="size-4" stroke={2} />
+              Copy
+            </button>
+          </div>
+        </div>
+      ) : (
+        <p className="mt-4 rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)] px-4 py-3 text-sm text-[var(--trade-text-muted)]">
+          Manual USDT deposits are not configured. Contact support if you need
+          help funding your account.
+        </p>
+      )}
 
       {!result ? (
         <div className="mt-6 space-y-4">
@@ -600,7 +629,7 @@ function UserManagementManualDepositSection({
           <button
             type="button"
             onClick={() => void submitManual()}
-            disabled={submitting || !amountOk}
+            disabled={submitting || !amountOk || !walletConfigured}
             className={cn(
               'inline-flex min-w-[200px] items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold transition-colors',
               'bg-[var(--trade-accent-blue)] text-[var(--trade-panel)] hover:opacity-90',
@@ -626,24 +655,6 @@ function UserManagementManualDepositSection({
             </span>{' '}
             (USDT). Send exactly from your wallet and include no other assets.
           </p>
-          <div>
-            <div className="text-xs font-medium uppercase tracking-wide text-[var(--trade-text-muted)]">
-              USDT deposit address
-            </div>
-            <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-stretch">
-              <div className="min-w-0 flex-1 break-all rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)] px-4 py-3 font-mono text-xs text-[var(--trade-text)]">
-                {result.walletAddress}
-              </div>
-              <button
-                type="button"
-                onClick={() => void copyAddress()}
-                className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)] px-4 py-3 text-sm font-medium text-[var(--trade-text)] hover:bg-[var(--trade-border)]/40"
-              >
-                <IconCopy className="size-4" stroke={2} />
-                Copy
-              </button>
-            </div>
-          </div>
           <p className="text-xs text-[var(--trade-text-muted)]">
             Reference / order ID:{' '}
             <span className="font-mono text-[var(--trade-text)]">

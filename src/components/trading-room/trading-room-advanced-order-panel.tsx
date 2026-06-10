@@ -116,7 +116,7 @@ export function TradingRoomAdvancedOrderPanel({
 
   const handleVolumeChange = (delta: number) => {
     const n = parseFloat(volume) || 0;
-    const next = Math.max(0.01, Math.min(100, n + delta));
+    const next = Math.max(0.01, n + delta);
     setVolume(next.toFixed(2));
   };
 
@@ -298,7 +298,6 @@ export function TradingRoomAdvancedOrderPanel({
                 onBlur={() => {
                   const n = parseFloat(volume);
                   if (Number.isNaN(n) || n < 0.01) setVolume('0.01');
-                  else if (n > 100) setVolume('100');
                   else setVolume(n.toFixed(2));
                 }}
                 className="flex-1 rounded border border-[var(--trade-border)] bg-[var(--trade-dark)] px-3 py-2 text-center text-sm font-bold text-[var(--trade-text)] outline-none focus:ring-1 focus:ring-[var(--trade-accent-blue)]"

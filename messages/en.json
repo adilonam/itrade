@@ -451,7 +451,9 @@
       "kyc": "KYC verification"
     },
     "sidebar": {
-      "ariaLabel": "User management"
+      "ariaLabel": "User management",
+      "toggle": "Open menu",
+      "mobileDescription": "User management navigation"
     },
     "dashboard": {
       "title": "Dashboard",

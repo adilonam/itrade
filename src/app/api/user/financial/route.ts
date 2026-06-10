@@ -14,9 +14,9 @@ export async function GET(request: NextRequest) {
     // Get room query parameter
     const searchParams = request.nextUrl.searchParams;
     const roomParam = searchParams.get('room');
-    const room: 'STOCK' | 'TRADING' | 'INSTITUTIONAL' | 'ALL' =
-      roomParam && ['STOCK', 'TRADING', 'INSTITUTIONAL', 'ALL'].includes(roomParam)
-        ? (roomParam as 'STOCK' | 'TRADING' | 'INSTITUTIONAL' | 'ALL')
+    const room: 'STOCK' | 'TRADING' | 'ALL' =
+      roomParam && ['STOCK', 'TRADING', 'ALL'].includes(roomParam)
+        ? (roomParam as 'STOCK' | 'TRADING' | 'ALL')
         : 'ALL';
     const balanceType = parseBalanceType(searchParams.get('balanceType'));
 

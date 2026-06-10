@@ -165,7 +165,7 @@ const createPositionSchema = z.object({
   description: z.string().optional(),
   status: z.enum(['PLACED', 'PENDING']).optional().default('PLACED'),
   userBalanceId: z.string().optional(),
-  balanceType: z.enum(['REAL', 'DEMO', 'INSTITUTIONAL']).optional()
+  balanceType: z.enum(['REAL', 'DEMO']).optional()
 });
 
 // POST - Create position for a linked user

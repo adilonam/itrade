@@ -2,7 +2,7 @@ import { UserManagementLayoutShell } from '@/components/user-management/user-man
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'PaySnap',
+  title: 'User Management',
   description: 'User management'
 };
 

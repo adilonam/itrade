@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   IconArrowDownLeft,
-  IconArrowRight,
   IconLayoutGrid,
   IconPlus,
   IconSettings,
@@ -27,7 +26,6 @@ const iconByUrl: Record<
 > = {
   '/user-management': IconLayoutGrid,
   '/user-management/deposit': IconPlus,
-  '/user-management/transfer': IconArrowRight,
   '/user-management/withdrawal': IconArrowDownLeft,
   '/user-management/settings': IconSettings,
   '/user-management/kyc': IconShield
@@ -45,16 +43,19 @@ function isActive(pathname: string): (item: UserManagementNavItem) => boolean {
 function NavRow({
   item,
   active,
-  label
+  label,
+  onNavigate
 }: {
   item: UserManagementNavItem;
   active: boolean;
   label: string;
+  onNavigate?: () => void;
 }) {
   const Icon = iconByUrl[item.url] ?? IconLayoutGrid;
   return (
     <Link
       href={item.url}
+      onClick={onNavigate}
       className={cn(
         'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
         active
@@ -68,7 +69,15 @@ function NavRow({
   );
 }
 
-export function UserManagementSidebar() {
+type UserManagementSidebarProps = {
+  className?: string;
+  onNavigate?: () => void;
+};
+
+export function UserManagementSidebar({
+  className,
+  onNavigate
+}: UserManagementSidebarProps = {}) {
   const pathname = usePathname() ?? '';
   const checkActive = isActive(pathname);
   const appName = usePublicAppName();
@@ -81,7 +90,12 @@ export function UserManagementSidebar() {
   };
 
   return (
-    <aside className="flex min-h-0 w-[260px] shrink-0 flex-col self-stretch border-r border-[var(--trade-border)] bg-[var(--trade-panel)]">
+    <aside
+      className={cn(
+        'flex min-h-0 w-[260px] shrink-0 flex-col self-stretch border-r border-[var(--trade-border)] bg-[var(--trade-panel)]',
+        className
+      )}
+    >
       <Link
         href="/trade"
         className="flex h-14 shrink-0 items-center border-b border-[var(--trade-border)] px-4 transition-colors hover:bg-[var(--trade-border)]/30"
@@ -117,6 +131,7 @@ export function UserManagementSidebar() {
               item={item}
               active={checkActive(item)}
               label={navLabel(item.title)}
+              onNavigate={onNavigate}
             />
           ))}
         </div>
@@ -133,6 +148,7 @@ export function UserManagementSidebar() {
                   item={item}
                   active={checkActive(item)}
                   label={navLabel(item.title)}
+                  onNavigate={onNavigate}
                 />
               ))}
             </div>

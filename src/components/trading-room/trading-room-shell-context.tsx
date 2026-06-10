@@ -21,8 +21,7 @@ import type { AdvancedOrderMarket } from './trading-room-advanced-order-panel';
 import type { ChartInterval } from './trading-room-chart-header';
 import { useTradeBalanceSelection } from '@/hooks/use-trade-balance-selection';
 
-export function getTradeRoomFromPath(pathname: string): 'TRADING' | 'INSTITUTIONAL' | 'STOCK' {
-  if (pathname.startsWith('/trading-view-room-institutional')) return 'INSTITUTIONAL';
+export function getTradeRoomFromPath(pathname: string): 'TRADING' | 'STOCK' {
   if (pathname.startsWith('/trading-view-room-stock')) return 'STOCK';
   return 'TRADING';
 }
@@ -62,7 +61,7 @@ type TradingRoomShellContextValue = {
     stopLoss?: number
   ) => Promise<void>;
   advancedOrderMarket: AdvancedOrderMarket;
-  tradeRoom: 'TRADING' | 'INSTITUTIONAL' | 'STOCK';
+  tradeRoom: 'TRADING' | 'STOCK';
   noNavigation: boolean;
   symbolLinkBasePath: string;
   signedIn: boolean;
@@ -106,11 +105,7 @@ export function TradingRoomShellProvider({ children }: { children: React.ReactNo
   const [mobileTradingOpen, setMobileTradingOpen] = useState(false);
   const mobileTradingPanelRef = useRef<ImperativePanelHandle | null>(null);
   const signedIn = Boolean(session?.user);
-  const role = session?.user?.role;
-  const canPlaceInstitutionalOrders =
-    role === 'ADMIN' || role === 'SUPERADMIN';
-  const showMarketsOrderControls =
-    tradeRoom !== 'INSTITUTIONAL' || canPlaceInstitutionalOrders;
+  const showMarketsOrderControls = true;
 
   const openMobileTrading = useCallback(() => {
     mobileTradingPanelRef.current?.resize(MOBILE_TRADING_PANEL_SIZE);
@@ -232,8 +227,7 @@ export function TradingRoomShellProvider({ children }: { children: React.ReactNo
           type,
           status: isPending ? 'PENDING' : 'PLACED',
           room: tradeRoom,
-          balanceType:
-            tradeRoom === 'INSTITUTIONAL' ? 'INSTITUTIONAL' : selectedBalanceType,
+          balanceType: selectedBalanceType,
           marketId: selectedMarket.id,
           quantity,
           description: isPending

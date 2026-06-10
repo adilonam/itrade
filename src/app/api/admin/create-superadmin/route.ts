@@ -1,4 +1,5 @@
 import bcrypt from 'bcryptjs';
+import { DEFAULT_USER_BALANCE_SEED } from '@/lib/balance';
 import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -65,7 +66,10 @@ export async function POST(request: NextRequest) {
         name,
         email,
         password: hashedPassword,
-        role: 'SUPERADMIN' // Set role to SUPERADMIN
+        role: 'SUPERADMIN',
+        balances: {
+          create: [...DEFAULT_USER_BALANCE_SEED]
+        }
       }
     });
 

@@ -28,11 +28,6 @@ function buildPatch(): Prisma.AppSettingsUpdateInput {
   const openMarket = parseBoolEnv('OPEN_MARKET');
   if (openMarket !== undefined) data.openMarket = openMarket;
 
-  const manualWallet = pick('MANUAL_USDT_DEPOSIT_WALLET_ADDRESS');
-  if (manualWallet !== undefined) {
-    data.manualUsdtDepositWalletAddress = manualWallet;
-  }
-
   return data;
 }
 

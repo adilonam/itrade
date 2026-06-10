@@ -64,7 +64,7 @@ export async function GET(
         name: true,
         email: true,
         balances: {
-          where: { type: { in: ['REAL', 'INSTITUTIONAL'] } },
+          where: { type: 'REAL' },
           select: { amount: true, type: true }
         },
         leverage: true,
@@ -86,17 +86,14 @@ export async function GET(
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    const realAmount =
-      user.balances.find((b) => b.type === 'REAL')?.amount ?? 0;
-    const institutionalAmount =
-      user.balances.find((b) => b.type === 'INSTITUTIONAL')?.amount ?? 0;
+    const realAmount = user.balances[0]?.amount ?? 0;
 
     return NextResponse.json({
       user: {
         ...user,
         balance: realAmount,
         realBalance: realAmount,
-        institutionalBalance: institutionalAmount
+        institutionalBalance: 0
       }
     });
   } catch (error) {

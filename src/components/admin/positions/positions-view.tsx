@@ -332,7 +332,6 @@ export function PositionsView() {
                   <SelectItem value='all'>All rooms</SelectItem>
                   <SelectItem value='STOCK'>STOCK</SelectItem>
                   <SelectItem value='TRADING'>TRADING</SelectItem>
-                  <SelectItem value='INSTITUTIONAL'>INSTITUTIONAL</SelectItem>
                 </SelectContent>
               </Select>
             </div>

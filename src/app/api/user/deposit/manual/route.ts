@@ -1,5 +1,5 @@
-import { getAppSettingsRow } from '@/lib/app-settings';
 import { getAuthSession } from '@/lib/auth';
+import { getManualUsdtDepositWalletAddress } from '@/lib/manual-usdt-deposit';
 import { ensureUserBalance, parseBalanceType } from '@/lib/balance';
 import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
@@ -34,9 +34,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const settingsRow = await getAppSettingsRow();
-    const walletAddress =
-      settingsRow?.manualUsdtDepositWalletAddress?.trim() ?? '';
+    const walletAddress = getManualUsdtDepositWalletAddress();
     if (!walletAddress) {
       return NextResponse.json(
         { error: 'Manual USDT deposits are not configured on the server.' },

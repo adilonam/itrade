@@ -1,0 +1,10 @@
+overrides:
+  pg: 8.18.0
+
+allowBuilds:
+  '@parcel/watcher': false
+  '@prisma/engines': false
+  '@swc/core': false
+  esbuild: false
+  prisma: false
+  sharp: false

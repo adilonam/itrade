@@ -81,9 +81,6 @@ export function PositionForm({
   const [userCandidates, setUserCandidates] = useState<AdminUserRow[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [realBalance, setRealBalance] = useState<number | null>(null);
-  const [institutionalBalance, setInstitutionalBalance] = useState<
-    number | null
-  >(null);
   const [loadingBalances, setLoadingBalances] = useState(false);
 
   const [marketSymbolQuery, setMarketSymbolQuery] = useState('');
@@ -107,17 +104,14 @@ export function PositionForm({
   const loadUserBalances = useCallback(async (userId: string) => {
     setLoadingBalances(true);
     setRealBalance(null);
-    setInstitutionalBalance(null);
     try {
       const res = await fetch(`/api/admin/users/${userId}`);
       if (!res.ok) return;
       const data = await res.json();
       const u = data.user as {
         realBalance?: number;
-        institutionalBalance?: number;
       };
       setRealBalance(u.realBalance ?? 0);
-      setInstitutionalBalance(u.institutionalBalance ?? 0);
     } finally {
       setLoadingBalances(false);
     }
@@ -361,7 +355,6 @@ export function PositionForm({
                 <SelectContent>
                   <SelectItem value='STOCK'>Stock</SelectItem>
                   <SelectItem value='TRADING'>Trading</SelectItem>
-                  <SelectItem value='INSTITUTIONAL'>Institutional</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -377,7 +370,6 @@ export function PositionForm({
                   if (position) return;
                   setFormData((prev) => ({ ...prev, userId: '' }));
                   setRealBalance(null);
-                  setInstitutionalBalance(null);
                 }}
                 placeholder='Type email to search'
                 autoComplete='off'
@@ -417,38 +409,20 @@ export function PositionForm({
               )}
             </div>
 
-            {(realBalance !== null || institutionalBalance !== null) && (
+            {realBalance !== null && (
               <div className='bg-muted/40 md:col-span-2 grid grid-cols-1 gap-3 rounded-lg border p-3'>
-                {formData.room === 'INSTITUTIONAL' ? (
-                  <div>
-                    <p className='text-muted-foreground text-xs'>
-                      INSTITUTIONAL balance (margin)
-                    </p>
-                    <p className='text-lg font-semibold tabular-nums'>
-                      {loadingBalances
-                        ? '…'
-                        : (institutionalBalance ?? 0).toLocaleString(
-                            undefined,
-                            {
-                              maximumFractionDigits: 2
-                            }
-                          )}
-                    </p>
-                  </div>
-                ) : (
-                  <div>
-                    <p className='text-muted-foreground text-xs'>
-                      REAL balance (margin)
-                    </p>
-                    <p className='text-lg font-semibold tabular-nums'>
-                      {loadingBalances
-                        ? '…'
-                        : (realBalance ?? 0).toLocaleString(undefined, {
-                            maximumFractionDigits: 2
-                          })}
-                    </p>
-                  </div>
-                )}
+                <div>
+                  <p className='text-muted-foreground text-xs'>
+                    REAL balance (margin)
+                  </p>
+                  <p className='text-lg font-semibold tabular-nums'>
+                    {loadingBalances
+                      ? '…'
+                      : (realBalance ?? 0).toLocaleString(undefined, {
+                          maximumFractionDigits: 2
+                        })}
+                  </p>
+                </div>
               </div>
             )}
 

@@ -18,8 +18,7 @@ const SEED_POSITION_DESCRIPTION = 'seed:demo-position';
 const SUPERADMIN_EMAIL = 'adil.abbadi.1996@gmail.com';
 
 /** Bulk demo positions for the superadmin (idempotent per slot via description). */
-const SUPERADMIN_TRADING_POSITION_COUNT = 24;
-const SUPERADMIN_INSTITUTIONAL_POSITION_COUNT = 24;
+const SUPERADMIN_TRADING_POSITION_COUNT = 48;
 
 type SeedUserSpec = {
   email: string;
@@ -59,11 +58,10 @@ async function ensureAppSettings(prisma: PrismaClient) {
   });
 }
 
-type MarketRow = { id: string; symbol: string; room: 'TRADING' | 'INSTITUTIONAL' };
+type MarketRow = { id: string; symbol: string; room: 'TRADING' | 'STOCK' };
 
 async function ensureMarkets(prisma: PrismaClient): Promise<{
   trading: MarketRow[];
-  institutional: MarketRow[];
 }> {
   const specs = [
     {
@@ -94,7 +92,7 @@ async function ensureMarkets(prisma: PrismaClient): Promise<{
       type: 'COMMODITIES' as const,
       symbol: 'XAUUSD',
       name: 'Gold / US Dollar',
-      room: 'INSTITUTIONAL' as const,
+      room: 'TRADING' as const,
       lastPrice: 2650,
       spread: 0.45
     },
@@ -102,7 +100,7 @@ async function ensureMarkets(prisma: PrismaClient): Promise<{
       type: 'INDICES' as const,
       symbol: 'US500',
       name: 'S&P 500',
-      room: 'INSTITUTIONAL' as const,
+      room: 'TRADING' as const,
       lastPrice: 5820,
       spread: 0.8
     },
@@ -110,7 +108,7 @@ async function ensureMarkets(prisma: PrismaClient): Promise<{
       type: 'FOREX' as const,
       symbol: 'USDJPY',
       name: 'US Dollar / Japanese Yen',
-      room: 'INSTITUTIONAL' as const,
+      room: 'TRADING' as const,
       lastPrice: 149.2,
       spread: 0.02
     },
@@ -118,14 +116,13 @@ async function ensureMarkets(prisma: PrismaClient): Promise<{
       type: 'CRYPTO' as const,
       symbol: 'ETHUSD',
       name: 'Ethereum / US Dollar',
-      room: 'INSTITUTIONAL' as const,
+      room: 'TRADING' as const,
       lastPrice: 3450,
       spread: 2.5
     }
   ];
 
   const trading: MarketRow[] = [];
-  const institutional: MarketRow[] = [];
 
   for (const s of specs) {
     let m = await prisma.market.findFirst({
@@ -135,12 +132,10 @@ async function ensureMarkets(prisma: PrismaClient): Promise<{
       m = await prisma.market.create({ data: s });
       console.log(`seed: created market ${s.symbol} (${s.room})`);
     }
-    const row: MarketRow = { id: m.id, symbol: s.symbol, room: s.room };
-    if (s.room === 'TRADING') trading.push(row);
-    else institutional.push(row);
+    trading.push({ id: m.id, symbol: s.symbol, room: s.room });
   }
 
-  return { trading, institutional };
+  return { trading };
 }
 
 async function ensureSeedInvestment(prisma: PrismaClient) {
@@ -188,8 +183,7 @@ async function upsertSeedUser(
           spec.email === SUPERADMIN_EMAIL
             ? [
                 { type: 'REAL', amount: 200_000 },
-                { type: 'DEMO', amount: 10_000 },
-                { type: 'INSTITUTIONAL', amount: 500_000 }
+                { type: 'DEMO', amount: 10_000 }
               ]
             : [
                 { type: 'REAL', amount: 50_000 },
@@ -225,23 +219,6 @@ async function upsertSeedUser(
         amount: spec.email === SUPERADMIN_EMAIL ? 200_000 : 50_000
       }
     });
-  }
-
-  if (spec.email === SUPERADMIN_EMAIL) {
-    await prisma.userBalance.upsert({
-      where: { userId_type: { userId: user.id, type: 'INSTITUTIONAL' } },
-      update: {},
-      create: { userId: user.id, type: 'INSTITUTIONAL', amount: 500_000 }
-    });
-    const inst = await prisma.userBalance.findUnique({
-      where: { userId_type: { userId: user.id, type: 'INSTITUTIONAL' } }
-    });
-    if (inst && inst.amount < 100_000) {
-      await prisma.userBalance.update({
-        where: { userId_type: { userId: user.id, type: 'INSTITUTIONAL' } },
-        data: { amount: 500_000 }
-      });
-    }
   }
 
   return user;
@@ -286,33 +263,25 @@ async function ensureSeedPosition(
 async function ensureSuperadminBulkPositions(
   prisma: PrismaClient,
   userId: string,
-  tradingMarkets: MarketRow[],
-  institutionalMarkets: MarketRow[]
+  tradingMarkets: MarketRow[]
 ) {
   await prisma.position.deleteMany({
     where: { userId, description: SEED_POSITION_DESCRIPTION }
   });
 
-  if (tradingMarkets.length === 0 || institutionalMarkets.length === 0) {
-    throw new Error(
-      'seed: need at least one TRADING and one INSTITUTIONAL market for superadmin positions'
-    );
+  if (tradingMarkets.length === 0) {
+    throw new Error('seed: need at least one TRADING market for superadmin positions');
   }
 
   const realBalanceRow = await prisma.userBalance.findUnique({
     where: { userId_type: { userId, type: 'REAL' } },
     select: { id: true }
   });
-  const instBalanceRow = await prisma.userBalance.findUnique({
-    where: { userId_type: { userId, type: 'INSTITUTIONAL' } },
-    select: { id: true }
-  });
-  if (!realBalanceRow || !instBalanceRow) {
-    throw new Error('seed: missing REAL or INSTITUTIONAL user_balance for superadmin');
+  if (!realBalanceRow) {
+    throw new Error('seed: missing REAL user_balance for superadmin');
   }
 
   let createdTrading = 0;
-  let createdInstitutional = 0;
 
   for (let i = 0; i < SUPERADMIN_TRADING_POSITION_COUNT; i++) {
     const description = `seed:adil:trading:${i}`;
@@ -353,55 +322,8 @@ async function ensureSuperadminBulkPositions(
     createdTrading++;
   }
 
-  for (let i = 0; i < SUPERADMIN_INSTITUTIONAL_POSITION_COUNT; i++) {
-    const description = `seed:adil:institutional:${i}`;
-    const exists = await prisma.position.findFirst({
-      where: { userId, description }
-    });
-    if (exists) continue;
-
-    const market = institutionalMarkets[i % institutionalMarkets.length]!;
-    const type = i % 3 === 0 ? 'SELL' : 'BUY';
-    const statusRoll = i % 6;
-    const status =
-      statusRoll === 5 ? 'CLOSED' : statusRoll === 4 ? 'PENDING' : 'PLACED';
-    const basePrice =
-      market.symbol === 'XAUUSD'
-        ? 2600 + i * 2
-        : market.symbol === 'US500'
-          ? 5750 + i * 3
-          : market.symbol === 'ETHUSD'
-            ? 3200 + i * 8
-            : 148 + i * 0.05;
-    const isClosed = status === 'CLOSED';
-
-    await prisma.position.create({
-      data: {
-        userId,
-        userBalanceId: instBalanceRow.id,
-        marketId: market.id,
-        type,
-        status,
-        room: 'INSTITUTIONAL',
-        quantity: 0.02 + (i % 8) * 0.015,
-        executedPrice: status === 'PENDING' ? null : basePrice,
-        executedAt: status === 'PENDING' ? null : new Date(),
-        closedAt: isClosed ? new Date() : null,
-        closedPrice: isClosed ? basePrice * (1 + (type === 'BUY' ? 0.0015 : -0.0015)) : null,
-        pnl: isClosed ? (type === 'BUY' ? 210 + i * 2 : -95 - i) : null,
-        takeProfit: status === 'PLACED' ? basePrice * 1.008 : null,
-        stopLoss: status === 'PLACED' ? basePrice * 0.996 : null,
-        requiredMargin: 800 + i * 40,
-        description
-      }
-    });
-    createdInstitutional++;
-  }
-
-  if (createdTrading > 0 || createdInstitutional > 0) {
-    console.log(
-      `seed: superadmin bulk positions +${createdTrading} TRADING, +${createdInstitutional} INSTITUTIONAL`
-    );
+  if (createdTrading > 0) {
+    console.log(`seed: superadmin bulk positions +${createdTrading} TRADING`);
   }
 }
 
@@ -493,8 +415,7 @@ async function main() {
 
   try {
     await ensureAppSettings(prisma);
-    const { trading: tradingMarkets, institutional: institutionalMarkets } =
-      await ensureMarkets(prisma);
+    const { trading: tradingMarkets } = await ensureMarkets(prisma);
     const investment = await ensureSeedInvestment(prisma);
 
     const primaryMarketId = tradingMarkets[0]?.id;
@@ -511,12 +432,7 @@ async function main() {
       );
 
       if (spec.email === SUPERADMIN_EMAIL) {
-        await ensureSuperadminBulkPositions(
-          prisma,
-          user.id,
-          tradingMarkets,
-          institutionalMarkets
-        );
+        await ensureSuperadminBulkPositions(prisma, user.id, tradingMarkets);
       } else {
         await ensureSeedPosition(prisma, user.id, primaryMarketId);
       }

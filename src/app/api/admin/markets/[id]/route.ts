@@ -19,7 +19,7 @@ const updateMarketSchema = z.object({
     .optional(),
   visible: z.boolean().optional(),
   spread: z.number().min(0).optional(),
-  room: z.enum(['STOCK', 'TRADING', 'INSTITUTIONAL']).optional(),
+  room: z.enum(['STOCK', 'TRADING']).optional(),
   image: z.string().nullable().optional()
 });
 

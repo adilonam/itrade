@@ -8,17 +8,12 @@ import {
   CardHeader,
   CardTitle
 } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import type { AppSettings } from '@/lib/prisma/generated/client';
 import { cn } from '@/lib/utils';
 import { IconCheck } from '@tabler/icons-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
-
-/** Inputs aligned with watch-trader / deposit flow (Match Trader shell). */
-const tradeInputClassName =
-  'h-auto min-h-[44px] rounded-lg border-[var(--trade-border)] bg-[var(--trade-dark)] px-4 py-2.5 text-sm text-[var(--trade-text)] shadow-none file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-[var(--trade-text)] placeholder:text-[var(--trade-text-muted)]/60 focus-visible:border-[var(--trade-accent-blue)] focus-visible:ring-2 focus-visible:ring-[var(--trade-accent-blue)]/25 focus-visible:ring-offset-0 dark:bg-[var(--trade-dark)]';
 
 const tradeCardClassName =
   'rounded-xl border border-[var(--trade-border)] bg-[var(--trade-panel)] text-[var(--trade-text)] shadow-sm';
@@ -39,8 +34,6 @@ interface AppSettingsFormProps {
 export function AppSettingsForm({ initialSettings }: AppSettingsFormProps) {
   const s = initialSettings;
   const [openMarket, setOpenMarket] = useState(s?.openMarket ?? true);
-  const [manualUsdtDepositWalletAddress, setManualUsdtDepositWalletAddress] =
-    useState(s?.manualUsdtDepositWalletAddress ?? '');
 
   const [configLoading, setConfigLoading] = useState(false);
 
@@ -50,9 +43,7 @@ export function AppSettingsForm({ initialSettings }: AppSettingsFormProps) {
     setConfigLoading(true);
     try {
       const body = {
-        openMarket,
-        manualUsdtDepositWalletAddress:
-          manualUsdtDepositWalletAddress.trim() || null
+        openMarket
       };
 
       const response = await fetch('/api/super-admin/app-settings', {
@@ -110,19 +101,6 @@ export function AppSettingsForm({ initialSettings }: AppSettingsFormProps) {
                 >
                   Open market (users may trade)
                 </Label>
-              </div>
-              <div className='space-y-2 sm:col-span-2'>
-                <Label htmlFor='manualWallet' className={tradeLabelClassName}>
-                  Manual USDT deposit wallet
-                </Label>
-                <Input
-                  id='manualWallet'
-                  value={manualUsdtDepositWalletAddress}
-                  onChange={(e) =>
-                    setManualUsdtDepositWalletAddress(e.target.value)
-                  }
-                  className={tradeInputClassName}
-                />
               </div>
             </div>
 

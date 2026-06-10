@@ -1,4 +1,5 @@
 import bcrypt from 'bcryptjs';
+import { DEFAULT_USER_BALANCE_SEED } from '@/lib/balance';
 import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -35,11 +36,7 @@ export async function POST(request: NextRequest) {
         email,
         password: hashedPassword,
         balances: {
-          create: [
-            { type: 'REAL', amount: 0 },
-            { type: 'DEMO', amount: 10000 },
-            { type: 'INSTITUTIONAL', amount: 0 }
-          ]
+          create: [...DEFAULT_USER_BALANCE_SEED]
         }
       }
     });

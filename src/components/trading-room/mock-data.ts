@@ -42,55 +42,52 @@ export const MOCK_SYMBOLS: MockSymbol[] = [
 export const MOCK_NEWS: MockNewsItem[] = [
   {
     id: 'n1',
-    title: 'Wall Street futures trim some losses after key inflation data',
-    time: '08:36',
+    title: 'Stock indexes dip nearly 2% on chip sell-off, Trump\u2019s threat of more Iran attacks',
+    time: '15:42',
     snippet:
-      'U.S. stock futures trimmed losses as traders digested broad economic releases, including a slightly soft to in-line inflation print, while renewed Gulf strikes kept geopolitical risk elevated.',
+      'Wall Street on Wednesday slumped after President Donald Trump ratcheted up his rhetoric against Iran and said the U.S. would "hit them hard" for a second straight day. Losses had been capped somewhat in the morning after a soft to in-line U.S. consumer inflation report, but the escalation in geopolitical tensions and a semiconductor sell-off deepened the decline.',
     flag: '🇺🇸',
     source: 'Investing.com',
-    url: 'https://www.investing.com/news/stock-market-news/us-stock-futures-steady-post-record-wall-st-close-iran-strikes-pce-data-in-focus-4713535'
+    url: 'https://www.investing.com/news/stock-market-news/stock-indexes-dip-nearly-2-on-chip-sell-off-trumps-threat-of-more-iran-attacks-4714200'
   },
   {
     id: 'n2',
-    title: 'U.S., Iran exchange strikes dampening hopes for imminent peace deal',
+    title: 'U.S. consumer prices rise by 4.2% annually in May',
     time: '08:30',
     snippet:
-      'Fresh military action between Washington and Tehran reduced confidence in a near-term diplomatic breakthrough and kept cross-asset volatility elevated.',
-    flag: '🇮🇷',
+      'The U.S. consumer price index rose 4.2% year-over-year in May, in line with expectations, offering traders a modest reprieve before geopolitical headlines and chip-sector weakness dominated the session.',
+    flag: '🇺🇸',
     source: 'Investing.com',
-    url: 'https://www.investing.com/news/economy-news/us-military-carries-out-more-strikes-on-iran-as-trump-signals-no-deal-in-sight-4713450'
+    url: 'https://www.investing.com/news/economic-indicators/us-consumer-prices-rise-by-42-annually-in-may-4714100'
   },
   {
     id: 'n3',
-    title: 'Oil prices tick higher amid renewed U.S.-Iran hostilities',
-    time: '08:24',
+    title: 'The Number 10 Mindset: Setting the Highest Standards with TenTrade',
+    time: '08:15',
     snippet:
-      'Crude prices moved higher as risk premiums returned to energy markets following another escalation in U.S.-Iran tensions.',
-    flag: '🛢️',
-    source: 'Investing.com',
-    url: 'https://www.investing.com/news/commodities-news/oil-prices-jump-nearly-2-after-us-attacks-iran-again-4713494'
+      'TenTrade explores the discipline and standards behind consistent trading performance — from risk management to execution under pressure.',
+    flag: '📰',
+    source: 'Partner News'
   },
   {
     id: 'n4',
-    title:
-      'UBS flags weather-driven headwinds for this European company despite stable soft commodity prices',
-    time: '08:18',
+    title: 'Earnings could be a positive catalyst for this stock: UBS',
+    time: '07:58',
     snippet:
-      'Analysts highlighted weather-related operational pressure as a near-term concern, even with softer commodity inputs remaining broadly stable.',
-    flag: '🇪🇺',
-    source: 'Investing.com',
-    url: 'https://www.investing.com/news/pro/ubs-flags-weatherdriven-headwinds-for-this-european-company-despite-stable-soft-commodity-prices-432SI-4713865'
+      'UBS analysts see upcoming earnings as a potential upside catalyst, citing improving fundamentals and favorable sector positioning despite broader market volatility.',
+    flag: '📈',
+    source: 'Pro',
+    url: 'https://www.investing.com/news/pro/earnings-could-be-a-positive-catalyst-for-this-stock-ubs-4714050'
   },
   {
     id: 'n5',
-    title:
-      'Gold prices slide as U.S.-Iran hostilities keep inflation, rate hike fears in focus',
-    time: '08:10',
+    title: 'Gold slides more than 4% as Trump threatens more Iran attacks',
+    time: '07:45',
     snippet:
-      'Bullion eased as higher oil and geopolitical stress reinforced uncertainty around inflation and potential policy tightening paths.',
+      'Gold fell more than 4% as President Trump signaled further U.S. strikes on Iran, boosting the dollar and reducing safe-haven demand for bullion.',
     flag: '🥇',
     source: 'Investing.com',
-    url: 'https://www.investing.com/news/commodities-news/gold-prices-dip-as-fresh-usiran-attacks-boost-oil-dollar-4713551'
+    url: 'https://www.investing.com/news/commodities-news/gold-slides-more-than-4-as-trump-threatens-more-iran-attacks-4714000'
   }
 ];
 

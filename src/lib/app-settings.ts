@@ -1,4 +1,5 @@
 import type { AppSettings } from '@/lib/prisma/generated/client';
+import { getManualUsdtDepositWalletAddress } from '@/lib/manual-usdt-deposit';
 import { prisma } from '@/lib/prisma';
 
 let cache: AppSettings | null = null;
@@ -46,7 +47,8 @@ export function pickPublicAppSettings(
   );
   return {
     openMarket: r?.openMarket ?? true,
-    manualUsdtDepositWalletAddress: r?.manualUsdtDepositWalletAddress ?? null,
+    manualUsdtDepositWalletAddress:
+      getManualUsdtDepositWalletAddress() || null,
     googleSignInEnabled
   };
 }

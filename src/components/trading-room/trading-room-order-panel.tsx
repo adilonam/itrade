@@ -57,7 +57,7 @@ export function TradingRoomOrderPanel({
 
   const incrementLot = () => {
     const n = parseFloat(lotSize) || 0;
-    setLotSize(Math.min(100, n + 0.01).toFixed(2));
+    setLotSize((n + 0.01).toFixed(2));
   };
   const decrementLot = () => {
     const n = parseFloat(lotSize) || 0;
@@ -75,8 +75,6 @@ export function TradingRoomOrderPanel({
     const n = parseFloat(lotSize);
     if (Number.isNaN(n) || n < 0.01) {
       setLotSize('0.01');
-    } else if (n > 100) {
-      setLotSize('100');
     } else {
       setLotSize(n.toFixed(2));
     }

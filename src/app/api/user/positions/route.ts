@@ -150,17 +150,6 @@ export async function POST(request: NextRequest) {
       userBalanceId?: string | null;
     } = await request.json();
 
-    const positionRoom = (body.room as string | undefined) ?? 'TRADING';
-    if (positionRoom === 'INSTITUTIONAL' && !canBypass) {
-      return NextResponse.json(
-        {
-          error: 'Only administrators can open institutional positions.',
-          message: 'Only administrators can open institutional positions.'
-        },
-        { status: 403 }
-      );
-    }
-
     const walletResult = await prisma.$transaction((tx) =>
       resolveUserBalanceForNewPosition(tx, session.user.id, {
         userBalanceId: body.userBalanceId,

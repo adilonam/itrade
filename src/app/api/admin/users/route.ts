@@ -3,6 +3,10 @@ import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 import { z } from 'zod';
 import { getAuthSession } from '@/lib/auth';
+import {
+  DEFAULT_DEMO_BALANCE_AMOUNT,
+  DEFAULT_REAL_BALANCE_AMOUNT
+} from '@/lib/balance';
 
 // Validation schemas
 const getUsersSchema = z.object({
@@ -204,8 +208,8 @@ export async function POST(request: NextRequest) {
         role,
         balances: {
           create: [
-            { type: 'REAL', amount: balance || 0 },
-            { type: 'DEMO', amount: 10000 }
+            { type: 'REAL', amount: balance ?? DEFAULT_REAL_BALANCE_AMOUNT },
+            { type: 'DEMO', amount: DEFAULT_DEMO_BALANCE_AMOUNT }
           ]
         },
         leverage: leverage || 1

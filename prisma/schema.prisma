@@ -45,7 +45,6 @@ enum KycDocumentKind {
 enum BalanceType {
   REAL
   DEMO
-  INSTITUTIONAL
 }
 
 // NextAuth.js required models
@@ -219,7 +218,6 @@ enum MarketType {
 enum Room {
   STOCK
   TRADING
-  INSTITUTIONAL
 }
 
 model Market {
@@ -385,8 +383,6 @@ enum TransactionType {
   LOSS // Loss from trading or investment or stock market
   DEPOSIT // Money deposited to account
   WITHDRAW // Money withdrawn from account
-  TRANSFER_IN // Inbound internal transfer (e.g. REAL ↔ INSTITUTIONAL)
-  TRANSFER_OUT // Outbound internal transfer (e.g. REAL ↔ INSTITUTIONAL)
 }
 
 // App Settings model for global configuration
@@ -394,8 +390,6 @@ model AppSettings {
   id         String  @id @default("default")
   // When true, users can create/update/close positions; when false, only admin/superadmin can
   openMarket Boolean @default(true) @map("open_market")
-
-  manualUsdtDepositWalletAddress String? @map("manual_usdt_deposit_wallet_address") @db.Text
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")

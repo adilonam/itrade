@@ -219,7 +219,7 @@ export async function GET() {
         const sp = marketForOpen.spread ?? 0;
         const executedPrice = signal === 'BUY' ? mid + sp / 2 : mid - sp / 2;
 
-        const balanceType = getBalanceTypeForPositionRoom(botUser.market.room);
+        const balanceType = getBalanceTypeForPositionRoom();
         const { botUserBalanceId, walletBalance } =
           await prisma.$transaction(async (tx) => {
             const ub = await ensureUserBalance(tx, botUser.userId, balanceType);

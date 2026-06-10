@@ -24,7 +24,7 @@ export default async function Page(props: PageProps) {
     market = await prisma.market.findFirst({
       where: {
         id: marketId,
-        room: 'INSTITUTIONAL',
+        room: 'TRADING',
         visible: true
       }
     });
@@ -35,7 +35,7 @@ export default async function Page(props: PageProps) {
   } else {
     market = await prisma.market.findFirst({
       where: {
-        room: 'INSTITUTIONAL',
+        room: 'TRADING',
         visible: true
       }
     });

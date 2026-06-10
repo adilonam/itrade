@@ -49,7 +49,7 @@ const formSchema = z.object({
   type: z.enum(['FOREX', 'CRYPTO', 'STOCKS', 'COMMODITIES', 'INDICES'], {
     required_error: 'Please select a market type'
   }),
-  room: z.enum(['STOCK', 'TRADING', 'INSTITUTIONAL'], {
+  room: z.enum(['STOCK', 'TRADING'], {
     required_error: 'Please select a market room'
   }),
   spread: z.coerce.number().min(0, 'Spread must be non-negative').optional(),
@@ -176,8 +176,7 @@ export function EditMarketDialog({
           <DialogTitle>Edit Market</DialogTitle>
           <DialogDescription>
             Modify all fields for this market. Changing the symbol will be
-            validated against the TwelveData API for Stock and Trading room
-            markets only; Institutional room markets skip that check.
+            validated against the TwelveData API.
           </DialogDescription>
         </DialogHeader>
 
@@ -252,9 +251,6 @@ export function EditMarketDialog({
                     <SelectContent>
                       <SelectItem value='TRADING'>Trading Only</SelectItem>
                       <SelectItem value='STOCK'>Stock Only</SelectItem>
-                      <SelectItem value='INSTITUTIONAL'>
-                        Institutional Only
-                      </SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />

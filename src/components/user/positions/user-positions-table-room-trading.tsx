@@ -796,8 +796,7 @@ export function UserPositionsTableCardRoomTrading({
   embeddedInTradePanel = false
 }: UserPositionsTableCardRoomTradingProps) {
   const { selectedBalanceType } = useTradeBalanceSelection();
-  const balanceType =
-    room === 'INSTITUTIONAL' ? 'INSTITUTIONAL' : selectedBalanceType;
+  const balanceType = selectedBalanceType;
   const [positions, setPositions] = useState<PositionWithMarket[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

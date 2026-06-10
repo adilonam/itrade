@@ -265,12 +265,12 @@ export async function calculateRequiredMargin(
 /**
  * Calculate comprehensive financial information for a user
  * @param user - User object from Prisma with id, balance, and leverage
- * @param room - Room filter (STOCK, TRADING, INSTITUTIONAL, or ALL). Defaults to ALL.
+ * @param room - Room filter (STOCK, TRADING, or ALL). Defaults to ALL.
  * @returns Object containing balance, margins, equity, PnL, and leverage
  */
 export async function calculateUserFinancialInfo(
   user: Pick<User, 'id' | 'leverage'>,
-  room: 'STOCK' | 'TRADING' | 'INSTITUTIONAL' | 'ALL' = 'ALL',
+  room: 'STOCK' | 'TRADING' | 'ALL' = 'ALL',
   balanceType: BalanceType = 'REAL'
 ): Promise<{
   balance: number;
@@ -290,7 +290,7 @@ export async function calculateUserFinancialInfo(
     const whereClause: {
       userId: string;
       status: 'PLACED';
-      room?: 'STOCK' | 'TRADING' | 'INSTITUTIONAL' | { in: ('STOCK' | 'TRADING')[] };
+      room?: 'STOCK' | 'TRADING' | { in: ('STOCK' | 'TRADING')[] };
     } = {
       userId: user.id,
       status: 'PLACED'
@@ -300,12 +300,7 @@ export async function calculateUserFinancialInfo(
     if (room !== 'ALL') {
       whereClause.room = room;
     } else {
-      // REAL/DEMO wallets only margin P&L from stock & trading rooms; INSTITUTIONAL wallet only from that room.
-      if (balanceType === 'INSTITUTIONAL') {
-        whereClause.room = 'INSTITUTIONAL';
-      } else {
-        whereClause.room = { in: ['STOCK', 'TRADING'] };
-      }
+      whereClause.room = { in: ['STOCK', 'TRADING'] };
     }
 
     // Get all PLACED positions for the user (filtered by room if specified)

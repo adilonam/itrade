@@ -1,6 +1,8 @@
 import { parseBalanceType } from '@/lib/balance';
 
-export type TradeBalanceType = 'REAL' | 'DEMO' | 'INSTITUTIONAL';
+export type TradeBalanceType = 'REAL' | 'DEMO';
+
+export const TRADE_BALANCE_TYPES: TradeBalanceType[] = ['REAL', 'DEMO'];
 
 export const TRADE_BALANCE_STORAGE_KEY = 'trade:selected-balance-type';
 export const TRADE_BALANCE_COOKIE = 'trade_balance_type';

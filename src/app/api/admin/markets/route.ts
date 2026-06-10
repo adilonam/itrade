@@ -8,7 +8,7 @@ import { getAuthSession } from '@/lib/auth';
 const createMarketSchema = z.object({
   symbol: z.string().min(1, 'Symbol is required').max(12, 'Symbol too long'),
   type: z.enum(['FOREX', 'CRYPTO', 'STOCKS', 'COMMODITIES', 'INDICES']),
-  room: z.enum(['STOCK', 'TRADING', 'INSTITUTIONAL']),
+  room: z.enum(['STOCK', 'TRADING']),
   spread: z.number().min(0).optional(),
   visible: z.boolean().optional(),
   image: z.string().optional()
@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
       where.type = type;
     }
 
-    if (room && ['STOCK', 'TRADING', 'INSTITUTIONAL'].includes(room)) {
+    if (room && ['STOCK', 'TRADING'].includes(room)) {
       where.room = room;
     }
 

@@ -312,7 +312,6 @@ export type UserManagementNavItem = {
 export const userManagementNavPrimary: UserManagementNavItem[] = [
   { title: 'Dashboard', url: '/user-management' },
   { title: 'Deposit', url: '/user-management/deposit' },
-  { title: 'Transfer', url: '/user-management/transfer' },
   { title: 'Withdrawal', url: '/user-management/withdrawal' },
   { title: 'Settings', url: '/user-management/settings' },
   { title: 'KYC verification', url: '/user-management/kyc' }

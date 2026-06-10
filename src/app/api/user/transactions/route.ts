@@ -13,7 +13,7 @@ function parseBalanceTypesParam(raw: string | null): BalanceType[] | null {
     .filter(Boolean);
   const out: BalanceType[] = [];
   for (const p of parts) {
-    if (p === 'REAL' || p === 'DEMO' || p === 'INSTITUTIONAL') {
+    if (p === 'REAL' || p === 'DEMO') {
       out.push(p);
     }
   }
@@ -25,9 +25,7 @@ const TRANSACTION_TYPE_VALUES = [
   'INVESTMENT_GAIN',
   'LOSS',
   'DEPOSIT',
-  'WITHDRAW',
-  'TRANSFER_IN',
-  'TRANSFER_OUT'
+  'WITHDRAW'
 ] as const;
 
 type ApiTransactionType = (typeof TRANSACTION_TYPE_VALUES)[number];

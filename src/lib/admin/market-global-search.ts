@@ -8,7 +8,7 @@ const MARKET_TYPES = [
   'INDICES'
 ] as const;
 
-const ROOMS = ['STOCK', 'TRADING', 'INSTITUTIONAL'] as const;
+const ROOMS = ['STOCK', 'TRADING'] as const;
 
 /** OR-clause for admin market list global search across table-relevant columns. */
 export function marketGlobalSearchWhere(

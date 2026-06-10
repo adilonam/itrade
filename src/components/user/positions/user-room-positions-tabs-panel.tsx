@@ -15,7 +15,7 @@ const TAB_TRIGGER_CLASS =
 
 type PanelLayout = 'trade-panel' | 'standalone-card';
 
-type FinancialRoomParam = 'TRADING' | 'INSTITUTIONAL' | 'STOCK';
+type FinancialRoomParam = 'TRADING' | 'STOCK';
 
 function RoomFinanceTabContent({ room }: { room: FinancialRoomParam }) {
   const t = useTranslations('Common');
@@ -71,7 +71,6 @@ function RoomFinanceTabContent({ room }: { room: FinancialRoomParam }) {
 }
 
 function financialRoomParam(room: Room): FinancialRoomParam {
-  if (room === 'INSTITUTIONAL') return 'INSTITUTIONAL';
   if (room === 'STOCK') return 'STOCK';
   return 'TRADING';
 }

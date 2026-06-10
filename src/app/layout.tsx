@@ -21,7 +21,7 @@ const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME?.trim() || 'Next Shadcn';
 
 export const metadata: Metadata = {
   title: APP_NAME,
-  description: 'Basic dashboard with Next.js and Shadcn',
+  description: 'Trading platform for trading and investing',
   icons: {
     apple: '/images/favico.png'
   }

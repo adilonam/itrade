@@ -39,7 +39,7 @@ export function InstitutionalRoomPageContent({
 
         <UserRoomPositionsTabsPanel
           layout="standalone-card"
-          room="INSTITUTIONAL"
+          room="TRADING"
           refreshEventName="room-institutional-positions-refresh"
           showFinanceTab={false}
         />
