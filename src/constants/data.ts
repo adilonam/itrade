@@ -358,7 +358,7 @@ export const landingNavLinks = {
 /** Landing placeholder links (replace with real routes when ready). */
 export const landingPlaceholderLink = '#' as const;
 
-export const colbariSiteLinks = {
+export const landingSiteLinks = {
   base: landingPlaceholderLink,
   legal: '/legal',
   aboutUs: '/about-us',
@@ -413,27 +413,52 @@ export const landingHeaderMenus: LandingHeaderMenu[] = [
     label: 'Learning',
     items: [
       { label: 'Education', href: landingPlaceholderLink },
-      { label: 'Economic Calendar', href: colbariSiteLinks.economicCalendar },
-      { label: 'CFDs', href: colbariSiteLinks.learningCfds },
-      { label: 'Market Movers', href: colbariSiteLinks.learningMarketMovers },
-      { label: 'Trading Pitfalls', href: colbariSiteLinks.learningTradingPitfalls },
-      { label: 'Smart Trading', href: colbariSiteLinks.learningSmartTrading },
+      { label: 'Economic Calendar', href: landingSiteLinks.economicCalendar },
+      { label: 'CFDs', href: landingSiteLinks.learningCfds },
+      { label: 'Market Movers', href: landingSiteLinks.learningMarketMovers },
+      { label: 'Trading Pitfalls', href: landingSiteLinks.learningTradingPitfalls },
+      { label: 'Smart Trading', href: landingSiteLinks.learningSmartTrading },
       {
         label: 'Technical and Fundamental',
-        href: colbariSiteLinks.learningTechnicalFundamental
+        href: landingSiteLinks.learningTechnicalFundamental
       },
-      { label: 'Glossary', href: colbariSiteLinks.learningGlossary },
-      { label: 'NFP', href: colbariSiteLinks.learningNfp }
+      { label: 'Glossary', href: landingSiteLinks.learningGlossary },
+      { label: 'NFP', href: landingSiteLinks.learningNfp }
     ]
   },
   {
     label: 'Account',
     items: [
-      { label: 'About Us', href: colbariSiteLinks.aboutUs },
-      { label: 'FAQs – Trading Platform', href: colbariSiteLinks.faqs }
+      { label: 'About Us', href: landingSiteLinks.aboutUs },
+      { label: 'FAQs – Trading Platform', href: landingSiteLinks.faqs }
     ]
   }
 ];
+
+/** Manual USDT deposit networks — wallet addresses are shown on the client only. */
+export const MANUAL_USDT_DEPOSIT_NETWORKS = [
+  {
+    id: 'trc20',
+    label: 'USDT TRC20',
+    hint: 'Tron network',
+    address: 'TPUVPMAkhyeFpPVbJkX4nmyYbDZzWcVMDP'
+  },
+  {
+    id: 'erc20',
+    label: 'USDT ERC20',
+    hint: 'Ethereum network',
+    address: '0x11740455c9aFD3C2a637d702931b3900be8B85F8'
+  },
+  {
+    id: 'bnb',
+    label: 'USDT BNB',
+    hint: 'BNB Smart Chain',
+    address: '0x11740455c9aFD3C2a637d702931b3900be8B85F8'
+  }
+] as const;
+
+export type ManualUsdtDepositNetworkId =
+  (typeof MANUAL_USDT_DEPOSIT_NETWORKS)[number]['id'];
 
 /** Symbols shown on the public landing page market ticker (Twelve Data). */
 export const landingMarketTapeSymbols = [

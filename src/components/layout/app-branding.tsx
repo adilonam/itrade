@@ -1,13 +1,14 @@
 'use client';
 
 import { IconPhotoUp } from '@tabler/icons-react';
+import { usePublicAppName } from '@/hooks/use-public-app-name';
 
 interface AppBrandingProps {
   className?: string;
 }
 
 export function AppBranding({ className }: AppBrandingProps) {
-  const appName = process.env.NEXT_PUBLIC_APP_NAME?.trim() || 'Trade Nova';
+  const appName = usePublicAppName();
 
   return (
     <div className={`flex items-center gap-3 ${className}`}>

@@ -1,5 +1,4 @@
 import type { AppSettings } from '@/lib/prisma/generated/client';
-import { getManualUsdtDepositWalletAddress } from '@/lib/manual-usdt-deposit';
 import { prisma } from '@/lib/prisma';
 
 let cache: AppSettings | null = null;
@@ -24,7 +23,6 @@ export async function getAppSettingsRow(): Promise<AppSettings | null> {
 /** Public API / client–safe field names (camelCase, Prisma-aligned or derived). */
 export const PUBLIC_APP_SETTING_LABELS = [
   'openMarket',
-  'manualUsdtDepositWalletAddress',
   'googleSignInEnabled'
 ] as const;
 
@@ -47,8 +45,6 @@ export function pickPublicAppSettings(
   );
   return {
     openMarket: r?.openMarket ?? true,
-    manualUsdtDepositWalletAddress:
-      getManualUsdtDepositWalletAddress() || null,
     googleSignInEnabled
   };
 }

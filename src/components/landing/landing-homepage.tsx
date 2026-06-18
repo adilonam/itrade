@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { EB_Garamond, Inter } from 'next/font/google';
 import { IconChartLine, IconSchool } from '@tabler/icons-react';
-import { colbariSiteLinks, landingPageLinks } from '@/constants/data';
+import { landingSiteLinks, landingPageLinks } from '@/constants/data';
 import {
   LandingHeaderNavMenus,
   LandingHeaderUtilities
@@ -13,13 +13,13 @@ import { LandingSiteFooter } from '@/components/landing/landing-site-footer';
 const ebGaramond = EB_Garamond({
   subsets: ['latin'],
   weight: ['400', '500'],
-  variable: '--font-colbari-display'
+  variable: '--font-landing-display'
 });
 
 const inter = Inter({
   subsets: ['latin'],
   weight: ['400', '500', '600'],
-  variable: '--font-colbari-body'
+  variable: '--font-landing-body'
 });
 
 const marketCardKeys = [
@@ -33,50 +33,50 @@ const marketCardKeys = [
 const marketCardLayout = [
   {
     key: 'currencies' as const,
-    image: '/images/landing/colbari/currencies.jpg',
+    image: '/images/landing/currencies.jpg',
     className: 'md:col-span-7',
     aspect: 'relative aspect-[16/9]'
   },
   {
     key: 'stocks' as const,
-    image: '/images/landing/colbari/stocks.jpg',
+    image: '/images/landing/stocks.jpg',
     className: 'md:col-span-5',
     aspect: 'relative min-h-[300px] md:min-h-[360px]'
   },
   {
     key: 'commodities' as const,
-    image: '/images/landing/colbari/commodities.jpg',
+    image: '/images/landing/commodities.jpg',
     className: 'md:col-span-4',
     aspect: 'relative aspect-square'
   },
   {
     key: 'crypto' as const,
-    image: '/images/landing/colbari/crypto.jpg',
+    image: '/images/landing/crypto.jpg',
     className: 'md:col-span-4',
     aspect: 'relative aspect-square'
   },
   {
     key: 'indices' as const,
-    image: '/images/landing/colbari/indices.jpg',
+    image: '/images/landing/indices.jpg',
     className: 'md:col-span-4',
     aspect: 'relative aspect-square'
   }
 ] as const;
 
 const marketCardLinks: Record<(typeof marketCardKeys)[number], string> = {
-  currencies: colbariSiteLinks.marketsCurrencies,
-  stocks: colbariSiteLinks.marketsStocks,
-  commodities: colbariSiteLinks.marketsCommodities,
-  crypto: colbariSiteLinks.marketsCryptocurrencies,
-  indices: colbariSiteLinks.marketsIndices
+  currencies: landingSiteLinks.marketsCurrencies,
+  stocks: landingSiteLinks.marketsStocks,
+  commodities: landingSiteLinks.marketsCommodities,
+  crypto: landingSiteLinks.marketsCryptocurrencies,
+  indices: landingSiteLinks.marketsIndices
 };
 
-type ColbariHomepageProps = {
+type LandingHomepageProps = {
   appName: string;
   session: boolean;
 };
 
-export async function ColbariHomepage({ appName, session }: ColbariHomepageProps) {
+export async function LandingHomepage({ appName, session }: LandingHomepageProps) {
   const locale = await getLocale();
   const t = await getTranslations('Landing');
   const createAccountHref = session ? landingPageLinks.trade : landingPageLinks.signUp;
@@ -191,7 +191,7 @@ export async function ColbariHomepage({ appName, session }: ColbariHomepageProps
                 </li>
               </ul>
               <Link
-                href={colbariSiteLinks.education}
+                href={landingSiteLinks.education}
                 className="inline-block border-b border-black pt-2 text-xs font-semibold tracking-[0.1em] text-black uppercase"
               >
                 {t('beginners.cta')}

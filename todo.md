@@ -361,8 +361,11 @@ bugs :
 
 - [x] add more than 100 lot on law advise project
 - [x] account mobile fix 
+- [ ] correct the problem dup favcion png and ico
 
-
+- [ ] account number for real demo l.. 300101
+- [ ] add the markets 
+- [ ] add manual deposit
 
 
 

@@ -11,13 +11,14 @@ import { getLocale, getMessages } from 'next-intl/server';
 import './globals.css';
 import './theme.css';
 import { DEFAULT_ACTIVE_THEME } from '@/constants/theme';
+import { getPublicAppName } from '@/lib/public-app-name';
 
 const META_THEME_COLORS = {
   light: '#ffffff',
   dark: '#09090b'
 };
 
-const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME?.trim() || 'Next Shadcn';
+const APP_NAME = getPublicAppName();
 
 export const metadata: Metadata = {
   title: APP_NAME,

@@ -148,8 +148,8 @@ function BalanceCard({
 
 function BalanceCardsSkeleton() {
   return (
-    <div className="grid min-w-0 flex-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-      {Array.from({ length: 3 }).map((_, i) => (
+    <div className="grid min-w-0 flex-1 gap-4 sm:grid-cols-2">
+      {Array.from({ length: 2 }).map((_, i) => (
         <div
           key={i}
           className="h-[160px] animate-pulse rounded-xl bg-[var(--trade-border)]"
@@ -199,8 +199,6 @@ export function UserManagementPanelControl() {
   const [financialDemo, setFinancialDemo] = useState<FinancialSnapshot | null>(
     null
   );
-  const [financialInstitutional, setFinancialInstitutional] =
-    useState<FinancialSnapshot | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [txLoading, setTxLoading] = useState(true);
@@ -237,38 +235,33 @@ export function UserManagementPanelControl() {
       setLoading(true);
       setError(null);
 
-      const [realRes, demoRes, institutionalRes] = await Promise.all([
+      const [realRes, demoRes] = await Promise.all([
         fetch('/api/user/financial?balanceType=REAL'),
-        fetch('/api/user/financial?balanceType=DEMO'),
-        fetch('/api/user/financial?balanceType=INSTITUTIONAL')
+        fetch('/api/user/financial?balanceType=DEMO')
       ]);
 
-      if (realRes.status === 401 || demoRes.status === 401 || institutionalRes.status === 401) {
+      if (realRes.status === 401 || demoRes.status === 401) {
         setError(t('signInBalances'));
         setFinancialReal(null);
         setFinancialDemo(null);
-        setFinancialInstitutional(null);
         return;
       }
 
-      if (!realRes.ok || !demoRes.ok || !institutionalRes.ok) {
+      if (!realRes.ok || !demoRes.ok) {
         throw new Error('Failed to load balances');
       }
 
-      const [real, demo, institutional] = await Promise.all([
+      const [real, demo] = await Promise.all([
         realRes.json() as Promise<FinancialSnapshot>,
-        demoRes.json() as Promise<FinancialSnapshot>,
-        institutionalRes.json() as Promise<FinancialSnapshot>
+        demoRes.json() as Promise<FinancialSnapshot>
       ]);
 
       setFinancialReal(real);
       setFinancialDemo(demo);
-      setFinancialInstitutional(institutional);
     } catch {
       setError(t('loadBalancesError'));
       setFinancialReal(null);
       setFinancialDemo(null);
-      setFinancialInstitutional(null);
     } finally {
       setLoading(false);
     }
@@ -282,8 +275,7 @@ export function UserManagementPanelControl() {
     void loadTransactions();
   }, [loadTransactions]);
 
-  const showCards =
-    financialReal && financialDemo && financialInstitutional && !error;
+  const showCards = financialReal && financialDemo && !error;
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-auto">
@@ -298,7 +290,7 @@ export function UserManagementPanelControl() {
             {loading && !showCards ? (
               <BalanceCardsSkeleton />
             ) : showCards ? (
-              <div className="grid min-w-0 flex-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              <div className="grid min-w-0 flex-1 gap-4 sm:grid-cols-2">
                 <AccountBalanceRow
                   financial={financialReal}
                   accountLabel={t('walletReal')}
@@ -309,12 +301,6 @@ export function UserManagementPanelControl() {
                   financial={financialDemo}
                   accountLabel={t('walletDemo')}
                   ghost="DEMO"
-                  t={t}
-                />
-                <AccountBalanceRow
-                  financial={financialInstitutional}
-                  accountLabel={t('walletInstitutional')}
-                  ghost="INST"
                   t={t}
                 />
               </div>

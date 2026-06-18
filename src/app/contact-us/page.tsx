@@ -1,9 +1,10 @@
-import { ColbariContactUsPage } from '@/components/landing/colbari-contact-us-page';
+import { LandingContactUsPage } from '@/components/landing/landing-contact-us-page';
+import { getPublicAppName } from '@/lib/public-app-name';
 import { getAuthSession } from '@/lib/auth';
 
 export default async function Page() {
   const session = await getAuthSession();
-  const appName = process.env.NEXT_PUBLIC_APP_NAME?.trim() || 'xminvest';
+  const appName = getPublicAppName();
 
-  return <ColbariContactUsPage appName={appName} session={Boolean(session)} />;
+  return <LandingContactUsPage appName={appName} session={Boolean(session)} />;
 }

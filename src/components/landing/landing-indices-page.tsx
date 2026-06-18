@@ -12,40 +12,40 @@ import { LandingSiteFooter } from '@/components/landing/landing-site-footer';
 const ebGaramond = EB_Garamond({
   subsets: ['latin'],
   weight: ['400', '500'],
-  variable: '--font-colbari-display'
+  variable: '--font-landing-display'
 });
 
 const inter = Inter({
   subsets: ['latin'],
   weight: ['400', '500', '600'],
-  variable: '--font-colbari-body'
+  variable: '--font-landing-body'
 });
 
-type ColbariStocksPageProps = {
+type LandingIndicesPageProps = {
   appName: string;
   session: boolean;
 };
 
-export async function ColbariStocksPage({ appName, session }: ColbariStocksPageProps) {
+export async function LandingIndicesPage({ appName, session }: LandingIndicesPageProps) {
   const locale = await getLocale();
-  const t = await getTranslations('Landing.stocksPage');
+  const t = await getTranslations('Landing.indicesPage');
   const tradeHref = session ? landingPageLinks.trade : landingPageLinks.signIn;
-  const stocksHighlights = [
+  const indicesHighlights = [
     {
-      title: t('highlights.stockCfds.title'),
-      description: t('highlights.stockCfds.description')
+      title: t('highlights.globalBenchmarks.title'),
+      description: t('highlights.globalBenchmarks.description')
     },
     {
-      title: t('highlights.leaders.title'),
-      description: t('highlights.leaders.description')
+      title: t('highlights.broadMarketExposure.title'),
+      description: t('highlights.broadMarketExposure.description')
     },
     {
-      title: t('highlights.flexible.title'),
-      description: t('highlights.flexible.description')
+      title: t('highlights.regionalCoverage.title'),
+      description: t('highlights.regionalCoverage.description')
     },
     {
-      title: t('highlights.insights.title'),
-      description: t('highlights.insights.description')
+      title: t('highlights.flexibleTradingApproach.title'),
+      description: t('highlights.flexibleTradingApproach.description')
     }
   ] as const;
 
@@ -95,9 +95,10 @@ export async function ColbariStocksPage({ appName, session }: ColbariStocksPageP
               <strong>{t('introHeading')}</strong>
             </p>
             <p>{t('paragraph1')}</p>
+            <p>{t('paragraph2')}</p>
 
             <div className="space-y-5 pt-2">
-              {stocksHighlights.map((item) => (
+              {indicesHighlights.map((item) => (
                 <div key={item.title}>
                   <p className="mb-1 text-base font-semibold text-black">• {item.title}</p>
                   <p>{item.description}</p>

@@ -14,21 +14,21 @@ import { getSupportEmail } from '@/lib/app-url';
 const ebGaramond = EB_Garamond({
   subsets: ['latin'],
   weight: ['400', '500'],
-  variable: '--font-colbari-display'
+  variable: '--font-landing-display'
 });
 
 const inter = Inter({
   subsets: ['latin'],
   weight: ['400', '500', '600'],
-  variable: '--font-colbari-body'
+  variable: '--font-landing-body'
 });
 
-type ColbariContactUsPageProps = {
+type LandingContactUsPageProps = {
   appName: string;
   session: boolean;
 };
 
-export async function ColbariContactUsPage({ appName, session }: ColbariContactUsPageProps) {
+export async function LandingContactUsPage({ appName, session }: LandingContactUsPageProps) {
   const locale = await getLocale();
   const supportEmail = await getSupportEmail();
   const tradeHref = session ? landingPageLinks.trade : landingPageLinks.signIn;

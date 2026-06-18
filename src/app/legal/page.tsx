@@ -1,9 +1,10 @@
-import { ColbariLegalPage } from '@/components/landing/colbari-legal-page';
+import { LandingLegalPage } from '@/components/landing/landing-legal-page';
+import { getPublicAppName } from '@/lib/public-app-name';
 import { getAuthSession } from '@/lib/auth';
 
 export default async function Page() {
   const session = await getAuthSession();
-  const appName = process.env.NEXT_PUBLIC_APP_NAME?.trim() || 'xminvest';
+  const appName = getPublicAppName();
 
-  return <ColbariLegalPage appName={appName} session={Boolean(session)} />;
+  return <LandingLegalPage appName={appName} session={Boolean(session)} />;
 }

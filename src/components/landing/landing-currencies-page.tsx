@@ -12,40 +12,40 @@ import { LandingSiteFooter } from '@/components/landing/landing-site-footer';
 const ebGaramond = EB_Garamond({
   subsets: ['latin'],
   weight: ['400', '500'],
-  variable: '--font-colbari-display'
+  variable: '--font-landing-display'
 });
 
 const inter = Inter({
   subsets: ['latin'],
   weight: ['400', '500', '600'],
-  variable: '--font-colbari-body'
+  variable: '--font-landing-body'
 });
 
-type ColbariIndicesPageProps = {
+type LandingCurrenciesPageProps = {
   appName: string;
   session: boolean;
 };
 
-export async function ColbariIndicesPage({ appName, session }: ColbariIndicesPageProps) {
+export async function LandingCurrenciesPage({ appName, session }: LandingCurrenciesPageProps) {
   const locale = await getLocale();
-  const t = await getTranslations('Landing.indicesPage');
+  const t = await getTranslations('Landing.currenciesPage');
   const tradeHref = session ? landingPageLinks.trade : landingPageLinks.signIn;
-  const indicesHighlights = [
+  const currenciesHighlights = [
     {
-      title: t('highlights.globalBenchmarks.title'),
-      description: t('highlights.globalBenchmarks.description')
+      title: t('highlights.pairs.title'),
+      description: t('highlights.pairs.description')
     },
     {
-      title: t('highlights.broadMarketExposure.title'),
-      description: t('highlights.broadMarketExposure.description')
+      title: t('highlights.liquidity.title'),
+      description: t('highlights.liquidity.description')
     },
     {
-      title: t('highlights.regionalCoverage.title'),
-      description: t('highlights.regionalCoverage.description')
+      title: t('highlights.global.title'),
+      description: t('highlights.global.description')
     },
     {
-      title: t('highlights.flexibleTradingApproach.title'),
-      description: t('highlights.flexibleTradingApproach.description')
+      title: t('highlights.flexible.title'),
+      description: t('highlights.flexible.description')
     }
   ] as const;
 
@@ -98,7 +98,7 @@ export async function ColbariIndicesPage({ appName, session }: ColbariIndicesPag
             <p>{t('paragraph2')}</p>
 
             <div className="space-y-5 pt-2">
-              {indicesHighlights.map((item) => (
+              {currenciesHighlights.map((item) => (
                 <div key={item.title}>
                   <p className="mb-1 text-base font-semibold text-black">• {item.title}</p>
                   <p>{item.description}</p>
@@ -106,7 +106,9 @@ export async function ColbariIndicesPage({ appName, session }: ColbariIndicesPag
               ))}
             </div>
 
-            <p className="pt-4 text-[20px] italic">{t('tagline')}</p>
+            <p className="pt-4 text-center text-[20px] italic">
+              {t('tagline')}
+            </p>
           </div>
         </div>
       </section>

@@ -9,41 +9,41 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { colbariSiteLinks, landingPlaceholderLink } from '@/constants/data';
+import { landingSiteLinks, landingPlaceholderLink } from '@/constants/data';
 import { LandingLanguageMenu } from '@/components/landing/landing-language-menu';
 
 const landingHeaderMenuConfig = [
   {
     labelKey: 'markets' as const,
     items: [
-      { labelKey: 'cryptocurrencies' as const, href: colbariSiteLinks.marketsCryptocurrencies },
-      { labelKey: 'currencies' as const, href: colbariSiteLinks.marketsCurrencies },
-      { labelKey: 'stocks' as const, href: colbariSiteLinks.marketsStocks },
-      { labelKey: 'commodities' as const, href: colbariSiteLinks.marketsCommodities },
-      { labelKey: 'indices' as const, href: colbariSiteLinks.marketsIndices }
+      { labelKey: 'cryptocurrencies' as const, href: landingSiteLinks.marketsCryptocurrencies },
+      { labelKey: 'currencies' as const, href: landingSiteLinks.marketsCurrencies },
+      { labelKey: 'stocks' as const, href: landingSiteLinks.marketsStocks },
+      { labelKey: 'commodities' as const, href: landingSiteLinks.marketsCommodities },
+      { labelKey: 'indices' as const, href: landingSiteLinks.marketsIndices }
     ]
   },
   {
     labelKey: 'learning' as const,
     items: [
-      { labelKey: 'economicCalendar' as const, href: colbariSiteLinks.economicCalendar },
-      { labelKey: 'cfds' as const, href: colbariSiteLinks.learningCfds },
-      { labelKey: 'marketMovers' as const, href: colbariSiteLinks.learningMarketMovers },
-      { labelKey: 'tradingPitfalls' as const, href: colbariSiteLinks.learningTradingPitfalls },
-      { labelKey: 'smartTrading' as const, href: colbariSiteLinks.learningSmartTrading },
+      { labelKey: 'economicCalendar' as const, href: landingSiteLinks.economicCalendar },
+      { labelKey: 'cfds' as const, href: landingSiteLinks.learningCfds },
+      { labelKey: 'marketMovers' as const, href: landingSiteLinks.learningMarketMovers },
+      { labelKey: 'tradingPitfalls' as const, href: landingSiteLinks.learningTradingPitfalls },
+      { labelKey: 'smartTrading' as const, href: landingSiteLinks.learningSmartTrading },
       {
         labelKey: 'technicalFundamental' as const,
-        href: colbariSiteLinks.learningTechnicalFundamental
+        href: landingSiteLinks.learningTechnicalFundamental
       },
-      { labelKey: 'glossary' as const, href: colbariSiteLinks.learningGlossary },
-      { labelKey: 'nfp' as const, href: colbariSiteLinks.learningNfp }
+      { labelKey: 'glossary' as const, href: landingSiteLinks.learningGlossary },
+      { labelKey: 'nfp' as const, href: landingSiteLinks.learningNfp }
     ]
   },
   {
     labelKey: 'account' as const,
     items: [
-      { labelKey: 'aboutUs' as const, href: colbariSiteLinks.aboutUs },
-      { labelKey: 'faqs' as const, href: colbariSiteLinks.faqs }
+      { labelKey: 'aboutUs' as const, href: landingSiteLinks.aboutUs },
+      { labelKey: 'faqs' as const, href: landingSiteLinks.faqs }
     ]
   }
 ] as const;

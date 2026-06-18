@@ -12,16 +12,16 @@ import { LandingSiteFooter } from '@/components/landing/landing-site-footer';
 const ebGaramond = EB_Garamond({
   subsets: ['latin'],
   weight: ['400', '500'],
-  variable: '--font-colbari-display'
+  variable: '--font-landing-display'
 });
 
 const inter = Inter({
   subsets: ['latin'],
   weight: ['400', '500', '600'],
-  variable: '--font-colbari-body'
+  variable: '--font-landing-body'
 });
 
-type ColbariNfpPageProps = {
+type LandingNfpPageProps = {
   appName: string;
   session: boolean;
 };
@@ -56,7 +56,7 @@ const nfpDatesAr = [
   { month: 'ديسمبر', day: 4, time: '08:30' }
 ] as const;
 
-export async function ColbariNfpPage({ appName, session }: ColbariNfpPageProps) {
+export async function LandingNfpPage({ appName, session }: LandingNfpPageProps) {
   const locale = await getLocale();
   const tradeHref = session ? landingPageLinks.trade : landingPageLinks.signIn;
   const content =

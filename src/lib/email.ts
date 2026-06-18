@@ -45,7 +45,9 @@ export interface EmailOptions {
   html?: string;
 }
 
-const getMailAppName = () => process.env.NEXT_PUBLIC_APP_NAME?.trim() || 'Trade Nova';
+import { getPublicAppName } from '@/lib/public-app-name';
+
+const getMailAppName = () => getPublicAppName();
 
 export const sendEmail = async (options: EmailOptions) => {
   try {

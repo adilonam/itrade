@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { getLocale, getTranslations } from 'next-intl/server';
+import { getLocale } from 'next-intl/server';
 import { EB_Garamond, Inter } from 'next/font/google';
 import { landingPageLinks } from '@/constants/data';
 import {
@@ -12,42 +12,26 @@ import { LandingSiteFooter } from '@/components/landing/landing-site-footer';
 const ebGaramond = EB_Garamond({
   subsets: ['latin'],
   weight: ['400', '500'],
-  variable: '--font-colbari-display'
+  variable: '--font-landing-display'
 });
 
 const inter = Inter({
   subsets: ['latin'],
   weight: ['400', '500', '600'],
-  variable: '--font-colbari-body'
+  variable: '--font-landing-body'
 });
 
-type ColbariCurrenciesPageProps = {
+type LandingEconomicCalendarPageProps = {
   appName: string;
   session: boolean;
 };
 
-export async function ColbariCurrenciesPage({ appName, session }: ColbariCurrenciesPageProps) {
+export async function LandingEconomicCalendarPage({
+  appName,
+  session
+}: LandingEconomicCalendarPageProps) {
   const locale = await getLocale();
-  const t = await getTranslations('Landing.currenciesPage');
   const tradeHref = session ? landingPageLinks.trade : landingPageLinks.signIn;
-  const currenciesHighlights = [
-    {
-      title: t('highlights.pairs.title'),
-      description: t('highlights.pairs.description')
-    },
-    {
-      title: t('highlights.liquidity.title'),
-      description: t('highlights.liquidity.description')
-    },
-    {
-      title: t('highlights.global.title'),
-      description: t('highlights.global.description')
-    },
-    {
-      title: t('highlights.flexible.title'),
-      description: t('highlights.flexible.description')
-    }
-  ] as const;
 
   return (
     <main
@@ -79,36 +63,25 @@ export async function ColbariCurrenciesPage({ appName, session }: ColbariCurrenc
       </header>
 
       <section className="pt-28 pb-20 md:pt-36 md:pb-24">
-        <div className="mx-auto w-full max-w-[1060px] px-5 md:px-16">
+        <div className="mx-auto w-full max-w-[1440px] px-5 md:px-16">
           <div className="mb-7 flex items-center gap-2 text-sm text-[#6b6e70]">
-            <span>{t('breadcrumb.markets')}</span>
+            <span>Learning</span>
             <span>/</span>
-            <span className="text-[#1a1c1c]">{t('breadcrumb.current')}</span>
+            <span className="text-[#1a1c1c]">Economic Calendar</span>
           </div>
 
           <h1 className={`${ebGaramond.className} mb-8 text-[44px] leading-[1.1] text-black md:text-[64px]`}>
-            {t('title')}
+            Economic Calendar
           </h1>
 
-          <div className="max-w-[860px] space-y-6 text-[17px] leading-8 text-[#2f3335]">
-            <p className="text-[22px] leading-8 text-black">
-              <strong>{t('introHeading')}</strong>
-            </p>
-            <p>{t('paragraph1')}</p>
-            <p>{t('paragraph2')}</p>
-
-            <div className="space-y-5 pt-2">
-              {currenciesHighlights.map((item) => (
-                <div key={item.title}>
-                  <p className="mb-1 text-base font-semibold text-black">• {item.title}</p>
-                  <p>{item.description}</p>
-                </div>
-              ))}
-            </div>
-
-            <p className="pt-4 text-center text-[20px] italic">
-              {t('tagline')}
-            </p>
+          <div className="overflow-hidden border border-[#D9D9D9] bg-[#f5f5f5]">
+            <iframe
+              src="https://www.tradays.com/en/economic-calendar/widget?mode=2"
+              title="Economic Calendar"
+              loading="lazy"
+              className="h-[640px] w-full bg-white md:h-[760px]"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
           </div>
         </div>
       </section>

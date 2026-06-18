@@ -1,5 +1,10 @@
 import { getAuthSession } from '@/lib/auth';
-import { getManualUsdtDepositWalletAddress } from '@/lib/manual-usdt-deposit';
+import {
+  formatManualUsdtPayCurrency,
+  getManualUsdtDepositNetwork,
+  isManualUsdtDepositNetworkId,
+  usdAmountToManualUsdtAmount
+} from '@/lib/manual-usdt-deposit';
 import { ensureUserBalance, parseBalanceType } from '@/lib/balance';
 import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
@@ -17,7 +22,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { amount, balanceType: rawBalanceType } = body;
+    const { amount, balanceType: rawBalanceType, network: rawNetwork } = body;
     const balanceType = parseBalanceType(rawBalanceType);
 
     if (balanceType !== 'REAL') {
@@ -34,13 +39,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const walletAddress = getManualUsdtDepositWalletAddress();
-    if (!walletAddress) {
+    if (
+      typeof rawNetwork !== 'string' ||
+      !isManualUsdtDepositNetworkId(rawNetwork)
+    ) {
       return NextResponse.json(
-        { error: 'Manual USDT deposits are not configured on the server.' },
-        { status: 503 }
+        { error: 'Invalid network. Choose TRC20, ERC20, or BNB.' },
+        { status: 400 }
       );
     }
+
+    const network = getManualUsdtDepositNetwork(rawNetwork);
+    const usdtAmount = usdAmountToManualUsdtAmount(amount);
 
     const orderId = `dep_manual_${session.user.id}_${Date.now()}`;
     const userBalance = await ensureUserBalance(
@@ -53,10 +63,11 @@ export async function POST(request: NextRequest) {
       data: {
         userBalanceId: userBalance.id,
         amountUsd: amount,
-        payCurrency: 'usdt',
+        payCurrency: formatManualUsdtPayCurrency(rawNetwork),
         channel: DepositRequestChannel.MANUAL,
         status: DepositRequestStatus.WAITING,
-        orderId
+        orderId,
+        adminNotes: `Send ${usdtAmount.toFixed(2)} USDT on ${network.label}`
       }
     });
 
@@ -65,9 +76,12 @@ export async function POST(request: NextRequest) {
       message: 'Deposit request created. Send USDT to the address below.',
       depositRequestId: depositRequest.id,
       orderId: depositRequest.orderId,
-      walletAddress,
+      network: rawNetwork,
+      networkLabel: network.label,
+      walletAddress: network.address,
       amountUsd: depositRequest.amountUsd,
-      payCurrency: 'USDT',
+      usdtAmount,
+      payCurrency: depositRequest.payCurrency,
       balanceType
     });
   } catch {

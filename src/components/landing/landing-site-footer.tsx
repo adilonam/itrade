@@ -1,21 +1,24 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
-import { colbariSiteLinks } from '@/constants/data';
-import { getSupportEmail } from '@/lib/app-url';
+import { landingSiteLinks } from '@/constants/data';
+import { getPublicAppName } from '@/lib/public-app-name';
 import { cn } from '@/lib/utils';
 
-type LandingSiteFooterProps = {
-  appName: string;
-  className?: string;
-};
+const LANDING_CUSTOMER_SERVICE_PHONE = '+442039960577';
+const LANDING_CUSTOMER_SERVICE_EMAIL = 'support@cfix.markets';
 
 const replaceBrandName = (text: string, appName: string) =>
   text.replaceAll('Colbari', appName).replaceAll('كولباري', appName);
 
+type LandingSiteFooterProps = {
+  appName?: string;
+  className?: string;
+};
+
 export async function LandingSiteFooter({ appName, className }: LandingSiteFooterProps) {
   const t = await getTranslations('Landing');
-  const supportEmail = await getSupportEmail();
+  const resolvedAppName = appName ?? getPublicAppName();
 
   return (
     <footer
@@ -27,19 +30,19 @@ export async function LandingSiteFooter({ appName, className }: LandingSiteFoote
       <div className="mx-auto max-w-[1440px]">
         <div className="mb-12 flex flex-wrap gap-8 border-b border-[#c4c7c7]/20 pb-12">
           <Link
-            href={colbariSiteLinks.legal}
+            href={landingSiteLinks.legal}
             className="text-sm text-[#444748] transition-colors hover:text-[#C0A678]"
           >
             {t('footer.legal')}
           </Link>
           <Link
-            href={colbariSiteLinks.aboutUs}
+            href={landingSiteLinks.aboutUs}
             className="text-sm text-[#444748] transition-colors hover:text-[#C0A678]"
           >
             {t('footer.aboutUs')}
           </Link>
           <Link
-            href={colbariSiteLinks.contactUs}
+            href={landingSiteLinks.contactUs}
             className="text-sm text-[#444748] transition-colors hover:text-[#C0A678]"
           >
             {t('footer.contactUs')}
@@ -47,10 +50,10 @@ export async function LandingSiteFooter({ appName, className }: LandingSiteFoote
         </div>
 
         <div className="mb-12 flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
-          <Link href="/" className="inline-flex shrink-0" aria-label={appName}>
+          <Link href="/" className="inline-flex shrink-0" aria-label={resolvedAppName}>
             <Image
               src="/images/logo-light.png"
-              alt={`${appName} logo`}
+              alt={`${resolvedAppName} logo`}
               width={160}
               height={40}
               className="h-8 w-auto"
@@ -58,10 +61,13 @@ export async function LandingSiteFooter({ appName, className }: LandingSiteFoote
           </Link>
           <div className="text-sm text-[#444748]">
             <p className="mb-1 font-medium text-black">{t('footer.customerService')}</p>
-            <p>+27 21 891 1885</p>
+            <p>{LANDING_CUSTOMER_SERVICE_PHONE}</p>
             <p>
-              <a href={`mailto:${supportEmail}`} className="transition-colors hover:text-[#C0A678]">
-                {supportEmail}
+              <a
+                href={`mailto:${LANDING_CUSTOMER_SERVICE_EMAIL}`}
+                className="transition-colors hover:text-[#C0A678]"
+              >
+                {LANDING_CUSTOMER_SERVICE_EMAIL}
               </a>
             </p>
           </div>
@@ -70,7 +76,7 @@ export async function LandingSiteFooter({ appName, className }: LandingSiteFoote
         <div className="space-y-4 text-[11px] leading-relaxed text-[#444748]/80">
           <p>
             <strong>{t('footer.companyInfo')}</strong>{' '}
-            {replaceBrandName(t('footer.companyInfoBody'), appName)}
+            {replaceBrandName(t('footer.companyInfoBody'), resolvedAppName)}
           </p>
           <p>{t('footer.valorValueBridge')}</p>
           <p>{t('footer.dunfield')}</p>
@@ -91,7 +97,7 @@ export async function LandingSiteFooter({ appName, className }: LandingSiteFoote
         </div>
 
         <p className="mt-10 text-[10px] tracking-widest text-[#444748] uppercase">
-          {t('footer.copyright', { appName: appName.toUpperCase() })}
+          {t('footer.copyright', { appName: resolvedAppName.toUpperCase() })}
         </p>
       </div>
     </footer>

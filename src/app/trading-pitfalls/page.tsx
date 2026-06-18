@@ -1,9 +1,10 @@
-import { ColbariTradingPitfallsPage } from '@/components/landing/colbari-trading-pitfalls-page';
+import { LandingTradingPitfallsPage } from '@/components/landing/landing-trading-pitfalls-page';
+import { getPublicAppName } from '@/lib/public-app-name';
 import { getAuthSession } from '@/lib/auth';
 
 export default async function Page() {
   const session = await getAuthSession();
-  const appName = process.env.NEXT_PUBLIC_APP_NAME?.trim() || 'xminvest';
+  const appName = getPublicAppName();
 
-  return <ColbariTradingPitfallsPage appName={appName} session={Boolean(session)} />;
+  return <LandingTradingPitfallsPage appName={appName} session={Boolean(session)} />;
 }

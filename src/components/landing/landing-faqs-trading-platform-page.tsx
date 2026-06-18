@@ -13,16 +13,16 @@ import { LandingSiteFooter } from '@/components/landing/landing-site-footer';
 const ebGaramond = EB_Garamond({
   subsets: ['latin'],
   weight: ['400', '500'],
-  variable: '--font-colbari-display'
+  variable: '--font-landing-display'
 });
 
 const inter = Inter({
   subsets: ['latin'],
   weight: ['400', '500', '600'],
-  variable: '--font-colbari-body'
+  variable: '--font-landing-body'
 });
 
-type ColbariFaqsTradingPlatformPageProps = {
+type LandingFaqsTradingPlatformPageProps = {
   appName: string;
   session: boolean;
 };
@@ -247,10 +247,10 @@ const faqItemsAr = [
   }
 ] as const;
 
-export async function ColbariFaqsTradingPlatformPage({
+export async function LandingFaqsTradingPlatformPage({
   appName,
   session
-}: ColbariFaqsTradingPlatformPageProps) {
+}: LandingFaqsTradingPlatformPageProps) {
   const locale = await getLocale();
   const tradeHref = session ? landingPageLinks.trade : landingPageLinks.signIn;
   const content =

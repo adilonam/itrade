@@ -1,7 +1,8 @@
 import { DashboardLayoutClient } from '@/components/layout/dashboard-layout-client';
+import { getPublicAppName } from '@/lib/public-app-name';
 import type { Metadata } from 'next';
 
-const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME?.trim() || 'Next Shadcn';
+const APP_NAME = getPublicAppName();
 
 export const metadata: Metadata = {
   title: `${APP_NAME} Dashboard`,

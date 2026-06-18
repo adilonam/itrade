@@ -1,9 +1,10 @@
-import { ColbariEconomicCalendarPage } from '@/components/landing/colbari-economic-calendar-page';
+import { LandingEconomicCalendarPage } from '@/components/landing/landing-economic-calendar-page';
+import { getPublicAppName } from '@/lib/public-app-name';
 import { getAuthSession } from '@/lib/auth';
 
 export default async function Page() {
   const session = await getAuthSession();
-  const appName = process.env.NEXT_PUBLIC_APP_NAME?.trim() || 'xminvest';
+  const appName = getPublicAppName();
 
-  return <ColbariEconomicCalendarPage appName={appName} session={Boolean(session)} />;
+  return <LandingEconomicCalendarPage appName={appName} session={Boolean(session)} />;
 }

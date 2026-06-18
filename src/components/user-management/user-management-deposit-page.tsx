@@ -3,6 +3,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { UserDepositRequestsSection } from '@/components/user-management/user-deposit-requests-section';
 import {
+  MANUAL_USDT_DEPOSIT_NETWORKS,
+  type ManualUsdtDepositNetworkId
+} from '@/constants/data';
+import {
   IconCheck,
   IconChevronLeft,
   IconChevronRight,
@@ -50,12 +54,10 @@ type StepIndex = 0 | 1 | 2;
 
 type UserManagementDepositPageProps = {
   paymentReturnStatus?: string | null;
-  manualUsdtWalletAddress?: string;
 };
 
 export function UserManagementDepositPage({
-  paymentReturnStatus = null,
-  manualUsdtWalletAddress = ''
+  paymentReturnStatus = null
 }: UserManagementDepositPageProps) {
   const t = useTranslations('UserManagement.deposit');
   const tShared = useTranslations('UserManagement.shared');
@@ -456,7 +458,6 @@ export function UserManagementDepositPage({
           </section>
 
           <UserManagementManualDepositSection
-            walletAddress={manualUsdtWalletAddress}
             onRequestCreated={() =>
               setDepositListExtraRefresh((n) => n + 1)
             }
@@ -475,18 +476,67 @@ type ManualDepositResult = {
   walletAddress: string;
   orderId: string;
   amountUsd: number;
+  networkLabel: string;
 };
 
+function ManualDepositAmountField({
+  value,
+  onChange,
+  showError
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  showError: boolean;
+}) {
+  return (
+    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+      <label
+        htmlFor="manual-deposit-amount"
+        className="shrink-0 text-sm font-semibold text-[var(--trade-text)]"
+      >
+        Amount (USDT)
+      </label>
+      <div className="min-w-0 flex-1 sm:max-w-xs">
+        <input
+          id="manual-deposit-amount"
+          type="text"
+          inputMode="decimal"
+          autoComplete="off"
+          placeholder="0.00"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className={cn(
+            'w-full rounded-lg border bg-[var(--trade-dark)] px-4 py-3 font-mono text-[var(--trade-text)] outline-none transition-[box-shadow,border-color]',
+            'border-[var(--trade-border)] placeholder:text-[var(--trade-text-muted)]/60',
+            'focus:border-[var(--trade-accent-blue)] focus:ring-2 focus:ring-[var(--trade-accent-blue)]/25'
+          )}
+        />
+        {showError && (
+          <p className="mt-2 text-xs text-[var(--trade-red)]">
+            Enter a valid amount greater than zero.
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function UserManagementManualDepositSection({
-  walletAddress,
   onRequestCreated
 }: {
-  walletAddress: string;
   onRequestCreated?: () => void;
 }) {
+  const [network, setNetwork] = useState<ManualUsdtDepositNetworkId>('trc20');
   const [amountRaw, setAmountRaw] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<ManualDepositResult | null>(null);
+
+  const selectedNetwork = useMemo(
+    () =>
+      MANUAL_USDT_DEPOSIT_NETWORKS.find((item) => item.id === network) ??
+      MANUAL_USDT_DEPOSIT_NETWORKS[0],
+    [network]
+  );
 
   const amountNum = useMemo(() => {
     const n = parseFloat(amountRaw.replace(',', '.'));
@@ -504,6 +554,7 @@ function UserManagementManualDepositSection({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           amount: amountNum,
+          network,
           balanceType: REAL_BALANCE_TYPE
         })
       });
@@ -512,6 +563,7 @@ function UserManagementManualDepositSection({
         walletAddress?: string;
         orderId?: string;
         amountUsd?: number;
+        networkLabel?: string;
       };
       if (!res.ok) {
         toast.error(data.error ?? 'Could not create deposit request');
@@ -520,7 +572,8 @@ function UserManagementManualDepositSection({
       if (
         !data.walletAddress ||
         !data.orderId ||
-        data.amountUsd === undefined
+        data.amountUsd === undefined ||
+        !data.networkLabel
       ) {
         toast.error('Invalid response from server.');
         return;
@@ -530,7 +583,8 @@ function UserManagementManualDepositSection({
       setResult({
         walletAddress: data.walletAddress,
         orderId: data.orderId,
-        amountUsd: data.amountUsd
+        amountUsd: data.amountUsd,
+        networkLabel: data.networkLabel
       });
       setAmountRaw('');
     } catch {
@@ -540,7 +594,7 @@ function UserManagementManualDepositSection({
     }
   };
 
-  const displayWalletAddress = result?.walletAddress ?? walletAddress;
+  const displayWalletAddress = result?.walletAddress ?? selectedNetwork.address;
 
   const copyAddress = async () => {
     if (!displayWalletAddress) return;
@@ -551,8 +605,6 @@ function UserManagementManualDepositSection({
       toast.error('Could not copy');
     }
   };
-
-  const walletConfigured = walletAddress.trim().length > 0;
 
   return (
     <section
@@ -566,19 +618,59 @@ function UserManagementManualDepositSection({
         Manual USDT deposit
       </h2>
       <p className="mt-1 text-xs text-[var(--trade-text-muted)]">
-        USDT only. Send funds to the platform wallet below, then create a
-        deposit request with the USD amount you transferred. Your balance is
-        updated after an administrator verifies your transfer.
+        USDT only. Choose a network, send funds to the platform wallet below,
+        then create a deposit request with the USD amount you transferred. Your
+        balance is updated after an administrator verifies your transfer.
       </p>
 
-      {walletConfigured ? (
-        <div className="mt-4">
+      <div className="mt-4 space-y-4">
+        <fieldset>
+          <legend className="text-sm font-semibold text-[var(--trade-text)]">
+            Network
+          </legend>
+          <div
+            className="mt-3 grid gap-3 sm:grid-cols-3"
+            role="radiogroup"
+            aria-label="USDT network"
+          >
+            {MANUAL_USDT_DEPOSIT_NETWORKS.map((item) => {
+              const selected = network === item.id;
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={selected}
+                  onClick={() => setNetwork(item.id)}
+                  className={cn(
+                    'flex flex-col rounded-xl border px-4 py-4 text-left transition-colors',
+                    selected
+                      ? 'border-[var(--trade-accent-blue)] bg-[var(--trade-accent-blue)]/[0.08] ring-1 ring-[var(--trade-accent-blue)]/30'
+                      : 'border-[var(--trade-border)] bg-[var(--trade-dark)] hover:border-[var(--trade-text-muted)]/40'
+                  )}
+                >
+                  <span className="font-mono text-base font-bold tracking-tight text-[var(--trade-text)]">
+                    USDT
+                  </span>
+                  <span className="mt-1 text-sm text-[var(--trade-text)]">
+                    {item.label.replace(/^USDT\s+/, '')}
+                  </span>
+                  <span className="mt-2 text-xs leading-snug text-[var(--trade-text-muted)]">
+                    {item.hint}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </fieldset>
+
+        <div>
           <div className="text-xs font-medium uppercase tracking-wide text-[var(--trade-text-muted)]">
-            USDT deposit address
+            {selectedNetwork.label} deposit address
           </div>
           <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-stretch">
             <div className="min-w-0 flex-1 break-all rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)] px-4 py-3 font-mono text-xs text-[var(--trade-text)]">
-              {walletAddress}
+              {displayWalletAddress}
             </div>
             <button
               type="button"
@@ -590,46 +682,19 @@ function UserManagementManualDepositSection({
             </button>
           </div>
         </div>
-      ) : (
-        <p className="mt-4 rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)] px-4 py-3 text-sm text-[var(--trade-text-muted)]">
-          Manual USDT deposits are not configured. Contact support if you need
-          help funding your account.
-        </p>
-      )}
+      </div>
 
       {!result ? (
         <div className="mt-6 space-y-4">
-          <div>
-            <label
-              htmlFor="manual-deposit-amount"
-              className="text-sm font-semibold text-[var(--trade-text)]"
-            >
-              Amount (USD equivalent)
-            </label>
-            <input
-              id="manual-deposit-amount"
-              type="text"
-              inputMode="decimal"
-              autoComplete="off"
-              placeholder="0.00"
-              value={amountRaw}
-              onChange={(e) => setAmountRaw(e.target.value)}
-              className={cn(
-                'mt-3 w-full max-w-md rounded-lg border bg-[var(--trade-dark)] px-4 py-3 font-mono text-[var(--trade-text)] outline-none transition-[box-shadow,border-color]',
-                'border-[var(--trade-border)] placeholder:text-[var(--trade-text-muted)]/60',
-                'focus:border-[var(--trade-accent-blue)] focus:ring-2 focus:ring-[var(--trade-accent-blue)]/25'
-              )}
-            />
-            {!amountOk && amountRaw.trim() !== '' && (
-              <p className="mt-2 text-xs text-[var(--trade-red)]">
-                Enter a valid amount greater than zero.
-              </p>
-            )}
-          </div>
+          <ManualDepositAmountField
+            value={amountRaw}
+            onChange={setAmountRaw}
+            showError={!amountOk && amountRaw.trim() !== ''}
+          />
           <button
             type="button"
             onClick={() => void submitManual()}
-            disabled={submitting || !amountOk || !walletConfigured}
+            disabled={submitting || !amountOk}
             className={cn(
               'inline-flex min-w-[200px] items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold transition-colors',
               'bg-[var(--trade-accent-blue)] text-[var(--trade-panel)] hover:opacity-90',
@@ -649,11 +714,11 @@ function UserManagementManualDepositSection({
       ) : (
         <div className="mt-6 space-y-4">
           <p className="rounded-lg border border-[var(--trade-green)]/40 bg-[var(--trade-green)]/10 px-4 py-3 text-sm text-[var(--trade-text)]">
-            Request created for{' '}
+            Request created. Send{' '}
             <span className="font-mono font-semibold tabular-nums">
               {fmtUsd(result.amountUsd)}
             </span>{' '}
-            (USDT). Send exactly from your wallet and include no other assets.
+            USDT on {result.networkLabel} to the address above.
           </p>
           <p className="text-xs text-[var(--trade-text-muted)]">
             Reference / order ID:{' '}

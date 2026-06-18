@@ -16,20 +16,21 @@ import {
   LandingHeaderUtilities
 } from '@/components/landing/landing-header-nav';
 import { LandingSiteFooter } from '@/components/landing/landing-site-footer';
+import { withAppName } from '@/lib/public-app-name';
 
 const ebGaramond = EB_Garamond({
   subsets: ['latin'],
   weight: ['400', '500'],
-  variable: '--font-colbari-display'
+  variable: '--font-landing-display'
 });
 
 const inter = Inter({
   subsets: ['latin'],
   weight: ['400', '500', '600'],
-  variable: '--font-colbari-body'
+  variable: '--font-landing-body'
 });
 
-type ColbariAboutUsPageProps = {
+type LandingAboutUsPageProps = {
   appName: string;
   session: boolean;
 };
@@ -38,7 +39,7 @@ const aboutHighlightsEn = [
   {
     title: 'Transparent Oversight',
     description:
-      'Colbari operates with a strong commitment to transparency and industry standards. Traders can rely on a secure environment supported by clear regulatory supervision. The brand is operated by VALOR CAPITAL (PTY) LTD, which is authorized and regulated by the Financial Sector Conduct Authority of South Africa with Financial Service Provider (FSP) license number 51822.',
+      '{appName} operates with a strong commitment to transparency and industry standards. Traders can rely on a secure environment supported by clear regulatory supervision. The brand is operated by VALOR CAPITAL (PTY) LTD, which is authorized and regulated by the Financial Sector Conduct Authority of South Africa with Financial Service Provider (FSP) license number 51822.',
     icon: IconShieldCheck
   },
   {
@@ -50,13 +51,13 @@ const aboutHighlightsEn = [
   {
     title: 'Support When It Matters Most',
     description:
-      'Access to experienced support staff, available 24/5, ensures that traders are never left without support. From security concerns to account inquiries, the team at Colbari is ready to assist whenever needed.',
+      'Access to experienced support staff, available 24/5, ensures that traders are never left without support. From security concerns to account inquiries, the team at {appName} is ready to assist whenever needed.',
     icon: IconHeadset
   },
   {
     title: 'Protection Through Technology',
     description:
-      'Every account at Colbari is secured with advanced systems. From encrypted data transfers to multi-step authentication, the platform is designed with modern protection standards at every layer.',
+      'Every account at {appName} is secured with advanced systems. From encrypted data transfers to multi-step authentication, the platform is designed with modern protection standards at every layer.',
     icon: IconLock
   },
   {
@@ -68,7 +69,7 @@ const aboutHighlightsEn = [
   {
     title: 'Regulation',
     description:
-      'Colbari is operated by VALOR CAPITAL (PTY) LTD, a South African investment firm, authorized and regulated by the Financial Sector Conduct Authority of South Africa with Financial Service Provider (FSP) license number 51822.',
+      '{appName} is operated by VALOR CAPITAL (PTY) LTD, a South African investment firm, authorized and regulated by the Financial Sector Conduct Authority of South Africa with Financial Service Provider (FSP) license number 51822.',
     icon: IconScale
   }
 ] as const;
@@ -77,7 +78,7 @@ const aboutHighlightsAr = [
   {
     title: 'رقابة شفافة',
     description:
-      'تعمل كولباري وفق التزام واضح بالشفافية ومعايير القطاع. يمكن للمتداولين الاعتماد على بيئة آمنة مدعومة بإشراف تنظيمي واضح. تُدار العلامة بواسطة VALOR CAPITAL (PTY) LTD المرخصة والمنظمة من هيئة سلوك القطاع المالي في جنوب أفريقيا بترخيص مزود خدمات مالية رقم 51822.',
+      'تعمل {appName} وفق التزام واضح بالشفافية ومعايير القطاع. يمكن للمتداولين الاعتماد على بيئة آمنة مدعومة بإشراف تنظيمي واضح. تُدار العلامة بواسطة VALOR CAPITAL (PTY) LTD المرخصة والمنظمة من هيئة سلوك القطاع المالي في جنوب أفريقيا بترخيص مزود خدمات مالية رقم 51822.',
     icon: IconShieldCheck
   },
   {
@@ -89,7 +90,7 @@ const aboutHighlightsAr = [
   {
     title: 'دعم عندما تحتاجه',
     description:
-      'يوفر فريق الدعم المتخصص خدمة متاحة 24/5 لضمان عدم بقاء المتداول دون مساعدة. من الاستفسارات الأمنية إلى أسئلة الحساب، فريق كولباري جاهز للمساعدة.',
+      'يوفر فريق الدعم المتخصص خدمة متاحة 24/5 لضمان عدم بقاء المتداول دون مساعدة. من الاستفسارات الأمنية إلى أسئلة الحساب، فريق {appName} جاهز للمساعدة.',
     icon: IconHeadset
   },
   {
@@ -107,12 +108,12 @@ const aboutHighlightsAr = [
   {
     title: 'التنظيم',
     description:
-      'تُدار كولباري بواسطة VALOR CAPITAL (PTY) LTD، وهي شركة استثمار جنوب أفريقية مرخصة ومنظمة من هيئة سلوك القطاع المالي في جنوب أفريقيا بترخيص مزود خدمات مالية رقم 51822.',
+      'تُدار {appName} بواسطة VALOR CAPITAL (PTY) LTD، وهي شركة استثمار جنوب أفريقية مرخصة ومنظمة من هيئة سلوك القطاع المالي في جنوب أفريقيا بترخيص مزود خدمات مالية رقم 51822.',
     icon: IconScale
   }
 ] as const;
 
-export async function ColbariAboutUsPage({ appName, session }: ColbariAboutUsPageProps) {
+export async function LandingAboutUsPage({ appName, session }: LandingAboutUsPageProps) {
   const locale = await getLocale();
   const tradeHref = session ? landingPageLinks.trade : landingPageLinks.signIn;
   const content =
@@ -183,7 +184,7 @@ export async function ColbariAboutUsPage({ appName, session }: ColbariAboutUsPag
                       {item.title}
                     </h2>
                     <p className="text-[20px] leading-7 text-[#303336] md:text-[18px]">
-                      {item.description}
+                      {withAppName(item.description, appName)}
                     </p>
                   </div>
                 </article>

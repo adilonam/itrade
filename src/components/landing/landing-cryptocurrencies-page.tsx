@@ -12,24 +12,45 @@ import { LandingSiteFooter } from '@/components/landing/landing-site-footer';
 const ebGaramond = EB_Garamond({
   subsets: ['latin'],
   weight: ['400', '500'],
-  variable: '--font-colbari-display'
+  variable: '--font-landing-display'
 });
 
 const inter = Inter({
   subsets: ['latin'],
   weight: ['400', '500', '600'],
-  variable: '--font-colbari-body'
+  variable: '--font-landing-body'
 });
 
-type ColbariCfdsPageProps = {
+type LandingCryptocurrenciesPageProps = {
   appName: string;
   session: boolean;
 };
 
-export async function ColbariCfdsPage({ appName, session }: ColbariCfdsPageProps) {
+export async function LandingCryptocurrenciesPage({
+  appName,
+  session
+}: LandingCryptocurrenciesPageProps) {
   const locale = await getLocale();
-  const t = await getTranslations('Landing.cfdsPage');
+  const t = await getTranslations('Landing.cryptoPage');
   const tradeHref = session ? landingPageLinks.trade : landingPageLinks.signIn;
+  const cryptoHighlights = [
+    {
+      title: t('highlights.wideCoverage.title'),
+      description: t('highlights.wideCoverage.description')
+    },
+    {
+      title: t('highlights.alwaysOpen.title'),
+      description: t('highlights.alwaysOpen.description')
+    },
+    {
+      title: t('highlights.execution.title'),
+      description: t('highlights.execution.description')
+    },
+    {
+      title: t('highlights.versatile.title'),
+      description: t('highlights.versatile.description')
+    }
+  ] as const;
 
   return (
     <main
@@ -63,29 +84,32 @@ export async function ColbariCfdsPage({ appName, session }: ColbariCfdsPageProps
       <section className="pt-28 pb-20 md:pt-36 md:pb-24">
         <div className="mx-auto w-full max-w-[1060px] px-5 md:px-16">
           <div className="mb-7 flex items-center gap-2 text-sm text-[#6b6e70]">
-            <span>{t('breadcrumb.learning')}</span>
+            <span>{t('breadcrumb.markets')}</span>
             <span>/</span>
             <span className="text-[#1a1c1c]">{t('breadcrumb.current')}</span>
           </div>
 
-          <h1 className={`${ebGaramond.className} mb-8 text-[52px] leading-[1.05] text-black md:text-[64px]`}>
+          <h1 className={`${ebGaramond.className} mb-8 text-[44px] leading-[1.1] text-black md:text-[64px]`}>
             {t('title')}
           </h1>
 
-          <div className="max-w-[980px] space-y-6 text-[17px] leading-9 text-[#2f3335]">
-            <p className="text-[32px] leading-tight text-black md:text-[36px]">
+          <div className="max-w-[860px] space-y-6 text-[17px] leading-8 text-[#2f3335]">
+            <p className="text-[22px] leading-8 text-black">
               <strong>{t('introHeading')}</strong>
             </p>
-
             <p>{t('paragraph1')}</p>
             <p>{t('paragraph2')}</p>
 
-            <ul className="list-disc space-y-2 ps-8 text-[17px] leading-8 text-[#202325]">
-              <li>{t('bullets.one')}</li>
-              <li>{t('bullets.two')}</li>
-              <li>{t('bullets.three')}</li>
-              <li>{t('bullets.four')}</li>
-            </ul>
+            <div className="space-y-5 pt-2">
+              {cryptoHighlights.map((item) => (
+                <div key={item.title}>
+                  <p className="mb-1 text-base font-semibold text-black">• {item.title}</p>
+                  <p>{item.description}</p>
+                </div>
+              ))}
+            </div>
+
+            <p className="pt-4 text-[20px] italic">{t('tagline')}</p>
           </div>
         </div>
       </section>

@@ -12,16 +12,16 @@ import { LandingSiteFooter } from '@/components/landing/landing-site-footer';
 const ebGaramond = EB_Garamond({
   subsets: ['latin'],
   weight: ['400', '500'],
-  variable: '--font-colbari-display'
+  variable: '--font-landing-display'
 });
 
 const inter = Inter({
   subsets: ['latin'],
   weight: ['400', '500', '600'],
-  variable: '--font-colbari-body'
+  variable: '--font-landing-body'
 });
 
-type ColbariMarketMoversPageProps = {
+type LandingMarketMoversPageProps = {
   appName: string;
   session: boolean;
 };
@@ -123,7 +123,7 @@ const marketMoverSectionsAr = [
   }
 ] as const;
 
-export async function ColbariMarketMoversPage({ appName, session }: ColbariMarketMoversPageProps) {
+export async function LandingMarketMoversPage({ appName, session }: LandingMarketMoversPageProps) {
   const locale = await getLocale();
   const tradeHref = session ? landingPageLinks.trade : landingPageLinks.signIn;
   const content =

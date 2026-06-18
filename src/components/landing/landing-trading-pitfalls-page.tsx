@@ -12,16 +12,16 @@ import { LandingSiteFooter } from '@/components/landing/landing-site-footer';
 const ebGaramond = EB_Garamond({
   subsets: ['latin'],
   weight: ['400', '500'],
-  variable: '--font-colbari-display'
+  variable: '--font-landing-display'
 });
 
 const inter = Inter({
   subsets: ['latin'],
   weight: ['400', '500', '600'],
-  variable: '--font-colbari-body'
+  variable: '--font-landing-body'
 });
 
-type ColbariTradingPitfallsPageProps = {
+type LandingTradingPitfallsPageProps = {
   appName: string;
   session: boolean;
 };
@@ -42,10 +42,10 @@ const pitfallsAr = [
   'اتخاذ قرارات تداول عاطفية بعد خسارة أو حركة سوق حادة.'
 ] as const;
 
-export async function ColbariTradingPitfallsPage({
+export async function LandingTradingPitfallsPage({
   appName,
   session
-}: ColbariTradingPitfallsPageProps) {
+}: LandingTradingPitfallsPageProps) {
   const locale = await getLocale();
   const tradeHref = session ? landingPageLinks.trade : landingPageLinks.signIn;
   const content =

@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { getLocale } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
 import { EB_Garamond, Inter } from 'next/font/google';
 import { landingPageLinks } from '@/constants/data';
 import {
@@ -12,25 +12,23 @@ import { LandingSiteFooter } from '@/components/landing/landing-site-footer';
 const ebGaramond = EB_Garamond({
   subsets: ['latin'],
   weight: ['400', '500'],
-  variable: '--font-colbari-display'
+  variable: '--font-landing-display'
 });
 
 const inter = Inter({
   subsets: ['latin'],
   weight: ['400', '500', '600'],
-  variable: '--font-colbari-body'
+  variable: '--font-landing-body'
 });
 
-type ColbariEconomicCalendarPageProps = {
+type LandingCfdsPageProps = {
   appName: string;
   session: boolean;
 };
 
-export async function ColbariEconomicCalendarPage({
-  appName,
-  session
-}: ColbariEconomicCalendarPageProps) {
+export async function LandingCfdsPage({ appName, session }: LandingCfdsPageProps) {
   const locale = await getLocale();
+  const t = await getTranslations('Landing.cfdsPage');
   const tradeHref = session ? landingPageLinks.trade : landingPageLinks.signIn;
 
   return (
@@ -63,25 +61,31 @@ export async function ColbariEconomicCalendarPage({
       </header>
 
       <section className="pt-28 pb-20 md:pt-36 md:pb-24">
-        <div className="mx-auto w-full max-w-[1440px] px-5 md:px-16">
+        <div className="mx-auto w-full max-w-[1060px] px-5 md:px-16">
           <div className="mb-7 flex items-center gap-2 text-sm text-[#6b6e70]">
-            <span>Learning</span>
+            <span>{t('breadcrumb.learning')}</span>
             <span>/</span>
-            <span className="text-[#1a1c1c]">Economic Calendar</span>
+            <span className="text-[#1a1c1c]">{t('breadcrumb.current')}</span>
           </div>
 
-          <h1 className={`${ebGaramond.className} mb-8 text-[44px] leading-[1.1] text-black md:text-[64px]`}>
-            Economic Calendar
+          <h1 className={`${ebGaramond.className} mb-8 text-[52px] leading-[1.05] text-black md:text-[64px]`}>
+            {t('title')}
           </h1>
 
-          <div className="overflow-hidden border border-[#D9D9D9] bg-[#f5f5f5]">
-            <iframe
-              src="https://www.tradays.com/en/economic-calendar/widget?mode=2"
-              title="Economic Calendar"
-              loading="lazy"
-              className="h-[640px] w-full bg-white md:h-[760px]"
-              referrerPolicy="no-referrer-when-downgrade"
-            />
+          <div className="max-w-[980px] space-y-6 text-[17px] leading-9 text-[#2f3335]">
+            <p className="text-[32px] leading-tight text-black md:text-[36px]">
+              <strong>{t('introHeading')}</strong>
+            </p>
+
+            <p>{t('paragraph1')}</p>
+            <p>{t('paragraph2')}</p>
+
+            <ul className="list-disc space-y-2 ps-8 text-[17px] leading-8 text-[#202325]">
+              <li>{t('bullets.one')}</li>
+              <li>{t('bullets.two')}</li>
+              <li>{t('bullets.three')}</li>
+              <li>{t('bullets.four')}</li>
+            </ul>
           </div>
         </div>
       </section>

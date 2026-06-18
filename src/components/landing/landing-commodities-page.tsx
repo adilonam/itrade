@@ -12,43 +12,40 @@ import { LandingSiteFooter } from '@/components/landing/landing-site-footer';
 const ebGaramond = EB_Garamond({
   subsets: ['latin'],
   weight: ['400', '500'],
-  variable: '--font-colbari-display'
+  variable: '--font-landing-display'
 });
 
 const inter = Inter({
   subsets: ['latin'],
   weight: ['400', '500', '600'],
-  variable: '--font-colbari-body'
+  variable: '--font-landing-body'
 });
 
-type ColbariCryptocurrenciesPageProps = {
+type LandingCommoditiesPageProps = {
   appName: string;
   session: boolean;
 };
 
-export async function ColbariCryptocurrenciesPage({
-  appName,
-  session
-}: ColbariCryptocurrenciesPageProps) {
+export async function LandingCommoditiesPage({ appName, session }: LandingCommoditiesPageProps) {
   const locale = await getLocale();
-  const t = await getTranslations('Landing.cryptoPage');
+  const t = await getTranslations('Landing.commoditiesPage');
   const tradeHref = session ? landingPageLinks.trade : landingPageLinks.signIn;
-  const cryptoHighlights = [
+  const highlights = [
     {
-      title: t('highlights.wideCoverage.title'),
-      description: t('highlights.wideCoverage.description')
+      title: t('highlights.metals.title'),
+      description: t('highlights.metals.description')
     },
     {
-      title: t('highlights.alwaysOpen.title'),
-      description: t('highlights.alwaysOpen.description')
+      title: t('highlights.energy.title'),
+      description: t('highlights.energy.description')
     },
     {
-      title: t('highlights.execution.title'),
-      description: t('highlights.execution.description')
+      title: t('highlights.agriculture.title'),
+      description: t('highlights.agriculture.description')
     },
     {
-      title: t('highlights.versatile.title'),
-      description: t('highlights.versatile.description')
+      title: t('highlights.industrial.title'),
+      description: t('highlights.industrial.description')
     }
   ] as const;
 
@@ -101,7 +98,7 @@ export async function ColbariCryptocurrenciesPage({
             <p>{t('paragraph2')}</p>
 
             <div className="space-y-5 pt-2">
-              {cryptoHighlights.map((item) => (
+              {highlights.map((item) => (
                 <div key={item.title}>
                   <p className="mb-1 text-base font-semibold text-black">• {item.title}</p>
                   <p>{item.description}</p>
