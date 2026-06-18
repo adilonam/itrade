@@ -5,6 +5,11 @@ import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import type { Market } from '@/lib/prisma/generated/client';
 import { useMarketsWebSocket } from '@/contexts/markets-websocket-context';
+import {
+  formatTradePrice,
+  formatTradePriceFull,
+  getTradePriceButtonTextClass
+} from '@/lib/trade-price-format';
 
 export type OrderPanelMarket = Market | { symbol: string; lastPrice: number; spread?: number } | null;
 
@@ -45,13 +50,12 @@ export function TradingRoomOrderPanel({
   const bid = midPrice - spread / 2;
   const ask = midPrice + spread / 2;
 
-  const formatFull = (p: number) => (p >= 1 ? p.toFixed(5) : p.toFixed(3));
-  const formatNoTrailingZeros = (p: number) =>
-    formatFull(p).replace(/\.?0+$/, '');
-  const displayBidFull = formatFull(bid);
-  const displayAskFull = formatFull(ask);
-  const displayBid = formatNoTrailingZeros(bid);
-  const displayAsk = formatNoTrailingZeros(ask);
+  const displayBidFull = formatTradePriceFull(bid);
+  const displayAskFull = formatTradePriceFull(ask);
+  const displayBid = formatTradePrice(bid);
+  const displayAsk = formatTradePrice(ask);
+  const bidPriceClass = getTradePriceButtonTextClass(displayBid);
+  const askPriceClass = getTradePriceButtonTextClass(displayAsk);
 
   const price = midPrice;
 
@@ -125,7 +129,9 @@ export function TradingRoomOrderPanel({
               <span className="text-[9px] font-bold uppercase opacity-80 max-md:text-[9px] md:text-[10px]">
                 {t('sell')}
               </span>
-              <span className="w-full truncate text-center text-xs font-bold max-md:text-xs md:text-sm">
+              <span
+                className={`w-full px-0.5 text-center font-mono font-bold leading-tight tabular-nums ${bidPriceClass}`}
+              >
                 {displayBid}
               </span>
             </>
@@ -148,7 +154,9 @@ export function TradingRoomOrderPanel({
               <span className="text-[9px] font-bold uppercase opacity-80 max-md:text-[9px] md:text-[10px]">
                 {t('buy')}
               </span>
-              <span className="w-full truncate text-center text-xs font-bold max-md:text-xs md:text-sm">
+              <span
+                className={`w-full px-0.5 text-center font-mono font-bold leading-tight tabular-nums ${askPriceClass}`}
+              >
                 {displayAsk}
               </span>
             </>

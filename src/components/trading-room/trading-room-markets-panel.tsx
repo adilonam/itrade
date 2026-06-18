@@ -8,6 +8,7 @@ import { TradingRoomOrderPanel } from './trading-room-order-panel';
 import type { Market } from '@/lib/prisma/generated/client';
 import type { MockSymbol } from './mock-data';
 import { getCurrencyFlags } from '@/lib/currency-flags';
+import { formatTradePrice } from '@/lib/trade-price-format';
 import {
   IconStar,
   IconTrendingUp,
@@ -79,10 +80,7 @@ export function TradingRoomMarketsPanel({
           return symbol.includes(query) || name.includes(query);
         });
 
-  const formatPrice = (price: number) => {
-    const s = price >= 1 ? price.toFixed(5) : price.toFixed(3);
-    return s.replace(/\.?0+$/, '');
-  };
+  const formatPrice = formatTradePrice;
 
   const rowContent = (item: SymbolItem, isSelected: boolean) => {
     const id = getId(item);

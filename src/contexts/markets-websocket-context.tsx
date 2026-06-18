@@ -8,6 +8,10 @@ import React, {
   useCallback
 } from 'react';
 import { useTwelveDataWebSocket } from '@/hooks/use-twelve-data-websocket';
+import {
+  getTwelveDataPublicApiKey,
+  TWELVE_DATA_PUBLIC_KEY_ENV
+} from '@/lib/twelve-data-config';
 import type { Market } from '@/lib/prisma/generated/client';
 import type { TwelveDataWebSocketPriceData } from '@/types/twelvedata';
 
@@ -43,12 +47,15 @@ export function MarketsWebSocketProvider({
   initialMarkets = []
 }: MarketsWebSocketProviderProps) {
   const [markets, setMarkets] = useState<Market[]>(initialMarkets);
-  const apiKey = process.env.NEXT_PUBLIC_TWELVE_DATA_API_KEY_PUBLIC || 'demo';
+  const apiKey = getTwelveDataPublicApiKey() ?? '';
+  const configError = apiKey
+    ? null
+    : `${TWELVE_DATA_PUBLIC_KEY_ENV} is not set. Live prices are disabled.`;
 
   const {
     isConnected,
     isConnecting,
-    error,
+    error: wsError,
     priceData: realTimePrices,
     connect: wsConnect,
     disconnect: wsDisconnect,
@@ -57,8 +64,10 @@ export function MarketsWebSocketProvider({
     reset: wsReset
   } = useTwelveDataWebSocket({
     apiKey,
-    autoConnect: true
+    autoConnect: Boolean(apiKey)
   });
+
+  const error = configError ?? wsError;
 
   // Subscribe to all market symbols when connected
   useEffect(() => {

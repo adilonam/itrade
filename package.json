@@ -22,6 +22,7 @@
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
     "db:seed": "pnpm exec tsx prisma/seed.ts",
+    "db:seed-markets": "pnpm exec tsx scripts/seed-markets.ts",
     "db:push": "prisma db push",
     "db:reset": "prisma migrate reset --force",
     "docker:up": "docker-compose up -d",
