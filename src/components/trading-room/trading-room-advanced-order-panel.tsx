@@ -10,6 +10,7 @@ import { getLotSize } from '@/lib/calculator-client';
 import type { Market } from '@/lib/prisma/generated/client';
 import type { MarketType } from '@/lib/prisma/generated/client';
 import { useTradeBalanceSelection } from '@/hooks/use-trade-balance-selection';
+import { formatTradePrice } from '@/lib/trade-price-format';
 
 export type AdvancedOrderMarket =
   | (Market & { lastPrice: number })
@@ -29,10 +30,7 @@ interface TradingRoomAdvancedOrderPanelProps {
   disabled?: boolean;
 }
 
-const formatPrice = (p: number) => {
-  const s = p >= 1 ? p.toFixed(5) : p.toFixed(3);
-  return s.replace(/\.?0+$/, '');
-};
+const formatPrice = formatTradePrice;
 
 const formatUsd = (n: number) =>
   n.toLocaleString('en-US', {

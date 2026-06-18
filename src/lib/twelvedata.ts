@@ -7,13 +7,23 @@ import type {
   TwelveDataEmaResponse
 } from '@/types/twelvedata';
 import { prisma } from '@/lib/prisma';
+import {
+  getTwelveDataServerApiKey,
+  TWELVE_DATA_SERVER_KEY_ENV
+} from '@/lib/twelve-data-config';
 
 class TwelveDataService {
   private readonly baseUrl = 'https://api.twelvedata.com';
 
-  private async apiKey(): Promise<string> {
-    const k = process.env.TWELVE_DATA_API_KEY?.trim();
-    return k && k.length > 0 ? k : 'demo';
+  private missingApiKeyError(): TwelveDataErrorResponse {
+    return {
+      error: 'Twelve Data API key not configured',
+      message: `Set ${TWELVE_DATA_SERVER_KEY_ENV} in your environment`
+    };
+  }
+
+  private apiKey(): string | null {
+    return getTwelveDataServerApiKey();
   }
 
   /**
@@ -23,9 +33,14 @@ class TwelveDataService {
     symbol: string
   ): Promise<TwelveDataPriceResponse | TwelveDataErrorResponse> {
     try {
+      const apiKey = this.apiKey();
+      if (!apiKey) {
+        return this.missingApiKeyError();
+      }
+
       const url = new URL(`${this.baseUrl}/price`);
       url.searchParams.set('symbol', symbol);
-      url.searchParams.set('apikey', await this.apiKey());
+      url.searchParams.set('apikey', apiKey);
 
       const response = await fetch(url.toString(), {
         method: 'GET',
@@ -67,9 +82,14 @@ class TwelveDataService {
     symbol: string
   ): Promise<TwelveDataQuoteResponse | TwelveDataErrorResponse> {
     try {
+      const apiKey = this.apiKey();
+      if (!apiKey) {
+        return this.missingApiKeyError();
+      }
+
       const url = new URL(`${this.baseUrl}/quote`);
       url.searchParams.set('symbol', symbol);
-      url.searchParams.set('apikey', await this.apiKey());
+      url.searchParams.set('apikey', apiKey);
 
       const response = await fetch(url.toString(), {
         method: 'GET',
@@ -204,10 +224,15 @@ class TwelveDataService {
     | TwelveDataErrorResponse
   > {
     try {
+      const apiKey = this.apiKey();
+      if (!apiKey) {
+        return this.missingApiKeyError();
+      }
+
       const url = new URL(`${this.baseUrl}/rsi`);
       url.searchParams.set('symbol', symbol);
       url.searchParams.set('interval', interval);
-      url.searchParams.set('apikey', await this.apiKey());
+      url.searchParams.set('apikey', apiKey);
 
       const response = await fetch(url.toString(), {
         method: 'GET',
@@ -266,11 +291,16 @@ class TwelveDataService {
     | TwelveDataErrorResponse
   > {
     try {
+      const apiKey = this.apiKey();
+      if (!apiKey) {
+        return this.missingApiKeyError();
+      }
+
       const url = new URL(`${this.baseUrl}/ema`);
       url.searchParams.set('symbol', symbol);
       url.searchParams.set('interval', interval);
       url.searchParams.set('time_period', String(timePeriod));
-      url.searchParams.set('apikey', await this.apiKey());
+      url.searchParams.set('apikey', apiKey);
 
       const response = await fetch(url.toString(), {
         method: 'GET',
