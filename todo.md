@@ -363,9 +363,9 @@ bugs :
 - [x] account mobile fix 
 - [ ] correct the problem dup favcion png and ico
 
-- [ ] account number for real demo l.. 300101
+- [?] account number for real demo l.. 300101
 - [ ] add the markets 
-- [ ] add manual deposit
+- [x] add manual deposit
 
 
 
