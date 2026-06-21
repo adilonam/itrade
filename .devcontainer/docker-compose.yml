@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile
     volumes:
-      - ..:/workspace/law-advise:cached
+      - ..:/workspace/itrade:cached
     command: sleep infinity
     depends_on:
       - db
@@ -25,7 +25,7 @@ services:
     ports:
       - '5432:5432'
     volumes:
-      - postgres-data-law-advise:/var/lib/postgresql/data
+      - postgres-data-itrade:/var/lib/postgresql/data
 
 volumes:
-  postgres-data-law-advise:
+  postgres-data-itrade:
