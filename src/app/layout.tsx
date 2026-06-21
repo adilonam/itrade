@@ -22,10 +22,7 @@ const APP_NAME = getPublicAppName();
 
 export const metadata: Metadata = {
   title: APP_NAME,
-  description: 'Trading platform for trading and investing',
-  icons: {
-    apple: '/images/favico.png'
-  }
+  description: 'Trading platform for trading and investing'
 };
 
 export const viewport: Viewport = {
