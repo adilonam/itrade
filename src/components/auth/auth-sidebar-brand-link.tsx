@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { brandLogoSrc } from '@/constants/data';
 
 export function AuthSidebarBrandLink({ appName }: { appName: string }) {
   return (
@@ -10,19 +11,11 @@ export function AuthSidebarBrandLink({ appName }: { appName: string }) {
     >
       <span className='relative flex h-10 shrink-0 items-center'>
         <Image
-          src='/images/logo-light.png'
+          src={brandLogoSrc}
           alt=''
           width={200}
           height={48}
-          className='h-10 w-auto max-h-10 dark:hidden'
-          priority
-        />
-        <Image
-          src='/images/logo-dark.png'
-          alt=''
-          width={200}
-          height={48}
-          className='hidden h-10 w-auto max-h-10 dark:block'
+          className='h-10 max-h-10 w-auto'
           priority
         />
       </span>

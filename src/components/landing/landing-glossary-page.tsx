@@ -2,7 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { getLocale } from 'next-intl/server';
 import { EB_Garamond, Inter } from 'next/font/google';
-import { landingPageLinks } from '@/constants/data';
+import { brandLogoSrc, landingPageLinks } from '@/constants/data';
 import {
   LandingHeaderNavMenus,
   LandingHeaderUtilities
@@ -47,15 +47,18 @@ const glossarySectionsEn: GlossarySection[] = [
       },
       {
         question: 'What does bid price mean?',
-        answer: 'The bid is the price a buyer is currently prepared to pay to acquire an asset.'
+        answer:
+          'The bid is the price a buyer is currently prepared to pay to acquire an asset.'
       },
       {
         question: 'What is the ask price?',
-        answer: 'The ask is the price a seller is willing to accept when selling an asset.'
+        answer:
+          'The ask is the price a seller is willing to accept when selling an asset.'
       },
       {
         question: 'What is the spread in trading?',
-        answer: 'The spread is the difference between the buying price and the selling price shown on a quote.'
+        answer:
+          'The spread is the difference between the buying price and the selling price shown on a quote.'
       }
     ]
   },
@@ -64,23 +67,28 @@ const glossarySectionsEn: GlossarySection[] = [
     items: [
       {
         question: 'What is a market order?',
-        answer: 'A market order is an instruction to trade immediately at the best available market price.'
+        answer:
+          'A market order is an instruction to trade immediately at the best available market price.'
       },
       {
         question: 'What is a limit order?',
-        answer: 'A limit order is an instruction to trade at a set price or better, waiting until the market reaches that level.'
+        answer:
+          'A limit order is an instruction to trade at a set price or better, waiting until the market reaches that level.'
       },
       {
         question: 'What is a stop-loss?',
-        answer: 'A stop-loss is a protective instruction to close a trade if the market reaches a chosen level, limiting losses.'
+        answer:
+          'A stop-loss is a protective instruction to close a trade if the market reaches a chosen level, limiting losses.'
       },
       {
         question: 'What does it mean to go long?',
-        answer: 'Going long means buying an asset in expectation that its price will increase.'
+        answer:
+          'Going long means buying an asset in expectation that its price will increase.'
       },
       {
         question: 'What does it mean to go short?',
-        answer: 'Going short means selling an asset first with the aim of buying it back later at a lower price.'
+        answer:
+          'Going short means selling an asset first with the aim of buying it back later at a lower price.'
       }
     ]
   },
@@ -94,11 +102,13 @@ const glossarySectionsEn: GlossarySection[] = [
       },
       {
         question: 'What is margin?',
-        answer: 'Margin is the minimum amount of money required to open and maintain a leveraged trade.'
+        answer:
+          'Margin is the minimum amount of money required to open and maintain a leveraged trade.'
       },
       {
         question: 'What is a margin call?',
-        answer: 'A margin call is a request from the broker for additional funds when account equity falls below a required threshold.'
+        answer:
+          'A margin call is a request from the broker for additional funds when account equity falls below a required threshold.'
       }
     ]
   },
@@ -107,7 +117,8 @@ const glossarySectionsEn: GlossarySection[] = [
     items: [
       {
         question: 'What is fundamental analysis?',
-        answer: 'Fundamental analysis evaluates an asset by using economic, political, and financial information.'
+        answer:
+          'Fundamental analysis evaluates an asset by using economic, political, and financial information.'
       },
       {
         question: 'What is technical analysis?',
@@ -146,7 +157,8 @@ const glossarySectionsEn: GlossarySection[] = [
       },
       {
         question: 'What is a swap in CFD trading?',
-        answer: 'A swap is an overnight financing adjustment applied while holding a CFD position overnight.'
+        answer:
+          'A swap is an overnight financing adjustment applied while holding a CFD position overnight.'
       }
     ]
   }
@@ -171,7 +183,8 @@ const glossarySectionsAr: GlossarySection[] = [
       },
       {
         question: 'ما هو السبريد في التداول؟',
-        answer: 'السبريد هو الفرق بين سعر الشراء وسعر البيع الظاهرين في التسعير.'
+        answer:
+          'السبريد هو الفرق بين سعر الشراء وسعر البيع الظاهرين في التسعير.'
       }
     ]
   },
@@ -184,7 +197,8 @@ const glossarySectionsAr: GlossarySection[] = [
       },
       {
         question: 'ما هو الأمر المحدد (Limit)؟',
-        answer: 'هو أمر للتنفيذ عند سعر محدد أو أفضل منه عند وصول السوق إلى ذلك المستوى.'
+        answer:
+          'هو أمر للتنفيذ عند سعر محدد أو أفضل منه عند وصول السوق إلى ذلك المستوى.'
       },
       {
         question: 'ما هو وقف الخسارة؟',
@@ -210,11 +224,13 @@ const glossarySectionsAr: GlossarySection[] = [
       },
       {
         question: 'ما هو الهامش؟',
-        answer: 'الهامش هو الحد الأدنى المطلوب لفتح صفقة برافعة مالية والحفاظ عليها.'
+        answer:
+          'الهامش هو الحد الأدنى المطلوب لفتح صفقة برافعة مالية والحفاظ عليها.'
       },
       {
         question: 'ما هي نداءات الهامش (Margin Call)؟',
-        answer: 'هي مطالبة من الوسيط بإيداع أموال إضافية عندما تهبط حقوق الحساب دون المستوى المطلوب.'
+        answer:
+          'هي مطالبة من الوسيط بإيداع أموال إضافية عندما تهبط حقوق الحساب دون المستوى المطلوب.'
       }
     ]
   },
@@ -227,15 +243,18 @@ const glossarySectionsAr: GlossarySection[] = [
       },
       {
         question: 'ما هو التحليل الفني؟',
-        answer: 'التحليل الفني يدرس تاريخ الأسعار وبنية الرسم والمؤشرات لاستشراف التحركات المحتملة.'
+        answer:
+          'التحليل الفني يدرس تاريخ الأسعار وبنية الرسم والمؤشرات لاستشراف التحركات المحتملة.'
       },
       {
         question: 'ما هي مستويات الدعم والمقاومة؟',
-        answer: 'الدعم مستوى سعري تتباطأ عنده الحركة الهابطة، والمقاومة مستوى تميل عنده الحركة الصاعدة للتوقف.'
+        answer:
+          'الدعم مستوى سعري تتباطأ عنده الحركة الهابطة، والمقاومة مستوى تميل عنده الحركة الصاعدة للتوقف.'
       },
       {
         question: 'ما هو مخطط الشموع؟',
-        answer: 'هو عرض بصري يوضح الافتتاح والأعلى والأدنى والإغلاق ضمن إطار زمني محدد.'
+        answer:
+          'هو عرض بصري يوضح الافتتاح والأعلى والأدنى والإغلاق ضمن إطار زمني محدد.'
       }
     ]
   },
@@ -253,17 +272,22 @@ const glossarySectionsAr: GlossarySection[] = [
       },
       {
         question: 'ما هي عقود الفروقات (CFD)؟',
-        answer: 'هي أداة مشتقة تتيح المضاربة على تغيرات الأسعار دون امتلاك الأصل الأساسي.'
+        answer:
+          'هي أداة مشتقة تتيح المضاربة على تغيرات الأسعار دون امتلاك الأصل الأساسي.'
       },
       {
         question: 'ما هو السواب في عقود الفروقات؟',
-        answer: 'السواب هو تسوية تمويلية ليلية تطبق عند الاحتفاظ بالصفقة لليوم التالي.'
+        answer:
+          'السواب هو تسوية تمويلية ليلية تطبق عند الاحتفاظ بالصفقة لليوم التالي.'
       }
     ]
   }
 ];
 
-export async function LandingGlossaryPage({ appName, session }: LandingGlossaryPageProps) {
+export async function LandingGlossaryPage({
+  appName,
+  session
+}: LandingGlossaryPageProps) {
   const locale = await getLocale();
   const tradeHref = session ? landingPageLinks.trade : landingPageLinks.signIn;
   const content =
@@ -290,16 +314,20 @@ export async function LandingGlossaryPage({ appName, session }: LandingGlossaryP
       dir={locale === 'ar' ? 'rtl' : 'ltr'}
       className={`${ebGaramond.variable} ${inter.className} h-dvh overflow-y-auto bg-[#f5f5f5] text-[#1a1c1c] antialiased`}
     >
-      <header className="fixed top-0 left-0 z-50 flex h-20 w-full items-center border-b border-white/10 bg-[#141414] px-5 md:px-16">
-        <div className="mx-auto flex h-full w-full max-w-[1440px] items-center justify-between gap-6">
-          <div className="flex min-w-0 items-center gap-6 md:gap-8 lg:gap-12">
-            <Link href="/" className="inline-flex shrink-0 items-center" aria-label={appName}>
+      <header className='fixed top-0 left-0 z-50 flex h-20 w-full items-center border-b border-white/10 bg-[#141414] px-5 md:px-16'>
+        <div className='mx-auto flex h-full w-full max-w-[1440px] items-center justify-between gap-6'>
+          <div className='flex min-w-0 items-center gap-6 md:gap-8 lg:gap-12'>
+            <Link
+              href='/'
+              className='inline-flex shrink-0 items-center'
+              aria-label={appName}
+            >
               <Image
-                src="/images/logo-light.png"
+                src={brandLogoSrc}
                 alt={`${appName} logo`}
                 width={160}
                 height={40}
-                className="h-12 w-auto"
+                className='h-12 w-auto'
                 priority
               />
             </Link>
@@ -314,29 +342,33 @@ export async function LandingGlossaryPage({ appName, session }: LandingGlossaryP
         </div>
       </header>
 
-      <section className="pt-28 pb-20 md:pt-36 md:pb-24">
-        <div className="mx-auto w-full max-w-[1060px] px-5 md:px-16">
-          <div className="mb-8 flex items-center gap-2 text-sm text-[#6b6e70]">
+      <section className='pt-28 pb-20 md:pt-36 md:pb-24'>
+        <div className='mx-auto w-full max-w-[1060px] px-5 md:px-16'>
+          <div className='mb-8 flex items-center gap-2 text-sm text-[#6b6e70]'>
             <span>{content.breadcrumbParent}</span>
             <span>/</span>
-            <span className="text-[#1a1c1c]">{content.breadcrumbCurrent}</span>
+            <span className='text-[#1a1c1c]'>{content.breadcrumbCurrent}</span>
           </div>
 
-          <h1 className="mb-8 text-[44px] leading-[1.1] font-semibold text-[#1a1c1c] md:text-[56px]">
+          <h1 className='mb-8 text-[44px] leading-[1.1] font-semibold text-[#1a1c1c] md:text-[56px]'>
             {content.title}
           </h1>
 
-          <div className="space-y-8 text-[15px] leading-8 text-[#2f3335]">
+          <div className='space-y-8 text-[15px] leading-8 text-[#2f3335]'>
             {content.sections.map((section) => (
-              <div key={section.title} className="space-y-2">
-                <h2 className="text-[21px] font-semibold text-[#1f2325]">{section.title}</h2>
+              <div key={section.title} className='space-y-2'>
+                <h2 className='text-[21px] font-semibold text-[#1f2325]'>
+                  {section.title}
+                </h2>
                 {section.items.map((item) => (
-                  <div key={item.question} className="space-y-1">
+                  <div key={item.question} className='space-y-1'>
                     <p>
-                      <span className="font-semibold">{content.qLabel}</span> {item.question}
+                      <span className='font-semibold'>{content.qLabel}</span>{' '}
+                      {item.question}
                     </p>
                     <p>
-                      <span className="font-semibold">{content.aLabel}</span> {item.answer}
+                      <span className='font-semibold'>{content.aLabel}</span>{' '}
+                      {item.answer}
                     </p>
                   </div>
                 ))}
@@ -346,7 +378,7 @@ export async function LandingGlossaryPage({ appName, session }: LandingGlossaryP
         </div>
       </section>
 
-      <LandingSiteFooter appName={appName} className="bg-[#f5f5f5]" />
+      <LandingSiteFooter appName={appName} className='bg-[#f5f5f5]' />
     </main>
   );
 }

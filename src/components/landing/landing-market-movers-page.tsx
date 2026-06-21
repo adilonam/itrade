@@ -2,7 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { getLocale } from 'next-intl/server';
 import { EB_Garamond, Inter } from 'next/font/google';
-import { landingPageLinks } from '@/constants/data';
+import { brandLogoSrc, landingPageLinks } from '@/constants/data';
 import {
   LandingHeaderNavMenus,
   LandingHeaderUtilities
@@ -123,7 +123,10 @@ const marketMoverSectionsAr = [
   }
 ] as const;
 
-export async function LandingMarketMoversPage({ appName, session }: LandingMarketMoversPageProps) {
+export async function LandingMarketMoversPage({
+  appName,
+  session
+}: LandingMarketMoversPageProps) {
   const locale = await getLocale();
   const tradeHref = session ? landingPageLinks.trade : landingPageLinks.signIn;
   const content =
@@ -158,16 +161,20 @@ export async function LandingMarketMoversPage({ appName, session }: LandingMarke
       dir={locale === 'ar' ? 'rtl' : 'ltr'}
       className={`${ebGaramond.variable} ${inter.className} h-dvh overflow-y-auto bg-[#f5f5f5] text-[#1a1c1c] antialiased`}
     >
-      <header className="fixed top-0 left-0 z-50 flex h-20 w-full items-center border-b border-white/10 bg-[#141414] px-5 md:px-16">
-        <div className="mx-auto flex h-full w-full max-w-[1440px] items-center justify-between gap-6">
-          <div className="flex min-w-0 items-center gap-6 md:gap-8 lg:gap-12">
-            <Link href="/" className="inline-flex shrink-0 items-center" aria-label={appName}>
+      <header className='fixed top-0 left-0 z-50 flex h-20 w-full items-center border-b border-white/10 bg-[#141414] px-5 md:px-16'>
+        <div className='mx-auto flex h-full w-full max-w-[1440px] items-center justify-between gap-6'>
+          <div className='flex min-w-0 items-center gap-6 md:gap-8 lg:gap-12'>
+            <Link
+              href='/'
+              className='inline-flex shrink-0 items-center'
+              aria-label={appName}
+            >
               <Image
-                src="/images/logo-light.png"
+                src={brandLogoSrc}
                 alt={`${appName} logo`}
                 width={160}
                 height={40}
-                className="h-12 w-auto"
+                className='h-12 w-auto'
                 priority
               />
             </Link>
@@ -182,46 +189,48 @@ export async function LandingMarketMoversPage({ appName, session }: LandingMarke
         </div>
       </header>
 
-      <section className="pt-28 pb-20 md:pt-36 md:pb-24">
-        <div className="mx-auto w-full max-w-[1060px] px-5 md:px-16">
-          <div className="mb-8 flex items-center gap-2 text-sm text-[#6b6e70]">
+      <section className='pt-28 pb-20 md:pt-36 md:pb-24'>
+        <div className='mx-auto w-full max-w-[1060px] px-5 md:px-16'>
+          <div className='mb-8 flex items-center gap-2 text-sm text-[#6b6e70]'>
             <span>{content.breadcrumbParent}</span>
             <span>/</span>
-            <span className="text-[#1a1c1c]">{content.breadcrumbCurrent}</span>
+            <span className='text-[#1a1c1c]'>{content.breadcrumbCurrent}</span>
           </div>
 
-          <h1 className="mb-3 text-[44px] leading-[1.1] font-semibold text-[#1a1c1c] md:text-[56px]">
+          <h1 className='mb-3 text-[44px] leading-[1.1] font-semibold text-[#1a1c1c] md:text-[56px]'>
             {content.title}
           </h1>
 
-          <p className="mb-7 text-[20px] font-semibold leading-8 text-[#1f2325]">
+          <p className='mb-7 text-[20px] leading-8 font-semibold text-[#1f2325]'>
             {content.subtitle}
           </p>
 
-          <div className="space-y-6 text-[16px] leading-8 text-[#2f3335]">
+          <div className='space-y-6 text-[16px] leading-8 text-[#2f3335]'>
             <p>{content.intro}</p>
 
-            <p className="text-[15px] font-semibold leading-7 text-[#202325]">
+            <p className='text-[15px] leading-7 font-semibold text-[#202325]'>
               {content.topics.join(' | ')}
             </p>
 
             {content.sections.map((section) => (
-              <div key={section.title} className="space-y-3 pt-1">
-                <h2 className="text-[24px] font-semibold leading-8 text-[#1d2022]">{section.title}</h2>
+              <div key={section.title} className='space-y-3 pt-1'>
+                <h2 className='text-[24px] leading-8 font-semibold text-[#1d2022]'>
+                  {section.title}
+                </h2>
                 {section.paragraphs.map((paragraph) => (
                   <p key={paragraph}>{paragraph}</p>
                 ))}
               </div>
             ))}
 
-            <p className="pt-2 text-[18px] font-semibold italic leading-8 text-[#1d2022]">
+            <p className='pt-2 text-[18px] leading-8 font-semibold text-[#1d2022] italic'>
               {content.outro}
             </p>
           </div>
         </div>
       </section>
 
-      <LandingSiteFooter appName={appName} className="bg-[#f5f5f5]" />
+      <LandingSiteFooter appName={appName} className='bg-[#f5f5f5]' />
     </main>
   );
 }

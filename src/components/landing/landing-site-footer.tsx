@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
-import { landingSiteLinks } from '@/constants/data';
+import { brandLogoSrc, landingSiteLinks } from '@/constants/data';
 import { getPublicAppName } from '@/lib/public-app-name';
 import { cn } from '@/lib/utils';
 
@@ -16,7 +16,10 @@ type LandingSiteFooterProps = {
   className?: string;
 };
 
-export async function LandingSiteFooter({ appName, className }: LandingSiteFooterProps) {
+export async function LandingSiteFooter({
+  appName,
+  className
+}: LandingSiteFooterProps) {
   const t = await getTranslations('Landing');
   const resolvedAppName = appName ?? getPublicAppName();
 
@@ -27,45 +30,51 @@ export async function LandingSiteFooter({ appName, className }: LandingSiteFoote
         className
       )}
     >
-      <div className="mx-auto max-w-[1440px]">
-        <div className="mb-12 flex flex-wrap gap-8 border-b border-[#c4c7c7]/20 pb-12">
+      <div className='mx-auto max-w-[1440px]'>
+        <div className='mb-12 flex flex-wrap gap-8 border-b border-[#c4c7c7]/20 pb-12'>
           <Link
             href={landingSiteLinks.legal}
-            className="text-sm text-[#444748] transition-colors hover:text-[#C0A678]"
+            className='text-sm text-[#444748] transition-colors hover:text-[#C0A678]'
           >
             {t('footer.legal')}
           </Link>
           <Link
             href={landingSiteLinks.aboutUs}
-            className="text-sm text-[#444748] transition-colors hover:text-[#C0A678]"
+            className='text-sm text-[#444748] transition-colors hover:text-[#C0A678]'
           >
             {t('footer.aboutUs')}
           </Link>
           <Link
             href={landingSiteLinks.contactUs}
-            className="text-sm text-[#444748] transition-colors hover:text-[#C0A678]"
+            className='text-sm text-[#444748] transition-colors hover:text-[#C0A678]'
           >
             {t('footer.contactUs')}
           </Link>
         </div>
 
-        <div className="mb-12 flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
-          <Link href="/" className="inline-flex shrink-0" aria-label={resolvedAppName}>
+        <div className='mb-12 flex flex-col gap-8 md:flex-row md:items-start md:justify-between'>
+          <Link
+            href='/'
+            className='inline-flex shrink-0'
+            aria-label={resolvedAppName}
+          >
             <Image
-              src="/images/logo-light.png"
+              src={brandLogoSrc}
               alt={`${resolvedAppName} logo`}
               width={160}
               height={40}
-              className="h-8 w-auto"
+              className='h-8 w-auto'
             />
           </Link>
-          <div className="text-sm text-[#444748]">
-            <p className="mb-1 font-medium text-black">{t('footer.customerService')}</p>
+          <div className='text-sm text-[#444748]'>
+            <p className='mb-1 font-medium text-black'>
+              {t('footer.customerService')}
+            </p>
             <p>{LANDING_CUSTOMER_SERVICE_PHONE}</p>
             <p>
               <a
                 href={`mailto:${LANDING_CUSTOMER_SERVICE_EMAIL}`}
-                className="transition-colors hover:text-[#C0A678]"
+                className='transition-colors hover:text-[#C0A678]'
               >
                 {LANDING_CUSTOMER_SERVICE_EMAIL}
               </a>
@@ -73,7 +82,7 @@ export async function LandingSiteFooter({ appName, className }: LandingSiteFoote
           </div>
         </div>
 
-        <div className="space-y-4 text-[11px] leading-relaxed text-[#444748]/80">
+        <div className='space-y-4 text-[11px] leading-relaxed text-[#444748]/80'>
           <p>
             <strong>{t('footer.companyInfo')}</strong>{' '}
             {replaceBrandName(t('footer.companyInfoBody'), resolvedAppName)}
@@ -81,7 +90,8 @@ export async function LandingSiteFooter({ appName, className }: LandingSiteFoote
           <p>{t('footer.valorValueBridge')}</p>
           <p>{t('footer.dunfield')}</p>
           <p>
-            <strong>{t('footer.riskWarningLabel')}</strong> {t('footer.riskWarningBody')}
+            <strong>{t('footer.riskWarningLabel')}</strong>{' '}
+            {t('footer.riskWarningBody')}
           </p>
           <p>{t('footer.antiSpam')}</p>
           <p>
@@ -92,11 +102,12 @@ export async function LandingSiteFooter({ appName, className }: LandingSiteFoote
             <strong>{t('footer.adviserNotice')}</strong>
           </p>
           <p>
-            <strong>{t('footer.riskWarningShortLabel')}</strong> - {t('footer.riskWarningShortBody')}
+            <strong>{t('footer.riskWarningShortLabel')}</strong> -{' '}
+            {t('footer.riskWarningShortBody')}
           </p>
         </div>
 
-        <p className="mt-10 text-[10px] tracking-widest text-[#444748] uppercase">
+        <p className='mt-10 text-[10px] tracking-widest text-[#444748] uppercase'>
           {t('footer.copyright', { appName: resolvedAppName.toUpperCase() })}
         </p>
       </div>
