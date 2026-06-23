@@ -286,14 +286,16 @@ export async function calculateUserFinancialInfo(
       return null;
     }
 
-    // Build where clause for positions
+    // Build where clause for positions (scoped to the selected wallet)
     const whereClause: {
       userId: string;
       status: 'PLACED';
       room?: 'STOCK' | 'TRADING' | { in: ('STOCK' | 'TRADING')[] };
+      userBalance: { type: BalanceType };
     } = {
       userId: user.id,
-      status: 'PLACED'
+      status: 'PLACED',
+      userBalance: { type: balanceType }
     };
 
     // Filter by room if specified (not ALL)
@@ -303,7 +305,7 @@ export async function calculateUserFinancialInfo(
       whereClause.room = { in: ['STOCK', 'TRADING'] };
     }
 
-    // Get all PLACED positions for the user (filtered by room if specified)
+    // Get PLACED positions for the user on this wallet (filtered by room if specified)
     const placedPositions = await prisma.position.findMany({
       where: whereClause,
       include: {
