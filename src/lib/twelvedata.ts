@@ -158,6 +158,41 @@ class TwelveDataService {
   }
 
   /**
+   * Bid/ask quotes for the IC landing market widget (parallel /quote + /price per symbol).
+   */
+  async getQuotesForLandingWidget(
+    pairs: ReadonlyArray<{ display: string; api: string }>
+  ): Promise<Record<string, { bid: number; ask: number; percentChange: number }>> {
+    const entries = await Promise.all(
+      pairs.map(async ({ display, api }) => {
+        const combined = await this.getCombinedData(api);
+        if ('error' in combined) return null;
+
+        const bid = Number.parseFloat(combined.bid);
+        const ask = Number.parseFloat(combined.ask);
+        const percentChange = Number.parseFloat(combined.percent_change);
+        if (Number.isNaN(bid) || Number.isNaN(ask)) return null;
+
+        return [
+          display,
+          {
+            bid,
+            ask,
+            percentChange: Number.isNaN(percentChange) ? 0 : percentChange
+          }
+        ] as const;
+      })
+    );
+
+    const out: Record<string, { bid: number; ask: number; percentChange: number }> =
+      {};
+    for (const row of entries) {
+      if (row) out[row[0]] = row[1];
+    }
+    return out;
+  }
+
+  /**
    * Get combined price and quote data for a symbol
    */
   async getCombinedData(
