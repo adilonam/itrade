@@ -14,8 +14,12 @@ import {
   IconStarFilled,
   IconWorld
 } from '@tabler/icons-react';
-import { brandLogoSrc, landingPageLinks, landingSiteLinks } from '@/constants/data';
+import { brandLogoSrc, landingHomeBannerAutomatedTradingImage, landingHomeBannerMobileChartImage, landingHomeBannerPlatformsImage, landingHomeBannerPromoItems, landingPageLinks, landingSiteLinks, tradingViewFooterIconSrc } from '@/constants/data';
+import { LandingIcHomeBannerCarousel } from '@/components/landing/ic/landing-ic-home-banner-carousel';
+import { LandingIcHomeHeader } from '@/components/landing/ic/landing-ic-home-header';
+import { LandingIcHomeScrollShell } from '@/components/landing/ic/landing-ic-home-scroll-shell';
 import { LandingIcMarketWidgets } from '@/components/landing/ic/landing-ic-market-widgets';
+import { LandingIcStatsBar } from '@/components/landing/ic/landing-ic-stats-bar';
 import './landing-ic-homepage.css';
 
 const inter = Inter({
@@ -63,55 +67,20 @@ export function LandingIcHomepage({ appName, session }: LandingIcHomepageProps) 
   const demoHref = landingPageLinks.signUp;
 
   return (
-    <main
+    <LandingIcHomeScrollShell
       className={`${inter.className} landing-ic-scrollbar flex h-dvh flex-col overflow-y-auto scroll-smooth bg-black text-slate-100`}
+      header={
+        <LandingIcHomeHeader
+          appName={appName}
+          startTradingHref={startTradingHref}
+          clientLoginHref={clientLoginHref}
+          scrolled={false}
+        />
+      }
     >
       {/* Hero */}
-      <section className='landing-ic-hero-rocket-bg relative flex h-[85vh] min-h-[600px] shrink-0 flex-col overflow-hidden'>
-        <div className='pointer-events-none absolute bottom-0 left-1/2 h-[400px] w-[600px] -translate-x-1/2 rounded-full bg-yellow-500/20 blur-[100px] mix-blend-screen' />
-        <div className='pointer-events-none absolute bottom-0 left-1/2 h-[300px] w-[300px] -translate-x-1/2 rounded-full bg-white/10 blur-[80px] mix-blend-screen' />
-
-        <header className='relative z-20 flex items-center justify-between px-6 py-5 lg:px-12'>
-          <div className='flex items-center space-x-12'>
-            <Link href='/' aria-label={appName} className='inline-flex shrink-0 items-center'>
-              <BrandLogo appName={appName} priority />
-            </Link>
-            <nav className='hidden items-center space-x-8 text-[13px] font-semibold text-slate-200 xl:flex'>
-              <Link href={landingSiteLinks.aboutUs} className='flex items-center gap-1.5 transition hover:text-[#00ff44]'>
-                Sponsorship{' '}
-                <span className='rounded bg-[#00ff44] px-1.5 py-0.5 text-[9px] font-black tracking-wider text-black uppercase'>
-                  New
-                </span>
-              </Link>
-              <Link href={startTradingHref} className='transition hover:text-[#00ff44]'>
-                Quickstart
-              </Link>
-              <Link href={landingPageLinks.trade} className='transition hover:text-[#00ff44]'>
-                Trading
-              </Link>
-              <Link href={landingSiteLinks.faqs} className='transition hover:text-[#00ff44]'>
-                Platforms
-              </Link>
-              <Link href={landingSiteLinks.contactUs} className='transition hover:text-[#00ff44]'>
-                More
-              </Link>
-            </nav>
-          </div>
-          <div className='flex items-center space-x-3'>
-            <Link
-              href={startTradingHref}
-              className='rounded bg-[#00ff44] px-5 py-2.5 text-xs font-bold text-black transition hover:bg-[#00cc36]'
-            >
-              Start Trading
-            </Link>
-            <Link
-              href={clientLoginHref}
-              className='hidden rounded border border-slate-600 px-5 py-2.5 text-xs font-bold text-white transition hover:border-white sm:block'
-            >
-              Client Login
-            </Link>
-          </div>
-        </header>
+      <section className='relative -mt-[88px] flex h-[85vh] min-h-[600px] shrink-0 flex-col overflow-hidden'>
+        <LandingIcHomeBannerCarousel appName={appName} ctaHref={startTradingHref} />
 
         <div className='absolute top-24 left-12 z-20 hidden items-center space-x-2 rounded-full border border-white/10 bg-black/40 px-3 py-1.5 backdrop-blur-md md:flex'>
           <div className='flex text-[#00b67a]'>
@@ -121,11 +90,34 @@ export function LandingIcHomepage({ appName, session }: LandingIcHomepageProps) 
           </div>
           <span className='text-[10px] font-semibold text-white'>Trustpilot</span>
         </div>
+      </section>
 
-        <div className='absolute bottom-8 left-1/2 z-20 flex -translate-x-1/2 space-x-2'>
-          <div className='h-1 w-8 rounded bg-[#00ff44]' />
-          <div className='h-1 w-8 rounded bg-white/30' />
-          <div className='h-1 w-8 rounded bg-white/30' />
+      <LandingIcStatsBar />
+
+      {/* Promo banners */}
+      <section className='z-10 shrink-0 border-b border-slate-900 bg-black px-6 py-10 lg:px-12'>
+        <div className='mx-auto grid max-w-7xl grid-cols-1 gap-4 md:grid-cols-3'>
+          {landingHomeBannerPromoItems.map((item) => (
+            <article
+              key={item.src}
+              className='group relative overflow-hidden rounded-2xl border border-slate-800 bg-slate-950'
+            >
+              <div className='relative aspect-[16/9] w-full'>
+                <Image
+                  src={item.src}
+                  alt={item.alt}
+                  fill
+                  sizes='(max-width: 768px) 100vw, 33vw'
+                  className='object-cover object-center transition-transform duration-500 group-hover:scale-105'
+                />
+                <div className='absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent' />
+              </div>
+              <div className='absolute inset-x-0 bottom-0 space-y-1 p-5'>
+                <h3 className='text-lg font-bold text-white'>{item.title}</h3>
+                <p className='text-xs leading-relaxed text-slate-300'>{item.description}</p>
+              </div>
+            </article>
+          ))}
         </div>
       </section>
 
@@ -141,7 +133,7 @@ export function LandingIcHomepage({ appName, session }: LandingIcHomepageProps) 
             </h2>
             <p className='text-sm leading-relaxed text-slate-400'>
               Raw Spreads are the difference you have been waiting for. Trade with spreads from 0.0
-              pips, no requotes, best possible prices and no restrictions. IC is the multi-asset
+              pips, no requotes, best possible prices and no restrictions. {appName} is the multi-asset
               trading platform of choice for high volume traders, scalpers and robots.
             </p>
             <div className='flex flex-wrap items-center gap-4 pt-2'>
@@ -190,7 +182,7 @@ export function LandingIcHomepage({ appName, session }: LandingIcHomepageProps) 
                 <div className='absolute top-0 left-1/2 z-20 h-4 w-32 -translate-x-1/2 rounded-b-xl bg-black' />
                 <div className='flex h-full w-full flex-col rounded-2xl bg-black'>
                   <div className='flex h-12 items-center justify-between border-b border-slate-800 px-3'>
-                    <div className='text-[10px] font-bold text-white'>IC MARKETS</div>
+                    <div className='text-[10px] font-bold text-white'>{appName}</div>
                     <div className='text-[10px] text-[#00ff44]'>Live</div>
                   </div>
                   <div className='flex-1 space-y-2 p-3'>
@@ -275,8 +267,16 @@ export function LandingIcHomepage({ appName, session }: LandingIcHomepageProps) 
       </section>
 
       {/* Automated Trading CTA */}
-      <section className='shrink-0 border-b border-slate-900 bg-[#050505] px-6 py-20 text-center lg:px-12'>
-        <div className='mx-auto max-w-4xl space-y-8'>
+      <section className='relative shrink-0 overflow-hidden border-b border-slate-900 bg-[#050505] px-6 py-20 text-center lg:px-12'>
+        <Image
+          src={landingHomeBannerAutomatedTradingImage}
+          alt={`Automated trading on ${appName}`}
+          fill
+          sizes='100vw'
+          className='object-cover object-center opacity-25'
+        />
+        <div className='absolute inset-0 bg-[#050505]/80' />
+        <div className='relative z-10 mx-auto max-w-4xl space-y-8'>
           <div className='flex items-center justify-center gap-2 text-[#00b67a]'>
             <span className='mr-2 text-sm font-bold text-white'>Excellent 4.8/5</span>
             {Array.from({ length: 5 }).map((_, i) => (
@@ -333,18 +333,14 @@ export function LandingIcHomepage({ appName, session }: LandingIcHomepageProps) 
               </Link>
             </div>
             <div className='relative flex h-64 items-center justify-center lg:h-auto lg:justify-end'>
-              <div className='relative flex aspect-[16/10] w-full max-w-md items-center justify-center overflow-hidden rounded-xl border-8 border-slate-800 bg-slate-300 shadow-2xl'>
-                <div className='absolute inset-0 grid grid-cols-2 gap-2 bg-[#111] p-2'>
-                  <div className='rounded border border-slate-800 bg-slate-900' />
-                  <div className='flex flex-col justify-end gap-1 rounded border border-slate-800 bg-slate-900 p-2'>
-                    <div className='h-1 w-3/4 bg-[#00ff44]/50' />
-                    <div className='h-1 w-1/2 bg-[#00ff44]/80' />
-                    <div className='h-1 w-full bg-red-500/80' />
-                  </div>
-                </div>
-                <span className='relative z-10 rounded bg-black/50 px-2 py-1 font-mono text-xs text-white'>
-                  SIMULATED PLATFORM
-                </span>
+              <div className='relative flex aspect-[16/10] w-full max-w-md items-center justify-center overflow-hidden rounded-xl border-8 border-slate-800 shadow-2xl'>
+                <Image
+                  src={landingHomeBannerPlatformsImage}
+                  alt={`${appName} trading platforms`}
+                  fill
+                  sizes='(max-width: 1024px) 100vw, 448px'
+                  className='object-cover object-center'
+                />
               </div>
             </div>
           </div>
@@ -403,7 +399,7 @@ export function LandingIcHomepage({ appName, session }: LandingIcHomepageProps) 
         <div className='relative mx-auto flex max-w-5xl flex-col items-center justify-between overflow-hidden rounded-[2rem] bg-black p-8 text-white md:flex-row lg:p-12'>
           <div className='relative z-10 space-y-6 md:w-1/2'>
             <h2 className='text-3xl font-bold lg:text-4xl'>
-              Trade on the go with IC
+              Trade on the go with {appName}
               <br />
               mobile app
             </h2>
@@ -444,8 +440,14 @@ export function LandingIcHomepage({ appName, session }: LandingIcHomepageProps) 
             <div className='relative flex h-72 w-48 rotate-[-5deg] items-center justify-center rounded-3xl border-[6px] border-slate-800 bg-white text-sm font-bold text-black shadow-2xl'>
               App View
             </div>
-            <div className='absolute right-10 -bottom-10 flex h-72 w-48 rotate-[5deg] items-center justify-center rounded-3xl border-[6px] border-slate-800 bg-slate-900 text-sm font-bold text-white shadow-2xl'>
-              Chart View
+            <div className='absolute right-10 -bottom-10 h-72 w-48 rotate-[5deg] overflow-hidden rounded-3xl border-[6px] border-slate-800 shadow-2xl'>
+              <Image
+                src={landingHomeBannerMobileChartImage}
+                alt={`Chart view on ${appName} mobile app`}
+                fill
+                sizes='192px'
+                className='object-cover'
+              />
             </div>
           </div>
           <IconWorld
@@ -455,7 +457,7 @@ export function LandingIcHomepage({ appName, session }: LandingIcHomepageProps) 
         </div>
 
         <div className='mx-auto mt-6 flex max-w-5xl flex-col items-center justify-between rounded-xl border border-slate-800 bg-black p-6 sm:flex-row'>
-          <span className='font-bold text-white'>Skill up with weekly IC WEBINARS</span>
+          <span className='font-bold text-white'>Skill up with weekly {appName} WEBINARS</span>
           <Link
             href={landingSiteLinks.economicCalendar}
             className='mt-4 rounded border border-slate-600 px-6 py-2.5 text-xs font-bold text-white transition hover:bg-white hover:text-black sm:mt-0'
@@ -494,9 +496,9 @@ export function LandingIcHomepage({ appName, session }: LandingIcHomepageProps) 
           <div className='space-y-6'>
             <BrandLogo appName={appName} size='sm' />
             <p className='text-[11px] leading-relaxed text-slate-500'>
-              IC Mission is to create the best trading experience for retail and institutional clients
-              alike, allowing traders to focus more on their trading. Built by traders for traders
-              IC is dedicated to offering superior spreads, execution and service.
+              {appName}&apos;s mission is to create the best trading experience for retail and institutional clients
+              alike, allowing traders to focus more on their trading. Built by traders for traders,{' '}
+              {appName} is dedicated to offering superior spreads, execution and service.
             </p>
             <div className='flex gap-3'>
               {[IconBrandX, IconBrandInstagram, IconBrandFacebook].map((Icon, i) => (
@@ -508,12 +510,18 @@ export function LandingIcHomepage({ appName, session }: LandingIcHomepageProps) 
                 </div>
               ))}
             </div>
-            <button
-              type='button'
-              className='flex items-center gap-2 rounded bg-white px-4 py-2 text-[10px] font-bold text-black'
+            <Link
+              href={landingPageLinks.trade}
+              className='inline-flex transition hover:opacity-90'
             >
-              TRADE ON <IconChartBar className='size-4 text-blue-500' /> TradingView
-            </button>
+              <Image
+                src={tradingViewFooterIconSrc}
+                alt='Trade on TradingView'
+                width={200}
+                height={56}
+                className='h-8 w-auto'
+              />
+            </Link>
           </div>
 
           <div>
@@ -574,7 +582,7 @@ export function LandingIcHomepage({ appName, session }: LandingIcHomepageProps) 
           </div>
 
           <div>
-            <h4 className='mb-4 font-bold text-white'>About IC</h4>
+            <h4 className='mb-4 font-bold text-white'>About {appName}</h4>
             <ul className='space-y-2 text-[11px]'>
               <li>
                 <Link href={landingSiteLinks.faqs} className='transition hover:text-white'>
@@ -583,7 +591,7 @@ export function LandingIcHomepage({ appName, session }: LandingIcHomepageProps) 
               </li>
               <li>
                 <Link href={landingSiteLinks.aboutUs} className='transition hover:text-white'>
-                  Why IC
+                  Why {appName}
                 </Link>
               </li>
               <li>
@@ -607,7 +615,7 @@ export function LandingIcHomepage({ appName, session }: LandingIcHomepageProps) 
 
         <div className='mx-auto max-w-7xl space-y-3 border-t border-slate-800 pt-8 text-[9px] leading-relaxed text-slate-600'>
           <p>
-            IC and IC Markets Global are the trading names of Raw Trading Ltd, which is regulated by
+            {appName} is a trading name of Raw Trading Ltd, which is regulated by
             the Seychelles Financial Services Authority (FSA) with Securities Dealer&apos;s license
             number SD018.
           </p>
@@ -657,6 +665,6 @@ export function LandingIcHomepage({ appName, session }: LandingIcHomepageProps) 
           </div>
         </div>
       </footer>
-    </main>
+    </LandingIcHomeScrollShell>
   );
 }

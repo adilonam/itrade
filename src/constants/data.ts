@@ -351,6 +351,8 @@ export const logoImages = {
 
 export const brandLogoSrc = logoImages.fullTransparentNobuffer;
 
+export const sponsorshipIconSrc = '/images/icons/sponsorship.svg';
+
 export const landingPageLinks = {
   signIn: '/auth/sign-in',
   signUp: '/auth/sign-up',
@@ -512,6 +514,108 @@ export const landingMarketTapeSymbols = [
 ] as const;
 
 /** Fallback values for landing tape when market data provider is unavailable. */
+/** IC-style home hero carousel (GIF first, then three static banners). */
+export type LandingHomeBannerCarouselHeroCopy = {
+  headline: string;
+  subheadline: string;
+  ctaLabel: string;
+  align: 'left' | 'center';
+  ctaHref?: string;
+  disclaimer?: string;
+};
+
+export const landingHomeBannerIntroVideoSrc = '/images/home-banner/48-lg-b.webm';
+
+export const landingHomeBannerCarouselItems = [
+  {
+    src: '/images/home-banner/48-sm.gif',
+    alt: 'Trade with {appName}',
+    unoptimized: true,
+    heroCopy: {
+      headline: 'SpaceX is Here',
+      subheadline: 'The wait is over. Trade the SpaceX CFD from day one.',
+      ctaLabel: 'Trade SPCX.NAS',
+      align: 'center'
+    }
+  },
+  {
+    src: '/images/home-banner/45.webp',
+    alt: 'Raw spreads from 0.0 pips',
+    heroCopy: {
+      headline: 'Different arenas.\nSame pursuit of\nexcellence.',
+      subheadline: 'Built for high-performance trading. Official FX Partner of TGR Haas F1 Team.',
+      ctaLabel: 'Learn More',
+      align: 'left',
+      ctaHref: landingSiteLinks.aboutUs
+    }
+  },
+  {
+    src: '/images/home-banner/35.webp',
+    alt: 'Institutional grade trading',
+    heroCopy: {
+      headline: '100% Bonus on Your First Deposit',
+      subheadline: 'Plus 50% Extra Every Time You Top Up*.',
+      ctaLabel: 'Learn More',
+      align: 'center',
+      ctaHref: landingSiteLinks.aboutUs,
+      disclaimer: '*Terms and Conditions apply.'
+    }
+  },
+  {
+    src: '/images/home-banner/17.webp',
+    alt: 'Powerful trading platforms',
+    heroCopy: {
+      headline: 'Powerful Trading Platforms',
+      subheadline:
+        'Trade forex, indices, commodities and crypto on MT4, MT5, cTrader and TradingView.',
+      ctaLabel: 'Explore Platforms',
+      align: 'center',
+      ctaHref: landingSiteLinks.faqs
+    }
+  }
+] as const;
+
+export type LandingHomeTradingStat = {
+  value: string;
+  label: string;
+};
+
+export const landingHomeTradingStats: LandingHomeTradingStat[] = [
+  { value: '0.0', label: 'PIP SPREADS*' },
+  { value: '1:5000', label: 'LEVERAGE' },
+  { value: '0.01', label: 'MICRO LOT TRADING' },
+  { value: '+2850', label: 'TRADABLE INSTRUMENTS' },
+  { value: '24/7', label: 'DEDICATED SUPPORT' }
+];
+
+/** Remaining home banner art used outside the hero carousel. */
+export const landingHomeBannerPromoItems = [
+  {
+    src: '/images/home-banner/19.webp',
+    alt: 'Fast order execution',
+    title: 'Ultra-fast execution',
+    description: 'Average speeds under 40ms on institutional infrastructure.'
+  },
+  {
+    src: '/images/home-banner/47.webp',
+    alt: 'Deep liquidity',
+    title: 'Deep liquidity',
+    description: 'Trade on real, diverse liquidity with reduced slippage.'
+  },
+  {
+    src: '/images/home-banner/34.webp',
+    alt: 'Trade on the go',
+    title: 'Trade anywhere',
+    description: 'Monitor markets and manage positions from any device.'
+  }
+] as const;
+
+export const landingHomeBannerSpreadsImage = '/images/home-banner/46.webp';
+export const landingHomeBannerAutomatedTradingImage = '/images/home-banner/32.webp';
+export const landingHomeBannerPlatformsImage = '/images/home-banner/33.webp';
+export const landingHomeBannerMobileChartImage = '/images/home-banner/19.webp';
+export const tradingViewFooterIconSrc = '/images/footer/tradingViewFooterIcon.svg';
+
 export const landingMarketTapeDefaultQuotes = {
   AAPL: { price: 190.5, percentChange: 0.42 },
   MSFT: { price: 420.25, percentChange: 0.31 },
