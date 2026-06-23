@@ -7,7 +7,6 @@ import { landingHomeBannerCarouselItems, landingHomeBannerIntroVideoSrc } from '
 import { withAppName } from '@/lib/public-app-name';
 
 const ROTATION_MS = 6000;
-const INTRO_VIDEO_END_SEC = 4;
 
 type LandingIcHomeBannerCarouselProps = {
   appName: string;
@@ -19,6 +18,7 @@ export function LandingIcHomeBannerCarousel({ appName, ctaHref }: LandingIcHomeB
   const [activeIndex, setActiveIndex] = useState(0);
   const rotationTimerRef = useRef<number | null>(null);
   const introVideoRef = useRef<HTMLVideoElement>(null);
+  const slideVideoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const introFinishedRef = useRef(false);
 
   const stopRotation = useCallback(() => {
@@ -53,21 +53,18 @@ export function LandingIcHomeBannerCarousel({ appName, ctaHref }: LandingIcHomeB
   }, [showIntroVideo, startRotation, stopRotation]);
 
   useEffect(() => {
-    if (!showIntroVideo) return;
+    if (showIntroVideo) return;
 
-    const fallbackTimer = window.setTimeout(() => finishIntro(0), INTRO_VIDEO_END_SEC * 1000);
+    slideVideoRefs.current.forEach((video, index) => {
+      if (!video) return;
 
-    return () => window.clearTimeout(fallbackTimer);
-  }, [showIntroVideo, finishIntro]);
-
-  const handleIntroTimeUpdate = useCallback(
-    (event: React.SyntheticEvent<HTMLVideoElement>) => {
-      if (event.currentTarget.currentTime >= INTRO_VIDEO_END_SEC) {
-        finishIntro(0);
+      if (index === activeIndex) {
+        void video.play();
+      } else {
+        video.pause();
       }
-    },
-    [finishIntro]
-  );
+    });
+  }, [activeIndex, showIntroVideo]);
 
   const goToSlide = useCallback(
     (index: number) => {
@@ -93,7 +90,6 @@ export function LandingIcHomeBannerCarousel({ appName, ctaHref }: LandingIcHomeB
           autoPlay
           muted
           playsInline
-          onTimeUpdate={handleIntroTimeUpdate}
           onEnded={() => finishIntro(0)}
           className='absolute inset-0 size-full object-cover object-center'
         />
@@ -108,15 +104,28 @@ export function LandingIcHomeBannerCarousel({ appName, ctaHref }: LandingIcHomeB
             }`}
             aria-hidden={index !== activeIndex}
           >
-            <Image
-              src={slide.src}
-              alt={withAppName(slide.alt, appName)}
-              fill
-              priority={index === 0}
-              unoptimized={'unoptimized' in slide ? slide.unoptimized : false}
-              sizes='100vw'
-              className='object-cover object-center'
-            />
+            {'isVideo' in slide && slide.isVideo ? (
+              <video
+                ref={(element) => {
+                  slideVideoRefs.current[index] = element;
+                }}
+                src={slide.src}
+                muted
+                loop
+                playsInline
+                className='absolute inset-0 size-full object-cover object-center'
+              />
+            ) : (
+              <Image
+                src={slide.src}
+                alt={withAppName(slide.alt, appName)}
+                fill
+                priority={index === 0}
+                unoptimized={'unoptimized' in slide && slide.unoptimized === true}
+                sizes='100vw'
+                className='object-cover object-center'
+              />
+            )}
           </div>
         ))}
       </div>

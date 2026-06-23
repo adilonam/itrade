@@ -528,9 +528,9 @@ export const landingHomeBannerIntroVideoSrc = '/images/home-banner/48-lg-b.webm'
 
 export const landingHomeBannerCarouselItems = [
   {
-    src: '/images/home-banner/48-sm.gif',
+    src: '/images/home-banner/48-lg.webm',
     alt: 'Trade with {appName}',
-    unoptimized: true,
+    isVideo: true,
     heroCopy: {
       headline: 'SpaceX is Here',
       subheadline: 'The wait is over. Trade the SpaceX CFD from day one.',
