@@ -471,6 +471,28 @@ export const MANUAL_USDT_DEPOSIT_NETWORKS = [
 export type ManualUsdtDepositNetworkId =
   (typeof MANUAL_USDT_DEPOSIT_NETWORKS)[number]['id'];
 
+/** Forex/metal pairs shown on the IC landing market widget (Twelve Data). */
+export const landingIcWidgetSymbols = [
+  { display: 'EURUSD', api: 'EUR/USD' },
+  { display: 'AUDUSD', api: 'AUD/USD' },
+  { display: 'GBPUSD', api: 'GBP/USD' },
+  { display: 'XAUUSD', api: 'XAU/USD' }
+] as const;
+
+export type LandingIcWidgetSymbol =
+  (typeof landingIcWidgetSymbols)[number]['display'];
+
+/** Fallback bid/ask when Twelve Data is unavailable. */
+export const landingIcWidgetDefaultQuotes: Record<
+  LandingIcWidgetSymbol,
+  { bid: number; ask: number; percentChange: number }
+> = {
+  EURUSD: { bid: 1.16692, ask: 1.16692, percentChange: 0.04 },
+  AUDUSD: { bid: 0.754, ask: 0.754, percentChange: -0.44 },
+  GBPUSD: { bid: 1.32584, ask: 1.32591, percentChange: 0.19 },
+  XAUUSD: { bid: 1298.21, ask: 1298.28, percentChange: 0.35 }
+};
+
 /** Symbols shown on the public landing page market ticker (Twelve Data). */
 export const landingMarketTapeSymbols = [
   'AAPL',
