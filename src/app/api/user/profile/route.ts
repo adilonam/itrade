@@ -50,10 +50,6 @@ export async function GET(request: NextRequest) {
       gender: user.gender,
       kycStatus: user.kycStatus,
       kycDocumentType: user.kycDocumentType,
-      kycFrontImageUrl: user.kycFrontImageUrl,
-      kycBackImageUrl: user.kycBackImageUrl,
-      kycSelfieUrl: user.kycSelfieUrl,
-      kycUtilityBillUrl: user.kycUtilityBillUrl,
       accounts: user.accounts,
       hasPassword: !!user.password
     };

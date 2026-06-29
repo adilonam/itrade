@@ -4,10 +4,16 @@ import React, {
   createContext,
   useContext,
   useEffect,
+  useId,
+  useMemo,
   useState,
-  useCallback
+  useCallback,
+  useSyncExternalStore
 } from 'react';
-import { useTwelveDataWebSocket } from '@/hooks/use-twelve-data-websocket';
+import {
+  twelveDataWebSocketManager,
+  type TwelveDataWebSocketSnapshot
+} from '@/lib/twelve-data-websocket-manager';
 import {
   getTwelveDataPublicApiKey,
   TWELVE_DATA_PUBLIC_KEY_ENV
@@ -16,22 +22,18 @@ import type { Market } from '@/lib/prisma/generated/client';
 import type { TwelveDataWebSocketPriceData } from '@/types/twelvedata';
 
 interface MarketsWebSocketContextType {
-  // Connection state
   isConnected: boolean;
   isConnecting: boolean;
   error: string | null;
-
-  // Market data
   markets: Market[];
   realTimePrices: Map<string, TwelveDataWebSocketPriceData>;
-
-  // Actions
   connect: () => void;
   disconnect: () => void;
   updateMarkets: (markets: Market[]) => void;
   refreshPrices: () => void;
   reset: () => void;
   subscribe: (symbols: string[]) => void;
+  registerSymbols: (consumerId: string, symbols: string[]) => void;
 }
 
 const MarketsWebSocketContext =
@@ -42,100 +44,98 @@ interface MarketsWebSocketProviderProps {
   initialMarkets?: Market[];
 }
 
+function useTwelveDataWebSocketSnapshot(): TwelveDataWebSocketSnapshot {
+  return useSyncExternalStore(
+    (listener) => twelveDataWebSocketManager.subscribe(listener),
+    () => twelveDataWebSocketManager.getSnapshot(),
+    () => twelveDataWebSocketManager.getServerSnapshot()
+  );
+}
+
 export function MarketsWebSocketProvider({
   children,
   initialMarkets = []
 }: MarketsWebSocketProviderProps) {
   const [markets, setMarkets] = useState<Market[]>(initialMarkets);
+  const [symbolRegistry, setSymbolRegistry] = useState<
+    Map<string, readonly string[]>
+  >(() => new Map());
   const apiKey = getTwelveDataPublicApiKey() ?? '';
   const configError = apiKey
     ? null
     : `${TWELVE_DATA_PUBLIC_KEY_ENV} is not set. Live prices are disabled.`;
 
+  useEffect(
+    () => twelveDataWebSocketManager.acquire(apiKey, Boolean(apiKey)),
+    [apiKey]
+  );
+
   const {
     isConnected,
     isConnecting,
     error: wsError,
-    priceData: realTimePrices,
-    connect: wsConnect,
-    disconnect: wsDisconnect,
-    subscribe: wsSubscribe,
-    unsubscribe: wsUnsubscribe,
-    reset: wsReset
-  } = useTwelveDataWebSocket({
-    apiKey,
-    autoConnect: Boolean(apiKey)
-  });
+    priceData: realTimePrices
+  } = useTwelveDataWebSocketSnapshot();
 
   const error = configError ?? wsError;
 
-  // Subscribe to all market symbols when connected
-  useEffect(() => {
-    if (isConnected && markets.length > 0) {
-      const symbols = markets.map((market) => market.symbol);
-      if (symbols.length > 0) {
-        wsSubscribe(symbols);
+  const registerSymbols = useCallback(
+    (consumerId: string, symbols: string[]) => {
+      setSymbolRegistry((prev) => {
+        const next = new Map(prev);
+        if (symbols.length === 0) {
+          next.delete(consumerId);
+        } else {
+          next.set(consumerId, symbols);
+        }
+        return next;
+      });
+    },
+    []
+  );
+
+  const desiredSymbols = useMemo(() => {
+    const symbols = new Set<string>();
+    for (const market of markets) {
+      symbols.add(market.symbol);
+    }
+    for (const consumerSymbols of Array.from(symbolRegistry.values())) {
+      for (const symbol of consumerSymbols) {
+        symbols.add(symbol);
       }
     }
-  }, [isConnected, markets, wsSubscribe]);
+    return symbols;
+  }, [markets, symbolRegistry]);
+
+  useEffect(() => {
+    twelveDataWebSocketManager.setDesiredSymbols(desiredSymbols);
+  }, [desiredSymbols]);
 
   const connect = useCallback(() => {
     if (apiKey) {
-      wsConnect();
+      twelveDataWebSocketManager.connect();
     }
-  }, [apiKey, wsConnect]);
+  }, [apiKey]);
 
   const disconnect = useCallback(() => {
-    wsDisconnect();
-  }, [wsDisconnect]);
+    twelveDataWebSocketManager.disconnect();
+  }, []);
 
-  const updateMarkets = useCallback(
-    (newMarkets: Market[]) => {
-      setMarkets(newMarkets);
-
-      // If connected, update subscriptions
-      if (isConnected) {
-        const currentSymbols = Array.from(realTimePrices.keys());
-        const newSymbols = newMarkets.map((m) => m.symbol);
-
-        // Unsubscribe from symbols no longer in markets
-        const symbolsToUnsubscribe = currentSymbols.filter(
-          (symbol) => !newSymbols.includes(symbol)
-        );
-        if (symbolsToUnsubscribe.length > 0) {
-          wsUnsubscribe(symbolsToUnsubscribe);
-        }
-
-        // Subscribe to new symbols
-        const symbolsToSubscribe = newSymbols.filter(
-          (symbol) => !currentSymbols.includes(symbol)
-        );
-        if (symbolsToSubscribe.length > 0) {
-          wsSubscribe(symbolsToSubscribe);
-        }
-      }
-    },
-
-    [isConnected, realTimePrices, wsSubscribe, wsUnsubscribe]
-  );
+  const updateMarkets = useCallback((newMarkets: Market[]) => {
+    setMarkets(newMarkets);
+  }, []);
 
   const refreshPrices = useCallback(() => {
-    if (isConnected && markets.length > 0) {
-      const symbols = markets.map((market) => market.symbol);
-      wsSubscribe(symbols);
-    }
-  }, [isConnected, markets, wsSubscribe]);
+    twelveDataWebSocketManager.setDesiredSymbols(desiredSymbols);
+  }, [desiredSymbols]);
 
   const reset = useCallback(() => {
-    wsReset();
-  }, [wsReset]);
+    twelveDataWebSocketManager.reset();
+  }, []);
 
-  const subscribe = useCallback(
-    (symbols: string[]) => {
-      wsSubscribe(symbols);
-    },
-    [wsSubscribe]
-  );
+  const subscribe = useCallback((symbols: string[]) => {
+    twelveDataWebSocketManager.subscribeSymbols(symbols);
+  }, []);
 
   const value: MarketsWebSocketContextType = {
     isConnected,
@@ -148,7 +148,8 @@ export function MarketsWebSocketProvider({
     updateMarkets,
     refreshPrices,
     reset,
-    subscribe
+    subscribe,
+    registerSymbols
   };
 
   return (
@@ -166,4 +167,25 @@ export function useMarketsWebSocket() {
     );
   }
   return context;
+}
+
+/** Register symbol interest for a component; merged into one shared subscription. */
+export function useMarketsWebSocketSymbols(symbols: string[]) {
+  const { registerSymbols } = useMarketsWebSocket();
+  const consumerId = useId();
+  const stableSymbols = useMemo(
+    () =>
+      Array.from(new Set(symbols.filter(Boolean))).sort((a, b) =>
+        a.localeCompare(b)
+      ),
+    [symbols]
+  );
+  const symbolsKey = stableSymbols.join('\0');
+
+  useEffect(() => {
+    registerSymbols(consumerId, stableSymbols);
+    return () => {
+      registerSymbols(consumerId, []);
+    };
+  }, [consumerId, registerSymbols, symbolsKey, stableSymbols]);
 }

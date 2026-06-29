@@ -295,12 +295,12 @@
       "kycRequests": "طلبات KYC",
       "depositRequest": "طلب إيداع",
       "settings": "الإعدادات",
-      "withdrawals": "السحوبات",
+      "withdrawals": "طلب سحب",
       "portfolio": "المحفظة"
     },
     "header": {
       "tradeRoom": "غرفة التداول",
-      "balanceTitle": "الرصيد (تداول · {type})",
+      "balanceTitle": "حقوق الملكية (تداول · {type})",
       "balanceTypeSelector": "اختيار نوع الرصيد",
       "connected": "متصل",
       "balanceReal": "حقيقي",
@@ -312,6 +312,14 @@
       "topMovers": "الأكثر تحركاً",
       "search": "بحث",
       "symbolPlaceholder": "الرمز",
+      "categories": {
+        "ALL": "الكل",
+        "FOREX": "فوركس",
+        "CRYPTO": "عملات رقمية",
+        "STOCKS": "أسهم",
+        "COMMODITIES": "سلع",
+        "INDICES": "مؤشرات"
+      },
       "popular": "شائع",
       "advancedOrder": "أمر متقدم",
       "info": "معلومات",

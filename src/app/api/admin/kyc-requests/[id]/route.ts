@@ -68,7 +68,16 @@ export async function PATCH(
       where: { id },
       include: {
         user: { select: { id: true, name: true, email: true } },
-        documents: { orderBy: { createdAt: 'asc' } }
+        documents: {
+          orderBy: { createdAt: 'asc' },
+          select: {
+            id: true,
+            kind: true,
+            contentType: true,
+            fileName: true,
+            createdAt: true
+          }
+        }
       }
     });
 

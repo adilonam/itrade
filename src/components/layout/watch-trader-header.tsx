@@ -86,12 +86,12 @@ export function WatchTraderHeader() {
         Record<TradeBalanceType, BalanceAmountDisplay | null>
       >(
         (acc, balanceType, index) => {
-          const bal =
-            typeof payloads[index]?.balance === 'number' ? payloads[index].balance : 0;
-          const sign = bal >= 0 ? '+' : '-';
+          const equity =
+            typeof payloads[index]?.equity === 'number' ? payloads[index].equity : 0;
+          const sign = equity >= 0 ? '+' : '-';
           acc[balanceType] = {
-            text: `${sign}$${Math.abs(bal).toFixed(2)}`,
-            nonNegative: bal >= 0
+            text: `${sign}$${Math.abs(equity).toFixed(2)}`,
+            nonNegative: equity >= 0
           };
           return acc;
         },

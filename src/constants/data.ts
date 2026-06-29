@@ -265,7 +265,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'Withdrawals',
+        title: 'Withdrawals request',
         url: '/admin/withdraw-requests',
         icon: 'minus',
         isActive: false,

@@ -103,10 +103,6 @@ model User {
   gender                  String?                  @map("gender")
   kycStatus               KycStatus                @default(NOT_SUBMITTED) @map("kyc_status")
   kycDocumentType         String?                  @map("kyc_document_type")
-  kycFrontImageUrl        String?                  @map("kyc_front_image_url") @db.Text
-  kycBackImageUrl         String?                  @map("kyc_back_image_url") @db.Text
-  kycSelfieUrl            String?                  @map("kyc_selfie_url") @db.Text
-  kycUtilityBillUrl       String?                  @map("kyc_utility_bill_url") @db.Text
   accounts                Account[]
   sessions                Session[]
   mfaChallenges           MfaChallenge[]
@@ -148,11 +144,13 @@ model KycVerificationRequest {
 }
 
 model KycVerificationDocument {
-  id        String          @id @default(cuid())
-  requestId String          @map("request_id")
-  kind      KycDocumentKind @map("kind")
-  fileUrl   String          @map("file_url") @db.Text
-  createdAt DateTime        @default(now()) @map("created_at")
+  id          String          @id @default(cuid())
+  requestId   String          @map("request_id")
+  kind        KycDocumentKind @map("kind")
+  fileContent Bytes           @map("file_content") @db.ByteA
+  contentType String          @map("content_type")
+  fileName    String?         @map("file_name")
+  createdAt   DateTime        @default(now()) @map("created_at")
 
   request KycVerificationRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
 

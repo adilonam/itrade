@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Table,
   TableBody,
@@ -31,7 +31,10 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import type { Market, Position } from '@/lib/prisma/generated/client';
-import { useMarketsWebSocket } from '@/contexts/markets-websocket-context';
+import {
+  useMarketsWebSocket,
+  useMarketsWebSocketSymbols
+} from '@/contexts/markets-websocket-context';
 import { calculatePnLClient } from '@/lib/calculator-client';
 import {
   IconLoader2,
@@ -135,26 +138,16 @@ export function UserPositionsTableRoomTrading({
   };
 
   const colCount = showCloseAction ? 13 : 12;
-  const { realTimePrices, isConnected, reset, subscribe } =
-    useMarketsWebSocket();
-
-  // Reset websocket subscriptions and subscribe to all markets in positions
-  useEffect(() => {
-    if (isConnected && positions.length > 0) {
-      // Reset first to clear any existing subscriptions
-      // reset();
-
-      // Get unique market symbols from positions
-      const marketSymbols = positions
-        .map((t) => t.market?.symbol)
+  const { realTimePrices } = useMarketsWebSocket();
+  const positionSymbols = useMemo(
+    () =>
+      positions
+        .map((position) => position.market?.symbol)
         .filter((symbol): symbol is string => Boolean(symbol))
-        .filter((symbol, index, array) => array.indexOf(symbol) === index); // Remove duplicates
-
-      if (marketSymbols.length > 0) {
-        subscribe(marketSymbols);
-      }
-    }
-  }, [isConnected, positions, reset, subscribe]);
+        .filter((symbol, index, array) => array.indexOf(symbol) === index),
+    [positions]
+  );
+  useMarketsWebSocketSymbols(positionSymbols);
 
   // Update real-time PnL when market data changes
   useEffect(() => {

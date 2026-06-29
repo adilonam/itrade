@@ -295,12 +295,12 @@
       "kycRequests": "KYC Requests",
       "depositRequest": "Deposit request",
       "settings": "Settings",
-      "withdrawals": "Withdrawals",
+      "withdrawals": "Withdrawals request",
       "portfolio": "Portfolio"
     },
     "header": {
       "tradeRoom": "Trade room",
-      "balanceTitle": "Balance (TRADING · {type})",
+      "balanceTitle": "Equity (TRADING · {type})",
       "balanceTypeSelector": "Balance type selector",
       "connected": "Connected",
       "balanceReal": "Real",
@@ -312,6 +312,14 @@
       "topMovers": "Top Movers",
       "search": "Search",
       "symbolPlaceholder": "Symbol",
+      "categories": {
+        "ALL": "All",
+        "FOREX": "Forex",
+        "CRYPTO": "Crypto",
+        "STOCKS": "Stocks",
+        "COMMODITIES": "Commodities",
+        "INDICES": "Indices"
+      },
       "popular": "Popular",
       "advancedOrder": "Advanced Order",
       "info": "Info",
