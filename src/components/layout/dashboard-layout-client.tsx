@@ -33,14 +33,14 @@ export function DashboardLayoutClient({
         className="watch-trader-shell flex min-h-screen w-full flex-col bg-[var(--trade-dark)] text-[var(--trade-text)]"
         dir={locale === 'ar' ? 'rtl' : 'ltr'}
       >
-        <WatchTraderHeader />
-        <main className="flex min-h-0 flex-1 flex-col overflow-hidden">
-          <MarketsWebSocketProvider>
+        <MarketsWebSocketProvider>
+          <WatchTraderHeader />
+          <main className="flex min-h-0 flex-1 flex-col overflow-hidden">
             <Suspense fallback={<TradingRoomShellSuspenseFallback />}>
               <TradingRoomShell>{children}</TradingRoomShell>
             </Suspense>
-          </MarketsWebSocketProvider>
-        </main>
+          </main>
+        </MarketsWebSocketProvider>
       </WatchTraderShellWithPortal>
     </KBar>
   );

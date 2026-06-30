@@ -8,19 +8,22 @@ import {
 
 interface UseTwelveDataWebSocketOptions {
   apiKey: string;
+  /** When true, this hook owns the shared connection (test/dev only). */
+  ownsConnection?: boolean;
   autoConnect?: boolean;
   heartbeatInterval?: number;
 }
 
 export function useTwelveDataWebSocket({
   apiKey,
+  ownsConnection = false,
   autoConnect = false,
-  heartbeatInterval = 1000
+  heartbeatInterval = 10000
 }: UseTwelveDataWebSocketOptions) {
-  useEffect(
-    () => twelveDataWebSocketManager.acquire(apiKey, autoConnect, heartbeatInterval),
-    [apiKey, autoConnect, heartbeatInterval]
-  );
+  useEffect(() => {
+    if (!ownsConnection) return;
+    return twelveDataWebSocketManager.acquire(apiKey, autoConnect, heartbeatInterval);
+  }, [apiKey, autoConnect, heartbeatInterval, ownsConnection]);
 
   const snapshot = useSyncExternalStore<TwelveDataWebSocketSnapshot>(
     (listener) => twelveDataWebSocketManager.subscribe(listener),
