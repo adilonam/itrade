@@ -54,6 +54,7 @@ import {
 } from '@/constants/trade-room-ui';
 import { useTranslations } from 'next-intl';
 import { useTradeBalanceSelection } from '@/hooks/use-trade-balance-selection';
+import { AnimatedPnLValue } from './animated-pnl-value';
 
 type PositionWithMarket = Position & {
   market: Market | null;
@@ -470,13 +471,11 @@ export function UserPositionsTableRoomTrading({
                             if (position.status !== 'PLACED') {
                               const pnl = position.pnl || 0;
                               return (
-                                <span
-                                  className={
-                                    pnl >= 0 ? pnlPositive : pnlNegative
-                                  }
-                                >
-                                  {pnl >= 0 ? '+' : ''}${pnl.toFixed(2)}
-                                </span>
+                                <AnimatedPnLValue
+                                  value={pnl}
+                                  positiveClassName={pnlPositive}
+                                  negativeClassName={pnlNegative}
+                                />
                               );
                             }
 
@@ -491,34 +490,17 @@ export function UserPositionsTableRoomTrading({
                                 )
                               : null;
 
-                            // Use dynamic PnL if available, otherwise fallback to position.pnl
                             const displayPnL =
                               dynamicPnL !== null
                                 ? dynamicPnL
                                 : position.pnl || 0;
-                            const isLive = dynamicPnL !== null && realTimeData;
 
                             return (
-                              <span
-                                className={
-                                  displayPnL >= 0
-                                    ? pnlPositive
-                                    : pnlNegative
-                                }
-                              >
-                                {displayPnL >= 0 ? '+' : ''}$
-                                {displayPnL.toFixed(2)}
-                                {isLive && (
-                                  <span
-                                    className={cn(
-                                      'ml-1 text-xs',
-                                      mutedCell
-                                    )}
-                                  >
-                                    (live)
-                                  </span>
-                                )}
-                              </span>
+                              <AnimatedPnLValue
+                                value={displayPnL}
+                                positiveClassName={pnlPositive}
+                                negativeClassName={pnlNegative}
+                              />
                             );
                           })()}
                         </TableCell>
@@ -575,7 +557,7 @@ export function UserPositionsTableRoomTrading({
                                 <AlertDialogContent
                                   className={
                                     isTradePanel
-                                      ? 'border-[var(--trade-border)] bg-[var(--trade-panel)] text-[var(--trade-text)]'
+                                      ? 'watch-trader-shell border-[var(--trade-border)] !bg-[var(--trade-panel,#161b22)] text-[var(--trade-text)] shadow-xl'
                                       : undefined
                                   }
                                 >
