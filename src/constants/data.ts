@@ -385,6 +385,7 @@ export const landingSiteLinks = {
   marketsStocks: '/stocks',
   marketsCommodities: '/commodities',
   marketsIndices: '/indices',
+  marketsPricePrediction: '/betting',
   learningCfds: '/cfds',
   learningMarketMovers: '/market-movers',
   learningTradingPitfalls: '/trading-pitfalls',
@@ -392,6 +393,11 @@ export const landingSiteLinks = {
   learningTechnicalFundamental: '/technical-fundamental',
   learningGlossary: '/glossary',
   learningNfp: '/nfp'
+} as const;
+
+export const pricePredictionLinks = {
+  listing: '/betting',
+  market: (slug: string) => `/betting/${slug}`
 } as const;
 
 export const landingLanguages = [
@@ -419,7 +425,11 @@ export const landingHeaderMenus: LandingHeaderMenu[] = [
       { label: 'Currencies', href: landingPlaceholderLink },
       { label: 'Stocks', href: landingPlaceholderLink },
       { label: 'Commodities', href: landingPlaceholderLink },
-      { label: 'Indices', href: landingPlaceholderLink }
+      { label: 'Indices', href: landingSiteLinks.marketsIndices },
+      {
+        label: 'Price Prediction',
+        href: landingSiteLinks.marketsPricePrediction
+      }
     ]
   },
   {
