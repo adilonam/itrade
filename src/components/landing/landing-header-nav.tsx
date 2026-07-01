@@ -29,7 +29,14 @@ const landingHeaderMenuConfig = [
         labelKey: 'commodities' as const,
         href: landingSiteLinks.marketsCommodities
       },
-      { labelKey: 'indices' as const, href: landingSiteLinks.marketsIndices }
+      {
+        labelKey: 'indices' as const,
+        href: landingSiteLinks.marketsIndices
+      },
+      {
+        labelKey: 'pricePrediction' as const,
+        href: landingSiteLinks.marketsPricePrediction
+      }
     ]
   },
   {
