@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 import { z } from 'zod';
 import { getAuthSession } from '@/lib/auth';
+import { getProfileImageUrl } from '@/lib/profile-image';
 import {
   DEFAULT_DEMO_BALANCE_AMOUNT,
   DEFAULT_REAL_BALANCE_AMOUNT
@@ -104,6 +105,8 @@ export async function GET(request: NextRequest) {
           id: true,
           name: true,
           email: true,
+          image: true,
+          profileImageContentType: true,
           balances: {
             where: { type: 'REAL' },
             select: { amount: true }
@@ -129,6 +132,7 @@ export async function GET(request: NextRequest) {
 
     const normalizedUsers = users.map((user) => ({
       ...user,
+      image: getProfileImageUrl(user),
       balance: user.balances[0]?.amount ?? 0
     }));
 
@@ -218,6 +222,8 @@ export async function POST(request: NextRequest) {
         id: true,
         name: true,
         email: true,
+        image: true,
+        profileImageContentType: true,
         balances: {
           where: { type: 'REAL' },
           select: { amount: true }
@@ -235,6 +241,7 @@ export async function POST(request: NextRequest) {
         message: 'User created successfully',
         user: {
           ...user,
+          image: getProfileImageUrl(user),
           balance: user.balances[0]?.amount ?? 0
         }
       },

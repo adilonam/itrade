@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { calculatePositionPnL } from '@/lib/calculator-server';
+import { requireAdminSession } from '@/lib/admin-auth';
 import type {
+  BalanceType,
   Market,
   Position,
   PositionType,
@@ -32,6 +34,11 @@ type CreatePositionBody = {
 
 export async function GET(request: NextRequest) {
   try {
+    const auth = await requireAdminSession();
+    if (!auth.ok) {
+      return NextResponse.json({ error: auth.error }, { status: auth.status });
+    }
+
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
@@ -40,6 +47,7 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status');
     const room = searchParams.get('room');
     const marketId = searchParams.get('marketId');
+    const balanceType = searchParams.get('balanceType');
     const search = searchParams.get('search');
 
     const skip = (page - 1) * limit;
@@ -51,6 +59,9 @@ export async function GET(request: NextRequest) {
     if (status) where.status = status;
     if (room) where.room = room;
     if (marketId) where.marketId = marketId;
+    if (balanceType === 'REAL' || balanceType === 'DEMO') {
+      where.userBalance = { type: balanceType as BalanceType };
+    }
 
     // Enhanced search functionality - search across multiple fields
     if (search) {
@@ -165,6 +176,11 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const auth = await requireAdminSession();
+    if (!auth.ok) {
+      return NextResponse.json({ error: auth.error }, { status: auth.status });
+    }
+
     const body = (await request.json()) as CreatePositionBody;
 
     // Validate required fields

@@ -5,6 +5,7 @@ import GoogleProvider from 'next-auth/providers/google';
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import { DEFAULT_USER_BALANCE_SEED } from './balance';
 import { prisma } from './prisma';
+import { getProfileImageUrl } from './profile-image';
 
 const sharedCallbacks: NextAuthOptions['callbacks'] = {
   async jwt({ token, user }) {
@@ -20,6 +21,7 @@ const sharedCallbacks: NextAuthOptions['callbacks'] = {
           role: true,
           leverage: true,
           image: true,
+          profileImageContentType: true,
           balances: {
             select: { type: true, amount: true }
           }
@@ -33,7 +35,10 @@ const sharedCallbacks: NextAuthOptions['callbacks'] = {
         token.role = dbUser.role;
         token.balance = selectedBalance?.amount ?? 0;
         token.leverage = dbUser.leverage;
-        token.image = dbUser.image ?? token.image;
+        token.image = getProfileImageUrl({
+          id: token.id as string,
+          ...dbUser
+        });
       }
     }
 
@@ -45,7 +50,7 @@ const sharedCallbacks: NextAuthOptions['callbacks'] = {
       session.user.role = (token.role as string) || 'USER';
       session.user.balance = (token.balance as number) || 0;
       session.user.leverage = (token.leverage as number) || 1;
-      session.user.image = (token.image as string) ?? session.user.image;
+      session.user.image = (token.image as string | null) ?? null;
     }
     return session;
   }
@@ -102,7 +107,7 @@ export async function buildAuthOptions(): Promise<NextAuthOptions> {
           id: challenge.user.id,
           email: challenge.user.email,
           name: challenge.user.name,
-          image: challenge.user.image
+          image: getProfileImageUrl(challenge.user)
         };
       }
     })

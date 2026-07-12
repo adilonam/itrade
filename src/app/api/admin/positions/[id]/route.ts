@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import type { Position } from '@/lib/prisma/generated/client';
+import { calculatePositionPnL } from '@/lib/calculator-server';
+import { requireAdminSession } from '@/lib/admin-auth';
+import {
+  applyAdminPositionBalanceAdjustment,
+  computeAdminPositionBalanceAdjustment
+} from '@/lib/admin-position-balance';
+import type { Market, Position, PositionStatus } from '@/lib/prisma/generated/client';
 
-// Update position data type
 type UpdatePositionData = Partial<Position>;
 
 export async function GET(
@@ -10,6 +15,11 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const auth = await requireAdminSession();
+    if (!auth.ok) {
+      return NextResponse.json({ error: auth.error }, { status: auth.status });
+    }
+
     const { id } = await params;
     const position = await prisma.position.findUnique({
       where: { id },
@@ -28,7 +38,8 @@ export async function GET(
             name: true,
             type: true
           }
-        }
+        },
+        userBalance: true
       }
     });
 
@@ -53,14 +64,19 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const auth = await requireAdminSession();
+    if (!auth.ok) {
+      return NextResponse.json({ error: auth.error }, { status: auth.status });
+    }
+
     const { id } = await params;
     const body: UpdatePositionData = await request.json();
 
-    // Check if position exists
     const existingPosition = await prisma.position.findUnique({
       where: { id },
       include: {
-        user: true
+        user: true,
+        market: true
       }
     });
 
@@ -71,7 +87,6 @@ export async function PUT(
       );
     }
 
-    // Validate quantity if provided
     if (body.quantity !== undefined && body.quantity <= 0) {
       return NextResponse.json(
         { error: 'Quantity must be greater than 0' },
@@ -99,38 +114,62 @@ export async function PUT(
       );
     }
 
-    // Handle P&L changes with balance updates and transaction history
-    let balanceChange = 0;
-    let shouldCreateTransaction = false;
+    const nextStatus = (body.status ?? existingPosition.status) as PositionStatus;
+    const resolvedClosedAt =
+      body.closedAt !== undefined
+        ? body.closedAt === null
+          ? null
+          : new Date(body.closedAt as string | Date)
+        : undefined;
+    const closedAt =
+      body.status !== undefined || body.closedAt !== undefined
+        ? nextStatus === 'CLOSED'
+          ? resolvedClosedAt !== undefined &&
+            resolvedClosedAt !== null &&
+            !Number.isNaN(resolvedClosedAt.getTime())
+            ? resolvedClosedAt
+            : new Date()
+          : null
+        : undefined;
 
-    if (body.pnl !== undefined && body.pnl !== existingPosition.pnl) {
-      const oldPnl = existingPosition.pnl || 0;
-      const newPnl = body.pnl || 0;
-      balanceChange = newPnl - oldPnl;
-      shouldCreateTransaction = true;
+    let resolvedPnl =
+      body.pnl !== undefined ? body.pnl : existingPosition.pnl;
+
+    if (
+      nextStatus === 'CLOSED' &&
+      existingPosition.status !== 'CLOSED' &&
+      (resolvedPnl === null || resolvedPnl === undefined) &&
+      existingPosition.market
+    ) {
+      const closedPrice =
+        body.closedPrice ??
+        existingPosition.closedPrice ??
+        existingPosition.market.lastPrice ??
+        null;
+
+      const calculated = await calculatePositionPnL({
+        ...existingPosition,
+        ...body,
+        status: 'CLOSED',
+        closedPrice,
+        market: existingPosition.market as Market
+      } as Position & { market: Market });
+
+      if (calculated !== null) {
+        resolvedPnl = calculated;
+      }
     }
 
-    // Use transaction to ensure data consistency
-    const result = await prisma.$transaction(async (tx) => {
-      // Update the position
-      const nextStatus = body.status ?? existingPosition.status;
-      const resolvedClosedAt =
-        body.closedAt !== undefined
-          ? body.closedAt === null
-            ? null
-            : new Date(body.closedAt as string | Date)
-          : undefined;
-      const closedAt =
-        body.status !== undefined || body.closedAt !== undefined
-          ? nextStatus === 'CLOSED'
-            ? resolvedClosedAt !== undefined &&
-              resolvedClosedAt !== null &&
-              !Number.isNaN(resolvedClosedAt.getTime())
-              ? resolvedClosedAt
-              : new Date()
-            : null
-          : undefined;
+    const balanceAdjustment = computeAdminPositionBalanceAdjustment({
+      oldStatus: existingPosition.status,
+      newStatus: nextStatus,
+      oldPnl: existingPosition.pnl,
+      newPnl: resolvedPnl ?? null,
+      positionId: id,
+      marketSymbol: existingPosition.market?.symbol
+    });
 
+    const result = await prisma.$transaction(async (tx) => {
       const updatedPosition = await tx.position.update({
         where: { id },
         data: {
@@ -148,7 +187,15 @@ export async function PUT(
           executedAt: body.executedAt
             ? new Date(body.executedAt as string | Date)
             : body.executedAt,
-          pnl: body.pnl
+          pnl:
+            body.pnl !== undefined
+              ? body.pnl
+              : nextStatus === 'CLOSED' &&
+                  existingPosition.status !== 'CLOSED' &&
+                  resolvedPnl !== null &&
+                  resolvedPnl !== undefined
+                ? resolvedPnl
+                : undefined
         },
         include: {
           user: {
@@ -165,25 +212,17 @@ export async function PUT(
               name: true,
               type: true
             }
-          }
+          },
+          userBalance: true
         }
       });
 
-      // Update user balance and create transaction if P&L changed
-      if (shouldCreateTransaction && balanceChange !== 0) {
-        await tx.userBalance.update({
-          where: { id: existingPosition.userBalanceId },
-          data: { amount: { increment: balanceChange } }
-        });
-
-        await tx.transaction.create({
-          data: {
-            userBalanceId: existingPosition.userBalanceId,
-            type: balanceChange > 0 ? 'GAIN' : 'LOSS',
-            absoluteAmount: Math.abs(balanceChange),
-            description: `Admin P&L adjustment for position ${id.slice(0, 8)}... - Balance ${balanceChange > 0 ? '+' : ''}${balanceChange.toFixed(2)}`
-          }
-        });
+      if (balanceAdjustment) {
+        await applyAdminPositionBalanceAdjustment(
+          tx,
+          existingPosition.userBalanceId,
+          balanceAdjustment
+        );
       }
 
       return updatedPosition;
@@ -203,8 +242,12 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const auth = await requireAdminSession();
+    if (!auth.ok) {
+      return NextResponse.json({ error: auth.error }, { status: auth.status });
+    }
+
     const { id } = await params;
-    // Check if position exists
     const existingPosition = await prisma.position.findUnique({
       where: { id }
     });

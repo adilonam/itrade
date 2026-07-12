@@ -3,7 +3,7 @@ import { Separator } from '@/components/ui/separator';
 import { PositionsView } from '@/components/admin/positions/positions-view';
 
 export const metadata = {
-  title: 'Admin: Positions'
+  title: 'Admin: Client Positions'
 };
 
 export default async function Page() {
@@ -13,10 +13,11 @@ export default async function Page() {
         <div className='flex items-start justify-between'>
           <div>
             <h1 className='text-lg font-bold tracking-tight text-[var(--trade-text)]'>
-              Positions
+              Client Positions
             </h1>
             <p className='mt-1 max-w-2xl text-xs leading-relaxed text-[var(--trade-text-muted)]'>
-              Manage and monitor all user positions in the system.
+              View and edit all client positions across users. Changes to P&amp;L
+              or status may update the linked user balance.
             </p>
           </div>
         </div>

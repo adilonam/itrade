@@ -83,7 +83,10 @@ model User {
   name                    String?
   email                   String                   @unique
   emailVerified           DateTime?                @map("email_verified")
-  image                   String? // profile image URL (e.g. Vercel Blob URL)
+  image                   String? // external provider profile image URL
+  profileImageContent     Bytes?                   @map("profile_image_content") @db.ByteA
+  profileImageContentType String?                  @map("profile_image_content_type")
+  profileImageFileName    String?                  @map("profile_image_file_name")
   password                String? // For credentials provider
   role                    Role                     @default(USER)
   createdAt               DateTime                 @default(now()) @map("created_at")

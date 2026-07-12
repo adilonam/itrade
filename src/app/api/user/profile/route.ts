@@ -1,9 +1,11 @@
-import { getBlobPutOptions } from '@/lib/blob-upload';
 import { getAuthSession } from '@/lib/auth';
 import { parseBalanceType } from '@/lib/balance';
 import type { Prisma } from '@/lib/prisma/generated/client';
 import { prisma } from '@/lib/prisma';
-import { put } from '@vercel/blob';
+import {
+  fileToProfileImagePayload,
+  getProfileImageUrl
+} from '@/lib/profile-image';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
@@ -36,7 +38,7 @@ export async function GET(request: NextRequest) {
       id: user.id,
       name: user.name,
       email: user.email,
-      image: user.image,
+      image: getProfileImageUrl(user),
       balance: user.balances[0]?.amount ?? 0,
       role: user.role,
       createdAt: user.createdAt,
@@ -72,9 +74,12 @@ export async function PATCH(request: NextRequest) {
 
     const contentType = request.headers.get('content-type') || '';
     if (contentType.includes('application/json')) {
-      return NextResponse.json({
-        error: 'JSON profile updates are not supported'
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          error: 'JSON profile updates are not supported'
+        },
+        { status: 400 }
+      );
     }
 
     const formData = await request.formData();
@@ -91,18 +96,24 @@ export async function PATCH(request: NextRequest) {
     const country = formData.get('country') as string | null;
     const gender = formData.get('gender') as string | null;
 
-    let imageLink: string | undefined;
+    let imagePayload:
+      | Awaited<ReturnType<typeof fileToProfileImagePayload>>
+      | undefined;
 
     if (imageFile && imageFile.size > 0) {
-      const ext = imageFile.name.split('.').pop() || 'jpg';
-      const filename = `profile-${session.user.id}-${Date.now()}.${ext}`;
-      const blobOpts = await getBlobPutOptions();
-      const blob = await put(filename, imageFile, {
-        access: 'private',
-        addRandomSuffix: true,
-        ...blobOpts
-      });
-      imageLink = blob.url;
+      try {
+        imagePayload = await fileToProfileImagePayload(imageFile);
+      } catch (error) {
+        return NextResponse.json(
+          {
+            error:
+              error instanceof Error
+                ? error.message
+                : 'Profile image must be an image file.'
+          },
+          { status: 400 }
+        );
+      }
     }
 
     let resolvedName: string | null | undefined;
@@ -123,16 +134,18 @@ export async function PATCH(request: NextRequest) {
       if (resolvedName !== undefined) {
         data.name = resolvedName;
       }
-      if (imageLink) {
-        data.image = imageLink;
+      if (imagePayload) {
+        data.profileImageContent = imagePayload.profileImageContent;
+        data.profileImageContentType = imagePayload.profileImageContentType;
+        data.profileImageFileName = imagePayload.profileImageFileName;
+        data.image = null;
       }
       if (phone !== null) {
         data.phone = phone || null;
       }
       if (formData.has('dateOfBirth')) {
         const raw = formData.get('dateOfBirth') as string | null;
-        data.dateOfBirth =
-          raw && raw.trim() !== '' ? new Date(raw) : null;
+        data.dateOfBirth = raw && raw.trim() !== '' ? new Date(raw) : null;
       }
       if (gender !== null) {
         data.gender = gender || null;
@@ -164,7 +177,7 @@ export async function PATCH(request: NextRequest) {
           id: existing.id,
           name: existing.name,
           email: existing.email,
-          image: existing.image,
+          image: getProfileImageUrl(existing),
           phone: existing.phone,
           dateOfBirth: existing.dateOfBirth,
           address: existing.address,
@@ -185,7 +198,7 @@ export async function PATCH(request: NextRequest) {
       id: user.id,
       name: user.name,
       email: user.email,
-      image: user.image,
+      image: getProfileImageUrl(user),
       phone: user.phone,
       dateOfBirth: user.dateOfBirth,
       address: user.address,
