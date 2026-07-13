@@ -33,7 +33,7 @@ type TwelveDataQuote = {
 };
 
 const MARKET_SPECS: MarketSpec[] = [
-  // Forex
+  // Forex majors
   {
     type: 'FOREX',
     symbol: 'EURUSD',
@@ -83,29 +83,8 @@ const MARKET_SPECS: MarketSpec[] = [
     name: 'New Zealand Dollar / US Dollar',
     spread: 0.00015
   },
-  {
-    type: 'FOREX',
-    symbol: 'EURGBP',
-    twelveDataSymbol: 'EUR/GBP',
-    name: 'Euro / British Pound',
-    spread: 0.00012
-  },
-  {
-    type: 'FOREX',
-    symbol: 'EURJPY',
-    twelveDataSymbol: 'EUR/JPY',
-    name: 'Euro / Japanese Yen',
-    spread: 0.02
-  },
-  {
-    type: 'FOREX',
-    symbol: 'GBPJPY',
-    twelveDataSymbol: 'GBP/JPY',
-    name: 'British Pound / Japanese Yen',
-    spread: 0.03
-  },
 
-  // Stocks
+  // Stocks (Magnificent 7)
   {
     type: 'STOCKS',
     symbol: 'AAPL',
@@ -155,29 +134,8 @@ const MARKET_SPECS: MarketSpec[] = [
     name: 'Tesla',
     spread: 0.05
   },
-  {
-    type: 'STOCKS',
-    symbol: '2222.SR',
-    twelveDataSymbol: '2222.SR',
-    name: 'Saudi Aramco',
-    spread: 0.05
-  },
-  {
-    type: 'STOCKS',
-    symbol: 'TSM',
-    twelveDataSymbol: 'TSM',
-    name: 'TSMC',
-    spread: 0.05
-  },
-  {
-    type: 'STOCKS',
-    symbol: 'BRK.B',
-    twelveDataSymbol: 'BRK.B',
-    name: 'Berkshire Hathaway',
-    spread: 0.05
-  },
 
-  // Commodities
+  // Commodities majors
   {
     type: 'COMMODITIES',
     symbol: 'XAUUSD',
@@ -206,50 +164,8 @@ const MARKET_SPECS: MarketSpec[] = [
     name: 'Brent Crude',
     spread: 0.03
   },
-  {
-    type: 'COMMODITIES',
-    symbol: 'NATGAS',
-    twelveDataSymbol: 'NG/USD',
-    name: 'Natural Gas',
-    spread: 0.005
-  },
-  {
-    type: 'COMMODITIES',
-    symbol: 'COPPER',
-    twelveDataSymbol: 'COPPER',
-    name: 'Copper',
-    spread: 0.002
-  },
-  {
-    type: 'COMMODITIES',
-    symbol: 'WHEAT',
-    twelveDataSymbol: 'ZW/USD',
-    name: 'Wheat',
-    spread: 0.01
-  },
-  {
-    type: 'COMMODITIES',
-    symbol: 'COFFEE',
-    twelveDataSymbol: 'KC/USD',
-    name: 'Coffee',
-    spread: 0.01
-  },
-  {
-    type: 'COMMODITIES',
-    symbol: 'SUGAR',
-    twelveDataSymbol: 'SB/USD',
-    name: 'Sugar',
-    spread: 0.001
-  },
-  {
-    type: 'COMMODITIES',
-    symbol: 'COTTON',
-    twelveDataSymbol: 'CT/USD',
-    name: 'Cotton',
-    spread: 0.001
-  },
 
-  // Indices
+  // Indices majors
   {
     type: 'INDICES',
     symbol: 'US500',
@@ -292,36 +208,8 @@ const MARKET_SPECS: MarketSpec[] = [
     name: 'Nikkei 225',
     spread: 15
   },
-  {
-    type: 'INDICES',
-    symbol: 'HSI',
-    twelveDataSymbol: 'HSI',
-    name: 'Hang Seng Index',
-    spread: 5
-  },
-  {
-    type: 'INDICES',
-    symbol: 'SSEC',
-    twelveDataSymbol: 'SSEC',
-    name: 'Shanghai Composite',
-    spread: 2
-  },
-  {
-    type: 'INDICES',
-    symbol: 'CAC40',
-    twelveDataSymbol: 'CAC40',
-    name: 'CAC 40',
-    spread: 0.8
-  },
-  {
-    type: 'INDICES',
-    symbol: 'TASI',
-    twelveDataSymbol: 'TASI',
-    name: 'Tadawul All Share Index',
-    spread: 5
-  },
 
-  // Crypto
+  // Crypto majors
   {
     type: 'CRYPTO',
     symbol: 'BTCUSD',
@@ -338,13 +226,6 @@ const MARKET_SPECS: MarketSpec[] = [
   },
   {
     type: 'CRYPTO',
-    symbol: 'BNBUSD',
-    twelveDataSymbol: 'BNB/USD',
-    name: 'Binance Coin',
-    spread: 0.5
-  },
-  {
-    type: 'CRYPTO',
     symbol: 'SOLUSD',
     twelveDataSymbol: 'SOL/USD',
     name: 'Solana',
@@ -356,76 +237,6 @@ const MARKET_SPECS: MarketSpec[] = [
     twelveDataSymbol: 'XRP/USD',
     name: 'XRP',
     spread: 0.001
-  },
-  {
-    type: 'CRYPTO',
-    symbol: 'ADAUSD',
-    twelveDataSymbol: 'ADA/USD',
-    name: 'Cardano',
-    spread: 0.001
-  },
-  {
-    type: 'CRYPTO',
-    symbol: 'DOGEUSD',
-    twelveDataSymbol: 'DOGE/USD',
-    name: 'Dogecoin',
-    spread: 0.0001
-  },
-  {
-    type: 'CRYPTO',
-    symbol: 'AVAXUSD',
-    twelveDataSymbol: 'AVAX/USD',
-    name: 'Avalanche',
-    spread: 0.02
-  },
-  {
-    type: 'CRYPTO',
-    symbol: 'DOTUSD',
-    twelveDataSymbol: 'DOT/USD',
-    name: 'Polkadot',
-    spread: 0.01
-  },
-  {
-    type: 'CRYPTO',
-    symbol: 'LINKUSD',
-    twelveDataSymbol: 'LINK/USD',
-    name: 'Chainlink',
-    spread: 0.02
-  },
-  {
-    type: 'CRYPTO',
-    symbol: 'TONUSD',
-    twelveDataSymbol: 'TON/USD',
-    name: 'Toncoin',
-    spread: 0.005
-  },
-  {
-    type: 'CRYPTO',
-    symbol: 'TRXUSD',
-    twelveDataSymbol: 'TRX/USD',
-    name: 'TRON',
-    spread: 0.0001
-  },
-  {
-    type: 'CRYPTO',
-    symbol: 'LTCUSD',
-    twelveDataSymbol: 'LTC/USD',
-    name: 'Litecoin',
-    spread: 0.1
-  },
-  {
-    type: 'CRYPTO',
-    symbol: 'SHIBUSD',
-    twelveDataSymbol: 'SHIB/USD',
-    name: 'Shiba Inu',
-    spread: 0.00000001
-  },
-  {
-    type: 'CRYPTO',
-    symbol: 'PEPEUSD',
-    twelveDataSymbol: 'PEPE/USD',
-    name: 'Pepe',
-    spread: 0.00000001
   }
 ];
 

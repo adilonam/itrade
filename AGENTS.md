@@ -16,3 +16,4 @@ This project uses:
 - Always import types/interfaces from the Prisma schema using: `import type { ... } from '@/lib/prisma/generated/client';`
 - Decompose code for good architecture: use components and functions for reusability and clarity
 - The trade header balance dropdown selection must be persisted and applied globally across user-facing trade data components; position/financial components must refresh immediately when it changes, and the change must emit a webhook event. see src/lib/balance-selection.ts
+- for github auth use token env var on .env GITHUB_TOKEN
