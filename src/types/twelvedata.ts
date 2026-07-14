@@ -74,9 +74,23 @@ export interface TwelveDataCombinedResponse extends TwelveDataQuoteResponse {
 
 // WebSocket Types
 export interface TwelveDataWebSocketMessage {
-  event: 'subscribe-status' | 'price' | 'error' | 'reset-status' | 'heartbeat';
+  event:
+    | 'subscribe-status'
+    | 'price'
+    | 'error'
+    | 'reset-status'
+    | 'heartbeat'
+    | 'message-processing';
   status?: 'ok' | 'error';
   message?: string;
+  messages?: string[];
+}
+
+export interface TwelveDataWebSocketMessageProcessing
+  extends TwelveDataWebSocketMessage {
+  event: 'message-processing';
+  status: 'ok' | 'error';
+  messages?: string[];
 }
 
 export interface TwelveDataWebSocketSubscribeStatus
@@ -127,7 +141,14 @@ export type TwelveDataWebSocketResponse =
   | TwelveDataWebSocketPriceData
   | TwelveDataWebSocketError
   | TwelveDataWebSocketResetStatus
+  | TwelveDataWebSocketMessageProcessing
   | TwelveDataWebSocketMessage;
+
+/** REST fallback price payload shaped like a WebSocket price event. */
+export type TwelveDataRestPricePayload = Pick<
+  TwelveDataWebSocketPriceData,
+  'event' | 'symbol' | 'price' | 'timestamp'
+>;
 
 export interface TwelveDataWebSocketSubscription {
   action: 'subscribe' | 'unsubscribe' | 'reset' | 'heartbeat';

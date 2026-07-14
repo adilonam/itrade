@@ -73,8 +73,8 @@ export async function calculatePositionPnL(
         const bidPrice = midPrice - spread / 2;
         const askPrice = midPrice + spread / 2;
 
-        // Use ask price for BUY, bid price for SELL
-        currentPrice = position.type === 'BUY' ? bidPrice : askPrice ;
+        // Exit price: BUY closes at bid, SELL closes at ask
+        currentPrice = position.type === 'BUY' ? bidPrice : askPrice;
       } else {
         return null;
       }
@@ -286,14 +286,16 @@ export async function calculateUserFinancialInfo(
       return null;
     }
 
-    // Build where clause for positions
+    // Build where clause for positions (scoped to the selected wallet)
     const whereClause: {
       userId: string;
       status: 'PLACED';
       room?: 'STOCK' | 'TRADING' | { in: ('STOCK' | 'TRADING')[] };
+      userBalance: { type: BalanceType };
     } = {
       userId: user.id,
-      status: 'PLACED'
+      status: 'PLACED',
+      userBalance: { type: balanceType }
     };
 
     // Filter by room if specified (not ALL)
@@ -303,7 +305,7 @@ export async function calculateUserFinancialInfo(
       whereClause.room = { in: ['STOCK', 'TRADING'] };
     }
 
-    // Get all PLACED positions for the user (filtered by room if specified)
+    // Get PLACED positions for the user on this wallet (filtered by room if specified)
     const placedPositions = await prisma.position.findMany({
       where: whereClause,
       include: {
@@ -322,8 +324,13 @@ export async function calculateUserFinancialInfo(
     const markets = Array.from(marketMap.values());
 
     // Refresh market data for all unique markets
-    if (markets.length > 0) {
-      await refreshSaveMarkets(markets);
+    const refreshedMarkets =
+      markets.length > 0 ? await refreshSaveMarkets(markets) : null;
+    const marketDataMap = new Map<string, Market>();
+    if (refreshedMarkets) {
+      refreshedMarkets.forEach((market) => {
+        marketDataMap.set(market.id, market);
+      });
     }
 
     // Calculate total PnL and used margin
@@ -337,12 +344,14 @@ export async function calculateUserFinancialInfo(
         position.executedPrice &&
         position.executedPrice > 0
       ) {
-        // Calculate current price based on position type
-        const midPrice = position.market.lastPrice ?? 0;
-        const spread = position.market.spread ?? 0;
+        const market =
+          marketDataMap.get(position.market.id) ?? position.market;
+        // Exit price: BUY closes at bid, SELL closes at ask (matches frontend)
+        const midPrice = market.lastPrice ?? 0;
+        const spread = market.spread ?? 0;
         const bidPrice = midPrice - spread / 2;
         const askPrice = midPrice + spread / 2;
-        const currentPrice = position.type === 'BUY' ? askPrice : bidPrice;
+        const currentPrice = position.type === 'BUY' ? bidPrice : askPrice;
 
         // Calculate PnL
         // For STOCK room, always use lot size of 1
@@ -462,12 +471,12 @@ export async function couldOpenPosition(
       if (pos.market && pos.executedPrice && pos.executedPrice > 0) {
         const refreshedMarket = marketDataMap.get(pos.market.id);
         if (refreshedMarket) {
-          // Calculate current price based on position type
+          // Exit price: BUY closes at bid, SELL closes at ask (matches frontend)
           const midPrice = refreshedMarket.lastPrice ?? 0;
           const spread = refreshedMarket.spread ?? 0;
           const bidPrice = midPrice - spread / 2;
           const askPrice = midPrice + spread / 2;
-          const currentPrice = pos.type === 'BUY' ? askPrice : bidPrice;
+          const currentPrice = pos.type === 'BUY' ? bidPrice : askPrice;
 
           // Calculate PnL
           // For STOCK room, always use lot size of 1

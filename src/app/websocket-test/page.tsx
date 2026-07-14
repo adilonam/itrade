@@ -136,6 +136,7 @@ export default function WebSocketTestPage() {
     sendHeartbeat
   } = useTwelveDataWebSocket({
     apiKey,
+    ownsConnection: true,
     autoConnect: false
   });
 

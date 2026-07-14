@@ -58,8 +58,8 @@ export function calculatePnLClient(
   const spread = position.market.spread ?? 0;
   const bidPrice = midPrice - spread / 2;
   const askPrice = midPrice + spread / 2;
-  // Use ask for BUY (exit/sell side), bid for SELL (exit/buy side), matching server
-  const currentPrice = position.type === 'BUY' ? bidPrice : askPrice ;
+  // Exit price: BUY closes at bid, SELL closes at ask
+  const currentPrice = position.type === 'BUY' ? bidPrice : askPrice;
 
 
 

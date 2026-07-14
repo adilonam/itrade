@@ -23,7 +23,10 @@ import { UserPositionsTableRoomStock } from '@/components/user/portfolio/user-po
 import { PortfolioSummary } from '@/components/user/portfolio/portfolio-summary';
 import { PortfolioPieChart } from '@/components/user/portfolio/portfolio-pie-chart';
 import { PortfolioBarChart } from '@/components/user/portfolio/portfolio-bar-chart';
-import { useMarketsWebSocket } from '@/contexts/markets-websocket-context';
+import {
+  useMarketsWebSocket,
+  useMarketsWebSocketSymbols
+} from '@/contexts/markets-websocket-context';
 import type { Position, Market, User } from '@/lib/prisma/generated/client';
 
 // Extended position type with relations
@@ -88,8 +91,15 @@ export function StockPortfolioView() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // WebSocket for real-time prices
-  const { realTimePrices, isConnected, subscribe } = useMarketsWebSocket();
+  const { realTimePrices } = useMarketsWebSocket();
+  const positionSymbols = useMemo(() => {
+    const placedPositions = positions.filter((p) => p.status === 'PLACED');
+    return placedPositions
+      .map((p) => p.market?.symbol)
+      .filter((symbol): symbol is string => Boolean(symbol))
+      .filter((symbol, index, array) => array.indexOf(symbol) === index);
+  }, [positions]);
+  useMarketsWebSocketSymbols(positionSymbols);
 
   // Filters
   const [filters, setFilters] = useState<PositionFilters>({
@@ -99,8 +109,6 @@ export function StockPortfolioView() {
   });
 
   const [currentFilters, setCurrentFilters] = useState<PositionFilters>({});
-
-  // Load positions
   const loadPositions = useCallback(
     async (page = 1, newFilters: PositionFilters = {}) => {
       try {
@@ -177,19 +185,6 @@ export function StockPortfolioView() {
     // Cleanup interval on unmount
     return () => clearInterval(interval);
   }, [loadFinancialData]);
-
-  // Subscribe to market data for real-time updates
-  useEffect(() => {
-    const placedPositions = positions.filter((p) => p.status === 'PLACED');
-    const marketSymbols = placedPositions
-      .map((p) => p.market?.symbol)
-      .filter((symbol): symbol is string => Boolean(symbol))
-      .filter((symbol, index, array) => array.indexOf(symbol) === index);
-
-    if (isConnected && marketSymbols.length > 0) {
-      subscribe(marketSymbols);
-    }
-  }, [isConnected, positions, subscribe]);
 
   // Handle filter changes
   const handleFilterChange = (key: keyof PositionFilters, value: any) => {

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 import { getAuthSession } from '@/lib/auth';
+import { getProfileImageUrl } from '@/lib/profile-image';
 
 const addUserSchema = z.object({
   email: z.string().email('Invalid email address')
@@ -86,6 +87,8 @@ export async function GET(
           id: true,
           name: true,
           email: true,
+          image: true,
+          profileImageContentType: true,
           balances: {
             where: { type: 'REAL' },
             select: { amount: true }
@@ -107,6 +110,7 @@ export async function GET(
     return NextResponse.json({
       users: linkedUsers.map((u) => ({
         ...u,
+        image: getProfileImageUrl(u),
         balance: u.balances[0]?.amount ?? 0
       })),
       pagination: {
@@ -210,6 +214,8 @@ export async function POST(
         id: true,
         name: true,
         email: true,
+        image: true,
+        profileImageContentType: true,
         balances: {
           where: { type: 'REAL' },
           select: { amount: true }
@@ -224,6 +230,7 @@ export async function POST(
         message: 'User added to seller successfully',
         user: {
           ...updatedUser,
+          image: getProfileImageUrl(updatedUser),
           balance: updatedUser.balances[0]?.amount ?? 0
         }
       },

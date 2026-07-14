@@ -63,6 +63,8 @@ interface PositionsTableProps {
   readOnly?: boolean;
   /** Single-user context: drop the User column */
   omitUserColumn?: boolean;
+  /** Omit linked user balance column (admin client-positions page) */
+  omitBalanceColumn?: boolean;
   cardDescription?: string;
   /** Subtitle when the table has rows (default: manage-all-users copy) */
   noPositionsHint?: string;
@@ -77,6 +79,7 @@ export function PositionsTable({
   onDelete,
   readOnly = false,
   omitUserColumn = false,
+  omitBalanceColumn = false,
   cardDescription,
   noPositionsHint,
   compact = false
@@ -227,9 +230,11 @@ export function PositionsTable({
                             User
                           </TableHead>
                         ) : null}
-                        <TableHead className='text-xs font-medium text-[var(--trade-text-muted)]'>
-                          User balance
-                        </TableHead>
+                        {!omitBalanceColumn ? (
+                          <TableHead className='text-xs font-medium text-[var(--trade-text-muted)]'>
+                            User balance
+                          </TableHead>
+                        ) : null}
                         <TableHead className='text-xs font-medium text-[var(--trade-text-muted)]'>
                           Type
                         </TableHead>
@@ -294,22 +299,24 @@ export function PositionsTable({
                               </div>
                             </TableCell>
                           ) : null}
-                          <TableCell className='text-[var(--trade-text)]'>
-                            {position.userBalance ? (
-                              <div>
-                                <div className='font-mono text-xs font-medium'>
-                                  {formatCurrency(position.userBalance.amount)}
+                          {!omitBalanceColumn ? (
+                            <TableCell className='text-[var(--trade-text)]'>
+                              {position.userBalance ? (
+                                <div>
+                                  <div className='font-mono text-xs font-medium'>
+                                    {formatCurrency(position.userBalance.amount)}
+                                  </div>
+                                  <div className='text-xs text-[var(--trade-text-muted)]'>
+                                    {position.userBalance.type}
+                                  </div>
                                 </div>
-                                <div className='text-xs text-[var(--trade-text-muted)]'>
-                                  {position.userBalance.type}
-                                </div>
-                              </div>
-                            ) : (
-                              <span className='text-xs text-[var(--trade-text-muted)]'>
-                                N/A
-                              </span>
-                            )}
-                          </TableCell>
+                              ) : (
+                                <span className='text-xs text-[var(--trade-text-muted)]'>
+                                  N/A
+                                </span>
+                              )}
+                            </TableCell>
+                          ) : null}
                           <TableCell>
                             <Badge className={getTypeColor(position.type)}>
                               {position.type}

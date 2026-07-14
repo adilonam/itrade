@@ -35,6 +35,7 @@ export const createSellerUserColumns = (
               width={40}
               height={40}
               className='rounded-full object-cover'
+              unoptimized={image.startsWith('/api/user/profile-images/')}
             />
           ) : (
             <div className='bg-muted flex h-10 w-10 items-center justify-center rounded-full'>

@@ -14,7 +14,7 @@ const TRADE_NAV_TITLE_KEYS = {
   'KYC Requests': 'kycRequests',
   'Deposit request': 'depositRequest',
   Settings: 'settings',
-  Withdrawals: 'withdrawals',
+  'Withdrawals request': 'withdrawals',
   Portfolio: 'portfolio'
 } as const;
 

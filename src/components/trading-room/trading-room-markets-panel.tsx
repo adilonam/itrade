@@ -1,25 +1,40 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { TradingRoomOrderPanel } from './trading-room-order-panel';
-import type { Market } from '@/lib/prisma/generated/client';
+import type { Market, MarketType } from '@/lib/prisma/generated/client';
 import type { MockSymbol } from './mock-data';
 import { getCurrencyFlags } from '@/lib/currency-flags';
 import { formatTradePrice } from '@/lib/trade-price-format';
+import { cn } from '@/lib/utils';
 import {
   IconStar,
-  IconTrendingUp,
   IconInfoCircle,
   IconSettings
 } from '@tabler/icons-react';
+
+const MARKET_CATEGORIES = [
+  'ALL',
+  'FOREX',
+  'CRYPTO',
+  'STOCKS',
+  'COMMODITIES',
+  'INDICES'
+] as const;
+
+type MarketCategory = (typeof MARKET_CATEGORIES)[number];
 
 export type SymbolItem = Market | MockSymbol;
 
 function isMarket(item: SymbolItem): item is Market {
   return 'room' in item && typeof (item as Market).room === 'string';
+}
+
+function getItemType(item: SymbolItem): MarketType | MockSymbol['type'] {
+  return isMarket(item) ? item.type : item.type;
 }
 
 interface TradingRoomMarketsPanelProps {
@@ -61,6 +76,7 @@ export function TradingRoomMarketsPanel({
   void _selectedMarket; // Reserved for future use
   const t = useTranslations('Trade.markets');
   const [symbolQuery, setSymbolQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<MarketCategory>('FOREX');
 
   const getPrice = (item: SymbolItem) =>
     isMarket(item) ? item.lastPrice : (item as MockSymbol).price;
@@ -71,14 +87,20 @@ export function TradingRoomMarketsPanel({
   const normalize = (value: string) =>
     value.toLowerCase().replace(/[^a-z0-9]/g, '');
   const query = normalize(symbolQuery.trim());
-  const filteredSymbols =
-    query.length === 0
-      ? symbols
-      : symbols.filter((item) => {
-          const symbol = normalize(getSymbol(item));
-          const name = normalize(getName(item));
-          return symbol.includes(query) || name.includes(query);
-        });
+
+  const categoryFilteredSymbols = useMemo(() => {
+    if (selectedCategory === 'ALL') return symbols;
+    return symbols.filter((item) => getItemType(item) === selectedCategory);
+  }, [selectedCategory, symbols]);
+
+  const filteredSymbols = useMemo(() => {
+    if (query.length === 0) return categoryFilteredSymbols;
+    return categoryFilteredSymbols.filter((item) => {
+      const symbol = normalize(getSymbol(item));
+      const name = normalize(getName(item));
+      return symbol.includes(query) || name.includes(query);
+    });
+  }, [categoryFilteredSymbols, query]);
 
   const formatPrice = formatTradePrice;
 
@@ -219,7 +241,7 @@ export function TradingRoomMarketsPanel({
       >
         <input
           type="text"
-          placeholder="Symbol"
+          placeholder={t('symbolPlaceholder')}
           value={symbolQuery}
           onChange={(e) => setSymbolQuery(e.target.value)}
           className="w-full rounded border border-[var(--trade-border)] bg-[var(--trade-dark)] px-3 py-1.5 text-sm text-[var(--trade-text)] placeholder:text-[var(--trade-text-muted)] focus:border-[var(--trade-accent-blue)] focus:outline-none focus:ring-1 focus:ring-[var(--trade-accent-blue)]"
@@ -227,12 +249,30 @@ export function TradingRoomMarketsPanel({
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-        <div className="flex shrink-0 items-center justify-between border-b border-[var(--trade-border)] bg-[var(--trade-dark)]/40 px-3 py-2">
-          <div className="flex items-center gap-2">
-            <IconTrendingUp className="size-4 text-[var(--trade-accent-blue)]" />
-            <span className="text-xs font-bold uppercase tracking-wider">Popular</span>
-            <span className="rounded bg-[var(--trade-border)] px-1.5 py-0.5 text-[10px]">{symbols.length}</span>
-          </div>
+        <div
+          className={cn(
+            'flex shrink-0 gap-1.5 overflow-x-auto border-b border-[var(--trade-border)] bg-[var(--trade-dark)]/40 scrollbar-none',
+            compact ? 'px-2 py-1.5' : 'px-3 py-2'
+          )}
+        >
+          {MARKET_CATEGORIES.map((category) => {
+            const isActive = selectedCategory === category;
+            return (
+              <button
+                key={category}
+                type="button"
+                onClick={() => setSelectedCategory(category)}
+                className={cn(
+                  'shrink-0 rounded-lg border px-2.5 py-1 text-[10px] font-semibold tracking-wide transition-colors',
+                  isActive
+                    ? 'border-[var(--trade-accent-blue)] bg-[var(--trade-accent-blue)]/15 text-[var(--trade-accent-blue)]'
+                    : 'border-[var(--trade-border)] bg-[var(--trade-panel)] text-[var(--trade-text-muted)] hover:border-[var(--trade-text-muted)]/40 hover:text-[var(--trade-text)]'
+                )}
+              >
+                {t(`categories.${category}`)}
+              </button>
+            );
+          })}
         </div>
         <ScrollArea className={compact ? 'min-h-0 max-h-[28vh] flex-1' : 'min-h-0 flex-1'}>
           <div className="space-y-0">

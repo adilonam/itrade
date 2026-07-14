@@ -6,10 +6,13 @@ import {
   calculateUserFinancialInfo
 } from '@/lib/calculator-server';
 import {
+  BalanceType,
   Market,
   Position,
   TransactionType
 } from '@/lib/prisma/generated/client';
+
+const MARGIN_CHECK_BALANCE_TYPES: BalanceType[] = ['REAL', 'DEMO'];
 export async function GET() {
   try {
     // eslint-disable-next-line no-console
@@ -38,25 +41,33 @@ export async function GET() {
     let marginCallClosedCount = 0;
     const marginCallClosedUsers = [];
 
-    // Check each user's margin level
+    // Check each user's margin level per wallet (REAL and DEMO are independent)
     for (const user of usersWithPositions) {
-      const financialInfo = await calculateUserFinancialInfo(user);
-
-      if (
-        financialInfo &&
-        financialInfo.marginLevel !== null &&
-        financialInfo.marginLevel < MIN_MARGIN_LEVEL
-      ) {
-        // eslint-disable-next-line no-console
-        console.log(
-          `MARGIN CALL: User ${user.email} has margin level ${financialInfo.marginLevel}% (below ${MIN_MARGIN_LEVEL}%)`
+      for (const balanceType of MARGIN_CHECK_BALANCE_TYPES) {
+        const financialInfo = await calculateUserFinancialInfo(
+          user,
+          'ALL',
+          balanceType
         );
 
-        // Get all PLACED positions for this user
+        if (
+          !financialInfo ||
+          financialInfo.marginLevel === null ||
+          financialInfo.marginLevel >= MIN_MARGIN_LEVEL
+        ) {
+          continue;
+        }
+
+        // eslint-disable-next-line no-console
+        console.log(
+          `MARGIN CALL: User ${user.email} (${balanceType}) has margin level ${financialInfo.marginLevel}% (below ${MIN_MARGIN_LEVEL}%)`
+        );
+
         const userPositions = await prisma.position.findMany({
           where: {
             userId: user.id,
-            status: 'PLACED'
+            status: 'PLACED',
+            userBalance: { type: balanceType }
           },
           include: {
             market: true
@@ -145,6 +156,7 @@ export async function GET() {
         marginCallClosedUsers.push({
           userId: user.id,
           email: user.email,
+          balanceType,
           marginLevel: financialInfo.marginLevel,
           positionsClosed: userPositions.length
         });

@@ -14,7 +14,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { useDebouncedCallback } from '@/hooks/use-debounced-callback';
 import {
   parseAsInteger,
   parseAsString,
@@ -59,13 +58,13 @@ export default function MarketListingPage({}: MarketListingPageProps) {
     setTableFilter(queryParams.search ?? '');
   }, [queryParams.search]);
 
-  const commitTableFilter = useDebouncedCallback((value: string) => {
-    const trimmed = value.trim();
+  const applyTableFilter = () => {
+    const trimmed = tableFilter.trim();
     void setQueryParams({
       search: trimmed ? trimmed : null,
       page: 1
     });
-  }, 400);
+  };
 
   const loadMarkets = useCallback(async () => {
     try {
@@ -202,24 +201,30 @@ export default function MarketListingPage({}: MarketListingPageProps) {
           <Label htmlFor='market-table-filter' className='text-muted-foreground text-xs'>
             Filter table
           </Label>
-          <div className='relative'>
-            <IconSearch
-              className='text-muted-foreground pointer-events-none absolute top-1/2 left-2.5 h-4 w-4 -translate-y-1/2'
-              aria-hidden
-            />
-            <Input
-              id='market-table-filter'
-              type='search'
-              value={tableFilter}
-              onChange={(e) => {
-                const v = e.target.value;
-                setTableFilter(v);
-                commitTableFilter(v);
-              }}
-              placeholder='Search symbol, name, type, room, prices, visible/hidden, date…'
-              className='h-9 pl-9'
-              autoComplete='off'
-            />
+          <div className='flex gap-2'>
+            <div className='relative flex-1'>
+              <IconSearch
+                className='text-muted-foreground pointer-events-none absolute top-1/2 left-2.5 h-4 w-4 -translate-y-1/2'
+                aria-hidden
+              />
+              <Input
+                id='market-table-filter'
+                type='search'
+                value={tableFilter}
+                onChange={(e) => setTableFilter(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    applyTableFilter();
+                  }
+                }}
+                placeholder='Search symbol, name, type, room, prices, visible/hidden, date…'
+                className='h-9 pl-9'
+                autoComplete='off'
+              />
+            </div>
+            <Button type='button' className='h-9 shrink-0' onClick={applyTableFilter}>
+              Filter
+            </Button>
           </div>
         </div>
         <div className='flex shrink-0 items-center justify-end gap-2'>

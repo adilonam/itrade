@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs';
 import { z } from 'zod';
 import { ensureUserBalance } from '@/lib/balance';
 import { getAuthSession } from '@/lib/auth';
+import { getProfileImageUrl } from '@/lib/profile-image';
 
 // Validation schemas
 const updateUserSchema = z
@@ -63,6 +64,8 @@ export async function GET(
         id: true,
         name: true,
         email: true,
+        image: true,
+        profileImageContentType: true,
         balances: {
           where: { type: 'REAL' },
           select: { amount: true, type: true }
@@ -91,6 +94,7 @@ export async function GET(
     return NextResponse.json({
       user: {
         ...user,
+        image: getProfileImageUrl(user),
         balance: realAmount,
         realBalance: realAmount,
         institutionalBalance: 0
@@ -204,6 +208,8 @@ export async function PUT(
           id: true,
           name: true,
           email: true,
+          image: true,
+          profileImageContentType: true,
           balances: {
             where: { type: 'REAL' },
             select: { amount: true }
@@ -221,6 +227,7 @@ export async function PUT(
       message: 'User updated successfully',
       user: {
         ...updatedUser,
+        image: getProfileImageUrl(updatedUser),
         balance: updatedUser.balances[0]?.amount ?? 0
       }
     });

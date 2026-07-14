@@ -4,7 +4,8 @@ import type {
   TwelveDataErrorResponse,
   TwelveDataCombinedResponse,
   TwelveDataRsiResponse,
-  TwelveDataEmaResponse
+  TwelveDataEmaResponse,
+  TwelveDataRestPricePayload
 } from '@/types/twelvedata';
 import { prisma } from '@/lib/prisma';
 import {
@@ -122,6 +123,41 @@ class TwelveDataService {
         message: error instanceof Error ? error.message : 'Unknown error'
       };
     }
+  }
+
+  /**
+   * Batch /price calls for WebSocket fallback (one credit per symbol).
+   */
+  async getPricesForSymbols(
+    symbols: string[]
+  ): Promise<Record<string, TwelveDataRestPricePayload | null>> {
+    const unique = Array.from(
+      new Set(symbols.map((s) => s.trim().toUpperCase()))
+    ).filter(Boolean);
+
+    const entries = await Promise.all(
+      unique.map(async (symbol) => {
+        const result = await this.getPrice(symbol);
+        if ('error' in result) return [symbol, null] as const;
+
+        const price = parseFloat(result.price);
+        if (!Number.isFinite(price)) return [symbol, null] as const;
+
+        const payload: TwelveDataRestPricePayload = {
+          event: 'price',
+          symbol,
+          price,
+          timestamp: Math.floor(Date.now() / 1000)
+        };
+        return [symbol, payload] as const;
+      })
+    );
+
+    const out: Record<string, TwelveDataRestPricePayload | null> = {};
+    for (const [symbol, payload] of entries) {
+      out[symbol] = payload;
+    }
+    return out;
   }
 
   /**

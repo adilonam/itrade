@@ -13,8 +13,10 @@ import { tradeNavTitleKey } from '@/lib/trade-nav-i18n';
 import { ModeToggle } from '@/components/layout/ThemeToggle/theme-toggle';
 import { useTranslations } from 'next-intl';
 import { UserNav } from './user-nav';
-import { IconWifi, IconWallet, IconChevronDown } from '@tabler/icons-react';
+import { IconWifi, IconWifiOff, IconWallet, IconChevronDown } from '@tabler/icons-react';
 import { useTradeBalanceSelection } from '@/hooks/use-trade-balance-selection';
+import { MarketsWebSocketStatusModal } from './markets-websocket-status-modal';
+import { useMarketsWebSocket } from '@/contexts/markets-websocket-context';
 import {
   TRADE_BALANCE_TYPES,
   type TradeBalanceType
@@ -45,9 +47,24 @@ type BalanceAmountDisplay = {
   nonNegative: boolean;
 };
 
-const emptyBalanceByType = (): Record<
+type WalletFinancialDisplay = {
+  balance: BalanceAmountDisplay;
+  equity: BalanceAmountDisplay;
+};
+
+function formatSignedDollar(amount: number): BalanceAmountDisplay {
+  const sign = amount >= 0 ? '+' : '-';
+  return {
+    text: `${sign}$${Math.abs(amount).toFixed(2)}`,
+    nonNegative: amount >= 0
+  };
+}
+
+const FINANCIAL_POLL_INTERVAL_MS = 1_000;
+
+const emptyFinancialByType = (): Record<
   TradeBalanceType,
-  BalanceAmountDisplay | null
+  WalletFinancialDisplay | null
 > => ({
   REAL: null,
   DEMO: null
@@ -69,17 +86,28 @@ export function WatchTraderHeader() {
     useTradeBalanceSelection();
   const [time, setTime] = useState(utcClockString);
   const [openBalanceDropdown, setOpenBalanceDropdown] = useState(false);
-  const [balanceByBalanceType, setBalanceByBalanceType] =
-    useState<Record<TradeBalanceType, BalanceAmountDisplay | null>>(
-      emptyBalanceByType
-    );
+  const [wsStatusOpen, setWsStatusOpen] = useState(false);
+  const [financialByBalanceType, setFinancialByBalanceType] = useState<
+    Record<TradeBalanceType, WalletFinancialDisplay | null>
+  >(emptyFinancialByType);
   const balanceDropdownRef = useRef<HTMLDivElement | null>(null);
+  const financialFetchInFlightRef = useRef(false);
+  const {
+    isConnected,
+    isFallbackMode,
+    restOnlyMode,
+    isPriceFeedConnected,
+    priceFeedStatus
+  } = useMarketsWebSocket();
 
   const loadFinancialBalance = useCallback(async () => {
     if (!session?.user) {
-      setBalanceByBalanceType(emptyBalanceByType());
+      setFinancialByBalanceType(emptyFinancialByType());
       return;
     }
+    if (financialFetchInFlightRef.current) return;
+
+    financialFetchInFlightRef.current = true;
     try {
       const responses = await Promise.all(
         TRADE_BALANCE_TYPES.map((balanceType) =>
@@ -91,24 +119,29 @@ export function WatchTraderHeader() {
       const payloads = await Promise.all(
         responses.map((response) => response.json())
       );
-      const nextBalanceByType = TRADE_BALANCE_TYPES.reduce<
-        Record<TradeBalanceType, BalanceAmountDisplay | null>
+      const nextFinancialByType = TRADE_BALANCE_TYPES.reduce<
+        Record<TradeBalanceType, WalletFinancialDisplay | null>
       >((acc, balanceType, index) => {
-        const bal =
+        const balance =
           typeof payloads[index]?.balance === 'number'
             ? payloads[index].balance
             : 0;
-        const sign = bal >= 0 ? '+' : '-';
+        const equity =
+          typeof payloads[index]?.equity === 'number'
+            ? payloads[index].equity
+            : 0;
         acc[balanceType] = {
-          text: `${sign}$${Math.abs(bal).toFixed(2)}`,
-          nonNegative: bal >= 0
+          balance: formatSignedDollar(balance),
+          equity: formatSignedDollar(equity)
         };
         return acc;
-      }, emptyBalanceByType());
+      }, emptyFinancialByType());
 
-      setBalanceByBalanceType(nextBalanceByType);
+      setFinancialByBalanceType(nextFinancialByType);
     } catch {
-      setBalanceByBalanceType(emptyBalanceByType());
+      setFinancialByBalanceType(emptyFinancialByType());
+    } finally {
+      financialFetchInFlightRef.current = false;
     }
   }, [session?.user]);
 
@@ -118,10 +151,18 @@ export function WatchTraderHeader() {
   }, []);
 
   useEffect(() => {
-    loadFinancialBalance();
-    const i = setInterval(loadFinancialBalance, 50_000);
-    return () => clearInterval(i);
-  }, [loadFinancialBalance]);
+    if (!session?.user) {
+      setFinancialByBalanceType(emptyFinancialByType());
+      return;
+    }
+
+    void loadFinancialBalance();
+    const intervalId = setInterval(() => {
+      void loadFinancialBalance();
+    }, FINANCIAL_POLL_INTERVAL_MS);
+
+    return () => clearInterval(intervalId);
+  }, [loadFinancialBalance, session?.user]);
 
   useEffect(() => {
     const onPointerDown = (event: MouseEvent) => {
@@ -154,7 +195,31 @@ export function WatchTraderHeader() {
     tenantNavItems['Room Trading']?.[userRole ?? 'USER'] ??
     tenantNavItems['Room Trading']?.USER ??
     [];
-  const selectedBalanceAmount = balanceByBalanceType[selectedBalanceType];
+  const selectedWalletFinancial = financialByBalanceType[selectedBalanceType];
+  const selectedBalanceAmount = selectedWalletFinancial?.balance ?? null;
+  const isAdminRole = userRole === 'ADMIN' || userRole === 'SUPERADMIN';
+
+  const connectionTitle =
+    priceFeedStatus === 'connecting'
+      ? t('wsStatus.connecting')
+      : isPriceFeedConnected
+        ? isConnected
+          ? isFallbackMode && !restOnlyMode
+            ? t('wsStatus.fallbackActive')
+            : t('connected')
+          : restOnlyMode
+            ? t('wsStatus.restOnlyActive')
+            : isFallbackMode
+              ? t('wsStatus.fallbackActive')
+              : t('connected')
+        : t('wsStatus.disconnected');
+
+  const connectionIconColor =
+    priceFeedStatus === 'connecting'
+      ? 'text-yellow-400'
+      : isPriceFeedConnected
+        ? 'text-[var(--trade-green)]'
+        : 'text-red-400';
 
   return (
     <header className='grid h-11 w-full shrink-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-2 border-b border-[var(--trade-border)] bg-[var(--trade-panel)] px-3 text-[var(--trade-text)]'>
@@ -247,18 +312,18 @@ export function WatchTraderHeader() {
 
           {openBalanceDropdown ? (
             <div
-              className='absolute top-[calc(100%+6px)] right-0 z-30 min-w-[180px] rounded border border-[var(--trade-border)] bg-[var(--trade-panel)] p-1 shadow-lg'
+              className='absolute top-[calc(100%+6px)] right-0 z-30 min-w-[200px] rounded border border-[var(--trade-border)] bg-[var(--trade-panel)] p-1 shadow-lg'
               role='menu'
               aria-label={t('balanceTypeSelector')}
             >
               {TRADE_BALANCE_TYPES.map((balanceType) => {
-                const rowBalance = balanceByBalanceType[balanceType];
+                const rowFinancial = financialByBalanceType[balanceType];
                 return (
                   <button
                     key={balanceType}
                     type='button'
                     className={cn(
-                      'flex w-full items-center justify-between rounded px-2 py-1.5 text-left text-[11px] hover:bg-[var(--trade-dark)]',
+                      'flex w-full flex-col gap-1 rounded px-2 py-1.5 text-left hover:bg-[var(--trade-dark)]',
                       selectedBalanceType === balanceType &&
                         'bg-[var(--trade-dark)]'
                     )}
@@ -268,22 +333,42 @@ export function WatchTraderHeader() {
                       setOpenBalanceDropdown(false);
                     }}
                   >
-                    <span className='font-mono text-[var(--trade-text)]'>
+                    <span className='text-[11px] font-medium text-[var(--trade-text)]'>
                       {balanceLabel[balanceType]}
                     </span>
-                    {rowBalance ? (
-                      <span
-                        className={cn(
-                          'font-mono',
-                          rowBalance.nonNegative
-                            ? 'text-[var(--trade-green)]'
-                            : 'text-red-400'
-                        )}
-                      >
-                        {rowBalance.text}
-                      </span>
+                    {rowFinancial ? (
+                      <div className='flex flex-col gap-0.5 font-mono text-[10px]'>
+                        <div className='flex items-center justify-between gap-3'>
+                          <span className='text-[var(--trade-text-muted)]'>
+                            {t('balance')}
+                          </span>
+                          <span
+                            className={cn(
+                              rowFinancial.balance.nonNegative
+                                ? 'text-[var(--trade-green)]'
+                                : 'text-red-400'
+                            )}
+                          >
+                            {rowFinancial.balance.text}
+                          </span>
+                        </div>
+                        <div className='flex items-center justify-between gap-3'>
+                          <span className='text-[var(--trade-text-muted)]'>
+                            {t('equity')}
+                          </span>
+                          <span
+                            className={cn(
+                              rowFinancial.equity.nonNegative
+                                ? 'text-[var(--trade-green)]'
+                                : 'text-red-400'
+                            )}
+                          >
+                            {rowFinancial.equity.text}
+                          </span>
+                        </div>
+                      </div>
                     ) : (
-                      <span className='font-mono text-[var(--trade-text-muted)]'>
+                      <span className='font-mono text-[10px] text-[var(--trade-text-muted)]'>
                         —
                       </span>
                     )}
@@ -293,12 +378,37 @@ export function WatchTraderHeader() {
             </div>
           ) : null}
         </div>
-        <span
-          className='flex items-center text-[var(--trade-green)]'
-          title={t('connected')}
-        >
-          <IconWifi className='size-4' />
-        </span>
+        {isAdminRole ? (
+          <>
+            <button
+              type='button'
+              className={cn(
+                'flex items-center transition-opacity hover:opacity-80',
+                connectionIconColor
+              )}
+              title={connectionTitle}
+              aria-label={connectionTitle}
+              onClick={() => setWsStatusOpen(true)}
+            >
+              {isPriceFeedConnected || priceFeedStatus === 'connecting' ? (
+                <IconWifi className='size-4' />
+              ) : (
+                <IconWifiOff className='size-4' />
+              )}
+            </button>
+            <MarketsWebSocketStatusModal
+              open={wsStatusOpen}
+              onOpenChange={setWsStatusOpen}
+            />
+          </>
+        ) : (
+          <span
+            className='flex items-center text-[var(--trade-green)]'
+            title={t('connected')}
+          >
+            <IconWifi className='size-4' />
+          </span>
+        )}
         <LanguageMenu variant='trade' />
         <ModeToggle />
         <UserNav variant='trade' />

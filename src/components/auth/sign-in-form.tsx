@@ -87,7 +87,7 @@ export function SignInForm() {
     setIsLoading(true);
     try {
       await signIn('google', {
-        callbackUrl: '/',
+        callbackUrl: '/trade',
         redirect: true
       });
     } finally {

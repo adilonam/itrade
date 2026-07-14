@@ -148,7 +148,10 @@ export function UserManagementSettingsPage() {
       fd.set('dateOfBirth', dob);
       fd.set('gender', gender);
       if (imageFile) fd.set('image', imageFile);
-      const res = await fetch('/api/user/profile', { method: 'PATCH', body: fd });
+      const res = await fetch('/api/user/profile', {
+        method: 'PATCH',
+        body: fd
+      });
       const data = (await res.json()) as { error?: string };
       if (!res.ok) {
         toast.error(data.error ?? 'Save failed');
@@ -172,7 +175,10 @@ export function UserManagementSettingsPage() {
       fd.set('postalCode', postalCode);
       fd.set('city', city);
       fd.set('country', country);
-      const res = await fetch('/api/user/profile', { method: 'PATCH', body: fd });
+      const res = await fetch('/api/user/profile', {
+        method: 'PATCH',
+        body: fd
+      });
       const data = (await res.json()) as { error?: string };
       if (!res.ok) {
         toast.error(data.error ?? 'Save failed');
@@ -239,382 +245,384 @@ export function UserManagementSettingsPage() {
 
   if (loading && !user) {
     return (
-      <div className="flex flex-1 items-center justify-center gap-2 p-12 text-[var(--trade-text-muted)]">
-        <IconLoader2 className="size-6 animate-spin" />
+      <div className='flex flex-1 items-center justify-center gap-2 p-12 text-[var(--trade-text-muted)]'>
+        <IconLoader2 className='size-6 animate-spin' />
         {t('loading')}
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-auto">
-      <UserManagementPageHeader title={t('title')} description={t('description')} />
+    <div className='flex min-h-0 flex-1 flex-col overflow-auto'>
+      <UserManagementPageHeader
+        title={t('title')}
+        description={t('description')}
+      />
 
-      <div className="flex flex-1 flex-col gap-6 p-6">
-        <div className="mx-auto w-full max-w-3xl space-y-4">
-              <section className="rounded-xl border border-[var(--trade-border)] bg-[var(--trade-panel)] p-6 shadow-sm">
-                <h2 className="text-sm font-semibold text-[var(--trade-text)]">
-                  Profile
-                </h2>
-                <p className="mt-1 text-xs text-[var(--trade-text-muted)]">
-                  Your name and contact details as they appear on your account.
-                </p>
+      <div className='flex flex-1 flex-col gap-6 p-6'>
+        <div className='mx-auto w-full max-w-3xl space-y-4'>
+          <section className='rounded-xl border border-[var(--trade-border)] bg-[var(--trade-panel)] p-6 shadow-sm'>
+            <h2 className='text-sm font-semibold text-[var(--trade-text)]'>
+              Profile
+            </h2>
+            <p className='mt-1 text-xs text-[var(--trade-text-muted)]'>
+              Your name and contact details as they appear on your account.
+            </p>
 
-                <div className="mt-6 flex flex-col gap-6 sm:flex-row">
-                  <div className="flex flex-col items-start gap-2">
-                    <div className="relative flex size-28 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)]">
-                      {avatarSrc ? (
-                        <Image
-                          src={avatarSrc}
-                          alt=""
-                          width={112}
-                          height={112}
-                          className="size-full object-cover"
-                          unoptimized={
-                            avatarSrc.startsWith('blob:') ||
-                            avatarSrc.startsWith('data:')
-                          }
-                        />
-                      ) : (
-                        <IconPhoto
-                          className="size-10 text-[var(--trade-text-muted)]"
-                          stroke={1.25}
-                        />
-                      )}
-                    </div>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="sr-only"
-                      id="settings-avatar"
-                      onChange={(e) =>
-                        onPickImage(e.target.files?.[0] ?? null)
+            <div className='mt-6 flex flex-col gap-6 sm:flex-row'>
+              <div className='flex flex-col items-start gap-2'>
+                <div className='relative flex size-28 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)]'>
+                  {avatarSrc ? (
+                    <Image
+                      src={avatarSrc}
+                      alt=''
+                      width={112}
+                      height={112}
+                      className='size-full object-cover'
+                      unoptimized={
+                        avatarSrc.startsWith('blob:') ||
+                        avatarSrc.startsWith('data:') ||
+                        avatarSrc.startsWith('/api/user/profile-images/')
                       }
                     />
-                    <label
-                      htmlFor="settings-avatar"
-                      className="cursor-pointer rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)] px-3 py-2 text-xs font-medium text-[var(--trade-text)] hover:bg-[var(--trade-border)]/40"
-                    >
-                      Upload photo
-                    </label>
-                  </div>
-
-                  <div className="grid min-w-0 flex-1 gap-4 sm:grid-cols-2">
-                    <div>
-                      <label
-                        htmlFor="fn"
-                        className="text-xs font-medium text-[var(--trade-text-muted)]"
-                      >
-                        First name
-                      </label>
-                      <input
-                        id="fn"
-                        value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)}
-                        className="mt-1.5 w-full rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)] px-3 py-2 text-sm text-[var(--trade-text)] outline-none focus:border-[var(--trade-accent-blue)] focus:ring-2 focus:ring-[var(--trade-accent-blue)]/25"
-                      />
-                    </div>
-                    <div>
-                      <label
-                        htmlFor="ln"
-                        className="text-xs font-medium text-[var(--trade-text-muted)]"
-                      >
-                        Last name
-                      </label>
-                      <input
-                        id="ln"
-                        value={lastName}
-                        onChange={(e) => setLastName(e.target.value)}
-                        className="mt-1.5 w-full rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)] px-3 py-2 text-sm text-[var(--trade-text)] outline-none focus:border-[var(--trade-accent-blue)] focus:ring-2 focus:ring-[var(--trade-accent-blue)]/25"
-                      />
-                    </div>
-                    <div className="sm:col-span-2">
-                      <label
-                        htmlFor="em"
-                        className="text-xs font-medium text-[var(--trade-text-muted)]"
-                      >
-                        Email
-                      </label>
-                      <input
-                        id="em"
-                        readOnly
-                        value={user?.email ?? ''}
-                        className="mt-1.5 w-full cursor-not-allowed rounded-lg border border-[var(--trade-border)] bg-[var(--trade-border)]/30 px-3 py-2 text-sm text-[var(--trade-text-muted)]"
-                      />
-                    </div>
-                    <div className="sm:col-span-2">
-                      <label
-                        htmlFor="ph"
-                        className="text-xs font-medium text-[var(--trade-text-muted)]"
-                      >
-                        Phone
-                      </label>
-                      <input
-                        id="ph"
-                        type="tel"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        className="mt-1.5 w-full rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)] px-3 py-2 text-sm text-[var(--trade-text)] outline-none focus:border-[var(--trade-accent-blue)] focus:ring-2 focus:ring-[var(--trade-accent-blue)]/25"
-                      />
-                    </div>
-                    <div>
-                      <label
-                        htmlFor="dob"
-                        className="text-xs font-medium text-[var(--trade-text-muted)]"
-                      >
-                        Date of birth
-                      </label>
-                      <input
-                        id="dob"
-                        type="date"
-                        value={dob}
-                        onChange={(e) => setDob(e.target.value)}
-                        className="mt-1.5 w-full rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)] px-3 py-2 text-sm text-[var(--trade-text)] outline-none focus:border-[var(--trade-accent-blue)] focus:ring-2 focus:ring-[var(--trade-accent-blue)]/25"
-                      />
-                    </div>
-                    <div>
-                      <span className="text-xs font-medium text-[var(--trade-text-muted)]">
-                        Gender
-                      </span>
-                      <div className="mt-1.5 flex flex-wrap gap-2">
-                        {['male', 'female', 'other'].map((g) => (
-                          <button
-                            key={g}
-                            type="button"
-                            onClick={() => setGender(g)}
-                            className={cn(
-                              'rounded-lg border px-3 py-2 text-xs font-medium capitalize transition-colors',
-                              gender === g
-                                ? 'border-[var(--trade-accent-blue)] bg-[var(--trade-accent-blue)]/15 text-[var(--trade-accent-blue)]'
-                                : 'border-[var(--trade-border)] bg-[var(--trade-dark)] text-[var(--trade-text)] hover:border-[var(--trade-text-muted)]/40'
-                            )}
-                          >
-                            {g}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-6 flex justify-end">
-                  <button
-                    type="button"
-                    onClick={() => void saveProfile()}
-                    disabled={savingProfile}
-                    className="inline-flex min-w-[120px] items-center justify-center gap-2 rounded-lg bg-[#45a29e] px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50"
-                  >
-                    {savingProfile ? (
-                      <IconLoader2 className="size-4 animate-spin" />
-                    ) : null}
-                    Save
-                  </button>
-                </div>
-              </section>
-
-              <Collapsible open={addrOpen} onOpenChange={setAddrOpen}>
-                <div className="rounded-xl border border-[var(--trade-border)] bg-[var(--trade-panel)] shadow-sm">
-                  <CollapsibleTrigger className="flex w-full items-center justify-between gap-2 px-6 py-4 text-left">
-                    <span className="text-sm font-semibold text-[var(--trade-text)]">
-                      Address
-                    </span>
-                    <IconChevronDown
-                      className={cn(
-                        'size-5 text-[var(--trade-text-muted)] transition-transform',
-                        addrOpen && 'rotate-180'
-                      )}
+                  ) : (
+                    <IconPhoto
+                      className='size-10 text-[var(--trade-text-muted)]'
+                      stroke={1.25}
                     />
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <div className="space-y-4 border-t border-[var(--trade-border)] px-6 py-4">
+                  )}
+                </div>
+                <input
+                  type='file'
+                  accept='image/*'
+                  className='sr-only'
+                  id='settings-avatar'
+                  onChange={(e) => onPickImage(e.target.files?.[0] ?? null)}
+                />
+                <label
+                  htmlFor='settings-avatar'
+                  className='cursor-pointer rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)] px-3 py-2 text-xs font-medium text-[var(--trade-text)] hover:bg-[var(--trade-border)]/40'
+                >
+                  Upload photo
+                </label>
+              </div>
+
+              <div className='grid min-w-0 flex-1 gap-4 sm:grid-cols-2'>
+                <div>
+                  <label
+                    htmlFor='fn'
+                    className='text-xs font-medium text-[var(--trade-text-muted)]'
+                  >
+                    First name
+                  </label>
+                  <input
+                    id='fn'
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    className='mt-1.5 w-full rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)] px-3 py-2 text-sm text-[var(--trade-text)] outline-none focus:border-[var(--trade-accent-blue)] focus:ring-2 focus:ring-[var(--trade-accent-blue)]/25'
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor='ln'
+                    className='text-xs font-medium text-[var(--trade-text-muted)]'
+                  >
+                    Last name
+                  </label>
+                  <input
+                    id='ln'
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    className='mt-1.5 w-full rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)] px-3 py-2 text-sm text-[var(--trade-text)] outline-none focus:border-[var(--trade-accent-blue)] focus:ring-2 focus:ring-[var(--trade-accent-blue)]/25'
+                  />
+                </div>
+                <div className='sm:col-span-2'>
+                  <label
+                    htmlFor='em'
+                    className='text-xs font-medium text-[var(--trade-text-muted)]'
+                  >
+                    Email
+                  </label>
+                  <input
+                    id='em'
+                    readOnly
+                    value={user?.email ?? ''}
+                    className='mt-1.5 w-full cursor-not-allowed rounded-lg border border-[var(--trade-border)] bg-[var(--trade-border)]/30 px-3 py-2 text-sm text-[var(--trade-text-muted)]'
+                  />
+                </div>
+                <div className='sm:col-span-2'>
+                  <label
+                    htmlFor='ph'
+                    className='text-xs font-medium text-[var(--trade-text-muted)]'
+                  >
+                    Phone
+                  </label>
+                  <input
+                    id='ph'
+                    type='tel'
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className='mt-1.5 w-full rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)] px-3 py-2 text-sm text-[var(--trade-text)] outline-none focus:border-[var(--trade-accent-blue)] focus:ring-2 focus:ring-[var(--trade-accent-blue)]/25'
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor='dob'
+                    className='text-xs font-medium text-[var(--trade-text-muted)]'
+                  >
+                    Date of birth
+                  </label>
+                  <input
+                    id='dob'
+                    type='date'
+                    value={dob}
+                    onChange={(e) => setDob(e.target.value)}
+                    className='mt-1.5 w-full rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)] px-3 py-2 text-sm text-[var(--trade-text)] outline-none focus:border-[var(--trade-accent-blue)] focus:ring-2 focus:ring-[var(--trade-accent-blue)]/25'
+                  />
+                </div>
+                <div>
+                  <span className='text-xs font-medium text-[var(--trade-text-muted)]'>
+                    Gender
+                  </span>
+                  <div className='mt-1.5 flex flex-wrap gap-2'>
+                    {['male', 'female', 'other'].map((g) => (
+                      <button
+                        key={g}
+                        type='button'
+                        onClick={() => setGender(g)}
+                        className={cn(
+                          'rounded-lg border px-3 py-2 text-xs font-medium capitalize transition-colors',
+                          gender === g
+                            ? 'border-[var(--trade-accent-blue)] bg-[var(--trade-accent-blue)]/15 text-[var(--trade-accent-blue)]'
+                            : 'border-[var(--trade-border)] bg-[var(--trade-dark)] text-[var(--trade-text)] hover:border-[var(--trade-text-muted)]/40'
+                        )}
+                      >
+                        {g}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className='mt-6 flex justify-end'>
+              <button
+                type='button'
+                onClick={() => void saveProfile()}
+                disabled={savingProfile}
+                className='inline-flex min-w-[120px] items-center justify-center gap-2 rounded-lg bg-[#45a29e] px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50'
+              >
+                {savingProfile ? (
+                  <IconLoader2 className='size-4 animate-spin' />
+                ) : null}
+                Save
+              </button>
+            </div>
+          </section>
+
+          <Collapsible open={addrOpen} onOpenChange={setAddrOpen}>
+            <div className='rounded-xl border border-[var(--trade-border)] bg-[var(--trade-panel)] shadow-sm'>
+              <CollapsibleTrigger className='flex w-full items-center justify-between gap-2 px-6 py-4 text-left'>
+                <span className='text-sm font-semibold text-[var(--trade-text)]'>
+                  Address
+                </span>
+                <IconChevronDown
+                  className={cn(
+                    'size-5 text-[var(--trade-text-muted)] transition-transform',
+                    addrOpen && 'rotate-180'
+                  )}
+                />
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <div className='space-y-4 border-t border-[var(--trade-border)] px-6 py-4'>
+                  <div>
+                    <label
+                      htmlFor='addr1'
+                      className='text-xs font-medium text-[var(--trade-text-muted)]'
+                    >
+                      Full address
+                    </label>
+                    <textarea
+                      id='addr1'
+                      rows={3}
+                      value={address}
+                      onChange={(e) => setAddress(e.target.value)}
+                      className='mt-1.5 w-full rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)] px-3 py-2 text-sm text-[var(--trade-text)] outline-none focus:border-[var(--trade-accent-blue)] focus:ring-2 focus:ring-[var(--trade-accent-blue)]/25'
+                    />
+                  </div>
+                  <div className='grid gap-4 sm:grid-cols-2'>
+                    <div>
+                      <label
+                        htmlFor='ct'
+                        className='text-xs font-medium text-[var(--trade-text-muted)]'
+                      >
+                        Country
+                      </label>
+                      <select
+                        id='ct'
+                        value={country}
+                        onChange={(e) => setCountry(e.target.value)}
+                        className='mt-1.5 w-full rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)] px-3 py-2 text-sm text-[var(--trade-text)] outline-none focus:border-[var(--trade-accent-blue)] focus:ring-2 focus:ring-[var(--trade-accent-blue)]/25'
+                      >
+                        <option value=''>Select country</option>
+                        {COUNTRIES.map((c) => (
+                          <option key={c.value} value={c.value}>
+                            {c.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label
+                        htmlFor='city'
+                        className='text-xs font-medium text-[var(--trade-text-muted)]'
+                      >
+                        City
+                      </label>
+                      <input
+                        id='city'
+                        value={city}
+                        onChange={(e) => setCity(e.target.value)}
+                        className='mt-1.5 w-full rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)] px-3 py-2 text-sm text-[var(--trade-text)] outline-none focus:border-[var(--trade-accent-blue)] focus:ring-2 focus:ring-[var(--trade-accent-blue)]/25'
+                      />
+                    </div>
+                    <div className='sm:col-span-2'>
+                      <label
+                        htmlFor='zip'
+                        className='text-xs font-medium text-[var(--trade-text-muted)]'
+                      >
+                        Postal code
+                      </label>
+                      <input
+                        id='zip'
+                        value={postalCode}
+                        onChange={(e) => setPostalCode(e.target.value)}
+                        className='mt-1.5 w-full rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)] px-3 py-2 text-sm text-[var(--trade-text)] outline-none focus:border-[var(--trade-accent-blue)] focus:ring-2 focus:ring-[var(--trade-accent-blue)]/25'
+                      />
+                    </div>
+                  </div>
+                  <div className='flex justify-end pt-2'>
+                    <button
+                      type='button'
+                      onClick={() => void saveAddress()}
+                      disabled={savingAddress}
+                      className='inline-flex min-w-[120px] items-center justify-center gap-2 rounded-lg bg-[#45a29e] px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50'
+                    >
+                      {savingAddress ? (
+                        <IconLoader2 className='size-4 animate-spin' />
+                      ) : null}
+                      Save
+                    </button>
+                  </div>
+                </div>
+              </CollapsibleContent>
+            </div>
+          </Collapsible>
+
+          <Collapsible open={secOpen} onOpenChange={setSecOpen}>
+            <div className='rounded-xl border border-[var(--trade-border)] bg-[var(--trade-panel)] shadow-sm'>
+              <CollapsibleTrigger className='flex w-full items-center justify-between gap-2 px-6 py-4 text-left'>
+                <span className='text-sm font-semibold text-[var(--trade-text)]'>
+                  Privacy and security
+                </span>
+                <IconChevronDown
+                  className={cn(
+                    'size-5 text-[var(--trade-text-muted)] transition-transform',
+                    secOpen && 'rotate-180'
+                  )}
+                />
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <div className='space-y-4 border-t border-[var(--trade-border)] px-6 py-4'>
+                  <div className='flex gap-3 rounded-lg border border-[var(--trade-green)]/40 bg-[var(--trade-green)]/10 px-4 py-3 text-sm text-[var(--trade-text)]'>
+                    <IconLock
+                      className='mt-0.5 size-5 shrink-0 text-[var(--trade-green)]'
+                      stroke={1.75}
+                    />
+                    <p>
+                      Two-factor authentication is enforced when your account
+                      uses email verification at sign-in. Keep your email secure
+                      to protect your account.
+                    </p>
+                  </div>
+
+                  {!editingPw ? (
+                    <div className='flex flex-wrap items-center justify-between gap-3'>
                       <div>
-                        <label
-                          htmlFor="addr1"
-                          className="text-xs font-medium text-[var(--trade-text-muted)]"
-                        >
-                          Full address
-                        </label>
-                        <textarea
-                          id="addr1"
-                          rows={3}
-                          value={address}
-                          onChange={(e) => setAddress(e.target.value)}
-                          className="mt-1.5 w-full rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)] px-3 py-2 text-sm text-[var(--trade-text)] outline-none focus:border-[var(--trade-accent-blue)] focus:ring-2 focus:ring-[var(--trade-accent-blue)]/25"
+                        <p className='text-xs font-medium text-[var(--trade-text-muted)]'>
+                          Password
+                        </p>
+                        <p className='mt-1 font-mono text-sm text-[var(--trade-text)]'>
+                          ••••••••••••
+                        </p>
+                      </div>
+                      <button
+                        type='button'
+                        onClick={() => setEditingPw(true)}
+                        className='text-sm font-medium text-[var(--trade-accent-blue)] hover:underline'
+                      >
+                        Edit password
+                      </button>
+                    </div>
+                  ) : (
+                    <div className='max-w-md space-y-3'>
+                      {user?.hasPassword ? (
+                        <PwField
+                          id='cur'
+                          label='Current password'
+                          value={currentPw}
+                          onChange={setCurrentPw}
+                          show={showPw.cur}
+                          onToggle={() => togglePw('cur')}
                         />
-                      </div>
-                      <div className="grid gap-4 sm:grid-cols-2">
-                        <div>
-                          <label
-                            htmlFor="ct"
-                            className="text-xs font-medium text-[var(--trade-text-muted)]"
-                          >
-                            Country
-                          </label>
-                          <select
-                            id="ct"
-                            value={country}
-                            onChange={(e) => setCountry(e.target.value)}
-                            className="mt-1.5 w-full rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)] px-3 py-2 text-sm text-[var(--trade-text)] outline-none focus:border-[var(--trade-accent-blue)] focus:ring-2 focus:ring-[var(--trade-accent-blue)]/25"
-                          >
-                            <option value="">Select country</option>
-                            {COUNTRIES.map((c) => (
-                              <option key={c.value} value={c.value}>
-                                {c.label}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                        <div>
-                          <label
-                            htmlFor="city"
-                            className="text-xs font-medium text-[var(--trade-text-muted)]"
-                          >
-                            City
-                          </label>
-                          <input
-                            id="city"
-                            value={city}
-                            onChange={(e) => setCity(e.target.value)}
-                            className="mt-1.5 w-full rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)] px-3 py-2 text-sm text-[var(--trade-text)] outline-none focus:border-[var(--trade-accent-blue)] focus:ring-2 focus:ring-[var(--trade-accent-blue)]/25"
-                          />
-                        </div>
-                        <div className="sm:col-span-2">
-                          <label
-                            htmlFor="zip"
-                            className="text-xs font-medium text-[var(--trade-text-muted)]"
-                          >
-                            Postal code
-                          </label>
-                          <input
-                            id="zip"
-                            value={postalCode}
-                            onChange={(e) => setPostalCode(e.target.value)}
-                            className="mt-1.5 w-full rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)] px-3 py-2 text-sm text-[var(--trade-text)] outline-none focus:border-[var(--trade-accent-blue)] focus:ring-2 focus:ring-[var(--trade-accent-blue)]/25"
-                          />
-                        </div>
-                      </div>
-                      <div className="flex justify-end pt-2">
+                      ) : null}
+                      <PwField
+                        id='nw'
+                        label='New password'
+                        value={newPw}
+                        onChange={setNewPw}
+                        show={showPw.nw}
+                        onToggle={() => togglePw('nw')}
+                      />
+                      <PwField
+                        id='cf'
+                        label='Confirm new password'
+                        value={confirmPw}
+                        onChange={setConfirmPw}
+                        show={showPw.cf}
+                        onToggle={() => togglePw('cf')}
+                      />
+                      <div className='flex flex-wrap gap-2 pt-2'>
                         <button
-                          type="button"
-                          onClick={() => void saveAddress()}
-                          disabled={savingAddress}
-                          className="inline-flex min-w-[120px] items-center justify-center gap-2 rounded-lg bg-[#45a29e] px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50"
+                          type='button'
+                          onClick={() => {
+                            setEditingPw(false);
+                            setCurrentPw('');
+                            setNewPw('');
+                            setConfirmPw('');
+                          }}
+                          className='rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)] px-4 py-2 text-sm font-medium text-[var(--trade-text)] hover:bg-[var(--trade-border)]/40'
                         >
-                          {savingAddress ? (
-                            <IconLoader2 className="size-4 animate-spin" />
+                          Cancel
+                        </button>
+                        <button
+                          type='button'
+                          onClick={() => void savePassword()}
+                          disabled={savingPw}
+                          className='inline-flex items-center gap-2 rounded-lg bg-[#45a29e] px-4 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50'
+                        >
+                          {savingPw ? (
+                            <IconLoader2 className='size-4 animate-spin' />
                           ) : null}
                           Save
                         </button>
                       </div>
                     </div>
-                  </CollapsibleContent>
+                  )}
                 </div>
-              </Collapsible>
-
-              <Collapsible open={secOpen} onOpenChange={setSecOpen}>
-                <div className="rounded-xl border border-[var(--trade-border)] bg-[var(--trade-panel)] shadow-sm">
-                  <CollapsibleTrigger className="flex w-full items-center justify-between gap-2 px-6 py-4 text-left">
-                    <span className="text-sm font-semibold text-[var(--trade-text)]">
-                      Privacy and security
-                    </span>
-                    <IconChevronDown
-                      className={cn(
-                        'size-5 text-[var(--trade-text-muted)] transition-transform',
-                        secOpen && 'rotate-180'
-                      )}
-                    />
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <div className="space-y-4 border-t border-[var(--trade-border)] px-6 py-4">
-                      <div className="flex gap-3 rounded-lg border border-[var(--trade-green)]/40 bg-[var(--trade-green)]/10 px-4 py-3 text-sm text-[var(--trade-text)]">
-                        <IconLock
-                          className="mt-0.5 size-5 shrink-0 text-[var(--trade-green)]"
-                          stroke={1.75}
-                        />
-                        <p>
-                          Two-factor authentication is enforced when your
-                          account uses email verification at sign-in. Keep your
-                          email secure to protect your account.
-                        </p>
-                      </div>
-
-                      {!editingPw ? (
-                        <div className="flex flex-wrap items-center justify-between gap-3">
-                          <div>
-                            <p className="text-xs font-medium text-[var(--trade-text-muted)]">
-                              Password
-                            </p>
-                            <p className="mt-1 font-mono text-sm text-[var(--trade-text)]">
-                              ••••••••••••
-                            </p>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => setEditingPw(true)}
-                            className="text-sm font-medium text-[var(--trade-accent-blue)] hover:underline"
-                          >
-                            Edit password
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="space-y-3 max-w-md">
-                          {user?.hasPassword ? (
-                            <PwField
-                              id="cur"
-                              label="Current password"
-                              value={currentPw}
-                              onChange={setCurrentPw}
-                              show={showPw.cur}
-                              onToggle={() => togglePw('cur')}
-                            />
-                          ) : null}
-                          <PwField
-                            id="nw"
-                            label="New password"
-                            value={newPw}
-                            onChange={setNewPw}
-                            show={showPw.nw}
-                            onToggle={() => togglePw('nw')}
-                          />
-                          <PwField
-                            id="cf"
-                            label="Confirm new password"
-                            value={confirmPw}
-                            onChange={setConfirmPw}
-                            show={showPw.cf}
-                            onToggle={() => togglePw('cf')}
-                          />
-                          <div className="flex flex-wrap gap-2 pt-2">
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setEditingPw(false);
-                                setCurrentPw('');
-                                setNewPw('');
-                                setConfirmPw('');
-                              }}
-                              className="rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)] px-4 py-2 text-sm font-medium text-[var(--trade-text)] hover:bg-[var(--trade-border)]/40"
-                            >
-                              Cancel
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => void savePassword()}
-                              disabled={savingPw}
-                              className="inline-flex items-center gap-2 rounded-lg bg-[#45a29e] px-4 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50"
-                            >
-                              {savingPw ? (
-                                <IconLoader2 className="size-4 animate-spin" />
-                              ) : null}
-                              Save
-                            </button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </CollapsibleContent>
-                </div>
-              </Collapsible>
+              </CollapsibleContent>
+            </div>
+          </Collapsible>
         </div>
       </div>
     </div>
@@ -640,31 +648,29 @@ function PwField({
     <div>
       <label
         htmlFor={id}
-        className="text-xs font-medium text-[var(--trade-text-muted)]"
+        className='text-xs font-medium text-[var(--trade-text-muted)]'
       >
         {label}
       </label>
-      <div className="relative mt-1.5">
+      <div className='relative mt-1.5'>
         <input
           id={id}
           type={show ? 'text' : 'password'}
-          autoComplete={
-            id === 'cur' ? 'current-password' : 'new-password'
-          }
+          autoComplete={id === 'cur' ? 'current-password' : 'new-password'}
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)] py-2 pl-3 pr-10 text-sm text-[var(--trade-text)] outline-none focus:border-[var(--trade-accent-blue)] focus:ring-2 focus:ring-[var(--trade-accent-blue)]/25"
+          className='w-full rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)] py-2 pr-10 pl-3 text-sm text-[var(--trade-text)] outline-none focus:border-[var(--trade-accent-blue)] focus:ring-2 focus:ring-[var(--trade-accent-blue)]/25'
         />
         <button
-          type="button"
+          type='button'
           onClick={onToggle}
-          className="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--trade-text-muted)] hover:text-[var(--trade-text)]"
+          className='absolute top-1/2 right-2 -translate-y-1/2 text-[var(--trade-text-muted)] hover:text-[var(--trade-text)]'
           aria-label={show ? 'Hide password' : 'Show password'}
         >
           {show ? (
-            <IconEyeOff className="size-4" />
+            <IconEyeOff className='size-4' />
           ) : (
-            <IconEye className="size-4" />
+            <IconEye className='size-4' />
           )}
         </button>
       </div>

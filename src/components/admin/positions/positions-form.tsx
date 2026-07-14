@@ -39,6 +39,8 @@ interface PositionFormProps {
   position?: PositionWithRelations | null;
   onClose: () => void;
   onSuccess: () => void;
+  /** Hide REAL balance preview (client-positions admin page) */
+  hideBalanceInfo?: boolean;
 }
 
 type AdminUserRow = {
@@ -56,7 +58,8 @@ function formatDatetimeLocal(d: Date): string {
 export function PositionForm({
   position,
   onClose,
-  onSuccess
+  onSuccess,
+  hideBalanceInfo = false
 }: PositionFormProps) {
   const [formData, setFormData] = useState(() => ({
     userId: '',
@@ -66,6 +69,7 @@ export function PositionForm({
     marketId: '',
     quantity: '',
     executedPrice: '',
+    closedPrice: '',
     takeProfit: '',
     stopLoss: '',
     description: '',
@@ -130,6 +134,8 @@ export function PositionForm({
           position.executedPrice != null
             ? String(position.executedPrice)
             : '',
+        closedPrice:
+          position.closedPrice != null ? String(position.closedPrice) : '',
         takeProfit:
           position.takeProfit != null ? String(position.takeProfit) : '',
         stopLoss: position.stopLoss != null ? String(position.stopLoss) : '',
@@ -146,9 +152,11 @@ export function PositionForm({
         pnl: position.pnl?.toString() || ''
       });
       setUserEmailQuery(position.user?.email ?? '');
-      void loadUserBalances(position.userId);
+      if (!hideBalanceInfo) {
+        void loadUserBalances(position.userId);
+      }
     }
-  }, [position, loadUserBalances]);
+  }, [position, loadUserBalances, hideBalanceInfo]);
 
   useEffect(() => {
     if (position) return;
@@ -246,6 +254,7 @@ export function PositionForm({
 
       const takeProfit = parseTpSl(formData.takeProfit, 'Take profit');
       const stopLoss = parseTpSl(formData.stopLoss, 'Stop loss');
+      const closedPrice = parseTpSl(formData.closedPrice, 'Closed price');
 
       const data: Record<string, unknown> = {
         userId: formData.userId,
@@ -255,6 +264,7 @@ export function PositionForm({
         marketId: formData.marketId,
         quantity,
         executedPrice,
+        closedPrice,
         takeProfit,
         stopLoss,
         description: formData.description || undefined,
@@ -409,7 +419,7 @@ export function PositionForm({
               )}
             </div>
 
-            {realBalance !== null && (
+            {realBalance !== null && !hideBalanceInfo && (
               <div className='bg-muted/40 md:col-span-2 grid grid-cols-1 gap-3 rounded-lg border p-3'>
                 <div>
                   <p className='text-muted-foreground text-xs'>
@@ -590,6 +600,21 @@ export function PositionForm({
                 value={formData.stopLoss}
                 onChange={(e) => handleInputChange('stopLoss', e.target.value)}
                 placeholder='Price level'
+              />
+            </div>
+
+            {/* Closed price */}
+            <div className='space-y-2'>
+              <Label htmlFor='closedPrice'>Closed price (optional)</Label>
+              <Input
+                id='closedPrice'
+                type='number'
+                step='0.0001'
+                value={formData.closedPrice}
+                onChange={(e) =>
+                  handleInputChange('closedPrice', e.target.value)
+                }
+                placeholder='0.0000'
               />
             </div>
 

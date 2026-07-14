@@ -10,9 +10,6 @@ services:
     command: sleep infinity
     depends_on:
       - db
-    ports:
-      - '3000:3000' # Forward Next.js port
-      - '3001:3001' # Forward backup port
 
   db:
     image: postgres:15
@@ -22,8 +19,6 @@ services:
       POSTGRES_PASSWORD: trading_password
       POSTGRES_DB: trading_app_db
       POSTGRES_HOST_AUTH_METHOD: trust
-    ports:
-      - '5432:5432'
     volumes:
       - postgres-data-itrade:/var/lib/postgresql/data
 

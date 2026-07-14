@@ -40,6 +40,10 @@ function isMarketItem(item: SymbolItem): item is Market {
   return 'room' in item && typeof (item as Market).room === 'string';
 }
 
+function getItemType(item: SymbolItem): Market['type'] | string {
+  return isMarketItem(item) ? item.type : (item as { type: string }).type;
+}
+
 export const MOBILE_TRADING_PANEL_SIZE = 48;
 
 type TradingRoomShellContextValue = {
@@ -197,8 +201,9 @@ export function TradingRoomShellProvider({ children }: { children: React.ReactNo
       }
       return;
     }
-    if (!selectedSymbolId && symbols[0]) {
-      const first = symbols[0];
+    if (!selectedSymbolId && symbols.length > 0) {
+      const first =
+        symbols.find((s) => getItemType(s) === 'FOREX') ?? symbols[0];
       setSelectedSymbolId(first.id);
       if (isMarketItem(first)) setSelectedMarket(first);
     }
