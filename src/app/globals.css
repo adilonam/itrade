@@ -204,6 +204,51 @@ html:not(.dark) .watch-trader-shell {
   }
 }
 
+@keyframes pnl-flash-up {
+  0% {
+    transform: translateY(0);
+    filter: brightness(1);
+  }
+  35% {
+    transform: translateY(-3px);
+    filter: brightness(1.35);
+  }
+  100% {
+    transform: translateY(0);
+    filter: brightness(1);
+  }
+}
+
+@keyframes pnl-flash-down {
+  0% {
+    transform: translateY(0);
+    filter: brightness(1);
+  }
+  35% {
+    transform: translateY(3px);
+    filter: brightness(1.35);
+  }
+  100% {
+    transform: translateY(0);
+    filter: brightness(1);
+  }
+}
+
+.animate-pnl-flash-up {
+  animation: pnl-flash-up 0.4s ease-out;
+}
+
+.animate-pnl-flash-down {
+  animation: pnl-flash-down 0.4s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-pnl-flash-up,
+  .animate-pnl-flash-down {
+    animation: none;
+  }
+}
+
 @keyframes reveal {
   from {
     /* Use CSS variables for the origin, defaulting to center if not set */

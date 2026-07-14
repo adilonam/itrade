@@ -31,7 +31,6 @@ import {
 type KycDocument = {
   id: string;
   kind: 'FRONT' | 'BACK' | 'SELFIE' | 'UTILITY_BILL';
-  fileUrl: string;
 };
 
 type KycRequestRow = {

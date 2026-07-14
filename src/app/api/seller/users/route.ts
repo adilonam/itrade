@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 import { getAuthSession } from '@/lib/auth';
+import { getProfileImageUrl } from '@/lib/profile-image';
 
 // Validation schema
 const getSellerUsersSchema = z.object({
@@ -84,6 +85,8 @@ export async function GET(request: NextRequest) {
           id: true,
           name: true,
           email: true,
+          image: true,
+          profileImageContentType: true,
           balances: {
             where: { type: 'REAL' },
             select: { amount: true }
@@ -110,6 +113,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       users: users.map((user) => ({
         ...user,
+        image: getProfileImageUrl(user),
         balance: user.balances[0]?.amount ?? 0
       })),
       pagination: {

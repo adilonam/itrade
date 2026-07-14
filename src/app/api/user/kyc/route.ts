@@ -1,22 +1,9 @@
-import { getBlobPutOptions } from '@/lib/blob-upload';
 import { getAuthSession } from '@/lib/auth';
+import { fileToKycPayload } from '@/lib/kyc-file';
 import { prisma } from '@/lib/prisma';
-import { put } from '@vercel/blob';
 import { NextRequest, NextResponse } from 'next/server';
 
 const DOC_TYPES = ['passport', 'national_id', 'drivers_license'] as const;
-
-async function uploadKycFile(userId: string, label: string, ts: number, file: File) {
-  const ext = file.name.split('.').pop() || 'jpg';
-  const filename = `kyc-${userId}-${label}-${ts}.${ext}`;
-  const blobOpts = await getBlobPutOptions();
-  const blob = await put(filename, file, {
-    access: 'private',
-    addRandomSuffix: true,
-    ...blobOpts
-  });
-  return blob.url;
-}
 
 export async function GET() {
   try {
@@ -29,11 +16,7 @@ export async function GET() {
       where: { id: session.user.id },
       select: {
         kycStatus: true,
-        kycDocumentType: true,
-        kycFrontImageUrl: true,
-        kycBackImageUrl: true,
-        kycSelfieUrl: true,
-        kycUtilityBillUrl: true
+        kycDocumentType: true
       }
     });
 
@@ -56,10 +39,6 @@ export async function GET() {
     return NextResponse.json({
       kycStatus: user.kycStatus,
       kycDocumentType: user.kycDocumentType,
-      hasFront: !!user.kycFrontImageUrl,
-      hasBack: !!user.kycBackImageUrl,
-      hasSelfie: !!user.kycSelfieUrl,
-      hasUtilityBill: !!user.kycUtilityBillUrl,
       requests
     });
   } catch {
@@ -146,14 +125,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const uid = session.user.id;
-    const ts = Date.now();
-
-    const [frontUrl, backUrl, selfieUrl, billUrl] = await Promise.all([
-      uploadKycFile(uid, 'front', ts, front),
-      uploadKycFile(uid, 'back', ts, back),
-      uploadKycFile(uid, 'selfie', ts, selfie),
-      uploadKycFile(uid, 'utility', ts, utilityBill)
+    const [frontFile, backFile, selfieFile, billFile] = await Promise.all([
+      fileToKycPayload(front),
+      fileToKycPayload(back),
+      fileToKycPayload(selfie),
+      fileToKycPayload(utilityBill)
     ]);
 
     await prisma.$transaction(async (tx) => {
@@ -161,10 +137,6 @@ export async function POST(request: NextRequest) {
         where: { id: session.user.id },
         data: {
           kycDocumentType: documentType,
-          kycFrontImageUrl: frontUrl,
-          kycBackImageUrl: backUrl,
-          kycSelfieUrl: selfieUrl,
-          kycUtilityBillUrl: billUrl,
           kycStatus: 'PENDING'
         }
       });
@@ -176,10 +148,30 @@ export async function POST(request: NextRequest) {
           status: 'PENDING',
           documents: {
             create: [
-              { kind: 'FRONT', fileUrl: frontUrl },
-              { kind: 'BACK', fileUrl: backUrl },
-              { kind: 'SELFIE', fileUrl: selfieUrl },
-              { kind: 'UTILITY_BILL', fileUrl: billUrl }
+              {
+                kind: 'FRONT',
+                fileContent: frontFile.fileContent,
+                contentType: frontFile.contentType,
+                fileName: frontFile.fileName
+              },
+              {
+                kind: 'BACK',
+                fileContent: backFile.fileContent,
+                contentType: backFile.contentType,
+                fileName: backFile.fileName
+              },
+              {
+                kind: 'SELFIE',
+                fileContent: selfieFile.fileContent,
+                contentType: selfieFile.contentType,
+                fileName: selfieFile.fileName
+              },
+              {
+                kind: 'UTILITY_BILL',
+                fileContent: billFile.fileContent,
+                contentType: billFile.contentType,
+                fileName: billFile.fileName
+              }
             ]
           }
         }

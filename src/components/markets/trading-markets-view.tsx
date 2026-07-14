@@ -16,7 +16,10 @@ import {
   IconWifiOff,
   IconRefresh
 } from '@tabler/icons-react';
-import { useMarketsWebSocket } from '@/contexts/markets-websocket-context';
+import {
+  useMarketsWebSocket,
+  useMarketsWebSocketSymbols
+} from '@/contexts/markets-websocket-context';
 
 interface MarketTradingProps {
   markets?: Market[];
@@ -38,7 +41,6 @@ export function TradingMarketsView({
     isConnecting,
     error: wsError,
     realTimePrices,
-    updateMarkets,
     refreshPrices
   } = useMarketsWebSocket();
 
@@ -53,8 +55,6 @@ export function TradingMarketsView({
           markets: Market[];
         };
         setMarkets(dbMarkets);
-        // Update WebSocket context with new markets
-        updateMarkets(dbMarkets);
       } catch (err) {
         // Best-effort; keep initial markets if any
       }
@@ -64,7 +64,7 @@ export function TradingMarketsView({
     if (markets.length === 0) {
       loadMarkets();
     }
-  }, [markets.length, updateMarkets]);
+  }, [markets.length]);
 
   const filteredMarkets = useMemo(() => {
     let filtered = markets;
@@ -95,6 +95,11 @@ export function TradingMarketsView({
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const paginatedMarkets = filteredMarkets.slice(startIndex, endIndex);
+  const paginatedSymbols = useMemo(
+    () => paginatedMarkets.map((market) => market.symbol),
+    [paginatedMarkets]
+  );
+  useMarketsWebSocketSymbols(paginatedSymbols);
 
   // Reset to first page when filters change
   useEffect(() => {
@@ -112,7 +117,6 @@ export function TradingMarketsView({
       };
 
       setMarkets(dbMarkets);
-      updateMarkets(dbMarkets);
       refreshPrices();
     } catch (err) {
       // Handle error silently

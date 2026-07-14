@@ -1,10 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import type { Market } from '@/lib/prisma/generated/client';
-import { useMarketsWebSocket } from '@/contexts/markets-websocket-context';
+import {
+  useMarketsWebSocket,
+  useMarketsWebSocketSymbols
+} from '@/contexts/markets-websocket-context';
 import {
   formatTradePrice,
   formatTradePriceFull,
@@ -33,14 +36,12 @@ export function TradingRoomOrderPanel({
   const t = useTranslations('Trade.order');
   const [lotSize, setLotSize] = useState('0.01');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { realTimePrices, isConnected, subscribe } = useMarketsWebSocket();
-
-  // Subscribe to live price for selected market
-  useEffect(() => {
-    if (market?.symbol && isConnected) {
-      subscribe([market.symbol]);
-    }
-  }, [market?.symbol, isConnected, subscribe]);
+  const { realTimePrices } = useMarketsWebSocket();
+  const symbolList = useMemo(
+    () => (market?.symbol ? [market.symbol] : []),
+    [market?.symbol]
+  );
+  useMarketsWebSocketSymbols(symbolList);
 
   const livePrice = market?.symbol
     ? realTimePrices.get(market.symbol)?.price

@@ -295,7 +295,7 @@
       "kycRequests": "طلبات KYC",
       "depositRequest": "طلب إيداع",
       "settings": "الإعدادات",
-      "withdrawals": "السحوبات",
+      "withdrawals": "طلب سحب",
       "portfolio": "المحفظة"
     },
     "header": {
@@ -305,13 +305,47 @@
       "connected": "متصل",
       "balanceReal": "حقيقي",
       "balanceDemo": "تجريبي",
-      "balanceInstitutional": "مؤسسي"
+      "balanceInstitutional": "مؤسسي",
+      "balance": "الرصيد",
+      "equity": "حقوق الملكية",
+      "wsStatus": {
+        "title": "اتصال بيانات السوق",
+        "description": "حالة اشتراك WebSocket ومصدر الأسعار.",
+        "connectionStatus": "حالة الاتصال",
+        "connected": "متصل",
+        "connecting": "جارٍ الاتصال…",
+        "disconnected": "غير متصل",
+        "connectionError": "مصدر الأسعار غير متاح",
+        "fallbackActive": "الاحتياطي REST نشط",
+        "priceSource": "مصدر السعر",
+        "priceSourceWs": "WebSocket",
+        "priceSourceRest": "احتياطي REST API",
+        "priceSourceRestOnly": "REST فقط (الجلسة)",
+        "priceSourceRateLimited": "REST فقط (حد المعدل، {seconds} ث)",
+        "priceSourceMixed": "WebSocket + REST (حسب الرمز)",
+        "rateLimitNotice": "تم إيقاف WebSocket — تم الوصول إلى حد معدل Twelve Data (100 حدث/دقيقة). تُحدَّث الأسعار عبر REST حتى الدقيقة التالية.",
+        "restOnlyNotice": "أُغلق WebSocket بشكل غير طبيعي مرتين (رمز 1006). تُحدَّث الأسعار المباشرة عبر REST فقط لهذه الجلسة. أعد تحميل الصفحة لإعادة محاولة WebSocket.",
+        "restOnlyActive": "REST فقط",
+        "rateLimitCooldown": "إعادة الاتصال خلال {seconds} ث…",
+        "subscribedMarkets": "الأسواق المشتركة ({count})",
+        "noSubscriptions": "لا توجد اشتراكات رموز نشطة.",
+        "wsActive": "WS",
+        "restOnly": "REST"
+      }
     },
     "markets": {
       "favorites": "المفضلة",
       "topMovers": "الأكثر تحركاً",
       "search": "بحث",
       "symbolPlaceholder": "الرمز",
+      "categories": {
+        "ALL": "الكل",
+        "FOREX": "فوركس",
+        "CRYPTO": "عملات رقمية",
+        "STOCKS": "أسهم",
+        "COMMODITIES": "سلع",
+        "INDICES": "مؤشرات"
+      },
       "popular": "شائع",
       "advancedOrder": "أمر متقدم",
       "info": "معلومات",

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { getProfileImageUrl } from '@/lib/profile-image';
 
 export async function POST(request: NextRequest) {
   try {
@@ -63,7 +64,7 @@ export async function POST(request: NextRequest) {
         id: challenge.user.id,
         email: challenge.user.email,
         name: challenge.user.name,
-        image: challenge.user.image
+        image: getProfileImageUrl(challenge.user)
       },
       token // This will be used as proof in NextAuth
     });

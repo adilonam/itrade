@@ -29,7 +29,7 @@ export function SignUpForm() {
     setIsLoading(true);
     try {
       await signIn('google', {
-        callbackUrl: '/',
+        callbackUrl: '/trade',
         redirect: true
       });
     } finally {

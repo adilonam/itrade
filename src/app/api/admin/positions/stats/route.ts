@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { requireAdminSession } from '@/lib/admin-auth';
 import { PositionType, PositionStatus } from '@/lib/prisma/generated/client';
 // Position stats type
 type PositionStats = {
@@ -13,6 +14,11 @@ type PositionStats = {
 
 export async function GET(request: NextRequest) {
   try {
+    const auth = await requireAdminSession();
+    if (!auth.ok) {
+      return NextResponse.json({ error: auth.error }, { status: auth.status });
+    }
+
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId');
     const dateFrom = searchParams.get('dateFrom');

@@ -24,7 +24,7 @@ Navigation is **tenant + role** based (see `src/constants/data.ts`). Roles: `USE
 - **Validation** — [Zod](https://zod.dev)
 - **State** — [Zustand](https://zustand-demo.pmnd.rs), [Nuqs](https://nuqs.47ng.com/) (search params)
 - **Market data** — Twelve Data API; optional Alpha Vantage for news
-- **Storage** — [Vercel Blob](https://vercel.com/docs/storage/vercel-blob) for profile images
+- **Storage** — PostgreSQL-backed image bytes for private profile and KYC images
 - **Tooling** — ESLint, Prettier, Husky, lint-staged
 
 ## Getting started
@@ -71,27 +71,26 @@ Set `DATABASE_URL` in `.env` to match (e.g. `postgresql://trading_user:trading_p
 
 Copy `.env.example` to `.env` and fill in:
 
-| Variable | Purpose |
-|----------|---------|
-| `DATABASE_URL` | PostgreSQL connection string |
-| `NEXTAUTH_URL`, `NEXTAUTH_SECRET` | NextAuth base URL and secret |
-| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Google OAuth (optional) |
+| Variable                                                 | Purpose                                |
+| -------------------------------------------------------- | -------------------------------------- |
+| `DATABASE_URL`                                           | PostgreSQL connection string           |
+| `NEXTAUTH_URL`, `NEXTAUTH_SECRET`                        | NextAuth base URL and secret           |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`               | Google OAuth (optional)                |
 | `NEXT_PUBLIC_TWELVE_DATA_API_KEY`, `TWELVE_DATA_API_KEY` | Market data (use `"demo"` for testing) |
-| `SMTP_*` | Email (MFA / notifications) |
-| `MIN_MARGIN_LEVEL` | Margin call threshold (default 100) |
-| `ALPHAVANTAGE_API_KEY` | News/sentiment (optional) |
-| `BLOB_READ_WRITE_TOKEN` | Vercel Blob for profile images (optional) |
+| `SMTP_*`                                                 | Email (MFA / notifications)            |
+| `MIN_MARGIN_LEVEL`                                       | Margin call threshold (default 100)    |
+| `ALPHAVANTAGE_API_KEY`                                   | News/sentiment (optional)              |
 
 ## Scripts
 
-| Command | Description |
-|---------|-------------|
-| `pnpm dev` | Next.js dev server (Turbopack) |
-| `pnpm build` | Prisma generate + migrate + Next build |
-| `pnpm start` | Production server |
-| `pnpm lint` / `pnpm lint:fix` | ESLint |
-| `pnpm format` | Prettier |
-| `pnpm setup` | Run `./setup.sh` |
+| Command                       | Description                            |
+| ----------------------------- | -------------------------------------- |
+| `pnpm dev`                    | Next.js dev server (Turbopack)         |
+| `pnpm build`                  | Prisma generate + migrate + Next build |
+| `pnpm start`                  | Production server                      |
+| `pnpm lint` / `pnpm lint:fix` | ESLint                                 |
+| `pnpm format`                 | Prettier                               |
+| `pnpm setup`                  | Run `./setup.sh`                       |
 
 ## Project layout
 

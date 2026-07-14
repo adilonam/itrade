@@ -150,6 +150,14 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
+        title: 'Client Positions',
+        url: '/admin/positions',
+        icon: 'portfolio',
+        isActive: false,
+        shortcut: ['c', 'p'],
+        items: []
+      },
+      {
         title: 'Markets',
         url: '/admin/markets',
         icon: 'market',
@@ -249,6 +257,14 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
+        title: 'Client Positions',
+        url: '/admin/positions',
+        icon: 'portfolio',
+        isActive: false,
+        shortcut: ['c', 'p'],
+        items: []
+      },
+      {
         title: 'Markets',
         url: '/admin/markets',
         icon: 'market',
@@ -265,7 +281,7 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
-        title: 'Withdrawals',
+        title: 'Withdrawals request',
         url: '/admin/withdraw-requests',
         icon: 'minus',
         isActive: false,

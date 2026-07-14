@@ -295,7 +295,7 @@
       "kycRequests": "KYC Requests",
       "depositRequest": "Deposit request",
       "settings": "Settings",
-      "withdrawals": "Withdrawals",
+      "withdrawals": "Withdrawals request",
       "portfolio": "Portfolio"
     },
     "header": {
@@ -305,13 +305,47 @@
       "connected": "Connected",
       "balanceReal": "Real",
       "balanceDemo": "Demo",
-      "balanceInstitutional": "Institutional"
+      "balanceInstitutional": "Institutional",
+      "balance": "Balance",
+      "equity": "Equity",
+      "wsStatus": {
+        "title": "Market data connection",
+        "description": "WebSocket subscription and price source status.",
+        "connectionStatus": "Connection status",
+        "connected": "Connected",
+        "connecting": "Connecting…",
+        "disconnected": "Disconnected",
+        "connectionError": "Price feed unavailable",
+        "fallbackActive": "REST fallback active",
+        "priceSource": "Price source",
+        "priceSourceWs": "WebSocket",
+        "priceSourceRest": "REST API fallback",
+        "priceSourceRestOnly": "REST only (session)",
+        "priceSourceRateLimited": "REST only (rate limited, {seconds}s)",
+        "priceSourceMixed": "WebSocket + REST (per symbol)",
+        "rateLimitNotice": "WebSocket paused — Twelve Data rate limit reached (100 events/min). Prices update via REST until the next minute.",
+        "restOnlyNotice": "WebSocket closed abnormally twice (code 1006). Live prices use REST only for this page session. Reload the page to retry WebSocket.",
+        "restOnlyActive": "REST only",
+        "rateLimitCooldown": "Reconnecting in {seconds}s…",
+        "subscribedMarkets": "Subscribed markets ({count})",
+        "noSubscriptions": "No active symbol subscriptions.",
+        "wsActive": "WS",
+        "restOnly": "REST"
+      }
     },
     "markets": {
       "favorites": "Favorites",
       "topMovers": "Top Movers",
       "search": "Search",
       "symbolPlaceholder": "Symbol",
+      "categories": {
+        "ALL": "All",
+        "FOREX": "Forex",
+        "CRYPTO": "Crypto",
+        "STOCKS": "Stocks",
+        "COMMODITIES": "Commodities",
+        "INDICES": "Indices"
+      },
       "popular": "Popular",
       "advancedOrder": "Advanced Order",
       "info": "Info",

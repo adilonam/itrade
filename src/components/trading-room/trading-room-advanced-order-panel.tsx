@@ -1,11 +1,14 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { getCurrencyFlags } from '@/lib/currency-flags';
 import { IconStar, IconX } from '@tabler/icons-react';
-import { useMarketsWebSocket } from '@/contexts/markets-websocket-context';
+import {
+  useMarketsWebSocket,
+  useMarketsWebSocketSymbols
+} from '@/contexts/markets-websocket-context';
 import { getLotSize } from '@/lib/calculator-client';
 import type { Market } from '@/lib/prisma/generated/client';
 import type { MarketType } from '@/lib/prisma/generated/client';
@@ -63,11 +66,16 @@ export function TradingRoomAdvancedOrderPanel({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const initializedRef = useRef(false);
 
-  const { realTimePrices, isConnected, subscribe } = useMarketsWebSocket();
+  const { realTimePrices } = useMarketsWebSocket();
+  const symbolList = useMemo(
+    () => (market?.symbol ? [market.symbol] : []),
+    [market?.symbol]
+  );
+  useMarketsWebSocketSymbols(symbolList);
 
   const midPrice =
     Number(
-      market?.symbol && isConnected
+      market?.symbol
         ? realTimePrices.get(market.symbol)?.price ?? market?.lastPrice
         : market?.lastPrice ?? 0
     ) || 0;
@@ -85,12 +93,6 @@ export function TradingRoomAdvancedOrderPanel({
   const execPrice = parseFloat(displayPrice) || midPrice;
   const requiredMargin = (vol * lotSizeMultiplier * execPrice) / leverage;
   const spreadUsd = spread * vol * lotSizeMultiplier;
-
-  useEffect(() => {
-    if (market?.symbol && isConnected) {
-      subscribe([market.symbol]);
-    }
-  }, [market?.symbol, isConnected, subscribe]);
 
   useEffect(() => {
     if (market && !initializedRef.current) {

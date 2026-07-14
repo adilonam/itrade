@@ -143,6 +143,9 @@ export default function UserDetail({ user, onUserUpdate }: UserDetailProps) {
                     width={80}
                     height={80}
                     className='rounded-full object-cover'
+                    unoptimized={user.image.startsWith(
+                      '/api/user/profile-images/'
+                    )}
                   />
                 ) : (
                   <div className='bg-muted flex h-20 w-20 items-center justify-center rounded-full'>

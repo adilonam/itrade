@@ -45,7 +45,14 @@ export async function GET(request: NextRequest) {
           }
         },
         documents: {
-          orderBy: { createdAt: 'asc' }
+          orderBy: { createdAt: 'asc' },
+          select: {
+            id: true,
+            kind: true,
+            contentType: true,
+            fileName: true,
+            createdAt: true
+          }
         }
       }
     });
