@@ -6,7 +6,7 @@ import { getPublicAppName } from '@/lib/public-app-name';
 import { cn } from '@/lib/utils';
 
 const LANDING_CUSTOMER_SERVICE_PHONE = '+442039960577';
-const LANDING_CUSTOMER_SERVICE_EMAIL = 'support@cfix.markets';
+const LANDING_CUSTOMER_SERVICE_EMAIL = 'support@smxmarkets.com';
 
 const replaceBrandName = (text: string, appName: string) =>
   text.replaceAll('Colbari', appName).replaceAll('كولباري', appName);
