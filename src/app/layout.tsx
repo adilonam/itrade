@@ -14,15 +14,19 @@ import { DEFAULT_ACTIVE_THEME } from '@/constants/theme';
 import { getPublicAppName } from '@/lib/public-app-name';
 
 const META_THEME_COLORS = {
-  light: '#ffffff',
-  dark: '#09090b'
+  light: '#000000',
+  dark: '#000000'
 };
 
 const APP_NAME = getPublicAppName();
 
 export const metadata: Metadata = {
   title: APP_NAME,
-  description: 'Trading platform for trading and investing'
+  description: 'Trading platform for trading and investing',
+  icons: {
+    icon: '/images/logo.png',
+    apple: '/images/logo.png'
+  }
 };
 
 export const viewport: Viewport = {
