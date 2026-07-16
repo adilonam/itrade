@@ -35,6 +35,11 @@ export default withAuth(
   async function middleware(req) {
     const pathname = req.nextUrl.pathname;
 
+    // Landing lives on a separate site in production
+    if (pathname === '/') {
+      return NextResponse.redirect('https://itradeglobalmarkets.online/');
+    }
+
     // Allow NextAuth API through without redirect logic
     if (pathname.startsWith('/api/auth')) {
       return NextResponse.next();
