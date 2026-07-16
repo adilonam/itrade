@@ -1,7 +1,7 @@
 'use client';
 
+import { AppLogo } from '@/components/brand/app-logo';
 import { usePublicAppName } from '@/hooks/use-public-app-name';
-import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -102,22 +102,7 @@ export function UserManagementSidebar({
         aria-label={`Go to trade, ${appName}`}
       >
         <span className="relative flex h-10 shrink-0 items-center">
-          <Image
-            src="/images/logo-light.png"
-            alt=""
-            width={200}
-            height={48}
-            className="h-10 w-auto max-h-10 dark:hidden"
-            priority
-          />
-          <Image
-            src="/images/logo-dark.png"
-            alt=""
-            width={200}
-            height={48}
-            className="hidden h-10 w-auto max-h-10 dark:block"
-            priority
-          />
+          <AppLogo alt="" className="h-10 max-h-10" priority />
         </span>
       </Link>
       <nav

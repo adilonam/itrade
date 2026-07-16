@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { EB_Garamond, Inter } from 'next/font/google';
 import { IconChartLine, IconSchool } from '@tabler/icons-react';
-import { landingSiteLinks, landingPageLinks } from '@/constants/data';
+import { landingSiteLinks, landingPageLinks, brandAssets } from '@/constants/data';
 import {
   LandingHeaderNavMenus,
   LandingHeaderUtilities
@@ -93,7 +93,7 @@ export async function LandingHomepage({ appName, session }: LandingHomepageProps
           <div className="flex min-w-0 items-center gap-6 md:gap-8 lg:gap-12">
             <Link href="/" className="inline-flex shrink-0 items-center" aria-label={appName}>
               <Image
-                src="/images/logo-light.png"
+                src={brandAssets.logoLight}
                 alt={`${appName} logo`}
                 width={160}
                 height={40}
@@ -275,7 +275,7 @@ export async function LandingHomepage({ appName, session }: LandingHomepageProps
               <div className="relative flex min-h-[280px] items-center justify-center border border-[#c4c7c7]/20 bg-white p-12 shadow-2xl md:min-h-[360px] md:p-16">
                 <div className="absolute -top-10 -left-10 z-0 h-40 w-40 bg-[#C0A678]/10" />
                 <Image
-                  src="/images/logo-dark.png"
+                  src={brandAssets.logoDark}
                   alt={`${appName} logo`}
                   width={320}
                   height={80}

@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
-import { landingSiteLinks } from '@/constants/data';
+import { landingSiteLinks, brandAssets } from '@/constants/data';
 import { getPublicAppName } from '@/lib/public-app-name';
 import { cn } from '@/lib/utils';
 
@@ -52,7 +52,7 @@ export async function LandingSiteFooter({ appName, className }: LandingSiteFoote
         <div className="mb-12 flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
           <Link href="/" className="inline-flex shrink-0" aria-label={resolvedAppName}>
             <Image
-              src="/images/logo-light.png"
+              src={brandAssets.logoLight}
               alt={`${resolvedAppName} logo`}
               width={160}
               height={40}

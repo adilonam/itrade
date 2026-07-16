@@ -24,7 +24,7 @@ export function BrandLogoImage({ src, alt, fallback, wrapperClassName }: BrandLo
           alt={alt}
           fill
           unoptimized
-          className="box-border bg-white object-contain p-1.5"
+          className="box-border object-contain p-1.5"
           onError={() => setFailed(true)}
         />
       )}

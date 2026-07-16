@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { getLocale } from 'next-intl/server';
 import { EB_Garamond, Inter } from 'next/font/google';
 import { IconPlus } from '@tabler/icons-react';
-import { landingPageLinks } from '@/constants/data';
+import {brandAssets, landingPageLinks} from '@/constants/data';
 import {
   LandingHeaderNavMenus,
   LandingHeaderUtilities
@@ -282,7 +282,7 @@ export async function LandingFaqsTradingPlatformPage({
           <div className="flex min-w-0 items-center gap-6 md:gap-8 lg:gap-12">
             <Link href="/" className="inline-flex shrink-0 items-center" aria-label={appName}>
               <Image
-                src="/images/logo-light.png"
+                src=brandAssets.logoLight
                 alt={`${appName} logo`}
                 width={160}
                 height={40}

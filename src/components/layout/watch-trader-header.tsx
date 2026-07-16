@@ -1,13 +1,13 @@
 'use client';
 
 import { usePublicAppName } from '@/hooks/use-public-app-name';
-import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { tenantNavItems } from '@/constants/data';
+import { AppLogo } from '@/components/brand/app-logo';
 import { LanguageMenu } from '@/components/i18n/language-menu';
 import { tradeNavTitleKey } from '@/lib/trade-nav-i18n';
 import { ModeToggle } from '@/components/layout/ThemeToggle/theme-toggle';
@@ -220,22 +220,7 @@ export function WatchTraderHeader() {
           className="relative flex h-[22px] shrink-0 items-center"
           aria-label={appName}
         >
-          <Image
-            src="/images/logo-light.png"
-            alt=""
-            width={200}
-            height={48}
-            className="h-[22px] w-auto max-h-[22px] dark:hidden"
-            priority
-          />
-          <Image
-            src="/images/logo-dark.png"
-            alt=""
-            width={200}
-            height={48}
-            className="hidden h-[22px] w-auto max-h-[22px] dark:block"
-            priority
-          />
+          <AppLogo alt="" className="h-[22px] max-h-[22px]" priority />
         </Link>
       </div>
       <nav

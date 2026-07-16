@@ -356,6 +356,12 @@ export const externalApiLinks = {
   nowPaymentsInvoiceApi: 'https://api.nowpayments.io/v1/invoice'
 } as const;
 
+export const brandAssets = {
+  logo: '/images/logo.png',
+  logoLight: '/images/logo-light.png',
+  logoDark: '/images/logo-dark.png'
+} as const;
+
 export const landingPageLinks = {
   signIn: '/auth/sign-in',
   signUp: '/auth/sign-up',
