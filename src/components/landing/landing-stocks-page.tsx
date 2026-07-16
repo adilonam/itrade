@@ -2,7 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { EB_Garamond, Inter } from 'next/font/google';
-import {brandAssets, landingPageLinks} from '@/constants/data';
+import { brandAssets, landingPageLinks } from '@/constants/data';
 import {
   LandingHeaderNavMenus,
   LandingHeaderUtilities
@@ -59,7 +59,7 @@ export async function LandingStocksPage({ appName, session }: LandingStocksPageP
           <div className="flex min-w-0 items-center gap-6 md:gap-8 lg:gap-12">
             <Link href="/" className="inline-flex shrink-0 items-center" aria-label={appName}>
               <Image
-                src=brandAssets.logoLight
+                src={brandAssets.logoLight}
                 alt={`${appName} logo`}
                 width={160}
                 height={40}
