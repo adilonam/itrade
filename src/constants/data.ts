@@ -367,6 +367,12 @@ export const logoImages = {
 
 export const brandLogoSrc = logoImages.fullTransparentNobuffer;
 
+export const brandAssets = {
+  logo: logoImages.fullTransparentNobuffer,
+  logoLight: logoImages.fullTransparentNobuffer,
+  logoDark: logoImages.fullTransparentNobuffer
+} as const;
+
 export const sponsorshipIconSrc = '/images/icons/sponsorship.svg';
 
 export const landingPageLinks = {
