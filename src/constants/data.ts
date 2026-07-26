@@ -476,30 +476,54 @@ export const landingHeaderMenus: LandingHeaderMenu[] = [
   }
 ];
 
-/** Manual USDT deposit networks — wallet addresses are shown on the client only. */
-export const MANUAL_USDT_DEPOSIT_NETWORKS = [
+/** Manual bank transfer accounts — details are shown on the client only. */
+export const MANUAL_BANK_TRANSFER_ACCOUNTS = [
   {
-    id: 'trc20',
-    label: 'USDT TRC20',
-    hint: 'Tron network',
-    address: 'TPUVPMAkhyeFpPVbJkX4nmyYbDZzWcVMDP'
+    id: 'usd-wire',
+    label: 'USD Wire Transfer',
+    hint: 'International wire (SWIFT)',
+    currency: 'USD',
+    accountName: 'ITRADE Global Markets Ltd',
+    bankName: 'Example International Bank',
+    accountNumber: '123456789012',
+    iban: 'GB29 EXMP 6016 1331 9268 19',
+    swift: 'EXMPGB2L',
+    routingNumber: null,
+    referenceHint:
+      'Include your order ID in the payment reference so we can match your transfer.'
   },
   {
-    id: 'erc20',
-    label: 'USDT ERC20',
-    hint: 'Ethereum network',
-    address: '0x11740455c9aFD3C2a637d702931b3900be8B85F8'
+    id: 'usd-ach',
+    label: 'USD ACH Transfer',
+    hint: 'US domestic transfer',
+    currency: 'USD',
+    accountName: 'ITRADE Global Markets Ltd',
+    bankName: 'Example National Bank',
+    accountNumber: '9876543210',
+    iban: null,
+    swift: null,
+    routingNumber: '021000021',
+    referenceHint:
+      'Include your order ID in the memo/reference field when sending.'
   },
   {
-    id: 'bnb',
-    label: 'USDT BNB',
-    hint: 'BNB Smart Chain',
-    address: '0x11740455c9aFD3C2a637d702931b3900be8B85F8'
+    id: 'eur-sepa',
+    label: 'EUR SEPA Transfer',
+    hint: 'European bank transfer',
+    currency: 'EUR',
+    accountName: 'ITRADE Global Markets Ltd',
+    bankName: 'Example European Bank',
+    accountNumber: null,
+    iban: 'DE89 3704 0044 0532 0130 00',
+    swift: 'COBADEFFXXX',
+    routingNumber: null,
+    referenceHint:
+      'Include your order ID in the transfer reference so we can match your payment.'
   }
 ] as const;
 
-export type ManualUsdtDepositNetworkId =
-  (typeof MANUAL_USDT_DEPOSIT_NETWORKS)[number]['id'];
+export type ManualBankTransferAccountId =
+  (typeof MANUAL_BANK_TRANSFER_ACCOUNTS)[number]['id'];
 
 /** Forex/metal pairs shown on the IC landing market widget (Twelve Data). */
 export const landingIcWidgetSymbols = [

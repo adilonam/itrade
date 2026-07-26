@@ -69,7 +69,7 @@ export async function PATCH(
             userBalanceId: ub.id,
             type: TransactionType.DEPOSIT,
             absoluteAmount: current.amountUsd,
-            description: `Manual deposit (USDT) order ${current.orderId}`
+            description: `Manual bank transfer order ${current.orderId}`
           }
         });
       }
