@@ -15,8 +15,8 @@ export default function AdminDepositRequestPage() {
             Deposit request
           </h1>
           <p className='mt-1 max-w-3xl text-xs leading-relaxed text-[var(--trade-text-muted)]'>
-            Review crypto deposits. Manual USDT requests are credited when you set
-            status to Finished (after you verify the on-chain transfer).
+            Review deposits. Bank transfer requests are credited when you set
+            status to Finished (after you verify the incoming transfer).
             NOWPayments deposits credit via webhook.
           </p>
         </div>

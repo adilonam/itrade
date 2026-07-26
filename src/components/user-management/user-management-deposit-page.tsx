@@ -3,8 +3,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { UserDepositRequestsSection } from '@/components/user-management/user-deposit-requests-section';
 import {
-  MANUAL_USDT_DEPOSIT_NETWORKS,
-  type ManualUsdtDepositNetworkId
+  MANUAL_BANK_TRANSFER_ACCOUNTS,
+  type ManualBankTransferAccountId
 } from '@/constants/data';
 import {
   IconCheck,
@@ -473,20 +473,21 @@ export function UserManagementDepositPage({
 }
 
 type ManualDepositResult = {
-  walletAddress: string;
   orderId: string;
   amountUsd: number;
-  networkLabel: string;
+  bankAccountLabel: string;
 };
 
 function ManualDepositAmountField({
   value,
   onChange,
-  showError
+  showError,
+  currency
 }: {
   value: string;
   onChange: (value: string) => void;
   showError: boolean;
+  currency: string;
 }) {
   return (
     <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
@@ -494,7 +495,7 @@ function ManualDepositAmountField({
         htmlFor="manual-deposit-amount"
         className="shrink-0 text-sm font-semibold text-[var(--trade-text)]"
       >
-        Amount (USDT)
+        Amount ({currency})
       </label>
       <div className="min-w-0 flex-1 sm:max-w-xs">
         <input
@@ -521,21 +522,64 @@ function ManualDepositAmountField({
   );
 }
 
+function BankDetailRow({
+  label,
+  value,
+  copyable = false
+}: {
+  label: string;
+  value: string;
+  copyable?: boolean;
+}) {
+  const copyValue = async () => {
+    try {
+      await navigator.clipboard.writeText(value);
+      toast.success(`${label} copied`);
+    } catch {
+      toast.error('Could not copy');
+    }
+  };
+
+  return (
+    <div>
+      <div className="text-xs font-medium uppercase tracking-wide text-[var(--trade-text-muted)]">
+        {label}
+      </div>
+      <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-stretch">
+        <div className="min-w-0 flex-1 break-all rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)] px-4 py-3 font-mono text-xs text-[var(--trade-text)]">
+          {value}
+        </div>
+        {copyable && (
+          <button
+            type="button"
+            onClick={() => void copyValue()}
+            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)] px-4 py-3 text-sm font-medium text-[var(--trade-text)] hover:bg-[var(--trade-border)]/40"
+          >
+            <IconCopy className="size-4" stroke={2} />
+            Copy
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function UserManagementManualDepositSection({
   onRequestCreated
 }: {
   onRequestCreated?: () => void;
 }) {
-  const [network, setNetwork] = useState<ManualUsdtDepositNetworkId>('trc20');
+  const [bankAccountId, setBankAccountId] =
+    useState<ManualBankTransferAccountId>('usd-wire');
   const [amountRaw, setAmountRaw] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<ManualDepositResult | null>(null);
 
-  const selectedNetwork = useMemo(
+  const selectedAccount = useMemo(
     () =>
-      MANUAL_USDT_DEPOSIT_NETWORKS.find((item) => item.id === network) ??
-      MANUAL_USDT_DEPOSIT_NETWORKS[0],
-    [network]
+      MANUAL_BANK_TRANSFER_ACCOUNTS.find((item) => item.id === bankAccountId) ??
+      MANUAL_BANK_TRANSFER_ACCOUNTS[0],
+    [bankAccountId]
   );
 
   const amountNum = useMemo(() => {
@@ -554,26 +598,24 @@ function UserManagementManualDepositSection({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           amount: amountNum,
-          network,
+          bankAccountId,
           balanceType: REAL_BALANCE_TYPE
         })
       });
       const data = (await res.json()) as {
         error?: string;
-        walletAddress?: string;
         orderId?: string;
         amountUsd?: number;
-        networkLabel?: string;
+        bankAccountLabel?: string;
       };
       if (!res.ok) {
         toast.error(data.error ?? 'Could not create deposit request');
         return;
       }
       if (
-        !data.walletAddress ||
         !data.orderId ||
         data.amountUsd === undefined ||
-        !data.networkLabel
+        !data.bankAccountLabel
       ) {
         toast.error('Invalid response from server.');
         return;
@@ -581,28 +623,15 @@ function UserManagementManualDepositSection({
       toast.success('Deposit request created');
       onRequestCreated?.();
       setResult({
-        walletAddress: data.walletAddress,
         orderId: data.orderId,
         amountUsd: data.amountUsd,
-        networkLabel: data.networkLabel
+        bankAccountLabel: data.bankAccountLabel
       });
       setAmountRaw('');
     } catch {
       toast.error('Could not create deposit request');
     } finally {
       setSubmitting(false);
-    }
-  };
-
-  const displayWalletAddress = result?.walletAddress ?? selectedNetwork.address;
-
-  const copyAddress = async () => {
-    if (!displayWalletAddress) return;
-    try {
-      await navigator.clipboard.writeText(displayWalletAddress);
-      toast.success('Address copied');
-    } catch {
-      toast.error('Could not copy');
     }
   };
 
@@ -615,33 +644,34 @@ function UserManagementManualDepositSection({
         id="manual-deposit-heading"
         className="text-sm font-semibold text-[var(--trade-text)]"
       >
-        Manual USDT deposit
+        Bank transfer deposit
       </h2>
       <p className="mt-1 text-xs text-[var(--trade-text-muted)]">
-        USDT only. Choose a network, send funds to the platform wallet below,
-        then create a deposit request with the USD amount you transferred. Your
-        balance is updated after an administrator verifies your transfer.
+        Choose a transfer method, send funds to the bank account below, then
+        create a deposit request with the amount you transferred. Include your
+        order ID in the payment reference. Your balance is updated after an
+        administrator verifies your transfer.
       </p>
 
       <div className="mt-4 space-y-4">
         <fieldset>
           <legend className="text-sm font-semibold text-[var(--trade-text)]">
-            Network
+            Transfer method
           </legend>
           <div
             className="mt-3 grid gap-3 sm:grid-cols-3"
             role="radiogroup"
-            aria-label="USDT network"
+            aria-label="Bank transfer method"
           >
-            {MANUAL_USDT_DEPOSIT_NETWORKS.map((item) => {
-              const selected = network === item.id;
+            {MANUAL_BANK_TRANSFER_ACCOUNTS.map((item) => {
+              const selected = bankAccountId === item.id;
               return (
                 <button
                   key={item.id}
                   type="button"
                   role="radio"
                   aria-checked={selected}
-                  onClick={() => setNetwork(item.id)}
+                  onClick={() => setBankAccountId(item.id)}
                   className={cn(
                     'flex flex-col rounded-xl border px-4 py-4 text-left transition-colors',
                     selected
@@ -650,10 +680,10 @@ function UserManagementManualDepositSection({
                   )}
                 >
                   <span className="font-mono text-base font-bold tracking-tight text-[var(--trade-text)]">
-                    USDT
+                    {item.currency}
                   </span>
                   <span className="mt-1 text-sm text-[var(--trade-text)]">
-                    {item.label.replace(/^USDT\s+/, '')}
+                    {item.label.replace(new RegExp(`^${item.currency}\\s+`), '')}
                   </span>
                   <span className="mt-2 text-xs leading-snug text-[var(--trade-text-muted)]">
                     {item.hint}
@@ -664,23 +694,35 @@ function UserManagementManualDepositSection({
           </div>
         </fieldset>
 
-        <div>
+        <div className="space-y-4">
           <div className="text-xs font-medium uppercase tracking-wide text-[var(--trade-text-muted)]">
-            {selectedNetwork.label} deposit address
+            {selectedAccount.label} bank details
           </div>
-          <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-stretch">
-            <div className="min-w-0 flex-1 break-all rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)] px-4 py-3 font-mono text-xs text-[var(--trade-text)]">
-              {displayWalletAddress}
-            </div>
-            <button
-              type="button"
-              onClick={() => void copyAddress()}
-              className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg border border-[var(--trade-border)] bg-[var(--trade-dark)] px-4 py-3 text-sm font-medium text-[var(--trade-text)] hover:bg-[var(--trade-border)]/40"
-            >
-              <IconCopy className="size-4" stroke={2} />
-              Copy
-            </button>
-          </div>
+          <BankDetailRow label="Account name" value={selectedAccount.accountName} copyable />
+          <BankDetailRow label="Bank name" value={selectedAccount.bankName} />
+          {selectedAccount.accountNumber ? (
+            <BankDetailRow
+              label="Account number"
+              value={selectedAccount.accountNumber}
+              copyable
+            />
+          ) : null}
+          {selectedAccount.iban ? (
+            <BankDetailRow label="IBAN" value={selectedAccount.iban} copyable />
+          ) : null}
+          {selectedAccount.swift ? (
+            <BankDetailRow label="SWIFT / BIC" value={selectedAccount.swift} copyable />
+          ) : null}
+          {selectedAccount.routingNumber ? (
+            <BankDetailRow
+              label="Routing number"
+              value={selectedAccount.routingNumber}
+              copyable
+            />
+          ) : null}
+          <p className="text-xs leading-relaxed text-[var(--trade-text-muted)]">
+            {selectedAccount.referenceHint}
+          </p>
         </div>
       </div>
 
@@ -690,6 +732,7 @@ function UserManagementManualDepositSection({
             value={amountRaw}
             onChange={setAmountRaw}
             showError={!amountOk && amountRaw.trim() !== ''}
+            currency={selectedAccount.currency}
           />
           <button
             type="button"
@@ -718,13 +761,12 @@ function UserManagementManualDepositSection({
             <span className="font-mono font-semibold tabular-nums">
               {fmtUsd(result.amountUsd)}
             </span>{' '}
-            USDT on {result.networkLabel} to the address above.
+            via {result.bankAccountLabel} using the bank details above.
           </p>
+          <BankDetailRow label="Payment reference / order ID" value={result.orderId} copyable />
           <p className="text-xs text-[var(--trade-text-muted)]">
-            Reference / order ID:{' '}
-            <span className="font-mono text-[var(--trade-text)]">
-              {result.orderId}
-            </span>
+            Use this order ID as your transfer reference so we can match your
+            payment.
           </p>
           <button
             type="button"

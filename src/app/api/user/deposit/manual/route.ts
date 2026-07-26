@@ -1,10 +1,10 @@
 import { getAuthSession } from '@/lib/auth';
 import {
-  formatManualUsdtPayCurrency,
-  getManualUsdtDepositNetwork,
-  isManualUsdtDepositNetworkId,
-  usdAmountToManualUsdtAmount
-} from '@/lib/manual-usdt-deposit';
+  formatManualBankTransferAdminNotes,
+  formatManualBankTransferPayCurrency,
+  getManualBankTransferAccount,
+  isManualBankTransferAccountId
+} from '@/lib/manual-bank-deposit';
 import { ensureUserBalance, parseBalanceType } from '@/lib/balance';
 import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
@@ -22,7 +22,11 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { amount, balanceType: rawBalanceType, network: rawNetwork } = body;
+    const {
+      amount,
+      balanceType: rawBalanceType,
+      bankAccountId: rawBankAccountId
+    } = body;
     const balanceType = parseBalanceType(rawBalanceType);
 
     if (balanceType !== 'REAL') {
@@ -40,17 +44,16 @@ export async function POST(request: NextRequest) {
     }
 
     if (
-      typeof rawNetwork !== 'string' ||
-      !isManualUsdtDepositNetworkId(rawNetwork)
+      typeof rawBankAccountId !== 'string' ||
+      !isManualBankTransferAccountId(rawBankAccountId)
     ) {
       return NextResponse.json(
-        { error: 'Invalid network. Choose TRC20, ERC20, or BNB.' },
+        { error: 'Invalid bank account. Choose a transfer method.' },
         { status: 400 }
       );
     }
 
-    const network = getManualUsdtDepositNetwork(rawNetwork);
-    const usdtAmount = usdAmountToManualUsdtAmount(amount);
+    const bankAccount = getManualBankTransferAccount(rawBankAccountId);
 
     const orderId = `dep_manual_${session.user.id}_${Date.now()}`;
     const userBalance = await ensureUserBalance(
@@ -63,24 +66,26 @@ export async function POST(request: NextRequest) {
       data: {
         userBalanceId: userBalance.id,
         amountUsd: amount,
-        payCurrency: formatManualUsdtPayCurrency(rawNetwork),
+        payCurrency: formatManualBankTransferPayCurrency(rawBankAccountId),
         channel: DepositRequestChannel.MANUAL,
         status: DepositRequestStatus.WAITING,
         orderId,
-        adminNotes: `Send ${usdtAmount.toFixed(2)} USDT on ${network.label}`
+        adminNotes: formatManualBankTransferAdminNotes(
+          amount,
+          bankAccount.label,
+          orderId
+        )
       }
     });
 
     return NextResponse.json({
       success: true,
-      message: 'Deposit request created. Send USDT to the address below.',
+      message: 'Deposit request created. Complete your bank transfer using the details below.',
       depositRequestId: depositRequest.id,
       orderId: depositRequest.orderId,
-      network: rawNetwork,
-      networkLabel: network.label,
-      walletAddress: network.address,
+      bankAccountId: rawBankAccountId,
+      bankAccountLabel: bankAccount.label,
       amountUsd: depositRequest.amountUsd,
-      usdtAmount,
       payCurrency: depositRequest.payCurrency,
       balanceType
     });
