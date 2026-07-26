@@ -357,20 +357,16 @@ export const externalApiLinks = {
 } as const;
 
 export const logoImages = {
-  full: '/images/logo/full.png',
-  fullNobuffer: '/images/logo/full-nobuffer.png',
-  fullTransparent: '/images/logo/full-transparent.png',
-  fullTransparentNobuffer: '/images/logo/full-transparent-nobuffer.png',
-  icon: '/images/logo/favicon.ico',
-  iconTransparent: '/images/logo/icon-transparent.png'
+  primary: '/images/logo/itrade-gm-3d-logo.png',
+  icon: '/images/logo/itrade-gm-3d-logo-171.png'
 } as const;
 
-export const brandLogoSrc = logoImages.fullTransparentNobuffer;
+export const brandLogoSrc = logoImages.primary;
 
 export const brandAssets = {
-  logo: logoImages.fullTransparentNobuffer,
-  logoLight: logoImages.fullTransparentNobuffer,
-  logoDark: logoImages.fullTransparentNobuffer
+  logo: logoImages.primary,
+  logoLight: logoImages.primary,
+  logoDark: logoImages.primary
 } as const;
 
 export const sponsorshipIconSrc = '/images/icons/sponsorship.svg';
