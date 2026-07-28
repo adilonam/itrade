@@ -2,9 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { UserDepositRequestsSection } from '@/components/user-management/user-deposit-requests-section';
-import {
-  MANUAL_BANK_TRANSFER_ACCOUNTS
-} from '@/constants/data';
+import { MANUAL_BANK_TRANSFER_ACCOUNTS } from '@/constants/data';
 import {
   IconCheck,
   IconChevronLeft,
