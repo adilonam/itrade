@@ -479,46 +479,23 @@ export const landingHeaderMenus: LandingHeaderMenu[] = [
 /** Manual bank transfer accounts — details are shown on the client only. */
 export const MANUAL_BANK_TRANSFER_ACCOUNTS = [
   {
-    id: 'usd-wire',
-    label: 'USD Wire Transfer',
-    hint: 'International wire (SWIFT)',
+    id: 'usd-standard-bank',
+    label: 'USD Bank Transfer',
+    hint: 'Standard Bank (SWIFT)',
     currency: 'USD',
-    accountName: 'ITRADE Global Markets Ltd',
-    bankName: 'Example International Bank',
-    accountNumber: '123456789012',
-    iban: 'GB29 EXMP 6016 1331 9268 19',
-    swift: 'EXMPGB2L',
+    accountName: 'ITRADE GLOBAL MARKETS (PTY) LTD',
+    bankName: 'Standard Bank',
+    registrationNumber: '2022/709631/07',
+    accountType: 'BIZLAUNCH',
+    accountNumber: '40 246 928 3',
+    branch: 'BAYSIDE',
+    branchCode: '002209',
+    iban: null,
+    swift: 'SBZAZAJJ',
     routingNumber: null,
+    accountOpenedDate: '12 December 2025',
     referenceHint:
       'Include your order ID in the payment reference so we can match your transfer.'
-  },
-  {
-    id: 'usd-ach',
-    label: 'USD ACH Transfer',
-    hint: 'US domestic transfer',
-    currency: 'USD',
-    accountName: 'ITRADE Global Markets Ltd',
-    bankName: 'Example National Bank',
-    accountNumber: '9876543210',
-    iban: null,
-    swift: null,
-    routingNumber: '021000021',
-    referenceHint:
-      'Include your order ID in the memo/reference field when sending.'
-  },
-  {
-    id: 'eur-sepa',
-    label: 'EUR SEPA Transfer',
-    hint: 'European bank transfer',
-    currency: 'EUR',
-    accountName: 'ITRADE Global Markets Ltd',
-    bankName: 'Example European Bank',
-    accountNumber: null,
-    iban: 'DE89 3704 0044 0532 0130 00',
-    swift: 'COBADEFFXXX',
-    routingNumber: null,
-    referenceHint:
-      'Include your order ID in the transfer reference so we can match your payment.'
   }
 ] as const;
 
