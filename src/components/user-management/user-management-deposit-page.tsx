@@ -3,8 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { UserDepositRequestsSection } from '@/components/user-management/user-deposit-requests-section';
 import {
-  MANUAL_BANK_TRANSFER_ACCOUNTS,
-  type ManualBankTransferAccountId
+  MANUAL_BANK_TRANSFER_ACCOUNTS
 } from '@/constants/data';
 import {
   IconCheck,
@@ -173,6 +172,28 @@ export function UserManagementDepositPage({
 
       <div className="flex flex-1 flex-col gap-6 p-6">
         <div className="mx-auto w-full max-w-3xl space-y-8">
+          <UserManagementManualDepositSection
+            onRequestCreated={() =>
+              setDepositListExtraRefresh((n) => n + 1)
+            }
+          />
+
+          <section
+            className="rounded-xl border border-[var(--trade-border)] bg-[var(--trade-panel)] p-6 shadow-sm"
+            aria-labelledby="crypto-deposit-heading"
+          >
+            <h2
+              id="crypto-deposit-heading"
+              className="text-sm font-semibold text-[var(--trade-text)]"
+            >
+              Crypto deposit
+            </h2>
+            <p className="mt-1 text-xs text-[var(--trade-text-muted)]">
+              Deposit via Bitcoin or USD Coin through NOWPayments. Amounts credit
+              your {REAL_WALLET_LABEL} balance in USD after on-chain confirmation.
+            </p>
+
+            <div className="mt-6 space-y-8">
           {/* Stepper */}
           <nav aria-label={tShared('progress')} className="w-full">
             <ol className="flex w-full items-stretch">
@@ -456,12 +477,8 @@ export function UserManagementDepositPage({
               </div>
             )}
           </section>
-
-          <UserManagementManualDepositSection
-            onRequestCreated={() =>
-              setDepositListExtraRefresh((n) => n + 1)
-            }
-          />
+            </div>
+          </section>
         </div>
 
         <div className="mx-auto w-full max-w-5xl pb-6">
@@ -569,18 +586,10 @@ function UserManagementManualDepositSection({
 }: {
   onRequestCreated?: () => void;
 }) {
-  const [bankAccountId, setBankAccountId] =
-    useState<ManualBankTransferAccountId>('usd-wire');
+  const bankAccount = MANUAL_BANK_TRANSFER_ACCOUNTS[0];
   const [amountRaw, setAmountRaw] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<ManualDepositResult | null>(null);
-
-  const selectedAccount = useMemo(
-    () =>
-      MANUAL_BANK_TRANSFER_ACCOUNTS.find((item) => item.id === bankAccountId) ??
-      MANUAL_BANK_TRANSFER_ACCOUNTS[0],
-    [bankAccountId]
-  );
 
   const amountNum = useMemo(() => {
     const n = parseFloat(amountRaw.replace(',', '.'));
@@ -598,7 +607,7 @@ function UserManagementManualDepositSection({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           amount: amountNum,
-          bankAccountId,
+          bankAccountId: bankAccount.id,
           balanceType: REAL_BALANCE_TYPE
         })
       });
@@ -644,84 +653,42 @@ function UserManagementManualDepositSection({
         id="manual-deposit-heading"
         className="text-sm font-semibold text-[var(--trade-text)]"
       >
-        Bank transfer deposit
+        Bank transfer
       </h2>
       <p className="mt-1 text-xs text-[var(--trade-text-muted)]">
-        Choose a transfer method, send funds to the bank account below, then
-        create a deposit request with the amount you transferred. Include your
-        order ID in the payment reference. Your balance is updated after an
-        administrator verifies your transfer.
+        Send USD to the Standard Bank account below, then create a deposit
+        request with the amount you transferred. Include your order ID in the
+        payment reference. Your balance is updated after an administrator
+        verifies your transfer.
       </p>
 
       <div className="mt-4 space-y-4">
-        <fieldset>
-          <legend className="text-sm font-semibold text-[var(--trade-text)]">
-            Transfer method
-          </legend>
-          <div
-            className="mt-3 grid gap-3 sm:grid-cols-3"
-            role="radiogroup"
-            aria-label="Bank transfer method"
-          >
-            {MANUAL_BANK_TRANSFER_ACCOUNTS.map((item) => {
-              const selected = bankAccountId === item.id;
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  role="radio"
-                  aria-checked={selected}
-                  onClick={() => setBankAccountId(item.id)}
-                  className={cn(
-                    'flex flex-col rounded-xl border px-4 py-4 text-left transition-colors',
-                    selected
-                      ? 'border-[var(--trade-accent-blue)] bg-[var(--trade-accent-blue)]/[0.08] ring-1 ring-[var(--trade-accent-blue)]/30'
-                      : 'border-[var(--trade-border)] bg-[var(--trade-dark)] hover:border-[var(--trade-text-muted)]/40'
-                  )}
-                >
-                  <span className="font-mono text-base font-bold tracking-tight text-[var(--trade-text)]">
-                    {item.currency}
-                  </span>
-                  <span className="mt-1 text-sm text-[var(--trade-text)]">
-                    {item.label.replace(new RegExp(`^${item.currency}\\s+`), '')}
-                  </span>
-                  <span className="mt-2 text-xs leading-snug text-[var(--trade-text-muted)]">
-                    {item.hint}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </fieldset>
-
         <div className="space-y-4">
           <div className="text-xs font-medium uppercase tracking-wide text-[var(--trade-text-muted)]">
-            {selectedAccount.label} bank details
+            USD bank details
           </div>
-          <BankDetailRow label="Account name" value={selectedAccount.accountName} copyable />
-          <BankDetailRow label="Bank name" value={selectedAccount.bankName} />
-          {selectedAccount.accountNumber ? (
-            <BankDetailRow
-              label="Account number"
-              value={selectedAccount.accountNumber}
-              copyable
-            />
-          ) : null}
-          {selectedAccount.iban ? (
-            <BankDetailRow label="IBAN" value={selectedAccount.iban} copyable />
-          ) : null}
-          {selectedAccount.swift ? (
-            <BankDetailRow label="SWIFT / BIC" value={selectedAccount.swift} copyable />
-          ) : null}
-          {selectedAccount.routingNumber ? (
-            <BankDetailRow
-              label="Routing number"
-              value={selectedAccount.routingNumber}
-              copyable
-            />
-          ) : null}
+          <BankDetailRow label="Account holder" value={bankAccount.accountName} copyable />
+          <BankDetailRow
+            label="ID / Reg number"
+            value={bankAccount.registrationNumber}
+            copyable
+          />
+          <BankDetailRow label="Account type" value={bankAccount.accountType} />
+          <BankDetailRow label="Bank name" value={bankAccount.bankName} />
+          <BankDetailRow
+            label="Account number"
+            value={bankAccount.accountNumber}
+            copyable
+          />
+          <BankDetailRow label="Branch" value={bankAccount.branch} />
+          <BankDetailRow label="Branch code" value={bankAccount.branchCode} copyable />
+          <BankDetailRow label="SWIFT code" value={bankAccount.swift} copyable />
+          <BankDetailRow
+            label="Date account opened"
+            value={bankAccount.accountOpenedDate}
+          />
           <p className="text-xs leading-relaxed text-[var(--trade-text-muted)]">
-            {selectedAccount.referenceHint}
+            {bankAccount.referenceHint}
           </p>
         </div>
       </div>
@@ -732,7 +699,7 @@ function UserManagementManualDepositSection({
             value={amountRaw}
             onChange={setAmountRaw}
             showError={!amountOk && amountRaw.trim() !== ''}
-            currency={selectedAccount.currency}
+            currency={bankAccount.currency}
           />
           <button
             type="button"
