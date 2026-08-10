@@ -330,7 +330,8 @@ export const userManagementNavPrimary: UserManagementNavItem[] = [
   { title: 'Deposit', url: '/user-management/deposit' },
   { title: 'Withdrawal', url: '/user-management/withdrawal' },
   { title: 'Settings', url: '/user-management/settings' },
-  { title: 'KYC verification', url: '/user-management/kyc' }
+  { title: 'KYC verification', url: '/user-management/kyc' },
+  { title: 'Trading consent', url: '/consent' }
 ];
 
 export const userManagementNavSecondary: UserManagementNavItem[] = [];
@@ -376,7 +377,8 @@ export const landingPageLinks = {
   signUp: '/auth/sign-up',
   trade: '/trade',
   plans: '/investments',
-  dashboard: '/overview'
+  dashboard: '/overview',
+  consent: '/consent'
 } as const;
 
 export const landingNavLinks = {
