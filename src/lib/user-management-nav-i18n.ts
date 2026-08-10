@@ -4,7 +4,8 @@ const USER_MANAGEMENT_NAV_KEYS = {
   Transfer: 'transfer',
   Withdrawal: 'withdrawal',
   Settings: 'settings',
-  'KYC verification': 'kyc'
+  'KYC verification': 'kyc',
+  'Trading consent': 'consent'
 } as const;
 
 export type UserManagementNavMessageKey =

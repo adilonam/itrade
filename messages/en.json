@@ -483,7 +483,8 @@
       "transfer": "Transfer",
       "withdrawal": "Withdrawal",
       "settings": "Settings",
-      "kyc": "KYC verification"
+      "kyc": "KYC verification",
+      "consent": "Trading consent"
     },
     "sidebar": {
       "ariaLabel": "User management",

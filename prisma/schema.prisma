@@ -104,24 +104,30 @@ model User {
   city                    String?                  @map("city")
   country                 String?                  @map("country")
   gender                  String?                  @map("gender")
-  kycStatus               KycStatus                @default(NOT_SUBMITTED) @map("kyc_status")
-  kycDocumentType         String?                  @map("kyc_document_type")
-  accounts                Account[]
-  sessions                Session[]
-  mfaChallenges           MfaChallenge[]
-  passwordResetTokens     PasswordResetToken[]
-  positions               Position[]
-  userInvestments         UserInvestment[]
-  withdrawRequests        WithdrawRequest[]
-  seller                  User?                    @relation("SellerUsers", fields: [sellerId], references: [id], onDelete: SetNull)
-  sellerId                String?                  @map("seller_id")
-  sellerUsers             User[]                   @relation("SellerUsers")
-  sentMessages            Message[]                @relation("MessageSender")
-  receivedMessages        Message[]                @relation("MessageReceiver")
-  botUsers                BotUser[]
-  balances                UserBalance[]
-  kycVerificationRequests KycVerificationRequest[] @relation("KycUserRequests")
-  reviewedKycRequests     KycVerificationRequest[] @relation("KycReviewedBy")
+  kycStatus                     KycStatus @default(NOT_SUBMITTED) @map("kyc_status")
+  kycDocumentType               String?   @map("kyc_document_type")
+  hasSignedConsent              Boolean   @default(false) @map("has_signed_consent")
+  consentSignedAt               DateTime? @map("consent_signed_at")
+  consentSignatureName          String?   @map("consent_signature_name")
+  consentSignatureContent       Bytes?    @map("consent_signature_content") @db.ByteA
+  consentSignatureContentType   String?   @map("consent_signature_content_type")
+  consentIpAddress              String?   @map("consent_ip_address")
+  accounts                      Account[]
+  sessions                      Session[]
+  mfaChallenges                 MfaChallenge[]
+  passwordResetTokens           PasswordResetToken[]
+  positions                     Position[]
+  userInvestments               UserInvestment[]
+  withdrawRequests              WithdrawRequest[]
+  seller                        User?     @relation("SellerUsers", fields: [sellerId], references: [id], onDelete: SetNull)
+  sellerId                      String?   @map("seller_id")
+  sellerUsers                   User[]    @relation("SellerUsers")
+  sentMessages                  Message[] @relation("MessageSender")
+  receivedMessages              Message[] @relation("MessageReceiver")
+  botUsers                      BotUser[]
+  balances                      UserBalance[]
+  kycVerificationRequests       KycVerificationRequest[] @relation("KycUserRequests")
+  reviewedKycRequests           KycVerificationRequest[] @relation("KycReviewedBy")
 
   @@map("users")
 }
