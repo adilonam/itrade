@@ -76,7 +76,7 @@ export function TradingRoomMarketsPanel({
   void _selectedMarket; // Reserved for future use
   const t = useTranslations('Trade.markets');
   const [symbolQuery, setSymbolQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<MarketCategory>('FOREX');
+  const [selectedCategory, setSelectedCategory] = useState<MarketCategory>('ALL');
 
   const getPrice = (item: SymbolItem) =>
     isMarket(item) ? item.lastPrice : (item as MockSymbol).price;

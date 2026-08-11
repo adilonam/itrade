@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { getLocale, getTranslations } from 'next-intl/server';
-import { EB_Garamond, Inter } from 'next/font/google';
+import { landingDisplayFontClassName, landingRootFontClasses } from '@/lib/landing-fonts';
 import { IconChartLine, IconSchool } from '@tabler/icons-react';
 import { landingSiteLinks, landingPageLinks, brandAssets } from '@/constants/data';
 import {
@@ -9,18 +9,6 @@ import {
   LandingHeaderUtilities
 } from '@/components/landing/landing-header-nav';
 import { LandingSiteFooter } from '@/components/landing/landing-site-footer';
-
-const ebGaramond = EB_Garamond({
-  subsets: ['latin'],
-  weight: ['400', '500'],
-  variable: '--font-landing-display'
-});
-
-const inter = Inter({
-  subsets: ['latin'],
-  weight: ['400', '500', '600'],
-  variable: '--font-landing-body'
-});
 
 const marketCardKeys = [
   'currencies',
@@ -86,7 +74,7 @@ export async function LandingHomepage({ appName, session }: LandingHomepageProps
   return (
     <main
       dir={locale === 'ar' ? 'rtl' : 'ltr'}
-      className={`${ebGaramond.variable} ${inter.className} h-dvh overflow-y-auto scroll-smooth bg-white text-[#1a1c1c] antialiased`}
+      className={`${landingRootFontClasses} h-dvh overflow-y-auto scroll-smooth bg-white text-[#1a1c1c] antialiased`}
     >
       <header className="fixed top-0 left-0 z-50 flex h-20 w-full items-center border-b border-white/10 bg-[#141414] px-5 md:px-16">
         <div className="mx-auto flex h-full w-full max-w-[1440px] items-center justify-between gap-6">
@@ -135,7 +123,7 @@ export async function LandingHomepage({ appName, session }: LandingHomepageProps
         <div className="relative z-20 mx-auto w-full max-w-[1440px] px-5 md:px-16">
           <div className="max-w-3xl">
             <h1
-              className={`${ebGaramond.className} mb-8 text-[40px] leading-[48px] tracking-[-0.01em] text-white md:text-[64px] md:leading-[72px] md:tracking-[-0.02em]`}
+              className={`${landingDisplayFontClassName} mb-8 text-[40px] leading-[48px] tracking-[-0.01em] text-white md:text-[64px] md:leading-[72px] md:tracking-[-0.02em]`}
             >
               {t('hero.titleLine1')} <br className="hidden md:block" /> {t('hero.titleLine2')}
             </h1>
@@ -162,7 +150,7 @@ export async function LandingHomepage({ appName, session }: LandingHomepageProps
         <div className="mx-auto max-w-[1440px] px-5 md:px-16">
           <div className="mx-auto mb-16 max-w-3xl text-center">
             <h2
-              className={`${ebGaramond.className} mb-6 text-[40px] leading-[48px] text-black italic md:text-[32px] md:leading-[40px]`}
+              className={`${landingDisplayFontClassName} mb-6 text-[40px] leading-[48px] text-black italic md:text-[32px] md:leading-[40px]`}
             >
               {t('whyChooseUs.title')}
             </h2>
@@ -172,7 +160,7 @@ export async function LandingHomepage({ appName, session }: LandingHomepageProps
             <div className="space-y-6 border border-[#c4c7c7]/20 bg-[#F9F9F9] p-8 md:p-10">
               <div className="flex items-center gap-4">
                 <IconSchool className="size-8 text-[#C0A678]" stroke={1.5} />
-                <h3 className={`${ebGaramond.className} text-2xl leading-8 font-medium`}>
+                <h3 className={`${landingDisplayFontClassName} text-2xl leading-8 font-medium`}>
                   {t('beginners.title')}
                 </h3>
               </div>
@@ -200,7 +188,7 @@ export async function LandingHomepage({ appName, session }: LandingHomepageProps
             <div className="space-y-6 border border-[#c4c7c7]/20 bg-[#F9F9F9] p-8 md:p-10">
               <div className="flex items-center gap-4">
                 <IconChartLine className="size-8 text-[#C0A678]" stroke={1.5} />
-                <h3 className={`${ebGaramond.className} text-2xl leading-8 font-medium`}>
+                <h3 className={`${landingDisplayFontClassName} text-2xl leading-8 font-medium`}>
                   {t('experienced.title')}
                 </h3>
               </div>
@@ -232,7 +220,7 @@ export async function LandingHomepage({ appName, session }: LandingHomepageProps
       <section className="mx-auto max-w-[1440px] bg-white px-5 py-[120px] md:px-16">
         <div className="mb-24 text-center">
           <h2
-            className={`${ebGaramond.className} mb-4 text-[40px] leading-[48px] text-black italic md:text-[32px] md:leading-[40px]`}
+            className={`${landingDisplayFontClassName} mb-4 text-[40px] leading-[48px] text-black italic md:text-[32px] md:leading-[40px]`}
           >
             {t('markets.title')}
           </h2>
@@ -258,7 +246,7 @@ export async function LandingHomepage({ appName, session }: LandingHomepageProps
                   <p className="mb-2 text-xs font-semibold tracking-[0.1em] text-white/70 uppercase">
                     {t(`markets.${card.key}.category`)}
                   </p>
-                  <h3 className={`${ebGaramond.className} text-2xl leading-8 font-medium text-white`}>
+                  <h3 className={`${landingDisplayFontClassName} text-2xl leading-8 font-medium text-white`}>
                     {t(`markets.${card.key}.title`)}
                   </h3>
                 </div>
@@ -285,7 +273,7 @@ export async function LandingHomepage({ appName, session }: LandingHomepageProps
             </div>
             <div className="lg:w-1/2">
               <h2
-                className={`${ebGaramond.className} mb-8 text-[40px] leading-[48px] text-black md:text-[48px] md:leading-[56px]`}
+                className={`${landingDisplayFontClassName} mb-8 text-[40px] leading-[48px] text-black md:text-[48px] md:leading-[56px]`}
               >
                 {t('tradeOnYourTerms.title')}
               </h2>
@@ -305,7 +293,7 @@ export async function LandingHomepage({ appName, session }: LandingHomepageProps
 
       <section className="mx-auto max-w-[1440px] px-5 py-[120px] text-center md:px-16">
         <h2
-          className={`${ebGaramond.className} mb-12 text-[40px] leading-[48px] md:text-[64px] md:leading-[72px] md:tracking-[-0.02em]`}
+          className={`${landingDisplayFontClassName} mb-12 text-[40px] leading-[48px] md:text-[64px] md:leading-[72px] md:tracking-[-0.02em]`}
         >
           {t('confidence.title')}
         </h2>

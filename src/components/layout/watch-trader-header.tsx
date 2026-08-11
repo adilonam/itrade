@@ -35,11 +35,6 @@ function isRoomTradingNavActive(pathname: string | null, url: string): boolean {
   return false;
 }
 
-function utcClockString() {
-  const now = new Date();
-  return now.toISOString().slice(11, 19);
-}
-
 type BalanceAmountDisplay = {
   text: string;
   nonNegative: boolean;
@@ -78,7 +73,9 @@ export function WatchTraderHeader() {
   const pathname = usePathname() ?? '';
   const { data: session } = useSession();
   const { selectedBalanceType, setTradeBalanceType } = useTradeBalanceSelection();
-  const [time, setTime] = useState(utcClockString);
+  const [clock, setClock] = useState<{ display: string; iso: string } | null>(
+    null
+  );
   const [openBalanceDropdown, setOpenBalanceDropdown] = useState(false);
   const [wsStatusOpen, setWsStatusOpen] = useState(false);
   const [financialByBalanceType, setFinancialByBalanceType] = useState<
@@ -137,8 +134,17 @@ export function WatchTraderHeader() {
   }, [session?.user]);
 
   useEffect(() => {
-    const t = setInterval(() => setTime(utcClockString()), 1000);
-    return () => clearInterval(t);
+    const tick = () => {
+      const now = new Date();
+      setClock({
+        display: now.toISOString().slice(11, 19),
+        iso: now.toISOString()
+      });
+    };
+
+    tick();
+    const intervalId = setInterval(tick, 1000);
+    return () => clearInterval(intervalId);
   }, []);
 
   useEffect(() => {
@@ -393,12 +399,14 @@ export function WatchTraderHeader() {
         <LanguageMenu variant="trade" />
         <ModeToggle />
         <UserNav variant="trade" />
-        <time
-          className="hidden font-mono text-[10px] text-[var(--trade-text-muted)] xl:block"
-          dateTime={new Date().toISOString()}
-        >
-          {time} (UTC+0)
-        </time>
+        {clock ? (
+          <time
+            className="hidden font-mono text-[10px] text-[var(--trade-text-muted)] xl:block"
+            dateTime={clock.iso}
+          >
+            {clock.display} (UTC+0)
+          </time>
+        ) : null}
       </div>
     </header>
   );

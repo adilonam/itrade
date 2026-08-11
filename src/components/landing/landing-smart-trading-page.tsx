@@ -1,25 +1,13 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { getLocale } from 'next-intl/server';
-import { EB_Garamond, Inter } from 'next/font/google';
+import { landingRootFontClasses } from '@/lib/landing-fonts';
 import { brandAssets, landingPageLinks } from '@/constants/data';
 import {
   LandingHeaderNavMenus,
   LandingHeaderUtilities
 } from '@/components/landing/landing-header-nav';
 import { LandingSiteFooter } from '@/components/landing/landing-site-footer';
-
-const ebGaramond = EB_Garamond({
-  subsets: ['latin'],
-  weight: ['400', '500'],
-  variable: '--font-landing-display'
-});
-
-const inter = Inter({
-  subsets: ['latin'],
-  weight: ['400', '500', '600'],
-  variable: '--font-landing-body'
-});
 
 type LandingSmartTradingPageProps = {
   appName: string;
@@ -89,7 +77,7 @@ export async function LandingSmartTradingPage({ appName, session }: LandingSmart
   return (
     <main
       dir={locale === 'ar' ? 'rtl' : 'ltr'}
-      className={`${ebGaramond.variable} ${inter.className} h-dvh overflow-y-auto bg-[#f5f5f5] text-[#1a1c1c] antialiased`}
+      className={`${landingRootFontClasses} h-dvh overflow-y-auto bg-[#f5f5f5] text-[#1a1c1c] antialiased`}
     >
       <header className="fixed top-0 left-0 z-50 flex h-20 w-full items-center border-b border-white/10 bg-[#141414] px-5 md:px-16">
         <div className="mx-auto flex h-full w-full max-w-[1440px] items-center justify-between gap-6">
