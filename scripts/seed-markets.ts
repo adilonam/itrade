@@ -19,7 +19,6 @@ const API_DELAY_MS = 250;
 type MarketSpec = {
   type: MarketType;
   symbol: string;
-  twelveDataSymbol: string;
   name: string;
   spread: number;
 };
@@ -36,50 +35,43 @@ const MARKET_SPECS: MarketSpec[] = [
   // Forex majors
   {
     type: 'FOREX',
-    symbol: 'EURUSD',
-    twelveDataSymbol: 'EUR/USD',
+    symbol: 'EUR/USD',
     name: 'Euro / US Dollar',
     spread: 0.00012
   },
   {
     type: 'FOREX',
-    symbol: 'USDJPY',
-    twelveDataSymbol: 'USD/JPY',
+    symbol: 'USD/JPY',
     name: 'US Dollar / Japanese Yen',
     spread: 0.02
   },
   {
     type: 'FOREX',
-    symbol: 'GBPUSD',
-    twelveDataSymbol: 'GBP/USD',
+    symbol: 'GBP/USD',
     name: 'British Pound / US Dollar',
     spread: 0.00015
   },
   {
     type: 'FOREX',
-    symbol: 'USDCHF',
-    twelveDataSymbol: 'USD/CHF',
+    symbol: 'USD/CHF',
     name: 'US Dollar / Swiss Franc',
     spread: 0.00012
   },
   {
     type: 'FOREX',
-    symbol: 'AUDUSD',
-    twelveDataSymbol: 'AUD/USD',
+    symbol: 'AUD/USD',
     name: 'Australian Dollar / US Dollar',
     spread: 0.00012
   },
   {
     type: 'FOREX',
-    symbol: 'USDCAD',
-    twelveDataSymbol: 'USD/CAD',
+    symbol: 'USD/CAD',
     name: 'US Dollar / Canadian Dollar',
     spread: 0.00012
   },
   {
     type: 'FOREX',
-    symbol: 'NZDUSD',
-    twelveDataSymbol: 'NZD/USD',
+    symbol: 'NZD/USD',
     name: 'New Zealand Dollar / US Dollar',
     spread: 0.00015
   },
@@ -88,49 +80,42 @@ const MARKET_SPECS: MarketSpec[] = [
   {
     type: 'STOCKS',
     symbol: 'AAPL',
-    twelveDataSymbol: 'AAPL',
     name: 'Apple',
     spread: 0.05
   },
   {
     type: 'STOCKS',
     symbol: 'MSFT',
-    twelveDataSymbol: 'MSFT',
     name: 'Microsoft',
     spread: 0.05
   },
   {
     type: 'STOCKS',
     symbol: 'NVDA',
-    twelveDataSymbol: 'NVDA',
     name: 'NVIDIA',
     spread: 0.05
   },
   {
     type: 'STOCKS',
     symbol: 'AMZN',
-    twelveDataSymbol: 'AMZN',
     name: 'Amazon',
     spread: 0.05
   },
   {
     type: 'STOCKS',
     symbol: 'GOOGL',
-    twelveDataSymbol: 'GOOGL',
     name: 'Alphabet',
     spread: 0.05
   },
   {
     type: 'STOCKS',
     symbol: 'META',
-    twelveDataSymbol: 'META',
     name: 'Meta',
     spread: 0.05
   },
   {
     type: 'STOCKS',
     symbol: 'TSLA',
-    twelveDataSymbol: 'TSLA',
     name: 'Tesla',
     spread: 0.05
   },
@@ -138,29 +123,25 @@ const MARKET_SPECS: MarketSpec[] = [
   // Commodities majors
   {
     type: 'COMMODITIES',
-    symbol: 'XAUUSD',
-    twelveDataSymbol: 'XAU/USD',
+    symbol: 'XAU/USD',
     name: 'Gold / US Dollar',
     spread: 0.45
   },
   {
     type: 'COMMODITIES',
-    symbol: 'XAGUSD',
-    twelveDataSymbol: 'XAG/USD',
+    symbol: 'XAG/USD',
     name: 'Silver / US Dollar',
     spread: 0.02
   },
   {
     type: 'COMMODITIES',
-    symbol: 'WTI',
-    twelveDataSymbol: 'WTI/USD',
+    symbol: 'WTI/USD',
     name: 'Crude Oil (WTI)',
     spread: 0.03
   },
   {
     type: 'COMMODITIES',
-    symbol: 'BRENT',
-    twelveDataSymbol: 'BRENT/USD',
+    symbol: 'BRENT/USD',
     name: 'Brent Crude',
     spread: 0.03
   },
@@ -168,43 +149,37 @@ const MARKET_SPECS: MarketSpec[] = [
   // Indices majors
   {
     type: 'INDICES',
-    symbol: 'US500',
-    twelveDataSymbol: 'SPX',
+    symbol: 'SPX',
     name: 'S&P 500',
     spread: 0.8
   },
   {
     type: 'INDICES',
     symbol: 'NDX',
-    twelveDataSymbol: 'NDX',
     name: 'NASDAQ Composite',
     spread: 1.2
   },
   {
     type: 'INDICES',
     symbol: 'DJI',
-    twelveDataSymbol: 'DJI',
     name: 'Dow Jones Industrial Average',
     spread: 2
   },
   {
     type: 'INDICES',
     symbol: 'DAX',
-    twelveDataSymbol: 'DAX',
     name: 'DAX',
     spread: 1
   },
   {
     type: 'INDICES',
     symbol: 'FTSE',
-    twelveDataSymbol: 'FTSE',
     name: 'FTSE 100',
     spread: 0.8
   },
   {
     type: 'INDICES',
     symbol: 'N225',
-    twelveDataSymbol: 'N225',
     name: 'Nikkei 225',
     spread: 15
   },
@@ -212,29 +187,25 @@ const MARKET_SPECS: MarketSpec[] = [
   // Crypto majors
   {
     type: 'CRYPTO',
-    symbol: 'BTCUSD',
-    twelveDataSymbol: 'BTC/USD',
+    symbol: 'BTC/USD',
     name: 'Bitcoin',
     spread: 12
   },
   {
     type: 'CRYPTO',
-    symbol: 'ETHUSD',
-    twelveDataSymbol: 'ETH/USD',
+    symbol: 'ETH/USD',
     name: 'Ethereum',
     spread: 2.5
   },
   {
     type: 'CRYPTO',
-    symbol: 'SOLUSD',
-    twelveDataSymbol: 'SOL/USD',
+    symbol: 'SOL/USD',
     name: 'Solana',
     spread: 0.15
   },
   {
     type: 'CRYPTO',
-    symbol: 'XRPUSD',
-    twelveDataSymbol: 'XRP/USD',
+    symbol: 'XRP/USD',
     name: 'XRP',
     spread: 0.001
   }
@@ -244,12 +215,12 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-async function validateWithTwelveData(twelveDataSymbol: string): Promise<
+async function validateWithTwelveData(symbol: string): Promise<
   | { ok: true; name: string; lastPrice: number; lastChange: number }
   | { ok: false; message: string }
 > {
   const url = new URL(`${TWELVE_DATA_BASE}/quote`);
-  url.searchParams.set('symbol', twelveDataSymbol);
+  url.searchParams.set('symbol', symbol);
   url.searchParams.set('apikey', requireTwelveDataServerApiKey());
 
   const response = await fetch(url.toString(), {
@@ -279,7 +250,7 @@ async function validateWithTwelveData(twelveDataSymbol: string): Promise<
 
   return {
     ok: true,
-    name: data.name?.trim() || twelveDataSymbol,
+    name: data.name?.trim() || symbol,
     lastPrice,
     lastChange: Number.isFinite(lastChange) ? lastChange : 0
   };
@@ -304,19 +275,17 @@ async function main() {
 
   let createdCount = 0;
   let updatedCount = 0;
-  const notFound: { symbol: string; twelveDataSymbol: string; message: string }[] =
-    [];
+  const notFound: { symbol: string; message: string }[] = [];
 
   for (const spec of MARKET_SPECS) {
-    process.stdout.write(`Checking ${spec.symbol} (${spec.twelveDataSymbol})... `);
+    process.stdout.write(`Checking ${spec.symbol}... `);
 
-    const validation = await validateWithTwelveData(spec.twelveDataSymbol);
+    const validation = await validateWithTwelveData(spec.symbol);
 
     if (!validation.ok) {
       console.log('NOT FOUND');
       notFound.push({
         symbol: spec.symbol,
-        twelveDataSymbol: spec.twelveDataSymbol,
         message: validation.message
       });
       await sleep(API_DELAY_MS);
@@ -366,9 +335,7 @@ async function main() {
   if (notFound.length > 0) {
     console.log('\nSymbols not found on Twelve Data:');
     for (const row of notFound) {
-      console.log(
-        `  - ${row.symbol} (API: ${row.twelveDataSymbol}) — ${row.message}`
-      );
+      console.log(`  - ${row.symbol} — ${row.message}`);
     }
   }
 }
