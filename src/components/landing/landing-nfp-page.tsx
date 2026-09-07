@@ -1,13 +1,5 @@
-import Image from 'next/image';
-import Link from 'next/link';
 import { getLocale } from 'next-intl/server';
-import { landingRootFontClasses } from '@/lib/landing-fonts';
-import { brandAssets, landingPageLinks } from '@/constants/data';
-import {
-  LandingHeaderNavMenus,
-  LandingHeaderUtilities
-} from '@/components/landing/landing-header-nav';
-import { LandingSiteFooter } from '@/components/landing/landing-site-footer';
+import { SmxMarketingShell } from '@/components/landing/smx/smx-marketing-shell';
 
 type LandingNfpPageProps = {
   appName: string;
@@ -46,7 +38,6 @@ const nfpDatesAr = [
 
 export async function LandingNfpPage({ appName, session }: LandingNfpPageProps) {
   const locale = await getLocale();
-  const tradeHref = session ? landingPageLinks.trade : landingPageLinks.signIn;
   const content =
     locale === 'ar'
       ? {
@@ -99,56 +90,30 @@ export async function LandingNfpPage({ appName, session }: LandingNfpPageProps) 
         };
 
   return (
-    <main
-      dir={locale === 'ar' ? 'rtl' : 'ltr'}
-      className={`${landingRootFontClasses} h-dvh overflow-y-auto bg-[#f5f5f5] text-[#1a1c1c] antialiased`}
-    >
-      <header className="fixed top-0 left-0 z-50 flex h-20 w-full items-center border-b border-white/10 bg-[#141414] px-5 md:px-16">
-        <div className="mx-auto flex h-full w-full max-w-[1440px] items-center justify-between gap-6">
-          <div className="flex min-w-0 items-center gap-6 md:gap-8 lg:gap-12">
-            <Link href="/" className="inline-flex shrink-0 items-center" aria-label={appName}>
-              <Image
-                src={brandAssets.logoLight}
-                alt={`${appName} logo`}
-                width={160}
-                height={40}
-                className="h-12 w-auto"
-                priority
-              />
-            </Link>
-            <LandingHeaderNavMenus />
-          </div>
-          <LandingHeaderUtilities
-            session={session}
-            signInHref={landingPageLinks.signIn}
-            signUpHref={landingPageLinks.signUp}
-            tradeHref={tradeHref}
-          />
-        </div>
-      </header>
+    <SmxMarketingShell appName={appName} session={session}>
 
-      <section className="pt-28 pb-20 md:pt-36 md:pb-24">
+      <section className="pt-12 pb-20 md:pt-16 md:pb-24">
         <div className="mx-auto w-full max-w-[1060px] px-5 md:px-16">
-          <div className="mb-8 flex items-center gap-2 text-sm text-[#6b6e70]">
+          <div className="mb-8 flex items-center gap-2 text-sm text-gray-500">
             <span>{content.breadcrumbParent}</span>
             <span>/</span>
-            <span className="text-[#1a1c1c]">{content.breadcrumbCurrent}</span>
+            <span className="text-gray-100">{content.breadcrumbCurrent}</span>
           </div>
 
-          <h1 className="mb-3 flex items-center gap-3 text-[44px] leading-[1.1] font-semibold text-[#1a1c1c] md:text-[56px]">
+          <h1 className="mb-3 flex items-center gap-3 text-[44px] leading-[1.1] font-semibold text-gray-100 md:text-[56px]">
             <span className="text-[48px] leading-none">🇺🇸</span>
             <span>NFP</span>
           </h1>
 
-          <p className="mb-7 text-[20px] leading-8 text-[#1f2325]">{content.subtitle}</p>
+          <p className="mb-7 text-[20px] leading-8 text-white">{content.subtitle}</p>
 
-          <div className="space-y-6 text-[16px] leading-8 text-[#2f3335]">
-            <p className="font-semibold text-[#1f2325]">{content.heading}</p>
+          <div className="space-y-6 text-[16px] leading-8 text-gray-300">
+            <p className="font-semibold text-white">{content.heading}</p>
 
             <p>{content.paragraph1}</p>
 
             <div>
-              <p className="mb-2 font-semibold text-[#1f2325]">{content.reasonsTitle}</p>
+              <p className="mb-2 font-semibold text-white">{content.reasonsTitle}</p>
               <ul className="list-disc space-y-1 ps-6">
                 <li>{content.reason1}</li>
                 <li>{content.reason2}</li>
@@ -159,10 +124,10 @@ export async function LandingNfpPage({ appName, session }: LandingNfpPageProps) 
             <p>{content.paragraph2}</p>
 
             <div className="space-y-3 pt-1">
-              <h2 className="text-[24px] font-semibold leading-8 text-[#1d2022]">{content.datesTitle}</h2>
+              <h2 className="text-[24px] font-semibold leading-8 text-white">{content.datesTitle}</h2>
               <p>{content.datesDescription}</p>
 
-              <div className="overflow-hidden border border-[#d1d3d4] bg-white shadow-sm">
+              <div className="overflow-hidden border border-white/15 bg-white/5 shadow-none">
                 <table className="w-full border-collapse text-center text-sm">
                   <thead>
                     <tr className="bg-[#111] text-white">
@@ -173,10 +138,10 @@ export async function LandingNfpPage({ appName, session }: LandingNfpPageProps) 
                   </thead>
                   <tbody>
                     {content.dates.map((item, index) => (
-                      <tr key={item.month} className={index % 2 === 0 ? 'bg-[#f3f4f6]' : 'bg-[#e9ebee]'}>
-                        <td className="border border-[#d1d3d4] px-4 py-3">{item.month}</td>
-                        <td className="border border-[#d1d3d4] px-4 py-3">{item.day}</td>
-                        <td className="border border-[#d1d3d4] px-4 py-3">{item.time}</td>
+                      <tr key={item.month} className={index % 2 === 0 ? 'bg-white/5' : 'bg-white/10'}>
+                        <td className="border border-white/15 px-4 py-3">{item.month}</td>
+                        <td className="border border-white/15 px-4 py-3">{item.day}</td>
+                        <td className="border border-white/15 px-4 py-3">{item.time}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -186,8 +151,6 @@ export async function LandingNfpPage({ appName, session }: LandingNfpPageProps) 
           </div>
         </div>
       </section>
-
-      <LandingSiteFooter appName={appName} className="bg-[#f5f5f5]" />
-    </main>
+    </SmxMarketingShell>
   );
 }

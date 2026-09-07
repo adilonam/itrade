@@ -1,13 +1,5 @@
-import Image from 'next/image';
-import Link from 'next/link';
 import { getLocale } from 'next-intl/server';
-import { landingRootFontClasses } from '@/lib/landing-fonts';
-import { brandAssets, landingPageLinks } from '@/constants/data';
-import {
-  LandingHeaderNavMenus,
-  LandingHeaderUtilities
-} from '@/components/landing/landing-header-nav';
-import { LandingSiteFooter } from '@/components/landing/landing-site-footer';
+import { SmxMarketingShell } from '@/components/landing/smx/smx-marketing-shell';
 
 type LandingSmartTradingPageProps = {
   appName: string;
@@ -52,7 +44,6 @@ const smartTradingSectionsAr = [
 
 export async function LandingSmartTradingPage({ appName, session }: LandingSmartTradingPageProps) {
   const locale = await getLocale();
-  const tradeHref = session ? landingPageLinks.trade : landingPageLinks.signIn;
   const content =
     locale === 'ar'
       ? {
@@ -75,64 +66,36 @@ export async function LandingSmartTradingPage({ appName, session }: LandingSmart
         };
 
   return (
-    <main
-      dir={locale === 'ar' ? 'rtl' : 'ltr'}
-      className={`${landingRootFontClasses} h-dvh overflow-y-auto bg-[#f5f5f5] text-[#1a1c1c] antialiased`}
-    >
-      <header className="fixed top-0 left-0 z-50 flex h-20 w-full items-center border-b border-white/10 bg-[#141414] px-5 md:px-16">
-        <div className="mx-auto flex h-full w-full max-w-[1440px] items-center justify-between gap-6">
-          <div className="flex min-w-0 items-center gap-6 md:gap-8 lg:gap-12">
-            <Link href="/" className="inline-flex shrink-0 items-center" aria-label={appName}>
-              <Image
-                src={brandAssets.logoLight}
-                alt={`${appName} logo`}
-                width={160}
-                height={40}
-                className="h-12 w-auto"
-                priority
-              />
-            </Link>
-            <LandingHeaderNavMenus />
-          </div>
-          <LandingHeaderUtilities
-            session={session}
-            signInHref={landingPageLinks.signIn}
-            signUpHref={landingPageLinks.signUp}
-            tradeHref={tradeHref}
-          />
-        </div>
-      </header>
+    <SmxMarketingShell appName={appName} session={session}>
 
-      <section className="pt-28 pb-20 md:pt-36 md:pb-24">
+      <section className="pt-12 pb-20 md:pt-16 md:pb-24">
         <div className="mx-auto w-full max-w-[1060px] px-5 md:px-16">
-          <div className="mb-8 flex items-center gap-2 text-sm text-[#6b6e70]">
+          <div className="mb-8 flex items-center gap-2 text-sm text-gray-500">
             <span>{content.breadcrumbParent}</span>
             <span>/</span>
-            <span className="text-[#1a1c1c]">{content.breadcrumbCurrent}</span>
+            <span className="text-gray-100">{content.breadcrumbCurrent}</span>
           </div>
 
-          <h1 className="mb-3 text-[44px] leading-[1.1] font-semibold text-[#1a1c1c] md:text-[56px]">
+          <h1 className="mb-3 text-[44px] leading-[1.1] font-semibold text-gray-100 md:text-[56px]">
             {content.title}
           </h1>
 
-          <p className="mb-7 text-[20px] font-semibold leading-8 text-[#1f2325]">
+          <p className="mb-7 text-[20px] font-semibold leading-8 text-white">
             {content.subtitle}
           </p>
 
-          <div className="space-y-6 text-[16px] leading-8 text-[#2f3335]">
+          <div className="space-y-6 text-[16px] leading-8 text-gray-300">
             <p>{content.intro}</p>
 
             {content.sections.map((section) => (
               <div key={section.title} className="space-y-2 pt-1">
-                <h2 className="text-[24px] font-semibold leading-8 text-[#1d2022]">{section.title}</h2>
+                <h2 className="text-[24px] font-semibold leading-8 text-white">{section.title}</h2>
                 <p>{section.content}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
-
-      <LandingSiteFooter appName={appName} className="bg-[#f5f5f5]" />
-    </main>
+    </SmxMarketingShell>
   );
 }

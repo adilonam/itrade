@@ -10,20 +10,43 @@ import {
   CardHeader,
   CardTitle
 } from '@/components/ui/card';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { CountryCallingCodePicker } from '@/components/phone/country-calling-code-picker';
+import {
+  DEFAULT_PHONE_COUNTRY,
+  formatPhoneE164,
+  parsePrefillPhone
+} from '@/lib/country-calling-codes';
+import { useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import Link from 'next/link';
 import { signIn } from 'next-auth/react';
 import { IconBrandGoogle } from '@tabler/icons-react';
+import type { CountryCode } from 'libphonenumber-js';
 
 export function SignUpForm() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [phoneCountry, setPhoneCountry] =
+    useState<CountryCode>(DEFAULT_PHONE_COUNTRY);
+  const [phoneNational, setPhoneNational] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const prefillName = searchParams.get('name');
+    const prefillEmail = searchParams.get('email');
+    const prefillPhone = parsePrefillPhone(searchParams.get('phone'));
+    if (prefillName) setName(prefillName);
+    if (prefillEmail) setEmail(prefillEmail);
+    if (prefillPhone) {
+      setPhoneCountry(prefillPhone.country);
+      setPhoneNational(prefillPhone.nationalNumber);
+    }
+  }, [searchParams]);
 
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
@@ -53,6 +76,13 @@ export function SignUpForm() {
       return;
     }
 
+    const phone = formatPhoneE164(phoneCountry, phoneNational);
+    if (!phone) {
+      toast.error('Please enter a valid phone number');
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const response = await fetch('/api/auth/register', {
         method: 'POST',
@@ -62,7 +92,8 @@ export function SignUpForm() {
         body: JSON.stringify({
           name,
           email,
-          password
+          password,
+          phone
         })
       });
 
@@ -74,7 +105,7 @@ export function SignUpForm() {
       } else {
         toast.error(data.error || 'An error occurred');
       }
-    } catch (error) {
+    } catch {
       toast.error('An error occurred. Please try again.');
     } finally {
       setIsLoading(false);
@@ -129,6 +160,31 @@ export function SignUpForm() {
               className='border-[var(--trade-border)] bg-[var(--trade-dark)] text-[var(--trade-text)] placeholder:text-[var(--trade-text-muted)] focus-visible:ring-[var(--trade-accent-blue)]'
               required
             />
+          </div>
+          <div className='space-y-2'>
+            <Label htmlFor='phone' className='text-[var(--trade-text-muted)]'>
+              Phone
+            </Label>
+            <div className='flex items-center gap-2' dir='ltr'>
+              <CountryCallingCodePicker
+                value={phoneCountry}
+                onChange={setPhoneCountry}
+                disabled={isLoading}
+                searchPlaceholder='Search country…'
+                emptyLabel='No country found'
+              />
+              <Input
+                id='phone'
+                type='tel'
+                inputMode='tel'
+                autoComplete='tel-national'
+                placeholder='50 123 4567'
+                value={phoneNational}
+                onChange={(e) => setPhoneNational(e.target.value)}
+                className='border-[var(--trade-border)] bg-[var(--trade-dark)] text-[var(--trade-text)] placeholder:text-[var(--trade-text-muted)] focus-visible:ring-[var(--trade-accent-blue)]'
+                required
+              />
+            </div>
           </div>
           <div className='space-y-2'>
             <Label

@@ -3,13 +3,28 @@ import { DEFAULT_USER_BALANCE_SEED } from '@/lib/balance';
 import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 
+function normalizePhone(phone: unknown): string | null {
+  if (typeof phone !== 'string') return null;
+  const trimmed = phone.trim();
+  if (!trimmed) return null;
+  return trimmed;
+}
+
 export async function POST(request: NextRequest) {
   try {
-    const { name, email, password } = await request.json();
+    const { name, email, password, phone } = await request.json();
+    const normalizedPhone = normalizePhone(phone);
 
     if (!email || !password) {
       return NextResponse.json(
         { error: 'Email and password are required' },
+        { status: 400 }
+      );
+    }
+
+    if (typeof password !== 'string' || password.length < 6) {
+      return NextResponse.json(
+        { error: 'Password must be at least 6 characters long' },
         { status: 400 }
       );
     }
@@ -35,6 +50,7 @@ export async function POST(request: NextRequest) {
         name,
         email,
         password: hashedPassword,
+        phone: normalizedPhone,
         balances: {
           create: [...DEFAULT_USER_BALANCE_SEED]
         }

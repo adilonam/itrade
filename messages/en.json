@@ -367,7 +367,7 @@
     "positions": {
       "open": "Open Positions",
       "pending": "Pending Orders",
-      "closed": "Closed Positions",
+      "closed": "Closed",
       "finance": "Finance",
       "loading": "Loading room trading positions...",
       "empty": "No room trading positions found. Positions will appear here once you start trading.",
@@ -383,7 +383,6 @@
       "pnl": "P&L",
       "status": "Status",
       "date": "Date",
-      "closed": "Closed",
       "close": "Close",
       "closePosition": "Close position",
       "closePositionConfirm": "Close this {type} position for {symbol}? This cannot be undone.",
@@ -574,6 +573,201 @@
       "cancel": "Cancel",
       "real": "Real",
       "progress": "Progress"
+    }
+  },
+  "SmxLanding": {
+    "nav": {
+      "home": "Home",
+      "markets": "Markets",
+      "platform": "Platform",
+      "whyUs": "Why SMX?",
+      "education": "Education",
+      "contact": "Contact"
+    },
+    "header": {
+      "tradeDesk": "Trading Desk",
+      "openAccount": "Open Account",
+      "signIn": "Sign In",
+      "registerNow": "Register Now",
+      "openMenu": "Open menu",
+      "closeMenu": "Close menu"
+    },
+    "hero": {
+      "badge": "Licensed & globally trusted platform",
+      "titleLine1": "Trade globally",
+      "titleLine2Prefix": "with",
+      "tagline": "Bigger opportunities … for a broader future",
+      "description": "Join leading investors across the Middle East and trade with cutting-edge technology, full transparency, and instant order execution.",
+      "badges": {
+        "globalNetwork": "Global network",
+        "advancedPlatform": "Advanced platform",
+        "proTools": "Professional tools",
+        "arabicSupport": "Arabic support"
+      },
+      "welcomeBackTitle": "Welcome back",
+      "welcomeBackBody": "Your account is ready — go straight to the trading platform",
+      "enterPlatform": "Enter the platform"
+    },
+    "registerForm": {
+      "title": "Start your trading journey",
+      "subtitle": "Create your free account to start trading",
+      "fullName": "Full name",
+      "fullNamePlaceholder": "John Smith",
+      "phone": "Phone number",
+      "phonePlaceholder": "50 123 4567",
+      "email": "Email address",
+      "password": "Password",
+      "passwordPlaceholder": "At least 6 characters",
+      "confirmPassword": "Confirm password",
+      "confirmPasswordPlaceholder": "Re-enter your password",
+      "searchCountry": "Search country…",
+      "noCountry": "No country found",
+      "passwordMismatch": "Passwords do not match",
+      "passwordTooShort": "Password must be at least 6 characters long",
+      "phoneInvalid": "Please enter a valid phone number",
+      "success": "Account created successfully! Please sign in.",
+      "errorGeneric": "An error occurred. Please try again.",
+      "submit": "Register Now",
+      "submitting": "Creating account…",
+      "privacyPrefix": "By registering, you agree to the",
+      "privacyLink": "Privacy Policy",
+      "privacySuffix": "and data protection.",
+      "haveAccount": "Already have an account?",
+      "signIn": "Sign In"
+    },
+    "benefits": {
+      "global": {
+        "title": "Global platform",
+        "description": "Trade from anywhere, anytime"
+      },
+      "support": {
+        "title": "Arabic support",
+        "description": "A dedicated team ready around the clock"
+      },
+      "security": {
+        "title": "Protection & security",
+        "description": "Bank-grade security and encryption standards"
+      },
+      "execution": {
+        "title": "Fast execution",
+        "description": "Millisecond-level order execution speed"
+      }
+    },
+    "markets": {
+      "titleBefore": "Diversity across",
+      "titleHighlight": "global markets",
+      "description": "Trade a wide range of trusted financial assets from a single screen",
+      "gold": {
+        "title": "Gold",
+        "subtitle": "XAUUSD"
+      },
+      "oil": {
+        "title": "Oil",
+        "subtitle": "USOIL"
+      },
+      "stocks": {
+        "title": "Global stocks",
+        "subtitle": "+1000 stocks"
+      },
+      "forex": {
+        "title": "Forex",
+        "subtitle": "+50 currency pairs"
+      },
+      "indices": {
+        "title": "Indices",
+        "subtitle": "US100, S&P500"
+      }
+    },
+    "platform": {
+      "eyebrow": "Trading platform",
+      "title": "Professional tools at your fingertips",
+      "description": "An advanced yet easy-to-use platform giving you fast access to global markets with a powerful set of analytical tools designed to strengthen your investment decisions.",
+      "features": {
+        "multiDevice": "Available on web, desktop, and smart mobile apps",
+        "charts": "Advanced real-time charts with precise technical indicators",
+        "analysis": "Integrated technical and financial analysis tools with periodic trading signals",
+        "execution": "Fast, instant, and stable execution without price slippage"
+      },
+      "discover": "Discover the platform",
+      "live": "● Live",
+      "buy": "BUY",
+      "sell": "SELL"
+    },
+    "whyChoose": {
+      "titleBefore": "Why choose",
+      "titleAfter": "?",
+      "description": "We provide a professional trading environment that supports your ambitions and sustainable financial growth",
+      "specialist": {
+        "title": "Specialist support",
+        "description": "A ready, professional Arabic team to guide you at every step"
+      },
+      "trust": {
+        "title": "Reliability & security",
+        "description": "We uphold the highest standards of transparency and financial regulation to protect your funds"
+      },
+      "tools": {
+        "title": "Advanced tools",
+        "description": "Deep technical analysis and live charts for better-informed decisions"
+      },
+      "opportunities": {
+        "title": "Broader opportunities",
+        "description": "Direct, instant access to an unprecedented and diverse set of markets"
+      }
+    },
+    "stats": {
+      "title": "Numbers that speak to our experience",
+      "description": "Join thousands of traders who trust SMX worldwide",
+      "traders": "Traders worldwide",
+      "instruments": "Available financial instruments",
+      "rating": "Client rating",
+      "support": "Continuous Arabic support"
+    },
+    "education": {
+      "eyebrow": "Education & analysis",
+      "title": "Develop your trading skills",
+      "description": "Benefit from a variety of educational materials and daily analysis to help you make better, more confident trading decisions.",
+      "hub": "Education Center",
+      "cards": {
+        "forexIntro": {
+          "title": "Introduction to forex trading",
+          "cta": "Watch now"
+        },
+        "dailyAnalysis": {
+          "title": "Daily market analysis",
+          "cta": "Read more"
+        },
+        "strategies": {
+          "title": "Trading strategies",
+          "cta": "Read more"
+        }
+      }
+    },
+    "finalCta": {
+      "title": "Ready to start your journey?",
+      "description": "Join SMX today and discover new opportunities in global markets",
+      "register": "Register Now"
+    },
+    "footer": {
+      "about": "SMX is a leading Middle East platform for trading and investing in global markets with the highest levels of security and transparency.",
+      "quickLinks": "Quick links",
+      "info": "Information",
+      "contact": "Contact us",
+      "contactPage": "Contact us page",
+      "address": "Dubai, United Arab Emirates",
+      "aboutSmx": "About SMX",
+      "faqs": "FAQs",
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Use",
+      "riskWarningLink": "Risk Warning",
+      "social": {
+        "facebook": "Facebook",
+        "instagram": "Instagram",
+        "youtube": "YouTube",
+        "linkedin": "LinkedIn",
+        "x": "X (Twitter)"
+      },
+      "riskWarning": "Risk warning: Trading financial instruments involves risk and may result in loss of capital. Make sure you fully understand the risks before you start trading.",
+      "copyright": "© {year} SMX. All rights reserved."
     }
   }
 }
