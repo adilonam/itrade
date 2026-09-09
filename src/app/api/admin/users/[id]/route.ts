@@ -14,6 +14,8 @@ const updateUserSchema = z
     password: z.string().min(8).optional(),
     role: z.enum(['USER', 'SELLER', 'ADMIN', 'SUPERADMIN']).optional(),
     balance: z.number().min(0, 'Balance cannot be negative').optional(),
+    realBalance: z.number().min(0, 'Real balance cannot be negative').optional(),
+    demoBalance: z.number().min(0, 'Demo balance cannot be negative').optional(),
     leverage: z.number().min(1, 'Leverage must be at least 1').optional(),
     emailVerified: z
       .union([z.string().pipe(z.coerce.date()), z.date(), z.null()])
@@ -22,6 +24,14 @@ const updateUserSchema = z
   .refine((data) => Object.keys(data).length > 0, {
     message: 'At least one field must be provided for update'
   });
+
+function pickBalanceAmounts(balances: { amount: number; type: string }[]) {
+  const realAmount =
+    balances.find((balance) => balance.type === 'REAL')?.amount ?? 0;
+  const demoAmount =
+    balances.find((balance) => balance.type === 'DEMO')?.amount ?? 0;
+  return { realAmount, demoAmount };
+}
 
 // Helper function to check admin permissions
 async function checkAdminPermission(session: any) {
@@ -64,10 +74,11 @@ export async function GET(
         id: true,
         name: true,
         email: true,
+        phone: true,
         image: true,
         profileImageContentType: true,
         balances: {
-          where: { type: 'REAL' },
+          where: { type: { in: ['REAL', 'DEMO'] } },
           select: { amount: true, type: true }
         },
         leverage: true,
@@ -89,7 +100,7 @@ export async function GET(
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    const realAmount = user.balances[0]?.amount ?? 0;
+    const { realAmount, demoAmount } = pickBalanceAmounts(user.balances);
 
     return NextResponse.json({
       user: {
@@ -97,6 +108,7 @@ export async function GET(
         image: getProfileImageUrl(user),
         balance: realAmount,
         realBalance: realAmount,
+        demoBalance: demoAmount,
         institutionalBalance: 0
       }
     });
@@ -149,8 +161,12 @@ export async function PUT(
     // Allow users to modify themselves through admin interface
 
     const updateData = { ...validation.data };
-    const nextRealBalance = updateData.balance;
+    const nextRealBalance =
+      updateData.realBalance ?? updateData.balance ?? undefined;
+    const nextDemoBalance = updateData.demoBalance;
     delete (updateData as { balance?: number }).balance;
+    delete (updateData as { realBalance?: number }).realBalance;
+    delete (updateData as { demoBalance?: number }).demoBalance;
 
     // Check email uniqueness if email is being updated
     if (updateData.email && updateData.email !== existingUser.email) {
@@ -201,6 +217,13 @@ export async function PUT(
           data: { amount: nextRealBalance }
         });
       }
+      if (nextDemoBalance != null) {
+        await ensureUserBalance(tx, id, 'DEMO');
+        await tx.userBalance.update({
+          where: { userId_type: { userId: id, type: 'DEMO' } },
+          data: { amount: nextDemoBalance }
+        });
+      }
       return tx.user.update({
         where: { id },
         data: updateData,
@@ -208,11 +231,12 @@ export async function PUT(
           id: true,
           name: true,
           email: true,
+          phone: true,
           image: true,
           profileImageContentType: true,
           balances: {
-            where: { type: 'REAL' },
-            select: { amount: true }
+            where: { type: { in: ['REAL', 'DEMO'] } },
+            select: { amount: true, type: true }
           },
           leverage: true,
           role: true,
@@ -223,12 +247,16 @@ export async function PUT(
       });
     });
 
+    const { realAmount, demoAmount } = pickBalanceAmounts(updatedUser.balances);
+
     return NextResponse.json({
       message: 'User updated successfully',
       user: {
         ...updatedUser,
         image: getProfileImageUrl(updatedUser),
-        balance: updatedUser.balances[0]?.amount ?? 0
+        balance: realAmount,
+        realBalance: realAmount,
+        demoBalance: demoAmount
       }
     });
   } catch (error) {

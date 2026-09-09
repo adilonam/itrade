@@ -143,6 +143,76 @@ ${appName} Team`;
   });
 };
 
+export type SignupNotifyPayload = {
+  name?: string | null;
+  email: string;
+  phone?: string | null;
+  createdAt?: Date | string | null;
+};
+
+/** Optional admin notify when a user signs up. No-op if SIGNUP_NOTIFY_EMAIL is unset. Never throws. */
+export const sendSignupNotifyEmail = async (payload: SignupNotifyPayload) => {
+  const notifyTo = process.env.SIGNUP_NOTIFY_EMAIL?.trim();
+  if (!notifyTo) {
+    return { success: true, skipped: true as const };
+  }
+
+  try {
+    const appName = getMailAppName();
+    const createdAt = payload.createdAt
+      ? new Date(payload.createdAt)
+      : new Date();
+    const atLabel = Number.isNaN(createdAt.getTime())
+      ? new Date().toISOString()
+      : createdAt.toISOString();
+    const displayName = payload.name?.trim() || '(not provided)';
+    const displayPhone = payload.phone?.trim() || '(not provided)';
+
+    const subject = `New signup on ${appName}`;
+    const text = `A new user created an account on ${appName}.
+
+Name: ${displayName}
+Email: ${payload.email}
+Phone: ${displayPhone}
+At: ${atLabel}
+`;
+
+    const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <h2 style="color: #333;">New signup on ${appName}</h2>
+      <p>A new user created an account.</p>
+      <ul style="padding-left: 18px; line-height: 1.6;">
+        <li><strong>Name:</strong> ${displayName}</li>
+        <li><strong>Email:</strong> ${payload.email}</li>
+        <li><strong>Phone:</strong> ${displayPhone}</li>
+        <li><strong>At:</strong> ${atLabel}</li>
+      </ul>
+    </div>
+  `;
+
+    const result = await sendEmail({
+      to: notifyTo,
+      subject,
+      text,
+      html
+    });
+
+    if (!result.success) {
+      // eslint-disable-next-line no-console
+      console.error('Signup notify email failed:', result.error);
+    }
+
+    return result;
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('Signup notify email failed:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    };
+  }
+};
+
 export const sendPasswordResetEmail = async (
   email: string,
   resetLink: string,

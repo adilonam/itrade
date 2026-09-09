@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs';
 import { DEFAULT_USER_BALANCE_SEED } from '@/lib/balance';
+import { sendSignupNotifyEmail } from '@/lib/email';
 import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -55,6 +56,14 @@ export async function POST(request: NextRequest) {
           create: [...DEFAULT_USER_BALANCE_SEED]
         }
       }
+    });
+
+    // Optional admin notify — never block signup on email failures
+    await sendSignupNotifyEmail({
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      createdAt: user.createdAt
     });
 
     // Remove password from response

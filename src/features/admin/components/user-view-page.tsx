@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { fetchUserById } from '../services/users';
 import { useRouter } from 'next/navigation';
 import UserForm from './user-form';
-import { User } from '@/lib/prisma/generated/client';
+import type { UserWithBalances } from '../services/users';
 import FormCardSkeleton from '@/components/form-card-skeleton';
 
 type TUserViewPageProps = {
@@ -12,7 +12,7 @@ type TUserViewPageProps = {
 };
 
 export default function UserViewPage({ userId }: TUserViewPageProps) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserWithBalances | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
