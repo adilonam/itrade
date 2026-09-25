@@ -104,30 +104,39 @@ model User {
   city                    String?                  @map("city")
   country                 String?                  @map("country")
   gender                  String?                  @map("gender")
-  kycStatus                     KycStatus @default(NOT_SUBMITTED) @map("kyc_status")
-  kycDocumentType               String?   @map("kyc_document_type")
-  hasSignedConsent              Boolean   @default(false) @map("has_signed_consent")
-  consentSignedAt               DateTime? @map("consent_signed_at")
-  consentSignatureName          String?   @map("consent_signature_name")
-  consentSignatureContent       Bytes?    @map("consent_signature_content") @db.ByteA
-  consentSignatureContentType   String?   @map("consent_signature_content_type")
-  consentIpAddress              String?   @map("consent_ip_address")
-  accounts                      Account[]
-  sessions                      Session[]
-  mfaChallenges                 MfaChallenge[]
-  passwordResetTokens           PasswordResetToken[]
-  positions                     Position[]
-  userInvestments               UserInvestment[]
-  withdrawRequests              WithdrawRequest[]
-  seller                        User?     @relation("SellerUsers", fields: [sellerId], references: [id], onDelete: SetNull)
-  sellerId                      String?   @map("seller_id")
-  sellerUsers                   User[]    @relation("SellerUsers")
-  sentMessages                  Message[] @relation("MessageSender")
-  receivedMessages              Message[] @relation("MessageReceiver")
-  botUsers                      BotUser[]
-  balances                      UserBalance[]
-  kycVerificationRequests       KycVerificationRequest[] @relation("KycUserRequests")
-  reviewedKycRequests           KycVerificationRequest[] @relation("KycReviewedBy")
+  kycStatus               KycStatus                @default(NOT_SUBMITTED) @map("kyc_status")
+  kycDocumentType         String?                  @map("kyc_document_type")
+  hasSignedConsent        Boolean                  @default(false) @map("has_signed_consent")
+  consentSignedAt         DateTime?                @map("consent_signed_at")
+  consentSignatureName    String?                  @map("consent_signature_name")
+  consentSignatureContent Bytes?                   @map("consent_signature_content") @db.ByteA
+  consentSignatureContentType String?              @map("consent_signature_content_type")
+  consentIpAddress        String?                  @map("consent_ip_address")
+  /// Optional display handle for prediction markets (/polymarket).
+  username                String?                  @unique
+  /// Spendable cash for prediction-market trades (separate from UserBalance).
+  predictionBalance       Float                    @default(0) @map("prediction_balance")
+  predictionAvatar        Bytes?                   @map("prediction_avatar") @db.ByteA
+  predictionAvatarMimeType String?                 @map("prediction_avatar_mime_type")
+  accounts                Account[]
+  sessions                Session[]
+  mfaChallenges           MfaChallenge[]
+  passwordResetTokens     PasswordResetToken[]
+  positions               Position[]
+  userInvestments         UserInvestment[]
+  withdrawRequests        WithdrawRequest[]
+  seller                  User?                    @relation("SellerUsers", fields: [sellerId], references: [id], onDelete: SetNull)
+  sellerId                String?                  @map("seller_id")
+  sellerUsers             User[]                   @relation("SellerUsers")
+  sentMessages            Message[]                @relation("MessageSender")
+  receivedMessages        Message[]                @relation("MessageReceiver")
+  botUsers                BotUser[]
+  balances                UserBalance[]
+  kycVerificationRequests KycVerificationRequest[] @relation("KycUserRequests")
+  reviewedKycRequests     KycVerificationRequest[] @relation("KycReviewedBy")
+  predictionTrades        PredictionTrade[]
+  predictionComments      PredictionComment[]
+  predictionBalanceLedgers PredictionBalanceLedger[]
 
   @@map("users")
 }
@@ -560,4 +569,247 @@ model BotUser {
   @@index([userId])
   @@index([marketId])
   @@map("bot_users")
+}
+
+// ---------------------------------------------------------------------------
+// Polymarket / prediction markets (mounted at /polymarket)
+// Models are prefixed to avoid clashes with itrade Market / trading enums.
+// ---------------------------------------------------------------------------
+
+/// Top-level topic used to browse and filter prediction markets.
+enum PredictionMarketCategory {
+  politics
+  crypto
+  sports
+  finance
+  tech
+  entertainment
+  world
+  commodities
+}
+
+/// Whether a prediction market is still tradeable (`open`) or settled (`resolved`).
+enum PredictionMarketStatus {
+  open
+  resolved
+}
+
+/// Binary side of a prediction market that traders can buy or sell.
+enum PredictionOutcomeType {
+  YES
+  NO
+}
+
+/// Direction of a prediction trade relative to an outcome.
+enum PredictionTradeSide {
+  BUY
+  SELL
+}
+
+/// How a prediction order is executed; currently only immediate market fills.
+enum PredictionOrderType {
+  MARKET
+}
+
+/// Reason a prediction balance ledger row was written (+ credit, − debit).
+enum PredictionBalanceLedgerType {
+  trade_buy
+  trade_sell
+  market_win
+  market_loss
+  seed
+  adjustment
+}
+
+/// Email one-time passcode and signup token state for verifying new accounts.
+model EmailOtp {
+  id                   String    @id @default(cuid())
+  email                String    @unique
+  name                 String
+  codeHash             String    @map("code_hash")
+  expiresAt            DateTime  @map("expires_at")
+  attempts             Int       @default(0)
+  verifiedAt           DateTime? @map("verified_at")
+  signupTokenHash      String?   @unique @map("signup_token_hash")
+  signupTokenExpiresAt DateTime? @map("signup_token_expires_at")
+  lastSentAt           DateTime  @default(now()) @map("last_sent_at")
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime  @updatedAt @map("updated_at")
+
+  @@index([expiresAt])
+  @@map("email_otps")
+}
+
+/// Container that groups related prediction markets under one event or topic.
+model PredictionMarketGroup {
+  id        String             @id @default(cuid())
+  slug      String             @unique
+  title     String
+  markets   PredictionMarket[]
+  createdAt DateTime           @default(now()) @map("created_at")
+  updatedAt DateTime           @updatedAt @map("updated_at")
+
+  @@map("prediction_market_groups")
+}
+
+/// A single prediction market (question) users can trade and discuss.
+model PredictionMarket {
+  id              String                      @id @default(cuid())
+  slug            String                      @unique
+  title           String
+  description     String
+  context         String?
+  category        PredictionMarketCategory
+  subcategory     String?
+  tags            String[]
+  status          PredictionMarketStatus      @default(open)
+  winningOutcome  PredictionOutcomeType?      @map("winning_outcome")
+  resolutionDate  DateTime                    @map("resolution_date")
+  dateLabel       String?                     @map("date_label")
+  totalVolume     Float                       @default(0) @map("total_volume")
+  liquidity       Float                       @default(0)
+  trendingScore   Int                         @default(0) @map("trending_score")
+  iconLabel       String?                     @map("icon_label")
+  image           Bytes?                      @db.ByteA
+  imageMimeType   String?                     @map("image_mime_type")
+  groupId         String?                     @map("group_id")
+  group           PredictionMarketGroup?      @relation(fields: [groupId], references: [id], onDelete: SetNull)
+  outcomes        PredictionOutcome[]
+  trades          PredictionTrade[]
+  comments        PredictionComment[]
+  priceHistory    PredictionPriceHistory[]
+  orderBookLevels PredictionOrderBookLevel[]
+  balanceLedgers  PredictionBalanceLedger[]
+  createdAt       DateTime                    @default(now()) @map("created_at")
+  updatedAt       DateTime                    @updatedAt @map("updated_at")
+
+  @@index([category])
+  @@index([status])
+  @@index([groupId])
+  @@index([resolutionDate])
+  @@index([trendingScore])
+  @@index([category, status])
+  @@map("prediction_markets")
+}
+
+/// Tradable YES/NO side of a prediction market, including its current price.
+model PredictionOutcome {
+  id           String                   @id @default(cuid())
+  marketId     String                   @map("market_id")
+  market       PredictionMarket         @relation(fields: [marketId], references: [id], onDelete: Cascade)
+  type         PredictionOutcomeType
+  currentPrice Float                    @map("current_price")
+  trades       PredictionTrade[]
+  priceHistory PredictionPriceHistory[]
+  createdAt    DateTime                 @default(now()) @map("created_at")
+  updatedAt    DateTime                 @updatedAt @map("updated_at")
+
+  @@unique([marketId, type])
+  @@index([marketId])
+  @@map("prediction_outcomes")
+}
+
+/// A user's buy or sell fill against a specific prediction market outcome.
+model PredictionTrade {
+  id             String                    @id @default(cuid())
+  userId         String                    @map("user_id")
+  user           User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  marketId       String                    @map("market_id")
+  market         PredictionMarket          @relation(fields: [marketId], references: [id], onDelete: Cascade)
+  outcomeId      String                    @map("outcome_id")
+  outcome        PredictionOutcome         @relation(fields: [outcomeId], references: [id], onDelete: Cascade)
+  side           PredictionTradeSide
+  orderType      PredictionOrderType       @default(MARKET) @map("order_type")
+  amount         Float
+  shares         Float
+  priceAtTrade   Float                     @map("price_at_trade")
+  balanceLedgers PredictionBalanceLedger[]
+  createdAt      DateTime                  @default(now()) @map("created_at")
+  updatedAt      DateTime                  @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@index([marketId])
+  @@index([outcomeId])
+  @@index([createdAt])
+  @@map("prediction_trades")
+}
+
+/// Append-only history of prediction-balance credits/debits for a user.
+model PredictionBalanceLedger {
+  id           String                       @id @default(cuid())
+  userId       String                       @map("user_id")
+  user         User                         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount       Float
+  balanceAfter Float                        @map("balance_after")
+  type         PredictionBalanceLedgerType
+  marketId     String?                      @map("market_id")
+  market       PredictionMarket?            @relation(fields: [marketId], references: [id], onDelete: SetNull)
+  tradeId      String?                      @map("trade_id")
+  trade        PredictionTrade?             @relation(fields: [tradeId], references: [id], onDelete: SetNull)
+  note         String?
+  createdAt    DateTime                     @default(now()) @map("created_at")
+  updatedAt    DateTime                     @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@index([createdAt])
+  @@index([userId, createdAt])
+  @@index([marketId])
+  @@index([tradeId])
+  @@map("prediction_balance_ledgers")
+}
+
+/// Discussion post or threaded reply attached to a prediction market.
+model PredictionComment {
+  id        String              @id @default(cuid())
+  userId    String              @map("user_id")
+  user      User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  marketId  String              @map("market_id")
+  market    PredictionMarket    @relation(fields: [marketId], references: [id], onDelete: Cascade)
+  content   String
+  likes     Int                 @default(0)
+  parentId  String?             @map("parent_id")
+  parent    PredictionComment?  @relation("PredictionCommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   PredictionComment[] @relation("PredictionCommentReplies")
+  createdAt DateTime            @default(now()) @map("created_at")
+  updatedAt DateTime            @updatedAt @map("updated_at")
+
+  @@index([marketId])
+  @@index([userId])
+  @@index([parentId])
+  @@index([createdAt])
+  @@map("prediction_comments")
+}
+
+/// Time-series snapshot of an outcome's probability for price charts.
+model PredictionPriceHistory {
+  id          String             @id @default(cuid())
+  marketId    String             @map("market_id")
+  market      PredictionMarket   @relation(fields: [marketId], references: [id], onDelete: Cascade)
+  outcomeId   String             @map("outcome_id")
+  outcome     PredictionOutcome  @relation(fields: [outcomeId], references: [id], onDelete: Cascade)
+  probability Float
+  timestamp   DateTime
+  createdAt   DateTime           @default(now()) @map("created_at")
+  updatedAt   DateTime           @updatedAt @map("updated_at")
+
+  @@index([marketId, timestamp])
+  @@index([outcomeId, timestamp])
+  @@map("prediction_price_history")
+}
+
+/// Display depth at a price level for a prediction market outcome's bid/ask book.
+model PredictionOrderBookLevel {
+  id          String                 @id @default(cuid())
+  marketId    String                 @map("market_id")
+  market      PredictionMarket       @relation(fields: [marketId], references: [id], onDelete: Cascade)
+  outcomeType PredictionOutcomeType  @map("outcome_type")
+  side        PredictionTradeSide
+  price       Float
+  size        Float
+  createdAt   DateTime               @default(now()) @map("created_at")
+  updatedAt   DateTime               @updatedAt @map("updated_at")
+
+  @@index([marketId])
+  @@index([marketId, outcomeType, side])
+  @@map("prediction_order_book_levels")
 }

@@ -7,6 +7,8 @@ declare module 'next-auth' {
       id: string;
       role: string;
       balance: number;
+      /** Prediction-market wallet (/polymarket). */
+      predictionBalance: number;
       leverage: number;
     } & DefaultSession['user'];
   }
@@ -21,6 +23,7 @@ declare module 'next-auth/jwt' {
     id: string;
     role: string;
     balance: number;
+    predictionBalance?: number;
     leverage: number;
     image?: string | null;
   }
