@@ -49,6 +49,14 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
+        title: 'Betting',
+        url: '/polymarket',
+        icon: 'ticket',
+        isActive: false,
+        shortcut: ['b', 't'],
+        items: []
+      },
+      {
         title: 'Dashboard',
         url: '/overview',
         icon: 'dashboard',
@@ -92,6 +100,14 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
+        title: 'Betting',
+        url: '/polymarket',
+        icon: 'ticket',
+        isActive: false,
+        shortcut: ['b', 't'],
+        items: []
+      },
+      {
         title: 'Overview',
         url: '/dashboard',
         icon: 'dashboard',
@@ -131,6 +147,14 @@ export const tenantNavItems: TenantNavItems = {
         icon: 'pigMoney',
         isActive: false,
         shortcut: ['m', 'p'],
+        items: []
+      },
+      {
+        title: 'Betting',
+        url: '/polymarket',
+        icon: 'ticket',
+        isActive: false,
+        shortcut: ['b', 't'],
         items: []
       },
       {
@@ -229,6 +253,14 @@ export const tenantNavItems: TenantNavItems = {
         icon: 'pigMoney',
         isActive: false,
         shortcut: ['m', 'p'],
+        items: []
+      },
+      {
+        title: 'Betting',
+        url: '/polymarket',
+        icon: 'ticket',
+        isActive: false,
+        shortcut: ['b', 't'],
         items: []
       },
       {
@@ -404,6 +436,7 @@ export const landingSiteLinks = {
   marketsCommodities: '/commodities',
   marketsIndices: '/indices',
   marketsPricePrediction: '/betting',
+  marketsPolymarket: '/polymarket',
   learningCfds: '/cfds',
   learningMarketMovers: '/market-movers',
   learningTradingPitfalls: '/trading-pitfalls',
@@ -416,6 +449,24 @@ export const landingSiteLinks = {
 export const pricePredictionLinks = {
   listing: '/betting',
   market: (slug: string) => `/betting/${slug}`
+} as const;
+
+/** Polymarket prediction markets section (cloned app mounted at /polymarket). */
+export const polymarketLinks = {
+  home: '/polymarket',
+  markets: '/polymarket/markets',
+  market: (slug: string) => `/polymarket/markets/${slug}`,
+  about: '/polymarket/about',
+  signIn: '/polymarket/sign-in',
+  signUp: '/polymarket/sign-up',
+  admin: {
+    markets: '/polymarket/admin/market',
+    generateMarket: '/polymarket/admin/generate-market',
+    trades: '/polymarket/admin/trades',
+    users: '/polymarket/admin/users',
+    profit: '/polymarket/admin/profit',
+    payouts: '/polymarket/admin/payouts'
+  }
 } as const;
 
 export const landingLanguages = [
@@ -447,6 +498,10 @@ export const landingHeaderMenus: LandingHeaderMenu[] = [
       {
         label: 'Price Prediction',
         href: landingSiteLinks.marketsPricePrediction
+      },
+      {
+        label: 'Polymarket',
+        href: landingSiteLinks.marketsPolymarket
       }
     ]
   },

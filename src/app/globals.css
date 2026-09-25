@@ -2,7 +2,14 @@
 
 @import 'tw-animate-css';
 
+@source '../components/polymarket/**/*.{ts,tsx}';
+@source '../lib/polymarket/**/*.{ts,tsx}';
+@source '../app/polymarket/**/*.{ts,tsx}';
+
 @custom-variant dark (&:is(.dark *));
+
+/* Polymarket @theme tokens must load in this entry so utilities are generated. */
+@import './polymarket/polymarket.css';
 
 @import './theme.css';
 

@@ -28,6 +28,8 @@ const isPublicPath = (pathname: string) =>
   pathname === '/faqs-trading-platform' ||
   pathname === '/betting' ||
   pathname.startsWith('/betting/') ||
+  pathname === '/polymarket' ||
+  pathname.startsWith('/polymarket/') ||
   isAuthPage(pathname) ||
   pathname.startsWith('/api/auth');
 
