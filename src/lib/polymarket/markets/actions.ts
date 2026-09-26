@@ -3,13 +3,14 @@
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
 
+import { ensureUserBalance } from "@/lib/balance"
+import { getSelectedTradeBalanceType } from "@/lib/balance-selection-server"
 import { auth } from "@/lib/polymarket/auth-session"
 import {
   BalanceLedgerType,
   MarketStatus,
   OutcomeType,
   TradeSide,
-  UserRole,
   prisma,
 } from "@/lib/polymarket/db"
 import { isPolymarketAdmin } from "@/lib/polymarket/roles"
@@ -88,6 +89,7 @@ export async function placeTrade(
   }
 
   const { marketId, outcomeType, side, amount } = parsed.data
+  const balanceType = await getSelectedTradeBalanceType()
 
   try {
     const { slug, balance } = await prisma.$transaction(async (tx) => {
@@ -115,23 +117,17 @@ export async function placeTrade(
 
       const shares = amount / price
 
-      const user = await tx.user.findUnique({
-        where: { id: userId },
-        select: { predictionBalance: true },
-      })
-      if (!user) {
-        throw new Error("not_found")
-      }
+      const wallet = await ensureUserBalance(tx, userId, balanceType)
 
       if (side === TradeSide.BUY) {
-        if (user.predictionBalance + 1e-9 < amount) {
+        if (wallet.amount + 1e-9 < amount) {
           throw new Error("insufficient_funds")
         }
       }
 
       if (side === TradeSide.SELL) {
         const prior = await tx.predictionTrade.findMany({
-          where: { userId, outcomeId: outcome.id },
+          where: { userId, outcomeId: outcome.id, balanceType },
         })
         const held = prior.reduce(
           (sum, trade) =>
@@ -165,6 +161,7 @@ export async function placeTrade(
           marketId,
           outcomeId: outcome.id,
           side,
+          balanceType,
           amount,
           shares,
           priceAtTrade: price,
@@ -172,10 +169,10 @@ export async function placeTrade(
       })
 
       const delta = side === TradeSide.BUY ? -amount : amount
-      const nextBalance = user.predictionBalance + delta
-      await tx.user.update({
-        where: { id: userId },
-        data: { predictionBalance: nextBalance },
+      const nextBalance = wallet.amount + delta
+      await tx.userBalance.update({
+        where: { id: wallet.id },
+        data: { amount: nextBalance },
       })
 
       await tx.predictionBalanceLedger.create({
@@ -183,6 +180,7 @@ export async function placeTrade(
           userId,
           amount: delta,
           balanceAfter: nextBalance,
+          balanceType,
           type:
             side === TradeSide.BUY
               ? BalanceLedgerType.trade_buy
@@ -317,44 +315,45 @@ export async function resolveMarket(
         throw new Error("not_found")
       }
 
-      const netByUser = new Map<string, number>()
+      const netByUserBalance = new Map<string, number>()
       for (const trade of market.trades) {
         if (trade.outcome.type !== winningType) {
           continue
         }
         const signed =
           trade.side === TradeSide.BUY ? trade.shares : -trade.shares
-        netByUser.set(
-          trade.userId,
-          (netByUser.get(trade.userId) ?? 0) + signed
-        )
+        const key = `${trade.userId}:${trade.balanceType}`
+        netByUserBalance.set(key, (netByUserBalance.get(key) ?? 0) + signed)
       }
 
       let winnersPaid = 0
       let totalPayout = 0
 
-      for (const [userId, netShares] of Array.from(netByUser.entries())) {
+      for (const [key, netShares] of Array.from(netByUserBalance.entries())) {
         if (netShares <= 1e-9) {
           continue
         }
+        const [payoutUserId, payoutBalanceType] = key.split(":") as [
+          string,
+          "REAL" | "DEMO",
+        ]
         const payout = netShares * 1
-        const user = await tx.user.findUnique({
-          where: { id: userId },
-          select: { predictionBalance: true },
-        })
-        if (!user) {
-          continue
-        }
-        const nextBalance = user.predictionBalance + payout
-        await tx.user.update({
-          where: { id: userId },
-          data: { predictionBalance: nextBalance },
+        const wallet = await ensureUserBalance(
+          tx,
+          payoutUserId,
+          payoutBalanceType
+        )
+        const nextBalance = wallet.amount + payout
+        await tx.userBalance.update({
+          where: { id: wallet.id },
+          data: { amount: nextBalance },
         })
         await tx.predictionBalanceLedger.create({
           data: {
-            userId,
+            userId: payoutUserId,
             amount: payout,
             balanceAfter: nextBalance,
+            balanceType: payoutBalanceType,
             type: BalanceLedgerType.market_win,
             marketId,
             note: `Resolved ${winningOutcome}: ${netShares.toFixed(4)} shares @ $1`,

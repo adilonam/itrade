@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { getLocale } from 'next-intl/server';
-import { EB_Garamond, Inter } from 'next/font/google';
+import { ebGaramond, inter } from '@/components/landing/landing-fonts';
 import {
   IconClock,
   IconHeadset,
@@ -17,18 +17,6 @@ import {
 } from '@/components/landing/landing-header-nav';
 import { LandingSiteFooter } from '@/components/landing/landing-site-footer';
 import { withAppName } from '@/lib/public-app-name';
-
-const ebGaramond = EB_Garamond({
-  subsets: ['latin'],
-  weight: ['400', '500'],
-  variable: '--font-landing-display'
-});
-
-const inter = Inter({
-  subsets: ['latin'],
-  weight: ['400', '500', '600'],
-  variable: '--font-landing-body'
-});
 
 type LandingAboutUsPageProps = {
   appName: string;

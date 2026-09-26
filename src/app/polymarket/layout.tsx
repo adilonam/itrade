@@ -3,6 +3,7 @@ import { getLocale, getMessages } from 'next-intl/server';
 import { NextIntlClientProvider } from 'next-intl';
 
 import { AuthProvider } from '@/components/polymarket/auth/auth-provider';
+import { RefreshOnBalanceChange } from '@/components/polymarket/auth/refresh-on-balance-change';
 import { cn } from '@/lib/utils';
 import { isRtlLocale } from '@/lib/polymarket/paths';
 
@@ -47,7 +48,10 @@ export default async function PolymarketLayout({
       lang={locale}
     >
       <NextIntlClientProvider locale={locale} messages={messages}>
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <RefreshOnBalanceChange />
+          {children}
+        </AuthProvider>
       </NextIntlClientProvider>
     </div>
   );
