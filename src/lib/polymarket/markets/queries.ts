@@ -5,6 +5,7 @@ import {
   type AdminPaginatedResult,
   type AdminPaginationInput,
 } from "@/lib/polymarket/admin/pagination"
+import type { TradeBalanceType } from "@/lib/balance-selection"
 import { MarketCategory, OutcomeType, prisma, type Prisma } from "@/lib/polymarket/db"
 import {
   houseProfitsForMarket,
@@ -65,6 +66,10 @@ export type AdminMarketListItem = Omit<
   tradeCount: number
   profitIfYes: number
   profitIfNo: number
+  profitIfYesReal: number
+  profitIfYesDemo: number
+  profitIfNoReal: number
+  profitIfNoDemo: number
 }
 
 export type ListAdminMarketsOptions = AdminPaginationInput & {
@@ -130,6 +135,7 @@ export async function listAdminMarkets(
       side: true,
       amount: true,
       shares: true,
+      balanceType: true,
       outcome: { select: { type: true } },
     },
   })
@@ -143,6 +149,7 @@ export async function listAdminMarkets(
       side: trade.side,
       amount: trade.amount,
       shares: trade.shares,
+      balanceType: trade.balanceType as TradeBalanceType,
       outcomeType: trade.outcome.type,
     })
     tradesByMarket.set(trade.marketId, list)
@@ -150,7 +157,7 @@ export async function listAdminMarkets(
 
   const items = markets.map((market) => {
     const marketTrades = tradesByMarket.get(market.id) ?? []
-    const { profitIfYes, profitIfNo } = houseProfitsForMarket(marketTrades)
+    const profits = houseProfitsForMarket(marketTrades)
     const yes = market.outcomes.find((o) => o.type === OutcomeType.YES)
     const no = market.outcomes.find((o) => o.type === OutcomeType.NO)
     return {
@@ -171,8 +178,12 @@ export async function listAdminMarkets(
       noPrice: no?.currentPrice ?? 0.5,
       imageUrl: market.imageMimeType ? marketImageSrc(market.id) : null,
       tradeCount: marketTrades.length,
-      profitIfYes,
-      profitIfNo,
+      profitIfYes: profits.profitIfYes,
+      profitIfNo: profits.profitIfNo,
+      profitIfYesReal: profits.real.profitIfYes,
+      profitIfYesDemo: profits.demo.profitIfYes,
+      profitIfNoReal: profits.real.profitIfNo,
+      profitIfNoDemo: profits.demo.profitIfNo,
     }
   })
 
@@ -217,6 +228,7 @@ export type AdminTradeListItem = {
   amount: AdminTradeRow["amount"]
   shares: AdminTradeRow["shares"]
   priceAtTrade: AdminTradeRow["priceAtTrade"]
+  balanceType: TradeBalanceType
   balanceImpact: number | null
   user: AdminTradeRow["user"]
   market: AdminTradeRow["market"]
@@ -232,17 +244,20 @@ export type AdminMarketOption = Prisma.PredictionMarketGetPayload<{
   select: typeof adminMarketOptionSelect
 }>
 
-/** Recent trades for admin, optionally filtered to one market. */
+/** Recent trades for admin, optionally filtered by market and/or balance type. */
 export async function listAdminTrades(options: {
   marketId?: string
+  balanceType?: TradeBalanceType
   page: number
   pageSize: number
 }): Promise<AdminPaginatedResult<AdminTradeListItem>> {
   noStore()
   const marketId = options.marketId
-  const where: Prisma.PredictionTradeWhereInput | undefined = marketId
-    ? { marketId }
-    : undefined
+  const balanceType = options.balanceType
+  const where: Prisma.PredictionTradeWhereInput = {
+    ...(marketId ? { marketId } : {}),
+    ...(balanceType ? { balanceType } : {}),
+  }
 
   const totalCount = await prisma.predictionTrade.count({ where })
   const { page, pageSize, totalPages, skip, take } = resolveAdminPagination(
@@ -269,6 +284,7 @@ export async function listAdminTrades(options: {
     amount: trade.amount,
     shares: trade.shares,
     priceAtTrade: trade.priceAtTrade,
+    balanceType: trade.balanceType as TradeBalanceType,
     balanceImpact: trade.balanceLedgers[0]?.amount ?? null,
     user: trade.user,
     market: trade.market,
@@ -379,6 +395,7 @@ export type HolderView = {
   avatarUrl: string | null
   outcome: OutcomeType
   shares: number
+  balanceType: TradeBalanceType
 }
 
 export type ActivityView = {
@@ -389,6 +406,7 @@ export type ActivityView = {
   shares: number
   priceAtTrade: number
   outcome: OutcomeType
+  balanceType: TradeBalanceType
   userName: string | null
   username: string | null
 }
@@ -396,6 +414,7 @@ export type ActivityView = {
 export type PositionView = {
   outcome: OutcomeType
   shares: number
+  balanceType: TradeBalanceType
 }
 
 export type MarketDetail = {
@@ -439,11 +458,16 @@ function formatShareLabel(shares: number, outcome: OutcomeType): string {
   return `${qty} ${outcome}`
 }
 
+function positionKey(userId: string, balanceType: TradeBalanceType): string {
+  return `${userId}:${balanceType}`
+}
+
 function netPositions(
   trades: {
     userId: string
     side: "BUY" | "SELL"
     shares: number
+    balanceType: TradeBalanceType
     outcome: { type: OutcomeType }
     user: {
       id: string
@@ -455,12 +479,19 @@ function netPositions(
 ) {
   const map = new Map<
     string,
-    { yes: number; no: number; user: (typeof trades)[number]["user"] }
+    {
+      yes: number
+      no: number
+      balanceType: TradeBalanceType
+      user: (typeof trades)[number]["user"]
+    }
   >()
   for (const trade of trades) {
-    const entry = map.get(trade.userId) ?? {
+    const key = positionKey(trade.userId, trade.balanceType)
+    const entry = map.get(key) ?? {
       yes: 0,
       no: 0,
+      balanceType: trade.balanceType,
       user: trade.user,
     }
     const delta = trade.side === "BUY" ? trade.shares : -trade.shares
@@ -469,7 +500,7 @@ function netPositions(
     } else {
       entry.no += delta
     }
-    map.set(trade.userId, entry)
+    map.set(key, entry)
   }
   return map
 }
@@ -574,20 +605,35 @@ export async function getMarketDetail(
     take: 8,
   })
 
-  const positions = netPositions(loaded.trades)
+  const positions = netPositions(
+    loaded.trades.map((trade) => ({
+      ...trade,
+      balanceType: trade.balanceType as TradeBalanceType,
+    }))
+  )
   type MarketComment = (typeof loaded.comments)[number]
   type MarketReply = MarketComment["replies"][number]
 
+  function commentNetForUser(userId: string) {
+    let yes = 0
+    let no = 0
+    for (const balanceType of ["REAL", "DEMO"] as const) {
+      const entry = positions.get(positionKey(userId, balanceType))
+      if (!entry) continue
+      yes += entry.yes
+      no += entry.no
+    }
+    return { yes, no }
+  }
+
   function commentView(comment: MarketComment | MarketReply): CommentView {
-    const net = positions.get(comment.userId)
+    const net = commentNetForUser(comment.userId)
     let positionLabel: string | null = null
-    if (net) {
-      if (net.yes > 0.05) {
-        positionLabel = formatShareLabel(net.yes, OutcomeType.YES)
-      } else if (net.no > 0.05 || net.yes < -0.05) {
-        const shares = net.no > 0 ? net.no : Math.abs(net.yes)
-        positionLabel = formatShareLabel(shares, OutcomeType.NO)
-      }
+    if (net.yes > 0.05) {
+      positionLabel = formatShareLabel(net.yes, OutcomeType.YES)
+    } else if (net.no > 0.05 || net.yes < -0.05) {
+      const shares = net.no > 0 ? net.no : Math.abs(net.yes)
+      positionLabel = formatShareLabel(shares, OutcomeType.NO)
     }
     const replies =
       "replies" in comment
@@ -613,7 +659,7 @@ export async function getMarketDetail(
   }
 
   const holders: HolderView[] = Array.from(positions.entries())
-    .map(([userId, entry]) => {
+    .map(([key, entry]) => {
       const yes = entry.yes
       const no = entry.no
       if (yes <= 0 && no <= 0) {
@@ -621,6 +667,7 @@ export async function getMarketDetail(
       }
       const outcome = yes >= no ? OutcomeType.YES : OutcomeType.NO
       const shares = outcome === OutcomeType.YES ? yes : no
+      const userId = key.split(":")[0] ?? entry.user.id
       return {
         userId,
         name: entry.user.name,
@@ -630,11 +677,12 @@ export async function getMarketDetail(
           : null,
         outcome,
         shares,
+        balanceType: entry.balanceType,
       }
     })
     .filter((row): row is HolderView => row !== null)
     .sort((a, b) => b.shares - a.shares)
-    .slice(0, 10)
+    .slice(0, 30)
 
   return {
     id: market.id,
@@ -680,7 +728,7 @@ export async function getMarketDetail(
       tags: row.tags,
     })),
     holders,
-    activity: market.trades.slice(0, 20).map((trade) => ({
+    activity: market.trades.slice(0, 40).map((trade) => ({
       id: trade.id,
       createdAt: trade.createdAt.toISOString(),
       side: trade.side,
@@ -688,6 +736,7 @@ export async function getMarketDetail(
       shares: trade.shares,
       priceAtTrade: trade.priceAtTrade,
       outcome: trade.outcome.type,
+      balanceType: trade.balanceType as TradeBalanceType,
       userName: trade.user.name,
       username: trade.user.username,
     })),
@@ -703,24 +752,41 @@ export async function getUserPositions(
     where: { userId, marketId },
     include: { outcome: { select: { type: true } } },
   })
-  const yes = trades.reduce((sum, trade) => {
-    if (trade.outcome.type !== OutcomeType.YES) {
-      return sum
+
+  const nets = new Map<
+    string,
+    { yes: number; no: number; balanceType: TradeBalanceType }
+  >()
+
+  for (const trade of trades) {
+    const balanceType = trade.balanceType as TradeBalanceType
+    const key = balanceType
+    const entry = nets.get(key) ?? { yes: 0, no: 0, balanceType }
+    const delta = trade.side === "BUY" ? trade.shares : -trade.shares
+    if (trade.outcome.type === OutcomeType.YES) {
+      entry.yes += delta
+    } else {
+      entry.no += delta
     }
-    return sum + (trade.side === "BUY" ? trade.shares : -trade.shares)
-  }, 0)
-  const no = trades.reduce((sum, trade) => {
-    if (trade.outcome.type !== OutcomeType.NO) {
-      return sum
-    }
-    return sum + (trade.side === "BUY" ? trade.shares : -trade.shares)
-  }, 0)
-  const rows: PositionView[] = []
-  if (yes > 0.0001) {
-    rows.push({ outcome: OutcomeType.YES, shares: yes })
+    nets.set(key, entry)
   }
-  if (no > 0.0001) {
-    rows.push({ outcome: OutcomeType.NO, shares: no })
+
+  const rows: PositionView[] = []
+  for (const entry of Array.from(nets.values())) {
+    if (entry.yes > 0.0001) {
+      rows.push({
+        outcome: OutcomeType.YES,
+        shares: entry.yes,
+        balanceType: entry.balanceType,
+      })
+    }
+    if (entry.no > 0.0001) {
+      rows.push({
+        outcome: OutcomeType.NO,
+        shares: entry.no,
+        balanceType: entry.balanceType,
+      })
+    }
   }
   return rows
 }

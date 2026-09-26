@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { getLocale } from 'next-intl/server';
-import { EB_Garamond, Inter } from 'next/font/google';
+import { ebGaramond, inter } from '@/components/landing/landing-fonts';
 import { IconMail, IconMessageCircle } from '@tabler/icons-react';
 import { brandLogoSrc, landingPageLinks } from '@/constants/data';
 import {
@@ -10,18 +10,6 @@ import {
 } from '@/components/landing/landing-header-nav';
 import { LandingSiteFooter } from '@/components/landing/landing-site-footer';
 import { getSupportEmail } from '@/lib/app-url';
-
-const ebGaramond = EB_Garamond({
-  subsets: ['latin'],
-  weight: ['400', '500'],
-  variable: '--font-landing-display'
-});
-
-const inter = Inter({
-  subsets: ['latin'],
-  weight: ['400', '500', '600'],
-  variable: '--font-landing-body'
-});
 
 type LandingContactUsPageProps = {
   appName: string;

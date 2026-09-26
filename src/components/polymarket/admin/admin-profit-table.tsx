@@ -85,7 +85,7 @@ export function AdminProfitTable({
         <TableBody>
           {markets.map((market) => (
             <TableRow
-              key={market.id}
+              key={`${market.balanceType}:${market.id}`}
               className="border-outline-variant hover:bg-transparent"
             >
               <TableCell className="px-4 py-3 whitespace-normal">
@@ -122,7 +122,7 @@ export function AdminProfitTable({
                 </time>
               </TableCell>
               <TableCell className="text-on-surface-variant hidden px-4 py-3 tabular-nums lg:table-cell">
-                {formatMoney(market.totalVolume)}
+                {formatMoney(market.volume)}
               </TableCell>
               <TableCell className="text-on-surface-variant hidden px-4 py-3 tabular-nums lg:table-cell">
                 {market.tradeCount.toLocaleString()}

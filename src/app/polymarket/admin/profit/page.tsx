@@ -5,25 +5,57 @@ import { AdminPagination } from "@/components/polymarket/admin/admin-pagination"
 import { AdminProfitSummaryCards } from "@/components/polymarket/admin/admin-profit-summary"
 import { AdminProfitTable } from "@/components/polymarket/admin/admin-profit-table"
 import { Header } from "@/components/polymarket/landing/header"
-import { parseAdminPagination } from "@/lib/polymarket/admin/pagination"
 import {
-  getAdminProfitSummary,
-  listAdminResolvedMarketProfits,
+  ADMIN_PAGE_SIZE_DEFAULT,
+  parseAdminPagination,
+} from "@/lib/polymarket/admin/pagination"
+import {
+  getAdminProfitOverview,
+  listAdminResolvedMarketProfitsForBalance,
 } from "@/lib/polymarket/admin/profit-queries"
+import { cn } from "@/lib/utils"
 
 type PageProps = {
-  searchParams: Promise<{ page?: string; pageSize?: string }>
+  searchParams: Promise<{
+    realPage?: string
+    demoPage?: string
+    pageSize?: string
+  }>
+}
+
+function parseSectionPage(value: string | undefined): number {
+  if (!value) return 1
+  const parsed = Number.parseInt(value, 10)
+  if (!Number.isFinite(parsed) || parsed < 1) return 1
+  return parsed
 }
 
 export default async function AdminProfitPage({ searchParams }: PageProps) {
   const params = await searchParams
-  const pagination = parseAdminPagination(params)
+  const { pageSize } = parseAdminPagination({
+    page: "1",
+    pageSize: params.pageSize,
+  })
+  const realPage = parseSectionPage(params.realPage)
+  const demoPage = parseSectionPage(params.demoPage)
 
-  const [t, summary, result] = await Promise.all([
+  const [t, overview, realResult, demoResult] = await Promise.all([
     getTranslations("Admin"),
-    getAdminProfitSummary(),
-    listAdminResolvedMarketProfits(pagination),
+    getAdminProfitOverview(),
+    listAdminResolvedMarketProfitsForBalance("REAL", {
+      page: realPage,
+      pageSize,
+    }),
+    listAdminResolvedMarketProfitsForBalance("DEMO", {
+      page: demoPage,
+      pageSize,
+    }),
   ])
+
+  const sharedParams = {
+    pageSize:
+      pageSize !== ADMIN_PAGE_SIZE_DEFAULT ? String(pageSize) : undefined,
+  }
 
   return (
     <>
@@ -38,21 +70,99 @@ export default async function AdminProfitPage({ searchParams }: PageProps) {
           </p>
         </div>
 
-        <div className="mt-8 space-y-8">
-          <AdminProfitSummaryCards summary={summary} />
-          <div className="space-y-4">
-            <h2 className="text-on-surface font-heading text-lg font-semibold">
-              {t("profitTableHeading")}
-            </h2>
-            <AdminProfitTable markets={result.items} />
-            <AdminPagination
-              pathname="/admin/profit"
-              page={result.page}
-              totalPages={result.totalPages}
-              pageSize={result.pageSize}
-              totalCount={result.totalCount}
+        <div className="mt-8 space-y-10">
+          <section
+            aria-labelledby="profit-real-heading"
+            className="border-outline-variant bg-surface-container-low/40 space-y-6 rounded-2xl border p-4 sm:p-6"
+          >
+            <div className="space-y-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <h2
+                  id="profit-real-heading"
+                  className="text-on-surface font-heading text-xl font-semibold"
+                >
+                  {t("profitSectionReal")}
+                </h2>
+                <span className="border-primary/40 bg-primary/15 text-primary dark:text-primary-fixed-dim rounded-full border px-2.5 py-0.5 text-xs font-semibold">
+                  {t("tradesBalanceReal")}
+                </span>
+              </div>
+              <p className="text-on-surface-variant text-sm">
+                {t("profitSectionRealDescription")}
+              </p>
+            </div>
+
+            <AdminProfitSummaryCards
+              summary={overview.real}
+              pendingDecisionCount={overview.pendingDecisionCount}
             />
-          </div>
+
+            <div className="space-y-4">
+              <h3 className="text-on-surface font-heading text-base font-semibold">
+                {t("profitTableHeading")}
+              </h3>
+              <AdminProfitTable markets={realResult.items} />
+              <AdminPagination
+                pathname="/admin/profit"
+                page={realResult.page}
+                totalPages={realResult.totalPages}
+                pageSize={realResult.pageSize}
+                totalCount={realResult.totalCount}
+                pageParam="realPage"
+                params={{
+                  ...sharedParams,
+                  demoPage:
+                    demoResult.page > 1 ? String(demoResult.page) : undefined,
+                }}
+              />
+            </div>
+          </section>
+
+          <section
+            aria-labelledby="profit-demo-heading"
+            className={cn(
+              "border-outline-variant bg-surface-container-low/40 space-y-6 rounded-2xl border p-4 sm:p-6"
+            )}
+          >
+            <div className="space-y-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <h2
+                  id="profit-demo-heading"
+                  className="text-on-surface font-heading text-xl font-semibold"
+                >
+                  {t("profitSectionDemo")}
+                </h2>
+                <span className="border-tertiary/40 bg-tertiary/15 text-tertiary dark:text-tertiary-fixed-dim rounded-full border px-2.5 py-0.5 text-xs font-semibold">
+                  {t("tradesBalanceDemo")}
+                </span>
+              </div>
+              <p className="text-on-surface-variant text-sm">
+                {t("profitSectionDemoDescription")}
+              </p>
+            </div>
+
+            <AdminProfitSummaryCards summary={overview.demo} />
+
+            <div className="space-y-4">
+              <h3 className="text-on-surface font-heading text-base font-semibold">
+                {t("profitTableHeading")}
+              </h3>
+              <AdminProfitTable markets={demoResult.items} />
+              <AdminPagination
+                pathname="/admin/profit"
+                page={demoResult.page}
+                totalPages={demoResult.totalPages}
+                pageSize={demoResult.pageSize}
+                totalCount={demoResult.totalCount}
+                pageParam="demoPage"
+                params={{
+                  ...sharedParams,
+                  realPage:
+                    realResult.page > 1 ? String(realResult.page) : undefined,
+                }}
+              />
+            </div>
+          </section>
         </div>
       </AdminPageShell>
     </>

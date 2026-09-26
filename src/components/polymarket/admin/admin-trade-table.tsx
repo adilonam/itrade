@@ -79,6 +79,9 @@ export function AdminTradeTable({ trades }: { trades: AdminTradeListItem[] }) {
               {t("tradesColMarket")}
             </TableHead>
             <TableHead className="text-on-surface h-auto px-4 py-3 font-semibold">
+              {t("tradesColBalance")}
+            </TableHead>
+            <TableHead className="text-on-surface h-auto px-4 py-3 font-semibold">
               {t("tradesColSide")}
             </TableHead>
             <TableHead className="text-on-surface h-auto px-4 py-3 font-semibold">
@@ -125,6 +128,20 @@ export function AdminTradeTable({ trades }: { trades: AdminTradeListItem[] }) {
                 >
                   {trade.market.title}
                 </Link>
+              </TableCell>
+              <TableCell className="px-4 py-3 whitespace-normal">
+                <Badge
+                  variant="outline"
+                  className={cn(
+                    trade.balanceType === "REAL"
+                      ? "border-primary/40 bg-primary/15 text-primary dark:text-primary-fixed-dim"
+                      : "border-tertiary/40 bg-tertiary/15 text-tertiary dark:text-tertiary-fixed-dim"
+                  )}
+                >
+                  {trade.balanceType === "REAL"
+                    ? t("tradesBalanceReal")
+                    : t("tradesBalanceDemo")}
+                </Badge>
               </TableCell>
               <TableCell className="px-4 py-3 whitespace-normal">
                 <Badge

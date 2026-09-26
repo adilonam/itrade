@@ -720,6 +720,8 @@ model PredictionTrade {
   outcome        PredictionOutcome         @relation(fields: [outcomeId], references: [id], onDelete: Cascade)
   side           PredictionTradeSide
   orderType      PredictionOrderType       @default(MARKET) @map("order_type")
+  /// Wallet used for this fill (REAL / DEMO via UserBalance).
+  balanceType    BalanceType               @default(REAL) @map("balance_type")
   amount         Float
   shares         Float
   priceAtTrade   Float                     @map("price_at_trade")
@@ -731,6 +733,8 @@ model PredictionTrade {
   @@index([marketId])
   @@index([outcomeId])
   @@index([createdAt])
+  @@index([userId, balanceType])
+  @@index([userId, marketId, balanceType])
   @@map("prediction_trades")
 }
 
@@ -742,6 +746,8 @@ model PredictionBalanceLedger {
   amount       Float
   balanceAfter Float                        @map("balance_after")
   type         PredictionBalanceLedgerType
+  /// Wallet this ledger row applies to (REAL / DEMO via UserBalance).
+  balanceType  BalanceType                  @default(REAL) @map("balance_type")
   marketId     String?                      @map("market_id")
   market       PredictionMarket?            @relation(fields: [marketId], references: [id], onDelete: SetNull)
   tradeId      String?                      @map("trade_id")
@@ -753,6 +759,7 @@ model PredictionBalanceLedger {
   @@index([userId])
   @@index([createdAt])
   @@index([userId, createdAt])
+  @@index([userId, balanceType])
   @@index([marketId])
   @@index([tradeId])
   @@map("prediction_balance_ledgers")

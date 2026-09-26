@@ -14,6 +14,8 @@ type AdminPaginationProps = {
   totalPages: number
   pageSize?: number
   totalCount: number
+  /** Query key for the page number (default `page`). */
+  pageParam?: string
   /** Extra query params to preserve (e.g. marketId, q). */
   params?: Record<string, string | undefined>
 }
@@ -24,6 +26,7 @@ export function AdminPagination({
   totalPages,
   pageSize = ADMIN_PAGE_SIZE_DEFAULT,
   totalCount,
+  pageParam,
   params,
 }: AdminPaginationProps) {
   const t = useTranslations("Admin")
@@ -38,11 +41,13 @@ export function AdminPagination({
   const prevHref = buildAdminListHref(pathname, {
     page: page - 1,
     pageSize,
+    pageParam,
     params,
   })
   const nextHref = buildAdminListHref(pathname, {
     page: page + 1,
     pageSize,
+    pageParam,
     params,
   })
 
