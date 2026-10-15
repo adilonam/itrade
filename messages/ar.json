@@ -308,6 +308,7 @@
       "balanceInstitutional": "مؤسسي",
       "balance": "الرصيد",
       "equity": "حقوق الملكية",
+      "leverage": "الرافعة المالية",
       "wsStatus": {
         "title": "اتصال بيانات السوق",
         "description": "حالة اشتراك WebSocket ومصدر الأسعار.",

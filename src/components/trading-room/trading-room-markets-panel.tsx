@@ -80,6 +80,8 @@ export function TradingRoomMarketsPanel({
 
   const getPrice = (item: SymbolItem) =>
     isMarket(item) ? item.lastPrice : (item as MockSymbol).price;
+  const getSpread = (item: SymbolItem): number | null =>
+    isMarket(item) && Number.isFinite(item.spread) ? item.spread : null;
   const getSymbol = (item: SymbolItem) => item.symbol;
   const getName = (item: SymbolItem) =>
     isMarket(item) ? (item as Market).name : (item as MockSymbol).name;
@@ -104,9 +106,25 @@ export function TradingRoomMarketsPanel({
 
   const formatPrice = formatTradePrice;
 
+  const priceWithSpread = (
+    price: number,
+    spread: number | null,
+    priceClassName: string
+  ) => (
+    <div className="flex flex-col items-end text-right">
+      <div className={priceClassName}>{formatPrice(price)}</div>
+      {spread != null ? (
+        <div className="text-[10px] font-normal font-mono text-[var(--trade-text-muted)]">
+          sp:{formatPrice(spread)}
+        </div>
+      ) : null}
+    </div>
+  );
+
   const rowContent = (item: SymbolItem, isSelected: boolean) => {
     const id = getId(item);
     const price = getPrice(item);
+    const spread = getSpread(item);
     const symbol = getSymbol(item);
     const name = getName(item);
     const market = isMarket(item) ? item : null;
@@ -141,12 +159,19 @@ export function TradingRoomMarketsPanel({
                   <div className="text-[10px] text-[var(--trade-text-muted)]">{name}</div>
                 </div>
               </div>
-              <div className="text-sm font-mono font-bold">{formatPrice(price)}</div>
+              {priceWithSpread(price, spread, 'text-sm font-mono font-bold')}
             </div>
             {showOrderControls ? (
               <>
                 <TradingRoomOrderPanel
-                  market={market ?? { symbol, lastPrice: price, spread: 0.00002 }}
+                  market={
+                    market ?? {
+                      symbol,
+                      lastPrice: price,
+                      spread: 0.00002,
+                      type: getItemType(item) as MarketType
+                    }
+                  }
                   onMarketOrder={onMarketOrder}
                   disabled={tradingDisabled}
                   showAdvancedOrder={false}
@@ -205,10 +230,7 @@ export function TradingRoomMarketsPanel({
             <div className="text-[10px] text-[var(--trade-text-muted)]">{name}</div>
           </div>
         </div>
-        <div className="flex flex-col items-end gap-0.5">
-          <span className="font-mono text-sm">{formatPrice(price)}</span>
-          <IconStar className="size-3 text-[var(--trade-text-muted)]" />
-        </div>
+        {priceWithSpread(price, spread, 'font-mono text-sm')}
       </>
     );
 

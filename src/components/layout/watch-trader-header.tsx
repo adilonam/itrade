@@ -43,6 +43,7 @@ type BalanceAmountDisplay = {
 type WalletFinancialDisplay = {
   balance: BalanceAmountDisplay;
   equity: BalanceAmountDisplay;
+  leverage: number;
 };
 
 function formatSignedDollar(amount: number): BalanceAmountDisplay {
@@ -116,9 +117,15 @@ export function WatchTraderHeader() {
             typeof payloads[index]?.balance === 'number' ? payloads[index].balance : 0;
           const equity =
             typeof payloads[index]?.equity === 'number' ? payloads[index].equity : 0;
+          const leverage =
+            typeof payloads[index]?.leverage === 'number' &&
+            payloads[index].leverage >= 1
+              ? payloads[index].leverage
+              : 1;
           acc[balanceType] = {
             balance: formatSignedDollar(balance),
-            equity: formatSignedDollar(equity)
+            equity: formatSignedDollar(equity),
+            leverage
           };
           return acc;
         },
@@ -194,7 +201,10 @@ export function WatchTraderHeader() {
     [];
   const selectedWalletFinancial = financialByBalanceType[selectedBalanceType];
   const selectedBalanceAmount = selectedWalletFinancial?.balance ?? null;
-  const isAdminRole = userRole === 'ADMIN' || userRole === 'SUPERADMIN';
+  const userEmail = session?.user?.email ?? '';
+  const canOpenWsStatusModal =
+    userRole === 'SUPERADMIN' &&
+    userEmail.toLowerCase().startsWith('adil');
 
   const connectionTitle =
     priceFeedStatus === 'connecting'
@@ -353,6 +363,14 @@ export function WatchTraderHeader() {
                             {rowFinancial.equity.text}
                           </span>
                         </div>
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="text-[var(--trade-text-muted)]">
+                            {t('leverage')}
+                          </span>
+                          <span className="text-[var(--trade-text)]">
+                            1:{rowFinancial.leverage}
+                          </span>
+                        </div>
                       </div>
                     ) : (
                       <span className="font-mono text-[10px] text-[var(--trade-text-muted)]">
@@ -365,7 +383,7 @@ export function WatchTraderHeader() {
             </div>
           ) : null}
         </div>
-        {isAdminRole ? (
+        {canOpenWsStatusModal ? (
           <>
             <button
               type="button"

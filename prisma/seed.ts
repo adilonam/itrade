@@ -70,7 +70,7 @@ async function ensureMarkets(prisma: PrismaClient): Promise<{
       name: 'Euro / US Dollar',
       room: 'TRADING' as const,
       lastPrice: 1.085,
-      spread: 0.00012
+      spread: 0.0012
     },
     {
       type: 'CRYPTO' as const,
@@ -78,7 +78,7 @@ async function ensureMarkets(prisma: PrismaClient): Promise<{
       name: 'Bitcoin / US Dollar',
       room: 'TRADING' as const,
       lastPrice: 67250,
-      spread: 12
+      spread: 120
     },
     {
       type: 'FOREX' as const,
@@ -86,7 +86,7 @@ async function ensureMarkets(prisma: PrismaClient): Promise<{
       name: 'British Pound / US Dollar',
       room: 'TRADING' as const,
       lastPrice: 1.265,
-      spread: 0.00015
+      spread: 0.0015
     },
     {
       type: 'COMMODITIES' as const,
@@ -94,7 +94,7 @@ async function ensureMarkets(prisma: PrismaClient): Promise<{
       name: 'Gold / US Dollar',
       room: 'TRADING' as const,
       lastPrice: 2650,
-      spread: 0.45
+      spread: 4.5
     },
     {
       type: 'INDICES' as const,
@@ -102,7 +102,7 @@ async function ensureMarkets(prisma: PrismaClient): Promise<{
       name: 'S&P 500',
       room: 'TRADING' as const,
       lastPrice: 5820,
-      spread: 0.8
+      spread: 8
     },
     {
       type: 'FOREX' as const,
@@ -110,7 +110,7 @@ async function ensureMarkets(prisma: PrismaClient): Promise<{
       name: 'US Dollar / Japanese Yen',
       room: 'TRADING' as const,
       lastPrice: 149.2,
-      spread: 0.02
+      spread: 0.2
     },
     {
       type: 'CRYPTO' as const,
@@ -118,7 +118,7 @@ async function ensureMarkets(prisma: PrismaClient): Promise<{
       name: 'Ethereum / US Dollar',
       room: 'TRADING' as const,
       lastPrice: 3450,
-      spread: 2.5
+      spread: 25
     }
   ];
 

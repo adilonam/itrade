@@ -37,43 +37,43 @@ const MARKET_SPECS: MarketSpec[] = [
     type: 'FOREX',
     symbol: 'EUR/USD',
     name: 'Euro / US Dollar',
-    spread: 0.00012
+    spread: 0.0012
   },
   {
     type: 'FOREX',
     symbol: 'USD/JPY',
     name: 'US Dollar / Japanese Yen',
-    spread: 0.02
+    spread: 0.2
   },
   {
     type: 'FOREX',
     symbol: 'GBP/USD',
     name: 'British Pound / US Dollar',
-    spread: 0.00015
+    spread: 0.0015
   },
   {
     type: 'FOREX',
     symbol: 'USD/CHF',
     name: 'US Dollar / Swiss Franc',
-    spread: 0.00012
+    spread: 0.0012
   },
   {
     type: 'FOREX',
     symbol: 'AUD/USD',
     name: 'Australian Dollar / US Dollar',
-    spread: 0.00012
+    spread: 0.0012
   },
   {
     type: 'FOREX',
     symbol: 'USD/CAD',
     name: 'US Dollar / Canadian Dollar',
-    spread: 0.00012
+    spread: 0.0012
   },
   {
     type: 'FOREX',
     symbol: 'NZD/USD',
     name: 'New Zealand Dollar / US Dollar',
-    spread: 0.00015
+    spread: 0.0015
   },
 
   // Stocks (Magnificent 7)
@@ -81,43 +81,43 @@ const MARKET_SPECS: MarketSpec[] = [
     type: 'STOCKS',
     symbol: 'AAPL',
     name: 'Apple',
-    spread: 0.05
+    spread: 0.5
   },
   {
     type: 'STOCKS',
     symbol: 'MSFT',
     name: 'Microsoft',
-    spread: 0.05
+    spread: 0.5
   },
   {
     type: 'STOCKS',
     symbol: 'NVDA',
     name: 'NVIDIA',
-    spread: 0.05
+    spread: 0.5
   },
   {
     type: 'STOCKS',
     symbol: 'AMZN',
     name: 'Amazon',
-    spread: 0.05
+    spread: 0.5
   },
   {
     type: 'STOCKS',
     symbol: 'GOOGL',
     name: 'Alphabet',
-    spread: 0.05
+    spread: 0.5
   },
   {
     type: 'STOCKS',
     symbol: 'META',
     name: 'Meta',
-    spread: 0.05
+    spread: 0.5
   },
   {
     type: 'STOCKS',
     symbol: 'TSLA',
     name: 'Tesla',
-    spread: 0.05
+    spread: 0.5
   },
 
   // Commodities majors
@@ -125,25 +125,25 @@ const MARKET_SPECS: MarketSpec[] = [
     type: 'COMMODITIES',
     symbol: 'XAU/USD',
     name: 'Gold / US Dollar',
-    spread: 0.45
+    spread: 4.5
   },
   {
     type: 'COMMODITIES',
     symbol: 'XAG/USD',
     name: 'Silver / US Dollar',
-    spread: 0.02
+    spread: 0.2
   },
   {
     type: 'COMMODITIES',
     symbol: 'WTI/USD',
     name: 'Crude Oil (WTI)',
-    spread: 0.03
+    spread: 0.3
   },
   {
     type: 'COMMODITIES',
     symbol: 'BRENT/USD',
     name: 'Brent Crude',
-    spread: 0.03
+    spread: 0.3
   },
 
   // Indices majors
@@ -151,37 +151,37 @@ const MARKET_SPECS: MarketSpec[] = [
     type: 'INDICES',
     symbol: 'SPX',
     name: 'S&P 500',
-    spread: 0.8
+    spread: 8
   },
   {
     type: 'INDICES',
     symbol: 'NDX',
     name: 'NASDAQ Composite',
-    spread: 1.2
+    spread: 12
   },
   {
     type: 'INDICES',
     symbol: 'DJI',
     name: 'Dow Jones Industrial Average',
-    spread: 2
+    spread: 20
   },
   {
     type: 'INDICES',
     symbol: 'DAX',
     name: 'DAX',
-    spread: 1
+    spread: 10
   },
   {
     type: 'INDICES',
     symbol: 'FTSE',
     name: 'FTSE 100',
-    spread: 0.8
+    spread: 8
   },
   {
     type: 'INDICES',
     symbol: 'N225',
     name: 'Nikkei 225',
-    spread: 15
+    spread: 150
   },
 
   // Crypto majors
@@ -189,25 +189,25 @@ const MARKET_SPECS: MarketSpec[] = [
     type: 'CRYPTO',
     symbol: 'BTC/USD',
     name: 'Bitcoin',
-    spread: 12
+    spread: 120
   },
   {
     type: 'CRYPTO',
     symbol: 'ETH/USD',
     name: 'Ethereum',
-    spread: 2.5
+    spread: 25
   },
   {
     type: 'CRYPTO',
     symbol: 'SOL/USD',
     name: 'Solana',
-    spread: 0.15
+    spread: 1.5
   },
   {
     type: 'CRYPTO',
     symbol: 'XRP/USD',
     name: 'XRP',
-    spread: 0.001
+    spread: 0.01
   }
 ];
 

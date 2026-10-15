@@ -308,6 +308,7 @@
       "balanceInstitutional": "Institutional",
       "balance": "Balance",
       "equity": "Equity",
+      "leverage": "Leverage",
       "wsStatus": {
         "title": "Market data connection",
         "description": "WebSocket subscription and price source status.",

@@ -3,18 +3,29 @@
 import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
-import type { Market } from '@/lib/prisma/generated/client';
+import { useSession } from 'next-auth/react';
+import type { Market, MarketType } from '@/lib/prisma/generated/client';
 import {
   useMarketsWebSocket,
   useMarketsWebSocketSymbols
 } from '@/contexts/markets-websocket-context';
+import { getLotSize } from '@/lib/calculator-client';
 import {
   formatTradePrice,
   formatTradePriceFull,
   getTradePriceButtonTextClass
 } from '@/lib/trade-price-format';
 
-export type OrderPanelMarket = Market | { symbol: string; lastPrice: number; spread?: number } | null;
+export type OrderPanelMarket =
+  | Market
+  | {
+      symbol: string;
+      lastPrice: number;
+      spread?: number;
+      type?: MarketType;
+      room?: Market['room'];
+    }
+  | null;
 
 interface TradingRoomOrderPanelProps {
   market: OrderPanelMarket;
@@ -34,6 +45,7 @@ export function TradingRoomOrderPanel({
   showAdvancedOrder = true
 }: TradingRoomOrderPanelProps) {
   const t = useTranslations('Trade.order');
+  const { data: session } = useSession();
   const [lotSize, setLotSize] = useState('0.01');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { realTimePrices } = useMarketsWebSocket();
@@ -59,6 +71,18 @@ export function TradingRoomOrderPanel({
   const askPriceClass = getTradePriceButtonTextClass(displayAsk);
 
   const price = midPrice;
+  const marketType: MarketType =
+    (market && 'type' in market ? market.type : undefined) ?? 'FOREX';
+  const marketRoom =
+    (market && 'room' in market ? market.room : undefined) ?? 'TRADING';
+  const lotSizeMultiplier =
+    marketRoom === 'STOCK' ? 1 : getLotSize(marketType);
+  const leverage =
+    marketRoom === 'STOCK' ? 1 : session?.user?.leverage || 1;
+  const quantity = parseFloat(lotSize) || 0.01;
+  // Required Margin = Position Value / Leverage
+  const requiredMargin =
+    (price * quantity * lotSizeMultiplier) / leverage;
 
   const incrementLot = () => {
     const n = parseFloat(lotSize) || 0;
@@ -93,9 +117,6 @@ export function TradingRoomOrderPanel({
     );
   }
 
-  const notionalUsd = Math.round(
-    (parseFloat(lotSize) || 0) * 100000 * price
-  );
   const formatUsd = (n: number) =>
     n.toLocaleString('en-US', { maximumFractionDigits: 0 });
   const controlsDisabled = disabled || isSubmitting;
@@ -187,9 +208,9 @@ export function TradingRoomOrderPanel({
             <span className="text-[9px] font-medium text-[var(--trade-text-muted)]">{t('lots')}</span>
           </div>
           <div className="text-[9px] text-[var(--trade-text-muted)]">
-            ≈ {(parseFloat(lotSize) || 0.01) * price < 1000
-              ? `${((parseFloat(lotSize) || 0.01) * price).toFixed(3)} USD`
-              : `${formatUsd(notionalUsd)} USD`}
+            ≈ {requiredMargin < 1000
+              ? `${requiredMargin.toFixed(3)} USD`
+              : `${formatUsd(Math.round(requiredMargin))} USD`}
           </div>
         </div>
         <button
