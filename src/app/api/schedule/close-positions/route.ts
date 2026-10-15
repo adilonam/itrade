@@ -11,6 +11,7 @@ import {
   Position,
   TransactionType
 } from '@/lib/prisma/generated/client';
+import { getTpSlTrigger } from '@/lib/position-tp-sl';
 
 const MARGIN_CHECK_BALANCE_TYPES: BalanceType[] = ['REAL', 'DEMO'];
 export async function GET() {
@@ -274,42 +275,20 @@ export async function GET() {
           stopLoss: position.stopLoss
         });
 
-        let shouldClose = false;
-        let closeReason = '';
+        const trigger = getTpSlTrigger(position, currentPrice);
 
-        // Check take profit and stop loss conditions
-        if (position.type === 'BUY') {
-          // For BUY positions:
-          // Take profit: current price >= take profit price
-          // Stop loss: current price <= stop loss price
-          if (position.takeProfit && currentPrice >= position.takeProfit) {
-            shouldClose = true;
-            closeReason = 'Take profit reached';
-          } else if (position.stopLoss && currentPrice <= position.stopLoss) {
-            shouldClose = true;
-            closeReason = 'Stop loss triggered';
-          }
-        } else if (position.type === 'SELL') {
-          // For SELL positions:
-          // Take profit: current price <= take profit price
-          // Stop loss: current price >= stop loss price
-          if (position.takeProfit && currentPrice <= position.takeProfit) {
-            shouldClose = true;
-            closeReason = 'Take profit reached';
-          } else if (position.stopLoss && currentPrice >= position.stopLoss) {
-            shouldClose = true;
-            closeReason = 'Stop loss triggered';
-          }
-        }
+        if (trigger) {
+          const { closePrice, reason: closeReason } = trigger;
 
-        if (shouldClose) {
           // eslint-disable-next-line no-console
-          console.log(`Closing position ${position.id}: ${closeReason}`);
+          console.log(
+            `Closing position ${position.id}: ${closeReason} at ${closePrice}`
+          );
 
           // Calculate P&L for the position
           const positionWithClosedPrice = {
             ...position,
-            closedPrice: currentPrice,
+            closedPrice: closePrice,
             status: 'CLOSED' as const
           };
 
@@ -324,7 +303,7 @@ export async function GET() {
               where: { id: position.id },
               data: {
                 status: 'CLOSED',
-                closedPrice: currentPrice,
+                closedPrice: closePrice,
                 closedAt: new Date(),
                 pnl: calculatedPnL || 0
               }
@@ -357,6 +336,7 @@ export async function GET() {
             symbol: position.market.symbol,
             type: position.type,
             reason: closeReason,
+            closedPrice: closePrice,
             pnl: calculatedPnL
           });
 
