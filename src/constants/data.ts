@@ -363,7 +363,8 @@ export const userManagementNavPrimary: UserManagementNavItem[] = [
   { title: 'Deposit', url: '/user-management/deposit' },
   { title: 'Withdrawal', url: '/user-management/withdrawal' },
   { title: 'Settings', url: '/user-management/settings' },
-  { title: 'KYC verification', url: '/user-management/kyc' }
+  { title: 'KYC verification', url: '/user-management/kyc' },
+  { title: 'Trading consent', url: '/consent' }
 ];
 
 export const userManagementNavSecondary: UserManagementNavItem[] = [];
@@ -402,12 +403,15 @@ export const brandAssets = {
   logoDark: logoImages.primary
 } as const;
 
+export const sponsorshipIconSrc = '/images/icons/sponsorship.svg';
+
 export const landingPageLinks = {
   signIn: '/auth/sign-in',
   signUp: '/auth/sign-up',
   trade: '/trade',
   plans: '/investments',
-  dashboard: '/overview'
+  dashboard: '/overview',
+  consent: '/consent'
 } as const;
 
 export const landingNavLinks = {
@@ -434,6 +438,8 @@ export const landingSiteLinks = {
   marketsStocks: '/stocks',
   marketsCommodities: '/commodities',
   marketsIndices: '/indices',
+  marketsPricePrediction: '/betting',
+  marketsPolymarket: '/polymarket',
   learningCfds: '/cfds',
   learningMarketMovers: '/market-movers',
   learningTradingPitfalls: '/trading-pitfalls',
@@ -441,6 +447,11 @@ export const landingSiteLinks = {
   learningTechnicalFundamental: '/technical-fundamental',
   learningGlossary: '/glossary',
   learningNfp: '/nfp'
+} as const;
+
+export const pricePredictionLinks = {
+  listing: '/betting',
+  market: (slug: string) => `/betting/${slug}`
 } as const;
 
 /** Polymarket prediction markets section (cloned app mounted at /polymarket). */
@@ -512,7 +523,15 @@ export const landingHeaderMenus: LandingHeaderMenu[] = [
       { label: 'Currencies', href: landingPlaceholderLink },
       { label: 'Stocks', href: landingPlaceholderLink },
       { label: 'Commodities', href: landingPlaceholderLink },
-      { label: 'Indices', href: landingPlaceholderLink }
+      { label: 'Indices', href: landingSiteLinks.marketsIndices },
+      {
+        label: 'Price Prediction',
+        href: landingSiteLinks.marketsPricePrediction
+      },
+      {
+        label: 'Polymarket',
+        href: landingSiteLinks.marketsPolymarket
+      }
     ]
   },
   {
@@ -541,30 +560,53 @@ export const landingHeaderMenus: LandingHeaderMenu[] = [
   }
 ];
 
-/** Manual USDT deposit networks — wallet addresses are shown on the client only. */
-export const MANUAL_USDT_DEPOSIT_NETWORKS = [
+/** Manual bank transfer accounts — details are shown on the client only. */
+export const MANUAL_BANK_TRANSFER_ACCOUNTS = [
   {
-    id: 'trc20',
-    label: 'USDT TRC20',
-    hint: 'Tron network',
-    address: 'TPUVPMAkhyeFpPVbJkX4nmyYbDZzWcVMDP'
-  },
-  {
-    id: 'erc20',
-    label: 'USDT ERC20',
-    hint: 'Ethereum network',
-    address: '0x11740455c9aFD3C2a637d702931b3900be8B85F8'
-  },
-  {
-    id: 'bnb',
-    label: 'USDT BNB',
-    hint: 'BNB Smart Chain',
-    address: '0x11740455c9aFD3C2a637d702931b3900be8B85F8'
+    id: 'usd-standard-bank',
+    label: 'USD Bank Transfer',
+    hint: 'Standard Bank (SWIFT)',
+    currency: 'USD',
+    accountName: 'ITRADE GLOBAL MARKETS (PTY) LTD',
+    bankName: 'Standard Bank',
+    registrationNumber: '2022/709631/07',
+    accountType: 'BIZLAUNCH',
+    accountNumber: '40 246 928 3',
+    branch: 'BAYSIDE',
+    branchCode: '002209',
+    iban: null,
+    swift: 'SBZAZAJJ',
+    routingNumber: null,
+    accountOpenedDate: '12 December 2025',
+    referenceHint:
+      'Include your order ID in the payment reference so we can match your transfer.'
   }
 ] as const;
 
-export type ManualUsdtDepositNetworkId =
-  (typeof MANUAL_USDT_DEPOSIT_NETWORKS)[number]['id'];
+export type ManualBankTransferAccountId =
+  (typeof MANUAL_BANK_TRANSFER_ACCOUNTS)[number]['id'];
+
+/** Forex/metal pairs shown on the IC landing market widget (Twelve Data). */
+export const landingIcWidgetSymbols = [
+  { display: 'EURUSD', api: 'EUR/USD' },
+  { display: 'AUDUSD', api: 'AUD/USD' },
+  { display: 'GBPUSD', api: 'GBP/USD' },
+  { display: 'XAUUSD', api: 'XAU/USD' }
+] as const;
+
+export type LandingIcWidgetSymbol =
+  (typeof landingIcWidgetSymbols)[number]['display'];
+
+/** Fallback bid/ask when Twelve Data is unavailable. */
+export const landingIcWidgetDefaultQuotes: Record<
+  LandingIcWidgetSymbol,
+  { bid: number; ask: number; percentChange: number }
+> = {
+  EURUSD: { bid: 1.16692, ask: 1.16692, percentChange: 0.04 },
+  AUDUSD: { bid: 0.754, ask: 0.754, percentChange: -0.44 },
+  GBPUSD: { bid: 1.32584, ask: 1.32591, percentChange: 0.19 },
+  XAUUSD: { bid: 1298.21, ask: 1298.28, percentChange: 0.35 }
+};
 
 /** Symbols shown on the public landing page market ticker (Twelve Data). */
 export const landingMarketTapeSymbols = [
@@ -585,6 +627,108 @@ export const landingMarketTapeSymbols = [
 ] as const;
 
 /** Fallback values for landing tape when market data provider is unavailable. */
+/** IC-style home hero carousel (GIF first, then three static banners). */
+export type LandingHomeBannerCarouselHeroCopy = {
+  headline: string;
+  subheadline: string;
+  ctaLabel: string;
+  align: 'left' | 'center';
+  ctaHref?: string;
+  disclaimer?: string;
+};
+
+export const landingHomeBannerIntroVideoSrc = '/images/home-banner/48-lg-b.webm';
+
+export const landingHomeBannerCarouselItems = [
+  {
+    src: '/images/home-banner/48-lg.webm',
+    alt: 'Trade with {appName}',
+    isVideo: true,
+    heroCopy: {
+      headline: 'SpaceX is Here',
+      subheadline: 'The wait is over. Trade the SpaceX CFD from day one.',
+      ctaLabel: 'Trade SPCX.NAS',
+      align: 'center'
+    }
+  },
+  {
+    src: '/images/home-banner/45.webp',
+    alt: 'Raw spreads from 0.0 pips',
+    heroCopy: {
+      headline: 'Different arenas.\nSame pursuit of\nexcellence.',
+      subheadline: 'Built for high-performance trading. Official FX Partner of TGR Haas F1 Team.',
+      ctaLabel: 'Learn More',
+      align: 'left',
+      ctaHref: landingSiteLinks.aboutUs
+    }
+  },
+  {
+    src: '/images/home-banner/35.webp',
+    alt: 'Institutional grade trading',
+    heroCopy: {
+      headline: '100% Bonus on Your First Deposit',
+      subheadline: 'Plus 50% Extra Every Time You Top Up*.',
+      ctaLabel: 'Learn More',
+      align: 'center',
+      ctaHref: landingSiteLinks.aboutUs,
+      disclaimer: '*Terms and Conditions apply.'
+    }
+  },
+  {
+    src: '/images/home-banner/17.webp',
+    alt: 'Powerful trading platforms',
+    heroCopy: {
+      headline: 'Powerful Trading Platforms',
+      subheadline:
+        'Trade forex, indices, commodities and crypto on MT4, MT5, cTrader and TradingView.',
+      ctaLabel: 'Explore Platforms',
+      align: 'center',
+      ctaHref: landingSiteLinks.faqs
+    }
+  }
+] as const;
+
+export type LandingHomeTradingStat = {
+  value: string;
+  label: string;
+};
+
+export const landingHomeTradingStats: LandingHomeTradingStat[] = [
+  { value: '0.0', label: 'PIP SPREADS*' },
+  { value: '1:5000', label: 'LEVERAGE' },
+  { value: '0.01', label: 'MICRO LOT TRADING' },
+  { value: '+2850', label: 'TRADABLE INSTRUMENTS' },
+  { value: '24/7', label: 'DEDICATED SUPPORT' }
+];
+
+/** Remaining home banner art used outside the hero carousel. */
+export const landingHomeBannerPromoItems = [
+  {
+    src: '/images/home-banner/19.webp',
+    alt: 'Fast order execution',
+    title: 'Ultra-fast execution',
+    description: 'Average speeds under 40ms on institutional infrastructure.'
+  },
+  {
+    src: '/images/home-banner/47.webp',
+    alt: 'Deep liquidity',
+    title: 'Deep liquidity',
+    description: 'Trade on real, diverse liquidity with reduced slippage.'
+  },
+  {
+    src: '/images/home-banner/34.webp',
+    alt: 'Trade on the go',
+    title: 'Trade anywhere',
+    description: 'Monitor markets and manage positions from any device.'
+  }
+] as const;
+
+export const landingHomeBannerSpreadsImage = '/images/home-banner/46.webp';
+export const landingHomeBannerAutomatedTradingImage = '/images/home-banner/32.webp';
+export const landingHomeBannerPlatformsImage = '/images/home-banner/33.webp';
+export const landingHomeBannerMobileChartImage = '/images/home-banner/19.webp';
+export const tradingViewFooterIconSrc = '/images/footer/tradingViewFooterIcon.svg';
+
 export const landingMarketTapeDefaultQuotes = {
   AAPL: { price: 190.5, percentChange: 0.42 },
   MSFT: { price: 420.25, percentChange: 0.31 },

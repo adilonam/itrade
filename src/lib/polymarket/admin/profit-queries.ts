@@ -1,5 +1,6 @@
 import { unstable_noStore as noStore } from "next/cache"
 
+import type { TradeBalanceType } from "@/lib/balance-selection"
 import {
   resolveAdminPagination,
   type AdminPaginatedResult,
@@ -25,22 +26,34 @@ type SettledMarketRow = Prisma.PredictionMarketGetPayload<{
   select: typeof settledMarketSelect
 }>
 
+/** One settled market’s house P&L for a single balance wallet. */
 export type AdminResolvedMarketProfit = Omit<
   SettledMarketRow,
-  "resolutionDate" | "winningOutcome"
+  "resolutionDate" | "winningOutcome" | "totalVolume"
 > & {
   resolutionDate: string
   winningOutcome: OutcomeType
+  balanceType: TradeBalanceType
   tradeCount: number
+  /** Sum of buy/sell amounts for this balance on the market. */
+  volume: number
   profit: number
 }
 
-export type AdminProfitSummary = {
+/** Summary stats for one balance wallet across settled markets. */
+export type AdminBalanceProfitSummary = {
+  balanceType: TradeBalanceType
   totalProfit: number
   settledCount: number
-  pendingDecisionCount: number
   totalVolume: number
   avgProfitPerMarket: number
+  tradeCount: number
+}
+
+export type AdminProfitOverview = {
+  pendingDecisionCount: number
+  real: AdminBalanceProfitSummary
+  demo: AdminBalanceProfitSummary
 }
 
 const tradeSelect = {
@@ -49,6 +62,7 @@ const tradeSelect = {
   side: true,
   amount: true,
   shares: true,
+  balanceType: true,
   outcome: { select: { type: true } },
 } satisfies Prisma.PredictionTradeSelect
 
@@ -73,6 +87,7 @@ async function loadTradesByMarketIds(
       side: trade.side,
       amount: trade.amount,
       shares: trade.shares,
+      balanceType: trade.balanceType as TradeBalanceType,
       outcomeType: trade.outcome.type,
     })
     tradesByMarket.set(trade.marketId, list)
@@ -81,27 +96,65 @@ async function loadTradesByMarketIds(
   return tradesByMarket
 }
 
-function toResolvedMarketProfit(
-  market: SettledMarketRow & { winningOutcome: OutcomeType },
-  tradesByMarket: Map<string, TradeForHouseProfit[]>
-): AdminResolvedMarketProfit {
-  const marketTrades = tradesByMarket.get(market.id) ?? []
-  const profit = houseProfitIfResolved(marketTrades, market.winningOutcome)
+function tradesForBalance(
+  trades: TradeForHouseProfit[],
+  balanceType: TradeBalanceType
+): TradeForHouseProfit[] {
+  return trades.filter((trade) => trade.balanceType === balanceType)
+}
 
+function volumeForTrades(trades: TradeForHouseProfit[]): number {
+  return trades.reduce((sum, trade) => sum + trade.amount, 0)
+}
+
+function emptyBalanceSummary(
+  balanceType: TradeBalanceType
+): AdminBalanceProfitSummary {
   return {
-    id: market.id,
-    slug: market.slug,
-    title: market.title,
-    category: market.category,
-    winningOutcome: market.winningOutcome,
-    resolutionDate: market.resolutionDate.toISOString(),
-    totalVolume: market.totalVolume,
-    tradeCount: marketTrades.length,
-    profit,
+    balanceType,
+    totalProfit: 0,
+    settledCount: 0,
+    totalVolume: 0,
+    avgProfitPerMarket: 0,
+    tradeCount: 0,
   }
 }
 
-export async function getAdminProfitSummary(): Promise<AdminProfitSummary> {
+function summarizeBalance(
+  balanceType: TradeBalanceType,
+  settledWithOutcome: Array<SettledMarketRow & { winningOutcome: OutcomeType }>,
+  tradesByMarket: Map<string, TradeForHouseProfit[]>
+): AdminBalanceProfitSummary {
+  let totalProfit = 0
+  let totalVolume = 0
+  let tradeCount = 0
+  let settledCount = 0
+
+  for (const market of settledWithOutcome) {
+    const scoped = tradesForBalance(
+      tradesByMarket.get(market.id) ?? [],
+      balanceType
+    )
+    if (scoped.length === 0) {
+      continue
+    }
+    settledCount += 1
+    tradeCount += scoped.length
+    totalVolume += volumeForTrades(scoped)
+    totalProfit += houseProfitIfResolved(scoped, market.winningOutcome)
+  }
+
+  return {
+    balanceType,
+    totalProfit,
+    settledCount,
+    totalVolume,
+    avgProfitPerMarket: settledCount > 0 ? totalProfit / settledCount : 0,
+    tradeCount,
+  }
+}
+
+export async function getAdminProfitOverview(): Promise<AdminProfitOverview> {
   noStore()
 
   const [settledMarkets, pendingDecisionCount] = await Promise.all([
@@ -126,41 +179,48 @@ export async function getAdminProfitSummary(): Promise<AdminProfitSummary> {
       market.winningOutcome != null
   )
 
+  if (settledWithOutcome.length === 0) {
+    return {
+      pendingDecisionCount,
+      real: emptyBalanceSummary("REAL"),
+      demo: emptyBalanceSummary("DEMO"),
+    }
+  }
+
   const tradesByMarket = await loadTradesByMarketIds(
     settledWithOutcome.map((market) => market.id)
   )
 
-  let totalProfit = 0
-  let totalVolume = 0
-
-  for (const market of settledWithOutcome) {
-    const marketTrades = tradesByMarket.get(market.id) ?? []
-    totalProfit += houseProfitIfResolved(marketTrades, market.winningOutcome)
-    totalVolume += market.totalVolume
-  }
-
-  const settledCount = settledWithOutcome.length
-
   return {
-    totalProfit,
-    settledCount,
     pendingDecisionCount,
-    totalVolume,
-    avgProfitPerMarket: settledCount > 0 ? totalProfit / settledCount : 0,
+    real: summarizeBalance("REAL", settledWithOutcome, tradesByMarket),
+    demo: summarizeBalance("DEMO", settledWithOutcome, tradesByMarket),
   }
 }
 
-export async function listAdminResolvedMarketProfits(
+/** Settled markets that have at least one trade on `balanceType`, with that wallet’s P&L. */
+export async function listAdminResolvedMarketProfitsForBalance(
+  balanceType: TradeBalanceType,
   options: AdminPaginationInput
 ): Promise<AdminPaginatedResult<AdminResolvedMarketProfit>> {
   noStore()
 
-  const where = {
-    status: MarketStatus.resolved,
-    winningOutcome: { not: null },
-  } satisfies Prisma.PredictionMarketWhereInput
+  const settledMarkets = await prisma.predictionMarket.findMany({
+    where: {
+      status: MarketStatus.resolved,
+      winningOutcome: { not: null },
+      trades: { some: { balanceType } },
+    },
+    orderBy: { resolutionDate: "desc" },
+    select: settledMarketSelect,
+  })
 
-  const totalCount = await prisma.predictionMarket.count({ where })
+  const settledWithOutcome = settledMarkets.filter(
+    (market): market is SettledMarketRow & { winningOutcome: OutcomeType } =>
+      market.winningOutcome != null
+  )
+
+  const totalCount = settledWithOutcome.length
   const { page, pageSize, totalPages, skip, take } = resolveAdminPagination(
     totalCount,
     options
@@ -170,26 +230,29 @@ export async function listAdminResolvedMarketProfits(
     return { items: [], totalCount, page, pageSize, totalPages }
   }
 
-  const markets = await prisma.predictionMarket.findMany({
-    where,
-    orderBy: { resolutionDate: "desc" },
-    select: settledMarketSelect,
-    skip,
-    take,
-  })
-
-  const settledWithOutcome = markets.filter(
-    (market): market is SettledMarketRow & { winningOutcome: OutcomeType } =>
-      market.winningOutcome != null
-  )
-
+  const pageMarkets = settledWithOutcome.slice(skip, skip + take)
   const tradesByMarket = await loadTradesByMarketIds(
-    settledWithOutcome.map((market) => market.id)
+    pageMarkets.map((market) => market.id)
   )
 
-  const items = settledWithOutcome.map((market) =>
-    toResolvedMarketProfit(market, tradesByMarket)
-  )
+  const items = pageMarkets.map((market) => {
+    const scoped = tradesForBalance(
+      tradesByMarket.get(market.id) ?? [],
+      balanceType
+    )
+    return {
+      id: market.id,
+      slug: market.slug,
+      title: market.title,
+      category: market.category,
+      winningOutcome: market.winningOutcome,
+      resolutionDate: market.resolutionDate.toISOString(),
+      balanceType,
+      tradeCount: scoped.length,
+      volume: volumeForTrades(scoped),
+      profit: houseProfitIfResolved(scoped, market.winningOutcome),
+    }
+  })
 
   return { items, totalCount, page, pageSize, totalPages }
 }

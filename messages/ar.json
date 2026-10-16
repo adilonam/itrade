@@ -256,6 +256,7 @@
       "stocks": "الأسهم",
       "commodities": "السلع",
       "indices": "المؤشرات",
+      "pricePrediction": "توقعات الأسعار",
       "education": "التعليم",
       "economicCalendar": "التقويم الاقتصادي",
       "cfds": "عقود الفروقات",
@@ -483,7 +484,8 @@
       "transfer": "تحويل",
       "withdrawal": "سحب",
       "settings": "الإعدادات",
-      "kyc": "التحقق من الهوية"
+      "kyc": "التحقق من الهوية",
+      "consent": "موافقة التداول"
     },
     "sidebar": {
       "ariaLabel": "إدارة المستخدم",

@@ -256,6 +256,7 @@
       "stocks": "Stocks",
       "commodities": "Commodities",
       "indices": "Indices",
+      "pricePrediction": "Price Prediction",
       "education": "Education",
       "economicCalendar": "Economic Calendar",
       "cfds": "CFDs",
@@ -483,7 +484,8 @@
       "transfer": "Transfer",
       "withdrawal": "Withdrawal",
       "settings": "Settings",
-      "kyc": "KYC verification"
+      "kyc": "KYC verification",
+      "consent": "Trading consent"
     },
     "sidebar": {
       "ariaLabel": "User management",

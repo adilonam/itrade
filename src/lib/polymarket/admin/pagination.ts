@@ -62,19 +62,22 @@ export function buildAdminListHref(
   options: {
     page: number
     pageSize: number
+    /** Query key for the page number (default `page`). */
+    pageParam?: string
     params?: Record<string, string | undefined>
   }
 ): string {
   const search = new URLSearchParams()
+  const pageParam = options.pageParam ?? "page"
 
   for (const [key, value] of Object.entries(options.params ?? {})) {
-    if (value != null && value !== "") {
+    if (value != null && value !== "" && key !== pageParam) {
       search.set(key, value)
     }
   }
 
   if (options.page > 1) {
-    search.set("page", String(options.page))
+    search.set(pageParam, String(options.page))
   }
   if (options.pageSize !== ADMIN_PAGE_SIZE_DEFAULT) {
     search.set("pageSize", String(options.pageSize))

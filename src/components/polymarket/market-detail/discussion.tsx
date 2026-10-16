@@ -10,12 +10,15 @@ import type {
   HolderView,
   PositionView,
 } from "@/lib/polymarket/markets/queries"
+import type { TradeBalanceType } from "@/lib/balance-selection"
 import { Button } from "@/components/polymarket/ui/button"
 import { Input } from "@/components/polymarket/ui/input"
 import { MarketThumb } from "@/components/polymarket/markets/market-thumb"
 import { formatCents, formatUsdVolume } from "@/components/polymarket/markets/data"
 import { cn } from "@/lib/utils"
 import { Link } from "@/lib/polymarket/routing"
+
+type BalanceFilter = "ALL" | TradeBalanceType
 
 function timeAgo(iso: string): string {
   const ms = Date.now() - new Date(iso).getTime()
@@ -41,6 +44,25 @@ function initials(name: string): string {
   return name.slice(0, 2).toUpperCase()
 }
 
+function balanceLabel(balanceType: TradeBalanceType): string {
+  return balanceType === "REAL" ? "Real" : "Demo"
+}
+
+function BalanceBadge({ balanceType }: { balanceType: TradeBalanceType }) {
+  return (
+    <span
+      className={cn(
+        "rounded-md px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide",
+        balanceType === "REAL"
+          ? "bg-primary/15 text-primary dark:text-primary-fixed-dim"
+          : "bg-tertiary/15 text-tertiary dark:text-tertiary-fixed-dim"
+      )}
+    >
+      {balanceLabel(balanceType)}
+    </span>
+  )
+}
+
 type Tab = "comments" | "holders" | "positions" | "activity"
 
 export function Discussion({
@@ -59,12 +81,29 @@ export function Discussion({
   signedIn: boolean
 }) {
   const [tab, setTab] = useState<Tab>("comments")
+  const [balanceFilter, setBalanceFilter] = useState<BalanceFilter>("ALL")
   const [content, setContent] = useState("")
   const [replyTo, setReplyTo] = useState<string | null>(null)
   const [pending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
   const commentCount =
     comments.length + comments.reduce((sum, c) => sum + c.replies.length, 0)
+
+  const showBalanceFilter =
+    tab === "holders" || tab === "positions" || tab === "activity"
+
+  const filteredHolders =
+    balanceFilter === "ALL"
+      ? holders
+      : holders.filter((row) => row.balanceType === balanceFilter)
+  const filteredPositions =
+    balanceFilter === "ALL"
+      ? positions
+      : positions.filter((row) => row.balanceType === balanceFilter)
+  const filteredActivity =
+    balanceFilter === "ALL"
+      ? activity
+      : activity.filter((row) => row.balanceType === balanceFilter)
 
   function submit() {
     const text = content.trim()
@@ -93,29 +132,61 @@ export function Discussion({
 
   return (
     <section>
-      <div className="mb-4 flex flex-wrap gap-4 border-b border-outline-variant">
-        {(
-          [
-            ["comments", `Comments (${commentCount})`],
-            ["holders", "Top Holders"],
-            ["positions", "Positions"],
-            ["activity", "Activity"],
-          ] as const
-        ).map(([key, label]) => (
-          <button
-            key={key}
-            type="button"
-            onClick={() => setTab(key)}
-            className={cn(
-              "font-label pb-2 text-sm font-semibold",
-              tab === key
-                ? "text-on-surface border-on-surface border-b-2"
-                : "text-secondary"
-            )}
+      <div className="mb-4 flex flex-wrap items-end justify-between gap-3 border-b border-outline-variant">
+        <div className="flex flex-wrap gap-4">
+          {(
+            [
+              ["comments", `Comments (${commentCount})`],
+              ["holders", "Top Holders"],
+              ["positions", "Positions"],
+              ["activity", "Activity"],
+            ] as const
+          ).map(([key, label]) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => setTab(key)}
+              className={cn(
+                "font-label pb-2 text-sm font-semibold",
+                tab === key
+                  ? "text-on-surface border-on-surface border-b-2"
+                  : "text-secondary"
+              )}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {showBalanceFilter ? (
+          <div
+            className="mb-2 flex flex-wrap gap-1"
+            role="group"
+            aria-label="Filter by balance type"
           >
-            {label}
-          </button>
-        ))}
+            {(
+              [
+                ["ALL", "All"],
+                ["REAL", "Real"],
+                ["DEMO", "Demo"],
+              ] as const
+            ).map(([value, label]) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => setBalanceFilter(value)}
+                className={cn(
+                  "rounded-lg px-2.5 py-1 text-xs font-semibold transition-colors",
+                  balanceFilter === value
+                    ? "bg-on-surface text-surface"
+                    : "bg-surface-container text-secondary hover:text-on-surface"
+                )}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        ) : null}
       </div>
 
       {tab === "comments" ? (
@@ -185,12 +256,12 @@ export function Discussion({
 
       {tab === "holders" ? (
         <ul className="space-y-3">
-          {holders.length === 0 ? (
+          {filteredHolders.length === 0 ? (
             <p className="text-secondary text-sm">No holders yet.</p>
           ) : (
-            holders.map((holder) => (
+            filteredHolders.map((holder) => (
               <li
-                key={holder.userId}
+                key={`${holder.userId}:${holder.balanceType}:${holder.outcome}`}
                 className="flex items-center justify-between gap-3"
               >
                 <div className="flex items-center gap-2">
@@ -203,6 +274,7 @@ export function Discussion({
                   <span className="text-sm font-semibold">
                     {displayName(holder)}
                   </span>
+                  <BalanceBadge balanceType={holder.balanceType} />
                 </div>
                 <span
                   className={cn(
@@ -225,20 +297,27 @@ export function Discussion({
 
       {tab === "positions" ? (
         signedIn ? (
-          positions.length > 0 ? (
+          filteredPositions.length > 0 ? (
             <ul className="space-y-2">
-              {positions.map((pos) => (
+              {filteredPositions.map((pos) => (
                 <li
-                  key={pos.outcome}
-                  className="bg-surface-container flex justify-between rounded-lg px-3 py-2 text-sm"
+                  key={`${pos.balanceType}:${pos.outcome}`}
+                  className="bg-surface-container flex items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm"
                 >
-                  <span>{pos.outcome}</span>
+                  <span className="flex items-center gap-2">
+                    <span>{pos.outcome}</span>
+                    <BalanceBadge balanceType={pos.balanceType} />
+                  </span>
                   <span className="font-data">{pos.shares.toFixed(2)} shares</span>
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="text-secondary text-sm">You have no positions in this market.</p>
+            <p className="text-secondary text-sm">
+              You have no positions in this market
+              {balanceFilter === "ALL" ? "" : ` (${balanceLabel(balanceFilter)})`}
+              .
+            </p>
           )
         ) : (
           <p className="text-secondary text-sm">
@@ -252,16 +331,18 @@ export function Discussion({
 
       {tab === "activity" ? (
         <ul className="space-y-3">
-          {activity.length === 0 ? (
+          {filteredActivity.length === 0 ? (
             <p className="text-secondary text-sm">No trades yet.</p>
           ) : (
-            activity.map((row) => (
+            filteredActivity.map((row) => (
               <li key={row.id} className="text-sm">
-                <span className="font-semibold">
+                <span className="inline-flex items-center gap-1.5 font-semibold">
                   {row.username ?? row.userName ?? "Trader"}
+                  <BalanceBadge balanceType={row.balanceType} />
                 </span>{" "}
-                {row.side.toLowerCase()} {row.outcome} · {formatCents(row.priceAtTrade)} ·{" "}
-                {formatUsdVolume(row.amount)} · {timeAgo(row.createdAt)}
+                {row.side.toLowerCase()} {row.outcome} ·{" "}
+                {formatCents(row.priceAtTrade)} · {formatUsdVolume(row.amount)} ·{" "}
+                {timeAgo(row.createdAt)}
               </li>
             ))
           )}

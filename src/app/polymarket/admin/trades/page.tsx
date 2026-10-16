@@ -5,6 +5,10 @@ import { AdminPagination } from "@/components/polymarket/admin/admin-pagination"
 import { AdminTradeTable } from "@/components/polymarket/admin/admin-trade-table"
 import { AdminTradesFilter } from "@/components/polymarket/admin/admin-trades-filter"
 import { Header } from "@/components/polymarket/landing/header"
+import {
+  TRADE_BALANCE_TYPES,
+  type TradeBalanceType,
+} from "@/lib/balance-selection"
 import { parseAdminPagination } from "@/lib/polymarket/admin/pagination"
 import {
   getAdminMarketById,
@@ -15,9 +19,19 @@ import {
 type PageProps = {
   searchParams: Promise<{
     marketId?: string
+    balanceType?: string
     page?: string
     pageSize?: string
   }>
+}
+
+function parseBalanceType(
+  value: string | undefined
+): TradeBalanceType | undefined {
+  if (!value) return undefined
+  return TRADE_BALANCE_TYPES.includes(value as TradeBalanceType)
+    ? (value as TradeBalanceType)
+    : undefined
 }
 
 export default async function AdminTradesPage({ searchParams }: PageProps) {
@@ -26,11 +40,12 @@ export default async function AdminTradesPage({ searchParams }: PageProps) {
     typeof params.marketId === "string" && params.marketId.length > 0
       ? params.marketId
       : undefined
+  const balanceType = parseBalanceType(params.balanceType)
   const pagination = parseAdminPagination(params)
 
   const [t, result, markets, selectedMarket] = await Promise.all([
     getTranslations("Admin"),
-    listAdminTrades({ marketId, ...pagination }),
+    listAdminTrades({ marketId, balanceType, ...pagination }),
     listAdminMarketOptions(),
     marketId ? getAdminMarketById(marketId) : Promise.resolve(null),
   ])
@@ -51,6 +66,7 @@ export default async function AdminTradesPage({ searchParams }: PageProps) {
           <AdminTradesFilter
             markets={markets}
             selectedMarket={selectedMarket}
+            selectedBalanceType={balanceType ?? null}
           />
           <AdminTradeTable trades={result.items} />
           <AdminPagination
@@ -59,7 +75,7 @@ export default async function AdminTradesPage({ searchParams }: PageProps) {
             totalPages={result.totalPages}
             pageSize={result.pageSize}
             totalCount={result.totalCount}
-            params={{ marketId }}
+            params={{ marketId, balanceType }}
           />
         </div>
       </AdminPageShell>

@@ -14,7 +14,7 @@ import {
 import { cn } from "@/lib/utils"
 
 const menuItemClassName =
-  "text-on-surface hover:bg-surface-container-low dark:hover:bg-on-secondary-fixed-variant flex w-full items-center gap-2 rounded-lg px-2 py-2 text-sm font-medium transition-colors"
+  "text-on-surface hover:bg-surface-container-low dark:text-inverse-on-surface dark:hover:bg-on-secondary-fixed-variant flex w-full items-center gap-2 rounded-lg px-2 py-2 text-sm font-medium transition-colors"
 
 type UserAvatarMenuProps = {
   name?: string | null
@@ -80,11 +80,11 @@ export function UserAvatarMenu({
       <DropdownMenuContent
         align="end"
         sideOffset={8}
-        className="min-w-56 border border-outline-variant bg-surface-white p-2 text-on-surface shadow-xl ring-0 dark:border-on-secondary-container"
+        className="min-w-56 border border-outline-variant bg-surface-white p-2 text-on-surface shadow-xl ring-0 dark:border-on-secondary-container dark:bg-on-secondary-fixed dark:text-inverse-on-surface"
       >
         <div className="space-y-0.5 px-2 py-2">
           {name?.trim() ? (
-            <p className="truncate text-sm font-semibold text-on-surface">
+            <p className="truncate text-sm font-semibold text-on-surface dark:text-inverse-on-surface">
               {name.trim()}
             </p>
           ) : null}

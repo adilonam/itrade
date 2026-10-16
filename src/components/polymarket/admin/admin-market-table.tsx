@@ -86,6 +86,16 @@ function formatDueAt(iso: string): string {
   })
 }
 
+/** Portaled dialog surfaces sit outside `.polymarket-root` — set dark tokens explicitly. */
+const adminDialogContentClassName =
+  "border border-outline-variant bg-surface-white text-on-surface ring-outline-variant dark:border-on-secondary-container dark:bg-on-secondary-fixed dark:text-inverse-on-surface dark:ring-on-secondary-container [&_[data-slot=dialog-close]]:dark:bg-on-secondary-fixed-variant [&_[data-slot=dialog-close]]:dark:text-inverse-on-surface [&_[data-slot=dialog-close]]:dark:hover:bg-on-secondary-container"
+
+const adminDialogMutedClassName =
+  "text-on-surface-variant dark:text-secondary-fixed-dim"
+
+const adminDialogCancelClassName =
+  "border-outline-variant bg-surface-white text-on-surface hover:bg-surface-container-low dark:border-on-secondary-container dark:bg-transparent dark:text-inverse-on-surface dark:hover:bg-on-secondary-fixed-variant"
+
 function fileToBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
@@ -132,7 +142,7 @@ function ProfitLine({
           ? "text-success-green"
           : value < 0
             ? "text-danger-red"
-            : "text-on-surface-variant"
+            : "text-on-surface-variant dark:text-secondary-fixed-dim"
       )}
     >
       {label}: {formatProfit(value)}
@@ -357,6 +367,14 @@ export function AdminMarketTable({
     confirm?.outcome === OutcomeType.YES
       ? confirm?.market.profitIfYes
       : confirm?.market.profitIfNo
+  const confirmProfitReal =
+    confirm?.outcome === OutcomeType.YES
+      ? confirm?.market.profitIfYesReal
+      : confirm?.market.profitIfNoReal
+  const confirmProfitDemo =
+    confirm?.outcome === OutcomeType.YES
+      ? confirm?.market.profitIfYesDemo
+      : confirm?.market.profitIfNoDemo
   const confirmBusy = pending && pendingId === confirm?.market.id
   const editBusy = pending && pendingId === editing?.id
   const deleteBusy = pending && pendingId === deleting?.id
@@ -480,15 +498,31 @@ export function AdminMarketTable({
                   <TableCell className="text-on-surface-variant hidden px-4 py-3 lg:table-cell">
                     ${Math.round(market.totalVolume).toLocaleString()}
                   </TableCell>
-                  <TableCell className="hidden space-y-0.5 px-4 py-3 whitespace-normal lg:table-cell">
-                    <ProfitLine
-                      label={t("profitYes")}
-                      value={market.profitIfYes}
-                    />
-                    <ProfitLine
-                      label={t("profitNo")}
-                      value={market.profitIfNo}
-                    />
+                  <TableCell className="hidden space-y-1 px-4 py-3 whitespace-normal lg:table-cell">
+                    <div className="space-y-0.5">
+                      <ProfitLine
+                        label={t("profitYes")}
+                        value={market.profitIfYes}
+                      />
+                      <p className="text-on-surface-variant font-data pl-0.5 text-[10px] tabular-nums">
+                        {t("profitBalanceBreakdown", {
+                          real: formatProfit(market.profitIfYesReal),
+                          demo: formatProfit(market.profitIfYesDemo),
+                        })}
+                      </p>
+                    </div>
+                    <div className="space-y-0.5">
+                      <ProfitLine
+                        label={t("profitNo")}
+                        value={market.profitIfNo}
+                      />
+                      <p className="text-on-surface-variant font-data pl-0.5 text-[10px] tabular-nums">
+                        {t("profitBalanceBreakdown", {
+                          real: formatProfit(market.profitIfNoReal),
+                          demo: formatProfit(market.profitIfNoDemo),
+                        })}
+                      </p>
+                    </div>
                   </TableCell>
                   <TableCell className="px-4 py-3 whitespace-normal">
                     <div className="flex flex-wrap items-center justify-end gap-2">
@@ -565,36 +599,58 @@ export function AdminMarketTable({
       >
         <DialogContent
           showCloseButton={!confirmBusy}
-          className="bg-surface text-on-surface ring-outline-variant"
+          className={adminDialogContentClassName}
         >
           <DialogHeader>
-            <DialogTitle>
+            <DialogTitle className="dark:text-inverse-on-surface">
               {t("resolveConfirmTitle", { outcome: confirmOutcomeLabel })}
             </DialogTitle>
-            <DialogDescription className="text-on-surface-variant">
+            <DialogDescription className={adminDialogMutedClassName}>
               {t("resolveConfirmBody")}
             </DialogDescription>
           </DialogHeader>
 
           {confirm ? (
-            <div className="space-y-2">
-              <p className="font-medium">{confirm.market.title}</p>
-              {confirmProfit !== undefined ? (
-                <p
-                  className={cn(
-                    "font-data text-sm tabular-nums",
-                    confirmProfit > 0
-                      ? "text-success-green"
-                      : confirmProfit < 0
-                        ? "text-danger-red"
-                        : "text-on-surface-variant"
-                  )}
-                >
-                  {t("resolveConfirmProfit", {
-                    outcome: confirmOutcomeLabel,
-                    profit: formatProfit(confirmProfit),
-                  })}
-                </p>
+            <div className="space-y-3">
+              <p className="font-medium dark:text-inverse-on-surface">
+                {confirm.market.title}
+              </p>
+              {confirmProfit !== undefined &&
+              confirmProfitReal !== undefined &&
+              confirmProfitDemo !== undefined ? (
+                <div className="bg-surface-container-low dark:bg-on-secondary-fixed-variant border-outline-variant dark:border-on-secondary-container space-y-2 rounded-lg border px-3 py-3">
+                  <p
+                    className={cn(
+                      "text-xs font-semibold tracking-wide uppercase",
+                      adminDialogMutedClassName
+                    )}
+                  >
+                    {t("resolveConfirmCasinoHeading")}
+                  </p>
+                  <ProfitLine
+                    label={t("resolveConfirmProfitReal")}
+                    value={confirmProfitReal}
+                  />
+                  <ProfitLine
+                    label={t("resolveConfirmProfitDemo")}
+                    value={confirmProfitDemo}
+                  />
+                  <p
+                    className={cn(
+                      "font-data border-outline-variant dark:border-on-secondary-container border-t pt-2 text-sm font-semibold tabular-nums",
+                      confirmProfit > 0
+                        ? "text-success-green"
+                        : confirmProfit < 0
+                          ? "text-danger-red"
+                          : adminDialogMutedClassName
+                    )}
+                  >
+                    {t("resolveConfirmProfit", {
+                      outcome: confirmOutcomeLabel,
+                      profit: formatProfit(confirmProfit),
+                    })}
+                  </p>
+                </div>
               ) : null}
               {dialogError ? (
                 <p className="text-danger-red text-sm" role="alert">
@@ -609,6 +665,7 @@ export function AdminMarketTable({
               type="button"
               variant="outline"
               disabled={confirmBusy}
+              className={adminDialogCancelClassName}
               onClick={closeConfirm}
             >
               {t("resolveCancel")}
@@ -638,11 +695,13 @@ export function AdminMarketTable({
       >
         <DialogContent
           showCloseButton={!editBusy}
-          className="bg-surface text-on-surface ring-outline-variant max-h-[90vh] overflow-y-auto sm:max-w-xl"
+          className={cn(adminDialogContentClassName, "max-h-[90vh] overflow-y-auto sm:max-w-xl")}
         >
           <DialogHeader>
-            <DialogTitle>{t("marketsEditTitle")}</DialogTitle>
-            <DialogDescription className="text-on-surface-variant">
+            <DialogTitle className="dark:text-inverse-on-surface">
+              {t("marketsEditTitle")}
+            </DialogTitle>
+            <DialogDescription className={adminDialogMutedClassName}>
               {t("marketsEditDescription")}
             </DialogDescription>
           </DialogHeader>
@@ -706,6 +765,7 @@ export function AdminMarketTable({
               type="button"
               variant="outline"
               disabled={editBusy}
+              className={adminDialogCancelClassName}
               onClick={closeEdit}
             >
               {t("resolveCancel")}
@@ -731,18 +791,22 @@ export function AdminMarketTable({
       >
         <DialogContent
           showCloseButton={!deleteBusy}
-          className="bg-surface text-on-surface ring-outline-variant"
+          className={adminDialogContentClassName}
         >
           <DialogHeader>
-            <DialogTitle>{t("marketsDeleteTitle")}</DialogTitle>
-            <DialogDescription className="text-on-surface-variant">
+            <DialogTitle className="dark:text-inverse-on-surface">
+              {t("marketsDeleteTitle")}
+            </DialogTitle>
+            <DialogDescription className={adminDialogMutedClassName}>
               {t("marketsDeleteBody")}
             </DialogDescription>
           </DialogHeader>
 
           {deleting ? (
             <div className="space-y-2">
-              <p className="font-medium">{deleting.title}</p>
+              <p className="font-medium dark:text-inverse-on-surface">
+                {deleting.title}
+              </p>
               {deleting.tradeCount > 0 ? (
                 <p className="text-danger-red text-sm" role="status">
                   {t("marketsDeleteHasTrades", {
@@ -763,6 +827,7 @@ export function AdminMarketTable({
               type="button"
               variant="outline"
               disabled={deleteBusy}
+              className={adminDialogCancelClassName}
               onClick={closeDelete}
             >
               {t("resolveCancel")}

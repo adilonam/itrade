@@ -371,7 +371,7 @@ bugs :
 
 
 
-
+- [x] consent contract 
 
 
 

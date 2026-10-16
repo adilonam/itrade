@@ -2,6 +2,7 @@
 import { SessionProvider } from 'next-auth/react';
 import React from 'react';
 import { ActiveThemeProvider } from '../active-theme';
+import { ConsentGateProvider } from '@/components/consent/consent-gate-provider';
 
 export default function Providers({
   activeThemeValue,
@@ -14,7 +15,7 @@ export default function Providers({
     <>
       <SessionProvider>
         <ActiveThemeProvider initialTheme={activeThemeValue}>
-          {children}
+          <ConsentGateProvider>{children}</ConsentGateProvider>
         </ActiveThemeProvider>
       </SessionProvider>
     </>

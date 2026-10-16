@@ -49,7 +49,7 @@ export async function Header({ activeNav = "home" }: HeaderProps) {
       <div className="mx-auto flex h-20 max-w-(--spacing-container-max) items-center justify-between gap-6 px-(--spacing-margin-mobile) md:px-(--spacing-margin-desktop)">
         <div className="flex min-w-0 items-center gap-6">
           <Logo className="shrink-0" />
-          <div className="hidden items-center gap-6 font-label text-label-caps md:flex">
+          <div className="hidden min-w-0 shrink items-center gap-6 overflow-x-auto overflow-y-hidden whitespace-nowrap font-label text-label-caps md:flex [scrollbar-width:thin] [scrollbar-color:var(--color-outline-variant)_transparent] dark:[scrollbar-color:var(--color-on-secondary-container)_transparent] [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-outline-variant dark:[&::-webkit-scrollbar-thumb]:bg-on-secondary-container">
             {navItems.map((link) => {
               const isActive = link.key === activeNav
 
@@ -58,7 +58,7 @@ export async function Header({ activeNav = "home" }: HeaderProps) {
                   key={link.key}
                   href={link.href}
                   className={cn(
-                    "transition-colors duration-200",
+                    "shrink-0 transition-colors duration-200",
                     isActive && activeNav === "home"
                       ? "text-primary dark:text-primary-fixed-dim border-primary dark:border-primary-fixed-dim border-b-2 pb-1 pt-1"
                       : isActive

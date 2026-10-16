@@ -1,11 +1,25 @@
 import type { NextAuthOptions } from 'next-auth';
 import { getServerSession } from 'next-auth';
+import { decode as decodeJwt, encode as encodeJwt } from 'next-auth/jwt';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
+import { getAuthSecret } from './auth-secret';
 import { DEFAULT_USER_BALANCE_SEED } from './balance';
 import { prisma } from './prisma';
 import { getProfileImageUrl } from './profile-image';
+
+function isStaleSessionError(error: unknown): boolean {
+  if (!(error instanceof Error)) return false;
+  const name = error.name;
+  const message = error.message.toLowerCase();
+  return (
+    name === 'JWEDecryptionFailed' ||
+    name === 'JWEInvalid' ||
+    message.includes('decryption operation failed') ||
+    message.includes('jwt invalid')
+  );
+}
 
 const sharedCallbacks: NextAuthOptions['callbacks'] = {
   async jwt({ token, user }) {
@@ -22,6 +36,7 @@ const sharedCallbacks: NextAuthOptions['callbacks'] = {
           leverage: true,
           image: true,
           profileImageContentType: true,
+          predictionBalance: true,
           balances: {
             select: { type: true, amount: true }
           }
@@ -34,6 +49,7 @@ const sharedCallbacks: NextAuthOptions['callbacks'] = {
         );
         token.role = dbUser.role;
         token.balance = selectedBalance?.amount ?? 0;
+        token.predictionBalance = dbUser.predictionBalance ?? 0;
         token.leverage = dbUser.leverage;
         token.image = getProfileImageUrl({
           id: token.id as string,
@@ -49,6 +65,8 @@ const sharedCallbacks: NextAuthOptions['callbacks'] = {
       session.user.id = token.id as string;
       session.user.role = (token.role as string) || 'USER';
       session.user.balance = (token.balance as number) || 0;
+      session.user.predictionBalance =
+        (token.predictionBalance as number) || 0;
       session.user.leverage = (token.leverage as number) || 1;
       session.user.image = (token.image as string | null) ?? null;
     }

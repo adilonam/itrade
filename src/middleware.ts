@@ -26,6 +26,8 @@ const isPublicPath = (pathname: string) =>
   pathname === '/glossary' ||
   pathname === '/nfp' ||
   pathname === '/faqs-trading-platform' ||
+  pathname === '/betting' ||
+  pathname.startsWith('/betting/') ||
   pathname === '/polymarket' ||
   pathname.startsWith('/polymarket/') ||
   isAuthPage(pathname) ||

@@ -63,3 +63,6 @@ backup/
 public/uploads/
 
 .cursor/
+
+# Local clone of upstream Polymarket app (integration lives under src/, messages/, public/)
+/polymarket/

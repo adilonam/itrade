@@ -47,7 +47,7 @@ function statusStyles(s: string) {
 }
 
 function channelLabel(c: string) {
-  return c === 'MANUAL' ? 'Manual USDT' : 'NOWPayments';
+  return c === 'MANUAL' ? 'Bank transfer' : 'NOWPayments';
 }
 
 type Props = {
@@ -104,7 +104,7 @@ export function UserDepositRequestsSection({ refreshKey = 0 }: Props) {
             Your deposit requests
           </h2>
           <p className="mt-1 text-xs text-[var(--trade-text-muted)]">
-            Track gateway and manual USDT deposits. Open payment again if a
+            Track gateway and bank transfer deposits. Open payment again if a
             link is still valid.
           </p>
         </div>
@@ -125,7 +125,7 @@ export function UserDepositRequestsSection({ refreshKey = 0 }: Props) {
             >
               <option value="all">All</option>
               <option value="GATEWAY">NOWPayments</option>
-              <option value="MANUAL">Manual USDT</option>
+              <option value="MANUAL">Bank transfer</option>
             </select>
           </label>
           <label className="flex flex-col gap-1 text-xs">

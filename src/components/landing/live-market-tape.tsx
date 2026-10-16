@@ -82,7 +82,10 @@ export function LiveMarketTape() {
             <TapeCell key={symbol} symbol={symbol} quotes={quotes} />
           ))}
         </div>
-        <div className={`${trackClass} motion-reduce:hidden`} aria-hidden='true'>
+        <div
+          className={`${trackClass} motion-reduce:hidden`}
+          aria-hidden='true'
+        >
           {symbols.map((symbol) => (
             <TapeCell key={`${symbol}-dup`} symbol={symbol} quotes={quotes} />
           ))}

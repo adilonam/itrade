@@ -104,7 +104,7 @@ function statusPillClass(s: string) {
 }
 
 function channelLabel(c: string) {
-  return c === 'MANUAL' ? 'Manual USDT' : 'NOWPayments';
+  return c === 'MANUAL' ? 'Bank transfer' : 'NOWPayments';
 }
 
 export default function DepositRequestsListing() {
