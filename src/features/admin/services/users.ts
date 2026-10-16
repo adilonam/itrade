@@ -21,8 +21,10 @@ export type CreateUserData = {
   name: string;
   email: string;
   password: string;
-  role: 'USER' | 'ADMIN' | 'SUPERADMIN';
+  role: 'USER' | 'SELLER' | 'ADMIN' | 'SUPERADMIN';
   balance?: number;
+  realBalance?: number;
+  demoBalance?: number;
   leverage?: number;
   emailVerified?: Date | null;
 };
@@ -31,10 +33,19 @@ export type UpdateUserData = {
   name?: string;
   email?: string;
   password?: string;
-  role?: 'USER' | 'ADMIN' | 'SUPERADMIN';
+  role?: 'USER' | 'SELLER' | 'ADMIN' | 'SUPERADMIN';
   emailVerified?: Date | null;
   balance?: number;
+  realBalance?: number;
+  demoBalance?: number;
   leverage?: number;
+};
+
+export type UserWithBalances = User & {
+  balance?: number;
+  realBalance?: number;
+  demoBalance?: number;
+  phone?: string | null;
 };
 
 export async function fetchUsers(
@@ -78,7 +89,7 @@ export async function fetchUsers(
   };
 }
 
-export async function fetchUserById(id: string): Promise<User> {
+export async function fetchUserById(id: string): Promise<UserWithBalances> {
   const response = await fetch(`/api/admin/users/${id}`);
 
   if (!response.ok) {
@@ -98,6 +109,9 @@ export async function fetchUserById(id: string): Promise<User> {
       : null,
     createdAt: new Date(data.user.createdAt),
     updatedAt: new Date(data.user.updatedAt),
+    balance: data.user.realBalance ?? data.user.balance ?? 0,
+    realBalance: data.user.realBalance ?? data.user.balance ?? 0,
+    demoBalance: data.user.demoBalance ?? 0,
     password: null // Never expose passwords on client
   };
 }

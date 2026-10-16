@@ -348,6 +348,7 @@ export const tenantNavItems: TenantNavItems = {
   },
 
 
+
  
 };
 
@@ -429,7 +430,7 @@ export const landingSiteLinks = {
   aboutUs: '/about-us',
   contactUs: '/contact-us',
   liveChat: landingPlaceholderLink,
-  education: landingPlaceholderLink,
+  education: '/smart-trading',
   economicCalendar: '/economic-calendar',
   faqs: '/faqs-trading-platform',
   marketsCryptocurrencies: '/cryptocurrencies',
@@ -470,6 +471,32 @@ export const polymarketLinks = {
     payouts: '/polymarket/admin/payouts'
   }
 } as const;
+
+/** SMX Arabic marketing landing anchors + contact. */
+export const smxLandingAnchors = {
+  home: '#top',
+  markets: '#markets',
+  platform: '#platform',
+  whyUs: '#why-us',
+  education: '#education',
+  contact: '#contact',
+  register: '#register'
+} as const;
+
+export const smxLandingContact = {
+  email: 'support@smxmarkets.com',
+  phone: '+971 4 123 4567',
+  phoneHref: 'tel:+97141234567'
+} as const;
+
+export const smxLandingNavItems = [
+  { key: 'home', href: smxLandingAnchors.home },
+  { key: 'markets', href: smxLandingAnchors.markets },
+  { key: 'platform', href: smxLandingAnchors.platform },
+  { key: 'whyUs', href: smxLandingAnchors.whyUs },
+  { key: 'education', href: smxLandingAnchors.education },
+  { key: 'contact', href: smxLandingAnchors.contact }
+] as const;
 
 export const landingLanguages = [
   { code: 'en', label: 'English', flag: 'gb' },

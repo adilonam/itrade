@@ -21,7 +21,10 @@ type UserRole = (typeof UserRole)[keyof typeof UserRole]
 import { solidPng } from "./solid-png"
 
 const rootDir = path.dirname(fileURLToPath(import.meta.url))
-config({ path: path.join(rootDir, "..", ".env") })
+config({ path: path.join(rootDir, "..", "..", ".env") })
+
+/** Platform release day used as the default createdAt anchor for seeded markets. */
+const RELEASE_DAY = new Date("2027-06-15T12:00:00.000Z")
 
 const prisma = new PrismaClient({
   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL! }),
@@ -128,9 +131,71 @@ function orderBook(probability: number) {
 }
 
 const MOCK_SEED: SeedMarket[] = [
+  // Politics (3)
   {
-    slug: "will-bitcoin-reach-200000-by-end-of-2026",
-    title: "Will Bitcoin reach $200,000 by end of 2026?",
+    slug: "will-democrats-control-the-us-senate-after-2027-specials",
+    title: "Will Democrats control the US Senate after 2027 special elections?",
+    description: rulesFor(
+      "Democrats hold a majority of US Senate seats after any 2027 special elections concluded by the resolution date",
+      "the Associated Press"
+    ),
+    category: MarketCategory.politics,
+    tags: ["US", "Senate"],
+    status: MarketStatus.open,
+    resolutionDate: new Date("2027-12-31T23:59:59.000Z"),
+    totalVolume: 71_450_000,
+    liquidity: 6_800_000,
+    trendingScore: 81,
+    iconLabel: "PO",
+    probability: 0.47,
+    changePercent: -1.8,
+    createdAt: RELEASE_DAY,
+    color: CATEGORY_COLOR.politics,
+  },
+  {
+    slug: "will-the-anc-lead-a-majority-coalition-through-2027",
+    title: "Will the ANC lead a majority coalition through end of 2027?",
+    description: rulesFor(
+      "the ANC remains the lead party in a governing coalition with a National Assembly majority through 31 December 2027",
+      "the Electoral Commission of South Africa or Parliament of South Africa"
+    ),
+    category: MarketCategory.politics,
+    tags: ["South Africa", "ANC"],
+    status: MarketStatus.open,
+    resolutionDate: new Date("2027-12-31T22:00:00.000Z"),
+    totalVolume: 28_900_000,
+    liquidity: 2_100_000,
+    trendingScore: 66,
+    iconLabel: "PO",
+    probability: 0.54,
+    changePercent: 2.4,
+    createdAt: new Date("2027-06-15T14:00:00.000Z"),
+    color: CATEGORY_COLOR.politics,
+  },
+  {
+    slug: "will-uk-hold-a-general-election-in-2027",
+    title: "Will the UK hold a general election in 2027?",
+    description: rulesFor(
+      "a UK general election is held during calendar year 2027",
+      "the UK Electoral Commission or Parliament"
+    ),
+    category: MarketCategory.politics,
+    tags: ["UK", "Elections"],
+    status: MarketStatus.open,
+    resolutionDate: new Date("2027-12-31T23:59:59.000Z"),
+    totalVolume: 39_670_000,
+    liquidity: 4_200_000,
+    trendingScore: 73,
+    iconLabel: "PO",
+    probability: 0.28,
+    changePercent: -0.8,
+    createdAt: new Date("2027-06-16T09:00:00.000Z"),
+    color: CATEGORY_COLOR.politics,
+  },
+  // Crypto (3)
+  {
+    slug: "will-bitcoin-reach-200000-by-end-of-2027",
+    title: "Will Bitcoin reach $200,000 by end of 2027?",
     description: rulesFor(
       "Bitcoin trades at or above $200,000 USD",
       "CoinDesk or Bloomberg"
@@ -138,119 +203,19 @@ const MOCK_SEED: SeedMarket[] = [
     category: MarketCategory.crypto,
     tags: ["Bitcoin", "Crypto"],
     status: MarketStatus.open,
-    resolutionDate: new Date("2026-12-31T23:59:59.000Z"),
+    resolutionDate: new Date("2027-12-31T23:59:59.000Z"),
     totalVolume: 151_930_000,
     liquidity: 12_400_000,
     trendingScore: 92,
     iconLabel: "CR",
     probability: 0.42,
     changePercent: 6.0,
-    createdAt: new Date("2025-11-02T10:00:00.000Z"),
+    createdAt: RELEASE_DAY,
     color: CATEGORY_COLOR.crypto,
   },
   {
-    slug: "will-the-fed-cut-rates-at-the-july-2026-meeting",
-    title: "Will the Fed cut rates at the July 2026 meeting?",
-    description: rulesFor(
-      "the Federal Reserve cuts the federal funds rate at the July 2026 FOMC meeting",
-      "the Federal Reserve"
-    ),
-    category: MarketCategory.finance,
-    tags: ["Fed", "Rates"],
-    status: MarketStatus.open,
-    resolutionDate: new Date("2026-07-29T20:00:00.000Z"),
-    totalVolume: 92_190_000,
-    liquidity: 8_100_000,
-    trendingScore: 88,
-    iconLabel: "FI",
-    probability: 0.58,
-    changePercent: -4.3,
-    createdAt: new Date("2026-01-15T14:00:00.000Z"),
-    color: CATEGORY_COLOR.finance,
-  },
-  {
-    slug: "will-the-sp-500-close-above-7000-in-2026",
-    title: "Will the S&P 500 close above 7,000 in 2026?",
-    description: rulesFor(
-      "the S&P 500 closes at or above 7,000",
-      "S&P Dow Jones Indices"
-    ),
-    category: MarketCategory.finance,
-    tags: ["Equities", "S&P"],
-    status: MarketStatus.open,
-    resolutionDate: new Date("2026-12-31T21:00:00.000Z"),
-    totalVolume: 88_740_000,
-    liquidity: 9_550_000,
-    trendingScore: 75,
-    iconLabel: "FI",
-    probability: 0.64,
-    changePercent: 2.1,
-    createdAt: new Date("2025-12-01T09:00:00.000Z"),
-    color: CATEGORY_COLOR.finance,
-  },
-  {
-    slug: "will-democrats-flip-the-us-house-in-2026",
-    title: "Will Democrats flip the US House in 2026?",
-    description: rulesFor(
-      "Democrats hold a majority of seats in the US House after the 2026 midterms",
-      "the Associated Press"
-    ),
-    category: MarketCategory.politics,
-    tags: ["US", "Elections"],
-    status: MarketStatus.open,
-    resolutionDate: new Date("2026-11-03T23:59:59.000Z"),
-    totalVolume: 71_450_000,
-    liquidity: 6_800_000,
-    trendingScore: 81,
-    iconLabel: "PO",
-    probability: 0.52,
-    changePercent: -1.8,
-    createdAt: new Date("2025-10-20T12:00:00.000Z"),
-    color: CATEGORY_COLOR.politics,
-  },
-  {
-    slug: "will-gold-close-above-3500-oz-in-2026",
-    title: "Will gold close above $3,500/oz in 2026?",
-    description: rulesFor(
-      "spot gold closes at or above $3,500 per troy ounce",
-      "LBMA or Bloomberg"
-    ),
-    category: MarketCategory.commodities,
-    tags: ["Gold", "Commodities"],
-    status: MarketStatus.open,
-    resolutionDate: new Date("2026-12-31T23:59:59.000Z"),
-    totalVolume: 64_320_000,
-    liquidity: 5_200_000,
-    trendingScore: 70,
-    iconLabel: "CO",
-    probability: 0.71,
-    changePercent: 5.4,
-    createdAt: new Date("2025-09-10T08:00:00.000Z"),
-    color: CATEGORY_COLOR.commodities,
-  },
-  {
-    slug: "will-openai-release-gpt-5-in-2026",
-    title: "Will OpenAI release GPT-5 in 2026?",
-    description: rulesFor(
-      "OpenAI publicly releases a model branded GPT-5",
-      "OpenAI"
-    ),
-    category: MarketCategory.tech,
-    tags: ["AI", "OpenAI"],
-    status: MarketStatus.open,
-    resolutionDate: new Date("2026-12-31T23:59:59.000Z"),
-    totalVolume: 58_910_000,
-    liquidity: 7_300_000,
-    trendingScore: 95,
-    iconLabel: "TE",
-    probability: 0.38,
-    changePercent: 9.2,
-    createdAt: new Date("2026-02-01T16:00:00.000Z"),
-    color: CATEGORY_COLOR.tech,
-  },
-  {
-    slug: "will-ethereum-flip-bitcoin-in-market-cap-by-2027",
-    title: "Will Ethereum flip Bitcoin in market cap by 2027?",
+    slug: "will-ethereum-flip-bitcoin-in-market-cap-by-end-of-2027",
+    title: "Will Ethereum flip Bitcoin in market cap by end of 2027?",
     description: rulesFor(
       "Ethereum's circulating market cap exceeds Bitcoin's",
       "CoinMarketCap or CoinGecko"
@@ -265,92 +230,175 @@ const MOCK_SEED: SeedMarket[] = [
     iconLabel: "CR",
     probability: 0.12,
     changePercent: -2.5,
-    createdAt: new Date("2025-08-15T11:00:00.000Z"),
+    createdAt: new Date("2027-06-15T11:00:00.000Z"),
     color: CATEGORY_COLOR.crypto,
   },
   {
-    slug: "will-the-springboks-win-the-rugby-championship-2026",
-    title: "Will the Springboks win the Rugby Championship 2026?",
+    slug: "will-solana-etf-see-10b-aum-by-end-of-2027",
+    title: "Will a Solana ETF reach $10B AUM by end of 2027?",
     description: rulesFor(
-      "South Africa wins the 2026 Rugby Championship",
+      "a US-listed Solana spot ETF reports at least $10 billion in assets under management",
+      "Bloomberg or the ETF issuer filings"
+    ),
+    category: MarketCategory.crypto,
+    tags: ["Solana", "ETF"],
+    status: MarketStatus.open,
+    resolutionDate: new Date("2027-12-31T23:59:59.000Z"),
+    totalVolume: 41_200_000,
+    liquidity: 3_600_000,
+    trendingScore: 64,
+    iconLabel: "CR",
+    probability: 0.35,
+    changePercent: 4.2,
+    createdAt: new Date("2027-06-18T12:00:00.000Z"),
+    color: CATEGORY_COLOR.crypto,
+  },
+  // Sports (3)
+  {
+    slug: "will-the-springboks-win-the-rugby-championship-2027",
+    title: "Will the Springboks win the Rugby Championship 2027?",
+    description: rulesFor(
+      "South Africa wins the 2027 Rugby Championship",
       "World Rugby or SANZAAR"
     ),
     category: MarketCategory.sports,
     tags: ["Rugby", "Springboks"],
     status: MarketStatus.open,
-    resolutionDate: new Date("2026-09-30T22:00:00.000Z"),
+    resolutionDate: new Date("2027-09-30T22:00:00.000Z"),
     totalVolume: 48_150_000,
     liquidity: 3_900_000,
     trendingScore: 68,
     iconLabel: "SP",
     probability: 0.71,
     changePercent: 3.2,
-    createdAt: new Date("2026-03-01T10:00:00.000Z"),
+    createdAt: RELEASE_DAY,
     color: CATEGORY_COLOR.sports,
   },
   {
-    slug: "will-tesla-stock-hit-500-in-2026",
-    title: "Will Tesla stock hit $500 in 2026?",
+    slug: "will-the-springboks-win-rugby-world-cup-2027",
+    title: "Will the Springboks win Rugby World Cup 2027?",
     description: rulesFor(
-      "Tesla (TSLA) trades at or above $500",
-      "Nasdaq"
+      "South Africa wins the 2027 Rugby World Cup",
+      "World Rugby"
+    ),
+    category: MarketCategory.sports,
+    tags: ["Rugby", "World Cup"],
+    status: MarketStatus.open,
+    resolutionDate: new Date("2027-11-13T22:00:00.000Z"),
+    totalVolume: 19_760_000,
+    liquidity: 1_850_000,
+    trendingScore: 82,
+    iconLabel: "SP",
+    probability: 0.39,
+    changePercent: 1.5,
+    createdAt: new Date("2027-06-16T09:00:00.000Z"),
+    color: CATEGORY_COLOR.sports,
+  },
+  {
+    slug: "will-a-south-african-win-wimbledon-singles-2027",
+    title: "Will a South African win a Wimbledon singles title in 2027?",
+    description: rulesFor(
+      "a South African player wins the gentlemen's or ladies' singles title at Wimbledon 2027",
+      "the All England Lawn Tennis Club"
+    ),
+    category: MarketCategory.sports,
+    tags: ["Tennis", "Wimbledon"],
+    status: MarketStatus.open,
+    resolutionDate: new Date("2027-07-16T20:00:00.000Z"),
+    totalVolume: 12_400_000,
+    liquidity: 980_000,
+    trendingScore: 44,
+    iconLabel: "SP",
+    probability: 0.08,
+    changePercent: -0.5,
+    createdAt: new Date("2027-06-20T10:00:00.000Z"),
+    color: CATEGORY_COLOR.sports,
+  },
+  // Finance (3)
+  {
+    slug: "will-the-fed-cut-rates-at-the-july-2027-meeting",
+    title: "Will the Fed cut rates at the July 2027 meeting?",
+    description: rulesFor(
+      "the Federal Reserve cuts the federal funds rate at the July 2027 FOMC meeting",
+      "the Federal Reserve"
     ),
     category: MarketCategory.finance,
-    tags: ["Tesla", "Equities"],
+    tags: ["Fed", "Rates"],
     status: MarketStatus.open,
-    resolutionDate: new Date("2026-12-31T21:00:00.000Z"),
-    totalVolume: 42_880_000,
-    liquidity: 5_600_000,
-    trendingScore: 62,
+    resolutionDate: new Date("2027-07-28T20:00:00.000Z"),
+    totalVolume: 92_190_000,
+    liquidity: 8_100_000,
+    trendingScore: 88,
     iconLabel: "FI",
-    probability: 0.45,
-    changePercent: 1.4,
-    createdAt: new Date("2025-12-20T13:00:00.000Z"),
+    probability: 0.58,
+    changePercent: -4.3,
+    createdAt: RELEASE_DAY,
     color: CATEGORY_COLOR.finance,
   },
   {
-    slug: "will-trump-win-the-2028-us-presidential-election",
-    title: "Will Trump win the 2028 US Presidential election?",
+    slug: "will-the-sp-500-close-above-7500-in-2027",
+    title: "Will the S&P 500 close above 7,500 in 2027?",
     description: rulesFor(
-      "Donald Trump is declared the winner of the 2028 US presidential election",
-      "the Associated Press"
+      "the S&P 500 closes at or above 7,500 on any trading day in 2027",
+      "S&P Dow Jones Indices"
     ),
-    category: MarketCategory.politics,
-    tags: ["US", "Elections"],
+    category: MarketCategory.finance,
+    tags: ["Equities", "S&P"],
     status: MarketStatus.open,
-    resolutionDate: new Date("2028-11-07T23:59:59.000Z"),
-    totalVolume: 39_670_000,
-    liquidity: 11_200_000,
-    trendingScore: 84,
-    iconLabel: "PO",
-    probability: 0.48,
-    changePercent: -0.8,
-    createdAt: new Date("2026-01-05T09:00:00.000Z"),
-    color: CATEGORY_COLOR.politics,
+    resolutionDate: new Date("2027-12-31T21:00:00.000Z"),
+    totalVolume: 88_740_000,
+    liquidity: 9_550_000,
+    trendingScore: 75,
+    iconLabel: "FI",
+    probability: 0.61,
+    changePercent: 2.1,
+    createdAt: new Date("2027-06-15T09:00:00.000Z"),
+    color: CATEGORY_COLOR.finance,
   },
   {
-    slug: "will-south-africas-repo-rate-drop-below-7-in-2026",
-    title: "Will South Africa's repo rate drop below 7% in 2026?",
+    slug: "will-south-africas-repo-rate-drop-below-65-in-2027",
+    title: "Will South Africa's repo rate drop below 6.5% in 2027?",
     description: rulesFor(
-      "the SARB repo rate is below 7%",
+      "the SARB repo rate is below 6.5%",
       "the South African Reserve Bank"
     ),
     category: MarketCategory.finance,
     tags: ["SARB", "Rates"],
     status: MarketStatus.open,
-    resolutionDate: new Date("2026-12-15T16:00:00.000Z"),
+    resolutionDate: new Date("2027-12-15T16:00:00.000Z"),
     totalVolume: 35_440_000,
     liquidity: 2_800_000,
     trendingScore: 72,
     iconLabel: "FI",
-    probability: 0.62,
+    probability: 0.52,
     changePercent: 4.1,
-    createdAt: new Date("2026-02-14T08:00:00.000Z"),
+    createdAt: new Date("2027-06-17T08:00:00.000Z"),
     color: CATEGORY_COLOR.finance,
   },
+  // Tech (3)
   {
-    slug: "will-apple-release-ar-glasses-in-2026",
-    title: "Will Apple release AR glasses in 2026?",
+    slug: "will-openai-release-gpt-5-in-2027",
+    title: "Will OpenAI release GPT-5 in 2027?",
+    description: rulesFor(
+      "OpenAI publicly releases a model branded GPT-5",
+      "OpenAI"
+    ),
+    category: MarketCategory.tech,
+    tags: ["AI", "OpenAI"],
+    status: MarketStatus.open,
+    resolutionDate: new Date("2027-12-31T23:59:59.000Z"),
+    totalVolume: 58_910_000,
+    liquidity: 7_300_000,
+    trendingScore: 95,
+    iconLabel: "TE",
+    probability: 0.48,
+    changePercent: 9.2,
+    createdAt: RELEASE_DAY,
+    color: CATEGORY_COLOR.tech,
+  },
+  {
+    slug: "will-apple-release-ar-glasses-in-2027",
+    title: "Will Apple release AR glasses in 2027?",
     description: rulesFor(
       "Apple commercially releases AR glasses",
       "Apple"
@@ -358,59 +406,101 @@ const MOCK_SEED: SeedMarket[] = [
     category: MarketCategory.tech,
     tags: ["Apple", "AR"],
     status: MarketStatus.open,
-    resolutionDate: new Date("2026-12-31T23:59:59.000Z"),
+    resolutionDate: new Date("2027-12-31T23:59:59.000Z"),
     totalVolume: 31_220_000,
     liquidity: 4_450_000,
     trendingScore: 58,
     iconLabel: "TE",
     probability: 0.33,
     changePercent: -3.6,
-    createdAt: new Date("2025-11-28T15:00:00.000Z"),
+    createdAt: new Date("2027-06-15T15:00:00.000Z"),
     color: CATEGORY_COLOR.tech,
   },
   {
-    slug: "will-the-anc-win-an-outright-majority-in-2026",
-    title: "Will the ANC win an outright majority in 2026?",
+    slug: "will-a-humanoid-robot-ship-100k-units-in-2027",
+    title: "Will any humanoid robot ship 100,000 units in 2027?",
     description: rulesFor(
-      "the ANC wins more than 50% of the national vote or National Assembly seats in 2026",
-      "the Electoral Commission of South Africa"
+      "a commercially available humanoid robot product ships at least 100,000 units during 2027",
+      "the manufacturer or corroborated reporting from Reuters and Bloomberg"
     ),
-    category: MarketCategory.politics,
-    tags: ["South Africa", "Elections"],
+    category: MarketCategory.tech,
+    tags: ["Robotics", "Hardware"],
     status: MarketStatus.open,
-    resolutionDate: new Date("2026-11-30T22:00:00.000Z"),
-    totalVolume: 28_900_000,
-    liquidity: 2_100_000,
-    trendingScore: 66,
-    iconLabel: "PO",
-    probability: 0.31,
-    changePercent: -5.0,
-    createdAt: new Date("2026-03-10T12:00:00.000Z"),
-    color: CATEGORY_COLOR.politics,
+    resolutionDate: new Date("2027-12-31T23:59:59.000Z"),
+    totalVolume: 24_500_000,
+    liquidity: 2_900_000,
+    trendingScore: 70,
+    iconLabel: "TE",
+    probability: 0.22,
+    changePercent: 5.1,
+    createdAt: new Date("2027-06-19T16:00:00.000Z"),
+    color: CATEGORY_COLOR.tech,
   },
+  // Entertainment (3)
   {
     slug: "will-a-south-african-film-win-an-oscar-in-2027",
     title: "Will a South African film win an Oscar in 2027?",
     description: rulesFor(
-      "a South African production wins a competitive Academy Award in 2027",
+      "a South African production wins a competitive Academy Award at the 2027 ceremony",
       "the Academy of Motion Picture Arts and Sciences"
     ),
     category: MarketCategory.entertainment,
     tags: ["Oscars", "Film"],
-    status: MarketStatus.open,
+    status: MarketStatus.resolved,
     resolutionDate: new Date("2027-03-15T06:00:00.000Z"),
     totalVolume: 12_450_000,
-    liquidity: 980_000,
-    trendingScore: 40,
+    liquidity: 0,
+    trendingScore: 25,
     iconLabel: "EN",
-    probability: 0.18,
-    changePercent: 1.2,
-    createdAt: new Date("2026-04-01T18:00:00.000Z"),
+    probability: 0,
+    changePercent: -4.2,
+    createdAt: new Date("2027-01-10T18:00:00.000Z"),
     color: CATEGORY_COLOR.entertainment,
   },
   {
-    slug: "will-brics-expand-to-15-members-by-end-of-2026",
-    title: "Will BRICS expand to 15 members by end of 2026?",
+    slug: "will-taylor-swift-announce-a-world-tour-in-2027",
+    title: "Will Taylor Swift announce a world tour in 2027?",
+    description: rulesFor(
+      "Taylor Swift or her official representatives announce a 2027 world tour",
+      "Taylor Swift's official channels or Billboard"
+    ),
+    category: MarketCategory.entertainment,
+    tags: ["Music", "Taylor Swift"],
+    status: MarketStatus.open,
+    resolutionDate: new Date("2027-12-31T23:59:59.000Z"),
+    totalVolume: 27_650_000,
+    liquidity: 3_200_000,
+    trendingScore: 77,
+    iconLabel: "EN",
+    probability: 0.44,
+    changePercent: 3.7,
+    createdAt: RELEASE_DAY,
+    color: CATEGORY_COLOR.entertainment,
+  },
+  {
+    slug: "will-gta-vi-sell-50m-copies-in-2027",
+    title: "Will GTA VI sell 50 million copies in 2027?",
+    description: rulesFor(
+      "Grand Theft Auto VI reports at least 50 million copies sold during calendar year 2027",
+      "Take-Two Interactive or Rockstar"
+    ),
+    category: MarketCategory.entertainment,
+    tags: ["Gaming", "GTA"],
+    status: MarketStatus.open,
+    resolutionDate: new Date("2027-12-31T23:59:59.000Z"),
+    totalVolume: 45_800_000,
+    liquidity: 5_100_000,
+    trendingScore: 85,
+    iconLabel: "EN",
+    probability: 0.57,
+    changePercent: 6.8,
+    createdAt: new Date("2027-06-16T20:00:00.000Z"),
+    color: CATEGORY_COLOR.entertainment,
+  },
+  // World (3)
+  {
+    slug: "will-brics-expand-to-15-members-by-end-of-2027",
+    title: "Will BRICS expand to 15 members by end of 2027?",
     description: rulesFor(
       "BRICS has at least 15 full member states",
       "an official BRICS communiqué"
@@ -418,114 +508,115 @@ const MOCK_SEED: SeedMarket[] = [
     category: MarketCategory.world,
     tags: ["BRICS", "Geopolitics"],
     status: MarketStatus.open,
-    resolutionDate: new Date("2026-12-31T23:59:59.000Z"),
+    resolutionDate: new Date("2027-12-31T23:59:59.000Z"),
     totalVolume: 22_180_000,
     liquidity: 1_750_000,
     trendingScore: 61,
     iconLabel: "WO",
     probability: 0.55,
     changePercent: 2.8,
-    createdAt: new Date("2025-10-05T10:00:00.000Z"),
+    createdAt: RELEASE_DAY,
     color: CATEGORY_COLOR.world,
   },
   {
-    slug: "will-bafana-bafana-qualify-for-the-2026-world-cup",
-    title: "Will Bafana Bafana qualify for the 2026 World Cup?",
+    slug: "will-a-ceasefire-hold-in-ukraine-through-2027",
+    title: "Will a ceasefire hold in Ukraine through 2027?",
     description: rulesFor(
-      "South Africa qualifies for the 2026 FIFA World Cup",
-      "FIFA"
-    ),
-    category: MarketCategory.sports,
-    tags: ["Football", "World Cup"],
-    status: MarketStatus.resolved,
-    resolutionDate: new Date("2026-03-26T22:00:00.000Z"),
-    totalVolume: 19_760_000,
-    liquidity: 0,
-    trendingScore: 30,
-    iconLabel: "SP",
-    probability: 1,
-    changePercent: 6.5,
-    createdAt: new Date("2025-06-01T09:00:00.000Z"),
-    color: CATEGORY_COLOR.sports,
-  },
-  {
-    slug: "will-solana-flip-ethereum-by-market-cap-in-2025",
-    title: "Will Solana flip Ethereum by market cap in 2025?",
-    description: rulesFor(
-      "Solana's circulating market cap exceeds Ethereum's during 2025",
-      "CoinMarketCap or CoinGecko"
-    ),
-    category: MarketCategory.crypto,
-    tags: ["Solana", "Ethereum"],
-    status: MarketStatus.resolved,
-    resolutionDate: new Date("2025-12-31T23:59:59.000Z"),
-    totalVolume: 41_200_000,
-    liquidity: 0,
-    trendingScore: 20,
-    iconLabel: "CR",
-    probability: 0,
-    changePercent: -12.0,
-    createdAt: new Date("2025-01-10T12:00:00.000Z"),
-    color: CATEGORY_COLOR.crypto,
-  },
-  {
-    slug: "will-taylor-swift-announce-a-world-tour-in-2026",
-    title: "Will Taylor Swift announce a world tour in 2026?",
-    description: rulesFor(
-      "Taylor Swift or her official representatives announce a 2026 world tour",
-      "Taylor Swift's official channels or Billboard"
-    ),
-    category: MarketCategory.entertainment,
-    tags: ["Music", "Taylor Swift"],
-    status: MarketStatus.open,
-    resolutionDate: new Date("2026-12-31T23:59:59.000Z"),
-    totalVolume: 27_650_000,
-    liquidity: 3_200_000,
-    trendingScore: 77,
-    iconLabel: "EN",
-    probability: 0.44,
-    changePercent: 3.7,
-    createdAt: new Date("2026-03-20T20:00:00.000Z"),
-    color: CATEGORY_COLOR.entertainment,
-  },
-  {
-    slug: "will-a-ceasefire-hold-in-ukraine-through-2026",
-    title: "Will a ceasefire hold in Ukraine through 2026?",
-    description: rulesFor(
-      "a ceasefire in Ukraine remains in effect through 31 December 2026",
+      "a ceasefire in Ukraine remains in effect through 31 December 2027",
       "the UN or mutually corroborating reporting from Reuters and AP"
     ),
     category: MarketCategory.world,
     tags: ["Ukraine", "Geopolitics"],
     status: MarketStatus.open,
-    resolutionDate: new Date("2026-12-31T23:59:59.000Z"),
+    resolutionDate: new Date("2027-12-31T23:59:59.000Z"),
     totalVolume: 67_880_000,
     liquidity: 8_900_000,
     trendingScore: 90,
     iconLabel: "WO",
     probability: 0.29,
     changePercent: -2.1,
-    createdAt: new Date("2026-02-28T07:00:00.000Z"),
+    createdAt: new Date("2027-06-15T07:00:00.000Z"),
     color: CATEGORY_COLOR.world,
   },
   {
-    slug: "will-oil-brent-trade-above-100-barrel-in-2026",
-    title: "Will oil (Brent) trade above $100/barrel in 2026?",
+    slug: "will-cop32-agree-a-binding-plastic-treaty-in-2027",
+    title: "Will COP32 agree a binding plastics treaty in 2027?",
     description: rulesFor(
-      "Brent crude trades above $100 per barrel during 2026",
+      "parties at COP32 adopt a legally binding global plastics treaty",
+      "the UNFCCC or UNEP official outcome documents"
+    ),
+    category: MarketCategory.world,
+    tags: ["Climate", "COP"],
+    status: MarketStatus.open,
+    resolutionDate: new Date("2027-11-30T23:59:59.000Z"),
+    totalVolume: 18_300_000,
+    liquidity: 1_420_000,
+    trendingScore: 52,
+    iconLabel: "WO",
+    probability: 0.36,
+    changePercent: 1.9,
+    createdAt: new Date("2027-06-21T10:00:00.000Z"),
+    color: CATEGORY_COLOR.world,
+  },
+  // Commodities (3 standalone; Hormuz group adds more)
+  {
+    slug: "will-gold-close-above-4000-oz-in-2027",
+    title: "Will gold close above $4,000/oz in 2027?",
+    description: rulesFor(
+      "spot gold closes at or above $4,000 per troy ounce on any day in 2027",
+      "LBMA or Bloomberg"
+    ),
+    category: MarketCategory.commodities,
+    tags: ["Gold", "Commodities"],
+    status: MarketStatus.open,
+    resolutionDate: new Date("2027-12-31T23:59:59.000Z"),
+    totalVolume: 64_320_000,
+    liquidity: 5_200_000,
+    trendingScore: 70,
+    iconLabel: "CO",
+    probability: 0.63,
+    changePercent: 5.4,
+    createdAt: RELEASE_DAY,
+    color: CATEGORY_COLOR.commodities,
+  },
+  {
+    slug: "will-oil-brent-trade-above-100-barrel-in-2027",
+    title: "Will oil (Brent) trade above $100/barrel in 2027?",
+    description: rulesFor(
+      "Brent crude trades above $100 per barrel during 2027",
       "ICE or Bloomberg"
     ),
     category: MarketCategory.commodities,
     tags: ["Oil", "Brent"],
-    status: MarketStatus.resolved,
-    resolutionDate: new Date("2026-01-31T23:59:59.000Z"),
+    status: MarketStatus.open,
+    resolutionDate: new Date("2027-12-31T23:59:59.000Z"),
     totalVolume: 33_100_000,
-    liquidity: 0,
-    trendingScore: 25,
+    liquidity: 2_750_000,
+    trendingScore: 63,
     iconLabel: "CO",
-    probability: 0,
-    changePercent: -8.4,
-    createdAt: new Date("2025-04-12T11:00:00.000Z"),
+    probability: 0.41,
+    changePercent: -3.2,
+    createdAt: new Date("2027-06-15T11:00:00.000Z"),
+    color: CATEGORY_COLOR.commodities,
+  },
+  {
+    slug: "will-copper-hit-12000-tonne-in-2027",
+    title: "Will copper hit $12,000/tonne in 2027?",
+    description: rulesFor(
+      "LME copper trades at or above $12,000 per tonne during 2027",
+      "the London Metal Exchange or Bloomberg"
+    ),
+    category: MarketCategory.commodities,
+    tags: ["Copper", "Metals"],
+    status: MarketStatus.open,
+    resolutionDate: new Date("2027-12-31T23:59:59.000Z"),
+    totalVolume: 21_600_000,
+    liquidity: 1_900_000,
+    trendingScore: 49,
+    iconLabel: "CO",
+    probability: 0.46,
+    changePercent: 2.7,
+    createdAt: new Date("2027-06-18T08:00:00.000Z"),
     color: CATEGORY_COLOR.commodities,
   },
 ]
@@ -544,40 +635,40 @@ const HORMUZ_DATES: {
   createdAt: Date
 }[] = [
   {
-    slug: "strait-of-hormuz-traffic-returns-to-normal-by-august-31",
+    slug: "strait-of-hormuz-traffic-returns-to-normal-by-august-31-2027",
     dateLabel: "Aug 31",
-    resolutionDate: new Date("2026-08-31T23:59:59.000Z"),
+    resolutionDate: new Date("2027-08-31T23:59:59.000Z"),
     probability: 0.05,
     changePercent: -1.1,
     volume: 1_120_000,
-    createdAt: new Date("2026-06-02T12:00:00.000Z"),
+    createdAt: RELEASE_DAY,
   },
   {
-    slug: "strait-of-hormuz-traffic-returns-to-normal-by-september-15",
+    slug: "strait-of-hormuz-traffic-returns-to-normal-by-september-15-2027",
     dateLabel: "Sep 15",
-    resolutionDate: new Date("2026-09-15T23:59:59.000Z"),
+    resolutionDate: new Date("2027-09-15T23:59:59.000Z"),
     probability: 0.08,
     changePercent: -2.4,
     volume: 2_040_000,
-    createdAt: new Date("2026-06-02T12:00:00.000Z"),
+    createdAt: RELEASE_DAY,
   },
   {
-    slug: "strait-of-hormuz-traffic-returns-to-normal-by-september-30",
+    slug: "strait-of-hormuz-traffic-returns-to-normal-by-september-30-2027",
     dateLabel: "Sep 30",
-    resolutionDate: new Date("2026-09-30T23:59:59.000Z"),
+    resolutionDate: new Date("2027-09-30T23:59:59.000Z"),
     probability: 0.11,
     changePercent: -4.3,
     volume: 3_627_055,
-    createdAt: new Date("2026-06-02T12:00:00.000Z"),
+    createdAt: RELEASE_DAY,
   },
   {
-    slug: "strait-of-hormuz-traffic-returns-to-normal-by-october-31",
+    slug: "strait-of-hormuz-traffic-returns-to-normal-by-october-31-2027",
     dateLabel: "Oct 31",
-    resolutionDate: new Date("2026-10-31T23:59:59.000Z"),
+    resolutionDate: new Date("2027-10-31T23:59:59.000Z"),
     probability: 0.18,
     changePercent: 1.6,
     volume: 2_880_000,
-    createdAt: new Date("2026-06-02T12:00:00.000Z"),
+    createdAt: RELEASE_DAY,
   },
 ]
 
@@ -716,9 +807,17 @@ async function createMarket(seed: SeedMarket, groupId?: string) {
     throw new Error(`Outcomes missing for ${seed.slug}`)
   }
 
+  const now = new Date()
+  const historyEnd =
+    seed.status === MarketStatus.resolved
+      ? seed.resolutionDate
+      : seed.createdAt.getTime() > now.getTime()
+        ? new Date(seed.createdAt.getTime() + 14 * 24 * 60 * 60 * 1000)
+        : now
+
   const points = historyPoints(
     seed.createdAt,
-    seed.status === MarketStatus.resolved ? seed.resolutionDate : new Date(),
+    historyEnd,
     yesPrice,
     seed.changePercent
   )
@@ -763,7 +862,7 @@ async function seedHormuzComments(
         amount: 4200,
         shares: 38_200,
         priceAtTrade: 0.11,
-        createdAt: new Date("2026-08-16T21:00:00.000Z"),
+        createdAt: new Date("2027-08-16T21:00:00.000Z"),
       },
       {
         userId: be54.id,
@@ -773,7 +872,7 @@ async function seedHormuzComments(
         amount: 360,
         shares: 40,
         priceAtTrade: 0.11,
-        createdAt: new Date("2026-08-16T18:00:00.000Z"),
+        createdAt: new Date("2027-08-16T18:00:00.000Z"),
       },
     ],
   })
@@ -785,7 +884,7 @@ async function seedHormuzComments(
       content:
         "Tanker flows still well below the 90-day average. IMF PortWatch would need a sharp rebound in September for Yes to have a shot.",
       likes: 24,
-      createdAt: new Date("2026-08-16T22:10:00.000Z"),
+      createdAt: new Date("2027-08-16T22:10:00.000Z"),
     },
   })
 
@@ -796,7 +895,7 @@ async function seedHormuzComments(
       parentId: parent.id,
       content: "Agree — insurance quotes still imply elevated disruption risk.",
       likes: 6,
-      createdAt: new Date("2026-08-16T23:40:00.000Z"),
+      createdAt: new Date("2027-08-16T23:40:00.000Z"),
     },
   })
 
@@ -807,7 +906,7 @@ async function seedHormuzComments(
         marketId,
         content: "No is free money unless traffic prints a V-shape recovery.",
         likes: 11,
-        createdAt: new Date("2026-08-17T00:15:00.000Z"),
+        createdAt: new Date("2027-08-17T00:15:00.000Z"),
       },
       {
         userId: ofunds.id,
@@ -815,7 +914,7 @@ async function seedHormuzComments(
         content:
           "Watching the Sep 30 contract vs Oct 31. Curve is still pricing a slow grind back to normal.",
         likes: 4,
-        createdAt: new Date("2026-08-16T20:05:00.000Z"),
+        createdAt: new Date("2027-08-16T20:05:00.000Z"),
       },
     ],
   })
@@ -907,9 +1006,19 @@ async function main() {
     }
   }
 
+  const byCategory = MOCK_SEED.reduce<Record<string, number>>((acc, m) => {
+    acc[m.category] = (acc[m.category] ?? 0) + 1
+    return acc
+  }, {})
+  byCategory.commodities =
+    (byCategory.commodities ?? 0) + HORMUZ_DATES.length
+
+  const totalMarkets = HORMUZ_DATES.length + MOCK_SEED.length
   console.log(
-    `Seeded ${HORMUZ_DATES.length + MOCK_SEED.length} markets, ${commentUsers.length + 1} users (balance $${SEED_STARTING_BALANCE}).`
+    `Seeded ${totalMarkets} markets, ${commentUsers.length + 1} users (balance $${SEED_STARTING_BALANCE}).`
   )
+  console.log(`Release day anchor: ${RELEASE_DAY.toISOString().slice(0, 10)}`)
+  console.log(`Per category: ${JSON.stringify(byCategory)}`)
   console.log(
     `Admin login: ${admin.email} / ${SEED_PASSWORD} → /admin/market`
   )

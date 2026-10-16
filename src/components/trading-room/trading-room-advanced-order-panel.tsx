@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState, useEffect, useRef } from 'react';
+import { useSession } from 'next-auth/react';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { getCurrencyFlags } from '@/lib/currency-flags';
@@ -51,6 +52,7 @@ export function TradingRoomAdvancedOrderPanel({
   onMarketOrder,
   disabled = false
 }: TradingRoomAdvancedOrderPanelProps) {
+  const { data: session } = useSession();
   const { selectedBalanceType } = useTradeBalanceSelection();
   const [orderTab, setOrderTab] = useState<'market' | 'pending'>('market');
   const [volume, setVolume] = useState('0.01');
@@ -61,6 +63,7 @@ export function TradingRoomAdvancedOrderPanel({
   const [takeProfitPrice, setTakeProfitPrice] = useState('');
   const [financial, setFinancial] = useState<{
     freeMargin: number;
+    leverage?: number;
     requiredMargin?: number;
   } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -87,10 +90,17 @@ export function TradingRoomAdvancedOrderPanel({
   const displayPrice = price || String(midPrice);
   const marketType: MarketType =
     (market && 'type' in market ? market.type : undefined) ?? 'FOREX';
-  const lotSizeMultiplier = getLotSize(marketType);
-  const leverage = 100;
+  const marketRoom =
+    (market && 'room' in market ? market.room : undefined) ?? 'TRADING';
+  const lotSizeMultiplier =
+    marketRoom === 'STOCK' ? 1 : getLotSize(marketType);
+  const leverage =
+    marketRoom === 'STOCK'
+      ? 1
+      : financial?.leverage || session?.user?.leverage || 1;
   const vol = parseFloat(volume) || 0.01;
   const execPrice = parseFloat(displayPrice) || midPrice;
+  // Required Margin = Position Value / Leverage
   const requiredMargin = (vol * lotSizeMultiplier * execPrice) / leverage;
   const spreadUsd = spread * vol * lotSizeMultiplier;
 
@@ -106,12 +116,15 @@ export function TradingRoomAdvancedOrderPanel({
     fetch(`/api/user/financial?room=TRADING&balanceType=${selectedBalanceType}`)
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
-        if (data) setFinancial({ freeMargin: data.freeMargin ?? 0 });
+        if (data)
+          setFinancial({
+            freeMargin: data.freeMargin ?? 0,
+            leverage: data.leverage
+          });
       })
       .catch(() => setFinancial({ freeMargin: 0 }));
   }, [selectedBalanceType]);
 
-  const notionalUsd = Math.round(vol * lotSizeMultiplier * execPrice);
   const [flagBase, flagQuote] = getCurrencyFlags(market?.symbol ?? '');
 
   const handleVolumeChange = (delta: number) => {
@@ -312,7 +325,7 @@ export function TradingRoomAdvancedOrderPanel({
               </button>
             </div>
             <p className="mt-1 text-[10px] text-[var(--trade-text-muted)]">
-              ≈ {notionalUsd.toLocaleString('en-US')} USD
+              ≈ {formatUsd(requiredMargin)} USD
             </p>
           </div>
 

@@ -7,6 +7,7 @@ import { Column, ColumnDef } from '@tanstack/react-table';
 import {
   CheckCircle2,
   Mail,
+  Phone,
   Shield,
   User as UserIcon,
   XCircle,
@@ -105,6 +106,23 @@ export const createColumns = (currentUserId?: string): ColumnDef<User>[] => [
       searchOnClick: true
     },
     enableColumnFilter: true
+  },
+  {
+    id: 'phone',
+    accessorKey: 'phone',
+    header: ({ column }: { column: Column<User, unknown> }) => (
+      <DataTableColumnHeader column={column} title='Phone' />
+    ),
+    cell: ({ row }) => {
+      const phone = row.getValue('phone') as string | null;
+
+      return (
+        <div className='flex items-center space-x-2'>
+          <Phone className='text-muted-foreground h-4 w-4' />
+          <span className='text-sm'>{phone || '—'}</span>
+        </div>
+      );
+    }
   },
   {
     id: 'role',

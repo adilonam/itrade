@@ -273,3 +273,63 @@ html:not(.dark) .watch-trader-shell {
   /* Apply the reveal animation */
   animation: reveal 0.4s ease-in-out forwards;
 }
+
+/* SMX Arabic marketing landing (scoped) */
+.smx-landing {
+  --smx-gold: #d8a84e;
+  --smx-gold-light: #e8bf6c;
+  --smx-gold-dark: #b98a33;
+  --smx-dark: #080b11;
+  --smx-dark-card: #101520;
+  --smx-border: #232938;
+  color: #e2e8f0;
+  background-color: #07090e;
+}
+
+.smx-landing .smx-glass-panel {
+  background: rgba(16, 21, 33, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(216, 168, 78, 0.18);
+}
+
+.smx-landing .smx-glass-input {
+  background: rgba(10, 14, 23, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.smx-landing .smx-glass-input:focus {
+  border-color: var(--smx-gold);
+  outline: none;
+  box-shadow: 0 0 0 1px var(--smx-gold);
+}
+
+.smx-landing .smx-gold-gradient-bg {
+  background: linear-gradient(135deg, #e8bf6c 0%, #d8a84e 50%, #b98a33 100%);
+}
+
+.smx-landing .smx-gold-gradient-text {
+  background: linear-gradient(135deg, #fff3d6 0%, #d8a84e 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.smx-landing .smx-asset-card {
+  background: radial-gradient(120% 100% at 50% 0%, #161d2b 0%, #0c1019 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.3s ease;
+}
+
+.smx-landing .smx-asset-card:hover {
+  border-color: rgba(216, 168, 78, 0.4);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 25px -8px rgba(0, 0, 0, 0.6);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .smx-landing .smx-asset-card:hover {
+    transform: none;
+  }
+}

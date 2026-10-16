@@ -46,7 +46,7 @@ export default async function Page(props: pageProps) {
         <Suspense
           // key={key}
           fallback={
-            <DataTableSkeleton columnCount={6} rowCount={10} filterCount={2} />
+            <DataTableSkeleton columnCount={7} rowCount={10} filterCount={2} />
           }
         >
           <UserListingPage />

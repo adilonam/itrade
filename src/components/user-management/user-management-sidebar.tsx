@@ -1,7 +1,7 @@
 'use client';
 
+import { AppLogo } from '@/components/brand/app-logo';
 import { usePublicAppName } from '@/hooks/use-public-app-name';
-import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -13,7 +13,6 @@ import {
 } from '@tabler/icons-react';
 import { cn } from '@/lib/utils';
 import {
-  brandLogoSrc,
   userManagementNavPrimary,
   userManagementNavSecondary,
   type UserManagementNavItem
@@ -64,8 +63,8 @@ function NavRow({
           : 'text-[var(--trade-text)] hover:bg-[var(--trade-border)]/40'
       )}
     >
-      <Icon className='size-5 shrink-0 stroke-[1.75]' stroke={1.75} />
-      <span className='truncate'>{label}</span>
+      <Icon className="size-5 shrink-0 stroke-[1.75]" stroke={1.75} />
+      <span className="truncate">{label}</span>
     </Link>
   );
 }
@@ -98,26 +97,19 @@ export function UserManagementSidebar({
       )}
     >
       <Link
-        href='/trade'
-        className='flex h-14 shrink-0 items-center border-b border-[var(--trade-border)] px-4 transition-colors hover:bg-[var(--trade-border)]/30'
+        href="/trade"
+        className="flex h-14 shrink-0 items-center border-b border-[var(--trade-border)] px-4 transition-colors hover:bg-[var(--trade-border)]/30"
         aria-label={`Go to trade, ${appName}`}
       >
-        <span className='relative flex h-10 shrink-0 items-center'>
-          <Image
-            src={brandLogoSrc}
-            alt=''
-            width={200}
-            height={48}
-            className='h-10 max-h-10 w-auto'
-            priority
-          />
+        <span className="relative flex h-10 shrink-0 items-center">
+          <AppLogo alt="" className="h-10 max-h-10" priority />
         </span>
       </Link>
       <nav
-        className='flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto px-2 py-3 text-[var(--trade-text)]'
+        className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto px-2 py-3 text-[var(--trade-text)]"
         aria-label={tSidebar('ariaLabel')}
       >
-        <div className='flex flex-col gap-0.5'>
+        <div className="flex flex-col gap-0.5">
           {userManagementNavPrimary.map((item) => (
             <NavRow
               key={item.url}
@@ -131,10 +123,10 @@ export function UserManagementSidebar({
         {userManagementNavSecondary.length > 0 ? (
           <>
             <div
-              className='my-3 h-px shrink-0 bg-[var(--trade-border)]'
-              role='separator'
+              className="my-3 h-px shrink-0 bg-[var(--trade-border)]"
+              role="separator"
             />
-            <div className='flex flex-col gap-0.5'>
+            <div className="flex flex-col gap-0.5">
               {userManagementNavSecondary.map((item) => (
                 <NavRow
                   key={item.url}

@@ -2,9 +2,9 @@ import {
   Geist,
   Geist_Mono,
   Instrument_Sans,
-  Inter,
   Mulish,
-  Noto_Sans_Mono
+  Noto_Sans_Mono,
+  Source_Sans_3
 } from 'next/font/google';
 
 import { cn } from '@/lib/utils';
@@ -34,8 +34,9 @@ const fontMullish = Mulish({
   variable: '--font-mullish'
 });
 
-const fontInter = Inter({
+const fontInter = Source_Sans_3({
   subsets: ['latin'],
+  weight: ['400', '500', '600'],
   variable: '--font-inter'
 });
 

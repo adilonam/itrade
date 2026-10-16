@@ -27,6 +27,15 @@ const createUserSchema = z.object({
     .min(0, 'Balance cannot be negative')
     .optional()
     .default(0),
+  realBalance: z
+    .number()
+    .min(0, 'Real balance cannot be negative')
+    .optional(),
+  demoBalance: z
+    .number()
+    .min(0, 'Demo balance cannot be negative')
+    .optional()
+    .default(DEFAULT_DEMO_BALANCE_AMOUNT),
   leverage: z
     .number()
     .min(1, 'Leverage must be at least 1')
@@ -89,7 +98,8 @@ export async function GET(request: NextRequest) {
     if (search) {
       where.OR = [
         { name: { contains: search, mode: 'insensitive' } },
-        { email: { contains: search, mode: 'insensitive' } }
+        { email: { contains: search, mode: 'insensitive' } },
+        { phone: { contains: search, mode: 'insensitive' } }
       ];
     }
 
@@ -105,6 +115,7 @@ export async function GET(request: NextRequest) {
           id: true,
           name: true,
           email: true,
+          phone: true,
           image: true,
           profileImageContentType: true,
           balances: {
@@ -178,7 +189,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { name, email, password, role, balance, leverage } = validation.data;
+    const {
+      name,
+      email,
+      password,
+      role,
+      balance,
+      realBalance,
+      demoBalance,
+      leverage
+    } = validation.data;
+    const nextRealBalance = realBalance ?? balance ?? DEFAULT_REAL_BALANCE_AMOUNT;
+    const nextDemoBalance = demoBalance ?? DEFAULT_DEMO_BALANCE_AMOUNT;
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
@@ -212,8 +234,8 @@ export async function POST(request: NextRequest) {
         role,
         balances: {
           create: [
-            { type: 'REAL', amount: balance ?? DEFAULT_REAL_BALANCE_AMOUNT },
-            { type: 'DEMO', amount: DEFAULT_DEMO_BALANCE_AMOUNT }
+            { type: 'REAL', amount: nextRealBalance },
+            { type: 'DEMO', amount: nextDemoBalance }
           ]
         },
         leverage: leverage || 1
@@ -222,11 +244,12 @@ export async function POST(request: NextRequest) {
         id: true,
         name: true,
         email: true,
+        phone: true,
         image: true,
         profileImageContentType: true,
         balances: {
-          where: { type: 'REAL' },
-          select: { amount: true }
+          where: { type: { in: ['REAL', 'DEMO'] } },
+          select: { amount: true, type: true }
         },
         leverage: true,
         role: true,
@@ -236,13 +259,20 @@ export async function POST(request: NextRequest) {
       }
     });
 
+    const realAmount =
+      user.balances.find((b) => b.type === 'REAL')?.amount ?? 0;
+    const demoAmount =
+      user.balances.find((b) => b.type === 'DEMO')?.amount ?? 0;
+
     return NextResponse.json(
       {
         message: 'User created successfully',
         user: {
           ...user,
           image: getProfileImageUrl(user),
-          balance: user.balances[0]?.amount ?? 0
+          balance: realAmount,
+          realBalance: realAmount,
+          demoBalance: demoAmount
         }
       },
       { status: 201 }

@@ -8,6 +8,7 @@ import type {
   TwelveDataRestPricePayload
 } from '@/types/twelvedata';
 import { prisma } from '@/lib/prisma';
+import { toTwelveDataSymbolString } from '@/lib/market-symbol';
 import {
   getTwelveDataServerApiKey,
   TWELVE_DATA_SERVER_KEY_ENV
@@ -40,7 +41,7 @@ class TwelveDataService {
       }
 
       const url = new URL(`${this.baseUrl}/price`);
-      url.searchParams.set('symbol', symbol);
+      url.searchParams.set('symbol', toTwelveDataSymbolString(symbol));
       url.searchParams.set('apikey', apiKey);
 
       const response = await fetch(url.toString(), {
@@ -89,7 +90,7 @@ class TwelveDataService {
       }
 
       const url = new URL(`${this.baseUrl}/quote`);
-      url.searchParams.set('symbol', symbol);
+      url.searchParams.set('symbol', toTwelveDataSymbolString(symbol));
       url.searchParams.set('apikey', apiKey);
 
       const response = await fetch(url.toString(), {
@@ -301,7 +302,7 @@ class TwelveDataService {
       }
 
       const url = new URL(`${this.baseUrl}/rsi`);
-      url.searchParams.set('symbol', symbol);
+      url.searchParams.set('symbol', toTwelveDataSymbolString(symbol));
       url.searchParams.set('interval', interval);
       url.searchParams.set('apikey', apiKey);
 
@@ -368,7 +369,7 @@ class TwelveDataService {
       }
 
       const url = new URL(`${this.baseUrl}/ema`);
-      url.searchParams.set('symbol', symbol);
+      url.searchParams.set('symbol', toTwelveDataSymbolString(symbol));
       url.searchParams.set('interval', interval);
       url.searchParams.set('time_period', String(timePeriod));
       url.searchParams.set('apikey', apiKey);

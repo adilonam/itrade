@@ -20,18 +20,22 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { User } from '@/lib/prisma/generated/client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-import { createUser, updateUser } from '../services/users';
+import {
+  createUser,
+  updateUser,
+  type CreateUserData,
+  type UpdateUserData,
+  type UserWithBalances
+} from '../services/users';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import SellerUsersSection from './seller-users-section';
 import { AdminUserKycPositionsSection } from './admin-user-kyc-positions-section';
-
-type UserWithBalance = User & { balance?: number };
+import { DEFAULT_DEMO_BALANCE_AMOUNT } from '@/lib/balance';
 
 const createFormSchema = z.object({
   name: z.string().min(2, {
@@ -46,13 +50,20 @@ const createFormSchema = z.object({
   role: z.enum(['USER', 'SELLER', 'ADMIN', 'SUPERADMIN'], {
     required_error: 'Please select a role.'
   }),
-  balance: z
+  realBalance: z
     .number()
     .min(0, {
-      message: 'Balance cannot be negative.'
+      message: 'Real balance cannot be negative.'
     })
     .optional()
     .default(0),
+  demoBalance: z
+    .number()
+    .min(0, {
+      message: 'Demo balance cannot be negative.'
+    })
+    .optional()
+    .default(DEFAULT_DEMO_BALANCE_AMOUNT),
   leverage: z
     .number()
     .min(1, {
@@ -80,10 +91,16 @@ const updateFormSchema = z.object({
   role: z.enum(['USER', 'SELLER', 'ADMIN', 'SUPERADMIN'], {
     required_error: 'Please select a role.'
   }),
-  balance: z
+  realBalance: z
     .number()
     .min(0, {
-      message: 'Balance cannot be negative.'
+      message: 'Real balance cannot be negative.'
+    })
+    .optional(),
+  demoBalance: z
+    .number()
+    .min(0, {
+      message: 'Demo balance cannot be negative.'
     })
     .optional(),
   leverage: z
@@ -99,7 +116,7 @@ export default function UserForm({
   initialData,
   pageTitle
 }: {
-  initialData: UserWithBalance | null;
+  initialData: UserWithBalances | null;
   pageTitle: string;
 }) {
   const router = useRouter();
@@ -116,7 +133,8 @@ export default function UserForm({
     email: initialData?.email || '',
     password: '',
     role: initialData?.role || ('USER' as const),
-    balance: initialData?.balance ?? 0,
+    realBalance: initialData?.realBalance ?? initialData?.balance ?? 0,
+    demoBalance: initialData?.demoBalance ?? DEFAULT_DEMO_BALANCE_AMOUNT,
     leverage: initialData?.leverage || 1,
     emailVerified: !!initialData?.emailVerified
   };
@@ -131,13 +149,18 @@ export default function UserForm({
       setLoading(true);
 
       if (isEdit && initialData) {
-        // Update user - remove password if empty and handle email verification
-        const updateData: any = { ...values };
-        if (!updateData.password || updateData.password === '') {
-          delete updateData.password;
+        const updateData: UpdateUserData = {
+          name: values.name,
+          email: values.email,
+          role: values.role,
+          realBalance: values.realBalance,
+          demoBalance: values.demoBalance,
+          leverage: values.leverage,
+          emailVerified: values.emailVerified ? new Date() : null
+        };
+        if (values.password) {
+          updateData.password = values.password;
         }
-        // Convert emailVerified boolean to Date or null
-        updateData.emailVerified = updateData.emailVerified ? new Date() : null;
 
         await updateUser(initialData.id, updateData);
         toast.success('User updated successfully');
@@ -147,9 +170,17 @@ export default function UserForm({
           toast.error('Password is required for new users');
           return;
         }
-        const createData: any = { ...values };
-        // Convert emailVerified boolean to Date or null for new users
-        createData.emailVerified = createData.emailVerified ? new Date() : null;
+        const createData: CreateUserData = {
+          name: values.name,
+          email: values.email,
+          password: values.password,
+          role: values.role,
+          balance: values.realBalance ?? 0,
+          realBalance: values.realBalance ?? 0,
+          demoBalance: values.demoBalance,
+          leverage: values.leverage,
+          emailVerified: values.emailVerified ? new Date() : null
+        };
 
         await createUser(createData);
         toast.success('User created successfully');
@@ -157,8 +188,10 @@ export default function UserForm({
 
       router.push('/admin/users');
       router.refresh();
-    } catch (error: any) {
-      toast.error(error.message || 'Something went wrong');
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : 'Something went wrong';
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -271,13 +304,13 @@ export default function UserForm({
             <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
               <FormField
                 control={form.control}
-                name='balance'
+                name='realBalance'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Account Balance</FormLabel>
+                    <FormLabel>Real Balance</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder='Enter account balance'
+                        placeholder='Enter real balance'
                         type='number'
                         step='0.01'
                         min='0'
@@ -289,12 +322,41 @@ export default function UserForm({
                       />
                     </FormControl>
                     <FormDescription>
-                      Set the initial account balance for this user
+                      Live trading account balance
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+              <FormField
+                control={form.control}
+                name='demoBalance'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Demo Balance</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder='Enter demo balance'
+                        type='number'
+                        step='0.01'
+                        min='0'
+                        disabled={loading}
+                        {...field}
+                        onChange={(e) =>
+                          field.onChange(parseFloat(e.target.value) || 0)
+                        }
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Practice account balance
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
               <FormField
                 control={form.control}
                 name='leverage'

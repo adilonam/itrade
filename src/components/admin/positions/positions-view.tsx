@@ -416,8 +416,8 @@ export function PositionsView() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value='all'>All balance types</SelectItem>
-                  <SelectItem value='REAL'>REAL</SelectItem>
-                  <SelectItem value='DEMO'>DEMO</SelectItem>
+                  <SelectItem value='REAL'>Real</SelectItem>
+                  <SelectItem value='DEMO'>Demo</SelectItem>
                 </SelectContent>
               </Select>
             </div>

@@ -3,6 +3,7 @@ import { SignUpForm } from '@/components/auth/sign-up-form';
 import { getPublicAppName } from '@/lib/public-app-name';
 import { Metadata } from 'next';
 import Link from 'next/link';
+import { Suspense } from 'react';
 
 export const metadata: Metadata = {
   title: 'Authentication',
@@ -42,18 +43,20 @@ export default async function SignUpViewPage() {
               Sign in
             </Link>
           </div>
-          <SignUpForm />
+          <Suspense fallback={<div className='text-sm text-[var(--trade-text-muted)]'>Loading…</div>}>
+            <SignUpForm />
+          </Suspense>
           <p className='px-4 text-center text-xs text-[var(--trade-text-muted)]'>
             By clicking continue, you agree to our{' '}
             <Link
-              href='/terms'
+              href='/legal'
               className='text-[var(--trade-accent-blue)] hover:underline'
             >
               Terms of Service
             </Link>{' '}
             and{' '}
             <Link
-              href='/privacy'
+              href='/legal'
               className='text-[var(--trade-accent-blue)] hover:underline'
             >
               Privacy Policy

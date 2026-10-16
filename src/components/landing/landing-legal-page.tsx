@@ -1,14 +1,6 @@
-import Image from 'next/image';
-import Link from 'next/link';
 import { getLocale } from 'next-intl/server';
-import { ebGaramond, inter } from '@/components/landing/landing-fonts';
 import { IconPlus } from '@tabler/icons-react';
-import { brandLogoSrc, landingPageLinks } from '@/constants/data';
-import {
-  LandingHeaderNavMenus,
-  LandingHeaderUtilities
-} from '@/components/landing/landing-header-nav';
-import { LandingSiteFooter } from '@/components/landing/landing-site-footer';
+import { SmxMarketingShell } from '@/components/landing/smx/smx-marketing-shell';
 
 type LandingLegalPageProps = {
   appName: string;
@@ -208,12 +200,8 @@ const legalSectionsAr: LegalSection[] = [
   }
 ];
 
-export async function LandingLegalPage({
-  appName,
-  session
-}: LandingLegalPageProps) {
+export async function LandingLegalPage({ appName, session }: LandingLegalPageProps) {
   const locale = await getLocale();
-  const tradeHref = session ? landingPageLinks.trade : landingPageLinks.signIn;
   const content =
     locale === 'ar'
       ? {
@@ -233,70 +221,31 @@ export async function LandingLegalPage({
   const rightColumn = content.sections.slice(7);
 
   return (
-    <main
-      dir={locale === 'ar' ? 'rtl' : 'ltr'}
-      className={`${ebGaramond.variable} ${inter.className} h-dvh overflow-y-auto bg-[#f5f5f5] text-[#1a1c1c] antialiased`}
-    >
-      <header className='fixed top-0 left-0 z-50 flex h-20 w-full items-center border-b border-white/10 bg-[#141414] px-5 md:px-16'>
-        <div className='mx-auto flex h-full w-full max-w-[1440px] items-center justify-between gap-6'>
-          <div className='flex min-w-0 items-center gap-6 md:gap-8 lg:gap-12'>
-            <Link
-              href='/'
-              className='inline-flex shrink-0 items-center'
-              aria-label={appName}
-            >
-              <Image
-                src={brandLogoSrc}
-                alt={`${appName} logo`}
-                width={160}
-                height={40}
-                className='h-12 w-auto'
-                priority
-              />
-            </Link>
-            <LandingHeaderNavMenus />
-          </div>
-          <LandingHeaderUtilities
-            session={session}
-            signInHref={landingPageLinks.signIn}
-            signUpHref={landingPageLinks.signUp}
-            tradeHref={tradeHref}
-          />
-        </div>
-      </header>
+    <SmxMarketingShell appName={appName} session={session}>
 
-      <section className='pt-28 pb-20 md:pt-36 md:pb-24'>
-        <div className='mx-auto w-full max-w-[1220px] px-5 md:px-16'>
-          <div className='mb-8 flex items-center gap-2 text-[10px] tracking-wide text-[#8a8d8f]'>
+      <section className="pt-12 pb-20 md:pt-16 md:pb-24">
+        <div className="mx-auto w-full max-w-[1220px] px-5 md:px-16">
+          <div className="mb-8 flex items-center gap-2 text-[10px] tracking-wide text-gray-500">
             <span>{content.breadcrumbParent}</span>
             <span>/</span>
-            <span className='text-[#26292a]'>{content.breadcrumbCurrent}</span>
+            <span className="text-gray-200">{content.breadcrumbCurrent}</span>
           </div>
 
-          <h1 className='mb-10 text-[56px] leading-[1.05] font-semibold text-[#222526]'>
-            {content.title}
-          </h1>
+          <h1 className="mb-10 text-[56px] leading-[1.05] font-semibold text-white">{content.title}</h1>
 
-          <div className='grid gap-x-16 gap-y-0 md:grid-cols-2'>
+          <div className="grid gap-x-16 gap-y-0 md:grid-cols-2">
             <div>
               {leftColumn.map((section) => (
-                <details
-                  key={section.title}
-                  className='group border-b border-[#b6b8ba] py-1'
-                >
-                  <summary className='flex cursor-pointer list-none items-center justify-between gap-4 py-3 text-[31px] leading-tight font-medium text-[#1f2223] marker:content-none md:text-[30px]'>
-                    <span className='text-[18px] leading-7 md:text-[31px] md:leading-tight'>
-                      {section.title}
-                    </span>
-                    <span className='grid size-8 shrink-0 place-items-center text-[#8e9092] transition-transform duration-150 group-open:rotate-45'>
-                      <IconPlus className='size-5' stroke={2} />
+                <details key={section.title} className="group border-b border-white/15 py-1">
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-3 text-[31px] leading-tight font-medium text-gray-100 marker:content-none md:text-[30px]">
+                    <span className="text-[18px] leading-7 md:text-[31px] md:leading-tight">{section.title}</span>
+                    <span className="grid size-8 shrink-0 place-items-center text-gray-500 transition-transform duration-150 group-open:rotate-45">
+                      <IconPlus className="size-5" stroke={2} />
                     </span>
                   </summary>
-                  <div className='pb-4 text-[14px] leading-7 text-[#434648]'>
+                  <div className="pb-4 text-[14px] leading-7 text-gray-400">
                     <p>{section.paragraphs[0]}</p>
-                    {section.paragraphs[1] ? (
-                      <p className='mt-3'>{section.paragraphs[1]}</p>
-                    ) : null}
+                    {section.paragraphs[1] ? <p className="mt-3">{section.paragraphs[1]}</p> : null}
                   </div>
                 </details>
               ))}
@@ -304,23 +253,16 @@ export async function LandingLegalPage({
 
             <div>
               {rightColumn.map((section) => (
-                <details
-                  key={section.title}
-                  className='group border-b border-[#b6b8ba] py-1'
-                >
-                  <summary className='flex cursor-pointer list-none items-center justify-between gap-4 py-3 text-[31px] leading-tight font-medium text-[#1f2223] marker:content-none md:text-[30px]'>
-                    <span className='text-[18px] leading-7 md:text-[31px] md:leading-tight'>
-                      {section.title}
-                    </span>
-                    <span className='grid size-8 shrink-0 place-items-center text-[#8e9092] transition-transform duration-150 group-open:rotate-45'>
-                      <IconPlus className='size-5' stroke={2} />
+                <details key={section.title} className="group border-b border-white/15 py-1">
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-3 text-[31px] leading-tight font-medium text-gray-100 marker:content-none md:text-[30px]">
+                    <span className="text-[18px] leading-7 md:text-[31px] md:leading-tight">{section.title}</span>
+                    <span className="grid size-8 shrink-0 place-items-center text-gray-500 transition-transform duration-150 group-open:rotate-45">
+                      <IconPlus className="size-5" stroke={2} />
                     </span>
                   </summary>
-                  <div className='pb-4 text-[14px] leading-7 text-[#434648]'>
+                  <div className="pb-4 text-[14px] leading-7 text-gray-400">
                     <p>{section.paragraphs[0]}</p>
-                    {section.paragraphs[1] ? (
-                      <p className='mt-3'>{section.paragraphs[1]}</p>
-                    ) : null}
+                    {section.paragraphs[1] ? <p className="mt-3">{section.paragraphs[1]}</p> : null}
                   </div>
                 </details>
               ))}
@@ -328,8 +270,6 @@ export async function LandingLegalPage({
           </div>
         </div>
       </section>
-
-      <LandingSiteFooter appName={appName} className='bg-[#f5f5f5]' />
-    </main>
+    </SmxMarketingShell>
   );
 }

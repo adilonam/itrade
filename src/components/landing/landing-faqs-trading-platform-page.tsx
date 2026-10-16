@@ -1,14 +1,6 @@
-import Image from 'next/image';
-import Link from 'next/link';
 import { getLocale } from 'next-intl/server';
-import { ebGaramond, inter } from '@/components/landing/landing-fonts';
 import { IconPlus } from '@tabler/icons-react';
-import { brandLogoSrc, landingPageLinks } from '@/constants/data';
-import {
-  LandingHeaderNavMenus,
-  LandingHeaderUtilities
-} from '@/components/landing/landing-header-nav';
-import { LandingSiteFooter } from '@/components/landing/landing-site-footer';
+import { SmxMarketingShell } from '@/components/landing/smx/smx-marketing-shell';
 
 type LandingFaqsTradingPlatformPageProps = {
   appName: string;
@@ -166,38 +158,31 @@ const faqItemsAr = [
   },
   {
     question: 'كيف أضيف أموالا إلى حسابي؟',
-    answer:
-      'استخدم قسم الإيداع في منطقة العميل، اختر طريقة الدفع واتبع التعليمات. الطرق المتاحة تختلف حسب المنطقة.'
+    answer: 'استخدم قسم الإيداع في منطقة العميل، اختر طريقة الدفع واتبع التعليمات. الطرق المتاحة تختلف حسب المنطقة.'
   },
   {
     question: 'ما آلية سحب الأموال؟',
-    answer:
-      'قدّم طلب سحب من لوحة التحكم. بعد فحوص الامتثال يتم تحويل الأموال إلى وسيلة الدفع المعتمدة.'
+    answer: 'قدّم طلب سحب من لوحة التحكم. بعد فحوص الامتثال يتم تحويل الأموال إلى وسيلة الدفع المعتمدة.'
   },
   {
     question: 'كيف أستطيع تحديث بيانات حسابي؟',
-    answer:
-      'افتح إعدادات الحساب، عدّل البيانات ثم احفظ. بعض الحقول قد تتطلب إعادة التحقق بالمستندات.'
+    answer: 'افتح إعدادات الحساب، عدّل البيانات ثم احفظ. بعض الحقول قد تتطلب إعادة التحقق بالمستندات.'
   },
   {
     question: 'هل يمكنني استخدام MetaTrader مع المنصة؟',
-    answer:
-      'قد يختلف توفر المنصات والأدوات حسب نوع الحساب. تواصل مع الدعم للتأكد من إتاحة التكامل لديك.'
+    answer: 'قد يختلف توفر المنصات والأدوات حسب نوع الحساب. تواصل مع الدعم للتأكد من إتاحة التكامل لديك.'
   },
   {
     question: 'ماذا أفعل إذا نسيت كلمة المرور؟',
-    answer:
-      'استخدم خيار نسيت كلمة المرور في صفحة الدخول، وسيتم إرسال رابط إعادة التعيين إلى بريدك المسجل.'
+    answer: 'استخدم خيار نسيت كلمة المرور في صفحة الدخول، وسيتم إرسال رابط إعادة التعيين إلى بريدك المسجل.'
   },
   {
     question: 'كيف يمكنني التواصل مع الدعم؟',
-    answer:
-      'يمكنك التواصل عبر الدردشة الحية أو البريد الإلكتروني أو الهاتف خلال ساعات الدعم.'
+    answer: 'يمكنك التواصل عبر الدردشة الحية أو البريد الإلكتروني أو الهاتف خلال ساعات الدعم.'
   },
   {
     question: 'هل بياناتي الشخصية آمنة؟',
-    answer:
-      'نعم. يتم حماية البيانات عبر التشفير وضوابط الوصول وإجراءات امتثال متوافقة مع المعايير التنظيمية.'
+    answer: 'نعم. يتم حماية البيانات عبر التشفير وضوابط الوصول وإجراءات امتثال متوافقة مع المعايير التنظيمية.'
   },
   {
     question: 'ماذا أفعل إذا لم يتم تنفيذ صفقة؟',
@@ -206,48 +191,39 @@ const faqItemsAr = [
   },
   {
     question: 'هل يمكنني فتح أكثر من حساب؟',
-    answer:
-      'قد تتاح حسابات متعددة حسب الولاية التنظيمية وسياسة الحساب. تواصل مع الدعم لمعرفة الخيارات.'
+    answer: 'قد تتاح حسابات متعددة حسب الولاية التنظيمية وسياسة الحساب. تواصل مع الدعم لمعرفة الخيارات.'
   },
   {
     question: 'ما أنواع الأدوات التي يمكنني تداولها؟',
-    answer:
-      'حسب نوع الحساب، يمكنك تداول الفوركس والسلع والمؤشرات والأسهم والعملات المشفرة عبر عقود الفروقات.'
+    answer: 'حسب نوع الحساب، يمكنك تداول الفوركس والسلع والمؤشرات والأسهم والعملات المشفرة عبر عقود الفروقات.'
   },
   {
     question: 'هل يوجد حد أدنى للإيداع؟',
-    answer:
-      'الحد الأدنى يختلف حسب نوع الحساب وطريقة التمويل ويمكنك مراجعته أثناء عملية الإيداع.'
+    answer: 'الحد الأدنى يختلف حسب نوع الحساب وطريقة التمويل ويمكنك مراجعته أثناء عملية الإيداع.'
   },
   {
     question: 'لماذا أُغلق مركزي تلقائيا؟',
-    answer:
-      'قد تُغلق المراكز تلقائيا عند اختراق حدود الهامش أو عند تفعيل أوامر الحماية مثل وقف الخسارة.'
+    answer: 'قد تُغلق المراكز تلقائيا عند اختراق حدود الهامش أو عند تفعيل أوامر الحماية مثل وقف الخسارة.'
   },
   {
     question: 'كيف أوثق حسابي؟',
-    answer:
-      'ارفع مستند هوية ساري وإثبات عنوان من قسم الملف الشخصي، ثم يراجع فريق الامتثال الطلب.'
+    answer: 'ارفع مستند هوية ساري وإثبات عنوان من قسم الملف الشخصي، ثم يراجع فريق الامتثال الطلب.'
   },
   {
     question: 'هل يمكنني التداول من الهاتف المحمول؟',
-    answer:
-      'نعم، يمكنك الوصول إلى الحساب عبر متصفح الهاتف أو التطبيقات المدعومة حسب إعداد المنصة.'
+    answer: 'نعم، يمكنك الوصول إلى الحساب عبر متصفح الهاتف أو التطبيقات المدعومة حسب إعداد المنصة.'
   },
   {
     question: 'كم تستغرق عمليات السحب؟',
-    answer:
-      'تختلف المدة حسب طريقة الدفع وفحوص الامتثال، لكن معظم السحوبات المعتمدة تعالج خلال أيام عمل اعتيادية.'
+    answer: 'تختلف المدة حسب طريقة الدفع وفحوص الامتثال، لكن معظم السحوبات المعتمدة تعالج خلال أيام عمل اعتيادية.'
   },
   {
     question: 'لا أستطيع تسجيل الدخول. ماذا أفعل؟',
-    answer:
-      'تحقق من بيانات الدخول وامسح ذاكرة المتصفح أو أعد تعيين كلمة المرور. إذا استمرت المشكلة تواصل مع الدعم.'
+    answer: 'تحقق من بيانات الدخول وامسح ذاكرة المتصفح أو أعد تعيين كلمة المرور. إذا استمرت المشكلة تواصل مع الدعم.'
   },
   {
     question: 'إلغاء الاشتراك في الإشعارات',
-    answer:
-      'افتح إعدادات الإشعارات في ملفك الشخصي وأوقف القنوات التي لا تريدها. قد تستمر رسائل الأمان الأساسية.'
+    answer: 'افتح إعدادات الإشعارات في ملفك الشخصي وأوقف القنوات التي لا تريدها. قد تستمر رسائل الأمان الأساسية.'
   }
 ] as const;
 
@@ -256,7 +232,6 @@ export async function LandingFaqsTradingPlatformPage({
   session
 }: LandingFaqsTradingPlatformPageProps) {
   const locale = await getLocale();
-  const tradeHref = session ? landingPageLinks.trade : landingPageLinks.signIn;
   const content =
     locale === 'ar'
       ? {
@@ -277,71 +252,34 @@ export async function LandingFaqsTradingPlatformPage({
         };
 
   return (
-    <main
-      dir={locale === 'ar' ? 'rtl' : 'ltr'}
-      className={`${ebGaramond.variable} ${inter.className} h-dvh overflow-y-auto bg-[#f5f5f5] text-[#1a1c1c] antialiased`}
-    >
-      <header className='fixed top-0 left-0 z-50 flex h-20 w-full items-center border-b border-white/10 bg-[#141414] px-5 md:px-16'>
-        <div className='mx-auto flex h-full w-full max-w-[1440px] items-center justify-between gap-6'>
-          <div className='flex min-w-0 items-center gap-6 md:gap-8 lg:gap-12'>
-            <Link
-              href='/'
-              className='inline-flex shrink-0 items-center'
-              aria-label={appName}
-            >
-              <Image
-                src={brandLogoSrc}
-                alt={`${appName} logo`}
-                width={160}
-                height={40}
-                className='h-12 w-auto'
-                priority
-              />
-            </Link>
-            <LandingHeaderNavMenus />
-          </div>
-          <LandingHeaderUtilities
-            session={session}
-            signInHref={landingPageLinks.signIn}
-            signUpHref={landingPageLinks.signUp}
-            tradeHref={tradeHref}
-          />
-        </div>
-      </header>
+    <SmxMarketingShell appName={appName} session={session}>
 
-      <section className='pt-28 pb-20 md:pt-36 md:pb-24'>
-        <div className='mx-auto w-full max-w-[1060px] px-5 md:px-16'>
-          <div className='mb-8 flex items-center gap-2 text-[10px] tracking-wide text-[#8a8d8f]'>
+      <section className="pt-12 pb-20 md:pt-16 md:pb-24">
+        <div className="mx-auto w-full max-w-[1060px] px-5 md:px-16">
+          <div className="mb-8 flex items-center gap-2 text-[10px] tracking-wide text-gray-500">
             <span>{content.breadcrumbParent}</span>
             <span>/</span>
             <span>{content.breadcrumbMiddle}</span>
             <span>/</span>
-            <span className='text-[#26292a]'>{content.breadcrumbCurrent}</span>
+            <span className="text-gray-200">{content.breadcrumbCurrent}</span>
           </div>
 
-          <div className='grid gap-8 md:grid-cols-[130px_minmax(0,1fr)] md:gap-12'>
-            <aside className='pt-5 text-sm font-semibold text-[#272a2c]'>
-              {content.sidebarTitle}
-            </aside>
+          <div className="grid gap-8 md:grid-cols-[130px_minmax(0,1fr)] md:gap-12">
+            <aside className="pt-5 text-sm font-semibold text-gray-300">{content.sidebarTitle}</aside>
 
             <div>
-              <h1 className='mb-8 text-[56px] leading-[1.05] font-semibold text-[#222526]'>
-                {content.pageTitle}
-              </h1>
+              <h1 className="mb-8 text-[56px] leading-[1.05] font-semibold text-white">{content.pageTitle}</h1>
 
-              <div className='space-y-1.5'>
+              <div className="space-y-1.5">
                 {content.faqItems.map((item) => (
-                  <details
-                    key={item.question}
-                    className='group border border-[#c7cacc] bg-[#ececec]'
-                  >
-                    <summary className='flex cursor-pointer list-none items-center justify-between gap-4 px-3 py-3 text-[13px] font-medium text-[#1f2223] marker:content-none'>
+                  <details key={item.question} className="group border border-white/15 bg-white/5">
+                    <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-3 py-3 text-[13px] font-medium text-gray-100 marker:content-none">
                       <span>{item.question}</span>
-                      <span className='grid size-5 shrink-0 place-items-center rounded-[2px] bg-[#1d2022] text-white'>
-                        <IconPlus className='size-3' stroke={2.2} />
+                      <span className="grid size-5 shrink-0 place-items-center rounded-[2px] bg-[#D8A84E]/20 text-[#D8A84E]">
+                        <IconPlus className="size-3" stroke={2.2} />
                       </span>
                     </summary>
-                    <div className='border-t border-[#c7cacc] bg-[#f6f6f6] px-3 py-3 text-[13px] leading-6 text-[#3a3d40]'>
+                    <div className="border-t border-white/10 bg-black/20 px-3 py-3 text-[13px] leading-6 text-gray-400">
                       {item.answer}
                     </div>
                   </details>
@@ -351,8 +289,6 @@ export async function LandingFaqsTradingPlatformPage({
           </div>
         </div>
       </section>
-
-      <LandingSiteFooter appName={appName} className='bg-[#f5f5f5]' />
-    </main>
+    </SmxMarketingShell>
   );
 }

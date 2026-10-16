@@ -31,6 +31,7 @@ import {
   AlertDialogTrigger
 } from '@/components/ui/alert-dialog';
 import type {
+  BalanceType,
   PositionType,
   PositionStatus,
   Position,
@@ -63,8 +64,10 @@ interface PositionsTableProps {
   readOnly?: boolean;
   /** Single-user context: drop the User column */
   omitUserColumn?: boolean;
-  /** Omit linked user balance column (admin client-positions page) */
+  /** Omit linked user balance amount column (admin client-positions page) */
   omitBalanceColumn?: boolean;
+  /** Omit balance type (Real/Demo) column */
+  omitBalanceTypeColumn?: boolean;
   cardDescription?: string;
   /** Subtitle when the table has rows (default: manage-all-users copy) */
   noPositionsHint?: string;
@@ -80,6 +83,7 @@ export function PositionsTable({
   readOnly = false,
   omitUserColumn = false,
   omitBalanceColumn = false,
+  omitBalanceTypeColumn = false,
   cardDescription,
   noPositionsHint,
   compact = false
@@ -137,6 +141,28 @@ export function PositionsTable({
       case 'FAILED':
         return 'border-[var(--trade-red)]/40 bg-[var(--trade-red)]/15 text-[var(--trade-red)]';
       case 'PENDING':
+        return 'border-[var(--trade-accent-blue)]/40 bg-[var(--trade-accent-blue)]/15 text-[var(--trade-accent-blue)]';
+      default:
+        return 'border-[var(--trade-border)] bg-[var(--trade-dark)] text-[var(--trade-text-muted)]';
+    }
+  };
+
+  const getBalanceTypeLabel = (type: BalanceType) => {
+    switch (type) {
+      case 'REAL':
+        return 'Real';
+      case 'DEMO':
+        return 'Demo';
+      default:
+        return type;
+    }
+  };
+
+  const getBalanceTypeColor = (type: BalanceType) => {
+    switch (type) {
+      case 'REAL':
+        return 'border-[var(--trade-green)]/40 bg-[var(--trade-green)]/15 text-[var(--trade-green)]';
+      case 'DEMO':
         return 'border-[var(--trade-accent-blue)]/40 bg-[var(--trade-accent-blue)]/15 text-[var(--trade-accent-blue)]';
       default:
         return 'border-[var(--trade-border)] bg-[var(--trade-dark)] text-[var(--trade-text-muted)]';
@@ -235,6 +261,11 @@ export function PositionsTable({
                             User balance
                           </TableHead>
                         ) : null}
+                        {!omitBalanceTypeColumn ? (
+                          <TableHead className='text-xs font-medium text-[var(--trade-text-muted)]'>
+                            Balance type
+                          </TableHead>
+                        ) : null}
                         <TableHead className='text-xs font-medium text-[var(--trade-text-muted)]'>
                           Type
                         </TableHead>
@@ -302,14 +333,28 @@ export function PositionsTable({
                           {!omitBalanceColumn ? (
                             <TableCell className='text-[var(--trade-text)]'>
                               {position.userBalance ? (
-                                <div>
-                                  <div className='font-mono text-xs font-medium'>
-                                    {formatCurrency(position.userBalance.amount)}
-                                  </div>
-                                  <div className='text-xs text-[var(--trade-text-muted)]'>
-                                    {position.userBalance.type}
-                                  </div>
+                                <div className='font-mono text-xs font-medium'>
+                                  {formatCurrency(position.userBalance.amount)}
                                 </div>
+                              ) : (
+                                <span className='text-xs text-[var(--trade-text-muted)]'>
+                                  N/A
+                                </span>
+                              )}
+                            </TableCell>
+                          ) : null}
+                          {!omitBalanceTypeColumn ? (
+                            <TableCell>
+                              {position.userBalance ? (
+                                <Badge
+                                  className={getBalanceTypeColor(
+                                    position.userBalance.type
+                                  )}
+                                >
+                                  {getBalanceTypeLabel(
+                                    position.userBalance.type
+                                  )}
+                                </Badge>
                               ) : (
                                 <span className='text-xs text-[var(--trade-text-muted)]'>
                                   N/A

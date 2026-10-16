@@ -7,6 +7,11 @@ import type {
   TwelveDataWebSocketSubscribeStatus,
   TwelveDataWebSocketSubscription
 } from '@/types/twelvedata';
+import {
+  resolveAppSymbolForTwelveData,
+  toAppMarketSymbol,
+  toTwelveDataSymbolString
+} from '@/lib/market-symbol';
 
 export interface TwelveDataWebSocketSnapshot {
   isConnected: boolean;
@@ -116,6 +121,20 @@ function createInitialSnapshot(): TwelveDataWebSocketSnapshot {
     priceData: new Map(),
     subscriptionStatus: null
   };
+}
+
+function toWireSymbols(symbols: string[]): string {
+  return symbols.map((symbol) => toTwelveDataSymbolString(symbol)).join(',');
+}
+
+function mapWireSymbolToApp(
+  wireSymbol: string,
+  appSymbols: Iterable<string>
+): string {
+  return (
+    resolveAppSymbolForTwelveData(wireSymbol, appSymbols) ??
+    toAppMarketSymbol(wireSymbol)
+  );
 }
 
 class TwelveDataWebSocketManager {
@@ -423,7 +442,7 @@ class TwelveDataWebSocketManager {
     if (active?.readyState === WebSocket.OPEN && removed.length > 0) {
       this.send({
         action: 'unsubscribe',
-        params: { symbols: removed.join(',') }
+        params: { symbols: toWireSymbols(removed) }
       });
       for (const symbol of removed) {
         this.ackedSymbols.delete(symbol);
@@ -476,7 +495,7 @@ class TwelveDataWebSocketManager {
     ) {
       this.send({
         action: 'unsubscribe',
-        params: { symbols: symbolList.join(',') }
+        params: { symbols: toWireSymbols(symbolList) }
       });
       for (const symbol of symbolList) {
         this.ackedSymbols.delete(symbol);
@@ -760,12 +779,13 @@ class TwelveDataWebSocketManager {
 
     wsLog('subscribe', {
       symbols: pending,
+      wireSymbols: pending.map((symbol) => toTwelveDataSymbolString(symbol)),
       count: pending.length
     });
 
     this.send({
       action: 'subscribe',
-      params: { symbols: pending.join(',') }
+      params: { symbols: toWireSymbols(pending) }
     });
   }
 
@@ -785,17 +805,31 @@ class TwelveDataWebSocketManager {
               new Set(
                 statusData.fails
                   ?.map((entry) => entry.symbol?.trim())
-                  .filter((symbol): symbol is string => Boolean(symbol)) ??
-                  []
+                  .filter((symbol): symbol is string => Boolean(symbol))
+                  .map((wireSymbol) =>
+                    mapWireSymbolToApp(wireSymbol, this.desiredSymbols)
+                  ) ?? []
               )
             );
             const errorMessages =
               statusData.fails
-                ?.map((entry) => formatSubscribeFailMessage(entry))
+                ?.map((entry) => {
+                  const appSymbol = entry.symbol
+                    ? mapWireSymbolToApp(entry.symbol, this.desiredSymbols)
+                    : entry.symbol;
+                  return formatSubscribeFailMessage({
+                    ...entry,
+                    symbol: appSymbol
+                  });
+                })
                 .filter(isMeaningfulWsErrorMessage) ?? [];
 
             statusData.success?.forEach((entry) => {
-              this.ackedSymbols.add(entry.symbol);
+              const appSymbol = mapWireSymbolToApp(
+                entry.symbol,
+                this.desiredSymbols
+              );
+              this.ackedSymbols.add(appSymbol);
             });
 
             if (failedSymbols.length > 0) {
@@ -816,10 +850,16 @@ class TwelveDataWebSocketManager {
             break;
           }
           statusData.success?.forEach((entry) => {
-            this.ackedSymbols.add(entry.symbol);
+            const appSymbol = mapWireSymbolToApp(
+              entry.symbol,
+              this.desiredSymbols
+            );
+            this.ackedSymbols.add(appSymbol);
           });
           wsLog('subscribe-status ok', {
-            success: statusData.success?.map((e) => e.symbol),
+            success: statusData.success?.map((e) =>
+              mapWireSymbolToApp(e.symbol, this.desiredSymbols)
+            ),
             ackedCount: this.ackedSymbols.size
           });
           this.setSnapshot({
@@ -833,8 +873,15 @@ class TwelveDataWebSocketManager {
         }
         case 'price': {
           const priceData = data as TwelveDataWebSocketPriceData;
+          const appSymbol = mapWireSymbolToApp(
+            priceData.symbol,
+            this.desiredSymbols
+          );
           const nextPrices = new Map(this.snapshot.priceData);
-          nextPrices.set(priceData.symbol, priceData);
+          nextPrices.set(appSymbol, {
+            ...priceData,
+            symbol: appSymbol
+          });
           this.setSnapshot({ priceData: nextPrices });
           break;
         }
