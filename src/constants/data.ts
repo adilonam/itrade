@@ -49,6 +49,14 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
+        title: 'Betting',
+        url: '/polymarket',
+        icon: 'ticket',
+        isActive: false,
+        shortcut: ['b', 't'],
+        items: []
+      },
+      {
         title: 'Dashboard',
         url: '/overview',
         icon: 'dashboard',
@@ -92,6 +100,14 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
+        title: 'Betting',
+        url: '/polymarket',
+        icon: 'ticket',
+        isActive: false,
+        shortcut: ['b', 't'],
+        items: []
+      },
+      {
         title: 'Overview',
         url: '/dashboard',
         icon: 'dashboard',
@@ -131,6 +147,14 @@ export const tenantNavItems: TenantNavItems = {
         icon: 'pigMoney',
         isActive: false,
         shortcut: ['m', 'p'],
+        items: []
+      },
+      {
+        title: 'Betting',
+        url: '/polymarket',
+        icon: 'ticket',
+        isActive: false,
+        shortcut: ['b', 't'],
         items: []
       },
       {
@@ -232,6 +256,14 @@ export const tenantNavItems: TenantNavItems = {
         items: []
       },
       {
+        title: 'Betting',
+        url: '/polymarket',
+        icon: 'ticket',
+        isActive: false,
+        shortcut: ['b', 't'],
+        items: []
+      },
+      {
         title: 'Dashboard',
         url: '/overview',
         icon: 'dashboard',
@@ -316,6 +348,7 @@ export const tenantNavItems: TenantNavItems = {
   },
 
 
+
  
 };
 
@@ -356,10 +389,17 @@ export const externalApiLinks = {
   nowPaymentsInvoiceApi: 'https://api.nowpayments.io/v1/invoice'
 } as const;
 
+export const logoImages = {
+  primary: '/images/logo/itrade-gm-3d-logo.png',
+  icon: '/images/logo/itrade-gm-3d-logo-171.png'
+} as const;
+
+export const brandLogoSrc = logoImages.primary;
+
 export const brandAssets = {
-  logo: '/images/logo.png',
-  logoLight: '/images/logo-light.png',
-  logoDark: '/images/logo-dark.png'
+  logo: logoImages.primary,
+  logoLight: logoImages.primary,
+  logoDark: logoImages.primary
 } as const;
 
 export const landingPageLinks = {
@@ -401,6 +441,24 @@ export const landingSiteLinks = {
   learningTechnicalFundamental: '/technical-fundamental',
   learningGlossary: '/glossary',
   learningNfp: '/nfp'
+} as const;
+
+/** Polymarket prediction markets section (cloned app mounted at /polymarket). */
+export const polymarketLinks = {
+  home: '/polymarket',
+  markets: '/polymarket/markets',
+  market: (slug: string) => `/polymarket/markets/${slug}`,
+  about: '/polymarket/about',
+  signIn: '/polymarket/sign-in',
+  signUp: '/polymarket/sign-up',
+  admin: {
+    markets: '/polymarket/admin/market',
+    generateMarket: '/polymarket/admin/generate-market',
+    trades: '/polymarket/admin/trades',
+    users: '/polymarket/admin/users',
+    profit: '/polymarket/admin/profit',
+    payouts: '/polymarket/admin/payouts'
+  }
 } as const;
 
 /** SMX Arabic marketing landing anchors + contact. */

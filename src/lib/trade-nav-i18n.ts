@@ -3,6 +3,7 @@ const TRADE_NAV_TITLE_KEYS = {
   Trade: 'trade',
   Institutional: 'institutional',
   Plans: 'plans',
+  Betting: 'betting',
   Props: 'props',
   Dashboard: 'dashboard',
   Account: 'account',

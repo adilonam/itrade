@@ -11,6 +11,7 @@ import { getLocale, getMessages } from 'next-intl/server';
 import './globals.css';
 import './theme.css';
 import { DEFAULT_ACTIVE_THEME } from '@/constants/theme';
+import { logoImages } from '@/constants/data';
 import { getPublicAppName } from '@/lib/public-app-name';
 
 const META_THEME_COLORS = {
@@ -24,8 +25,8 @@ export const metadata: Metadata = {
   title: APP_NAME,
   description: 'Trading platform for trading and investing',
   icons: {
-    icon: '/images/logo.png',
-    apple: '/images/logo.png'
+    icon: logoImages.icon,
+    apple: logoImages.icon
   }
 };
 

@@ -1,0 +1,165 @@
+/*
+ * Polymarket design tokens. This file MUST be imported from the Tailwind entry
+ * (`src/app/globals.css`) so `@theme` registers utilities (bg-surface,
+ * text-headline-xl, font-headline, etc.). Importing only from layout.tsx leaves
+ * those utilities ungenerated.
+ *
+ * `primary` / `secondary` are intentionally omitted from `@theme` so they do not
+ * clobber itrade shadcn tokens site-wide; they are scoped under `.polymarket-root`.
+ */
+
+@theme {
+  --color-danger-red: #ef4444;
+  --color-success-green: #22c55e;
+  --color-primary-fixed-dim: #b4c5ff;
+  --color-surface-container-highest: #e0e3e5;
+  --color-on-secondary-fixed: #111c2d;
+  --color-tertiary-container: #bc4800;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #d5e0f8;
+  --color-error-container: #ffdad6;
+  --color-primary-container: #2563eb;
+  --color-surface-tint: #0053db;
+  --color-on-surface: #191c1e;
+  --color-surface-container-high: #e6e8ea;
+  --color-secondary-fixed-dim: #bcc7de;
+  --color-surface-bright: #f7f9fb;
+  --color-on-primary-container: #eeefff;
+  --color-surface-variant: #e0e3e5;
+  --color-inverse-primary: #b4c5ff;
+  --color-on-tertiary-fixed-variant: #7d2d00;
+  --color-inverse-on-surface: #eff1f3;
+  --color-outline: #737686;
+  --color-slate-text: #334155;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-dim: #d8dadc;
+  --color-on-primary-fixed: #00174b;
+  --color-secondary-fixed: #d8e3fb;
+  --color-on-error: #ffffff;
+  --color-outline-variant: #c3c6d7;
+  --color-on-tertiary-fixed: #360f00;
+  --color-tertiary-fixed-dim: #ffb596;
+  --color-on-primary-fixed-variant: #003ea8;
+  --color-tertiary: #943700;
+  --color-surface: #f7f9fb;
+  --color-inverse-surface: #2d3133;
+  --color-on-tertiary-container: #ffede6;
+  --color-on-secondary-container: #586377;
+  --color-primary-fixed: #dbe1ff;
+  --color-on-primary: #ffffff;
+  --color-tertiary-fixed: #ffdbcd;
+  --color-on-error-container: #93000a;
+  --color-on-secondary-fixed-variant: #3c475a;
+  --color-surface-container-low: #f2f4f6;
+  --color-surface-white: #ffffff;
+  --color-on-tertiary: #ffffff;
+  --color-on-background: #191c1e;
+  --color-error: #ba1a1a;
+  --color-surface-container: #eceef0;
+  --color-on-surface-variant: #434655;
+
+  --spacing-margin-desktop: 40px;
+  --spacing-gutter: 24px;
+  --spacing-container-max: 1280px;
+  --spacing-stack-sm: 4px;
+  --spacing-stack-lg: 24px;
+  --spacing-margin-mobile: 16px;
+  --spacing-base: 8px;
+  --spacing-stack-md: 12px;
+
+  --font-headline: var(--font-space-grotesk), ui-sans-serif, sans-serif;
+  --font-data: var(--font-mono), ui-monospace, monospace;
+  --font-label: var(--font-sans), ui-sans-serif, sans-serif;
+
+  --text-headline-xl: 48px;
+  --text-headline-xl--line-height: 56px;
+  --text-headline-xl--letter-spacing: -0.02em;
+  --text-headline-xl--font-weight: 700;
+
+  --text-headline-lg: 32px;
+  --text-headline-lg--line-height: 40px;
+  --text-headline-lg--font-weight: 600;
+
+  --text-headline-lg-mobile: 24px;
+  --text-headline-lg-mobile--line-height: 32px;
+  --text-headline-lg-mobile--font-weight: 600;
+
+  --text-body-md: 16px;
+  --text-body-md--line-height: 24px;
+  --text-body-md--font-weight: 400;
+
+  --text-body-sm: 14px;
+  --text-body-sm--line-height: 20px;
+  --text-body-sm--font-weight: 400;
+
+  --text-data-mono: 14px;
+  --text-data-mono--line-height: 20px;
+  --text-data-mono--font-weight: 500;
+
+  --text-label-caps: 12px;
+  --text-label-caps--line-height: 16px;
+  --text-label-caps--letter-spacing: 0.05em;
+  --text-label-caps--font-weight: 600;
+}
+
+/*
+ * Scope Polymarket primary/secondary (and dark palette) so itrade shadcn
+ * tokens stay intact outside this section.
+ */
+.polymarket-root {
+  --color-primary: #004ac6;
+  --color-secondary: #545f73;
+  --primary: #004ac6;
+  --secondary: #545f73;
+  /*
+   * Re-declare font tokens here: @theme defines them on :root where
+   * --font-space-grotesk / layout --font-mono are not set yet, which makes
+   * var(--font-headline) invalidate. next/font variables live on this root.
+   */
+  --font-headline: var(--font-space-grotesk), ui-sans-serif, sans-serif;
+  --font-data: var(--font-mono), ui-monospace, monospace;
+  --font-label: var(--font-sans), ui-sans-serif, sans-serif;
+}
+
+.dark .polymarket-root {
+  --color-surface: #111c2d;
+  --color-surface-white: #1e2433;
+  --color-surface-bright: #252b3b;
+  --color-surface-dim: #0d1117;
+  --color-surface-container-lowest: #0d1117;
+  --color-surface-container-low: #111c2d;
+  --color-surface-container: #252b3b;
+  --color-surface-container-high: #2d3548;
+  --color-surface-container-highest: #3c475a;
+  --color-surface-variant: #3c475a;
+  --color-on-surface: #eff1f3;
+  --color-on-background: #eff1f3;
+  --color-on-surface-variant: #bcc7de;
+  --color-slate-text: #bcc7de;
+  --color-secondary: #bcc7de;
+  --secondary: #bcc7de;
+  --color-on-secondary-container: #bcc7de;
+  --color-outline-variant: #3c475a;
+  --color-outline: #586377;
+}
+
+.landing-ticker-wrap {
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.landing-ticker-track {
+  display: inline-block;
+  padding-left: 100%;
+  animation: landing-ticker 30s linear infinite;
+}
+
+@keyframes landing-ticker {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-100%, 0, 0);
+  }
+}
